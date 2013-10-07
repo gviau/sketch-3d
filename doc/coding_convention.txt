@@ -79,6 +79,12 @@ with an underscore.
 
 Use 'const' as much as possible.
 
+Parameters order for functions should be:
+
+1. IN parameters (those are constants)
+2. IN/OUT parameters
+3. OUT parameters
+
 Classes
 -------
 
