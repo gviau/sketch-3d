@@ -1,0 +1,199 @@
+===================
+Coding Convention
+===================
+
+This document aims to describe what coding convention is used throughout the
+project. It gives guidelines to follow so that all the project is written
+following a standard. Its goal is to mmake the code cleaner and more readable.
+Those coding conventions are highly inspired by Id Software's coding convention
+for Doom 3. It can be found at
+    ftp://ftp.idsoftware.com/idstuff/doom3/source/CodeStyleConventions.doc
+
+General
+-------
+
+Use tabs that equal 4 spaces.
+
+Use trailing braces everywhere (if, else, functions, structures, class, loops,
+etc.) even if the if/loop is only 1 line long.
+
+if (x) {
+}
+
+The else statement starts on the same line as the last closing brace
+if (x) {
+} else {
+}
+
+Use preicions specification for floating point values.
+
+float f = 0.5f;
+
+Instead of
+
+float f = 0.5;
+
+And
+
+float f = 1.0f;
+
+Instead of
+
+float f = 1.f;
+
+CamelCase for function names:
+
+void ThisIsAFunction();
+
+camelCase for variable names:
+
+float thisIsAVariable;
+
+Typedef names use the same naming convention as variables, however they always
+end with "_t".
+
+typedef int theTypedef_t;
+
+Struct names use the same naming convention as variables, however they always
+end with "_t".
+
+struct theStruct_t;
+
+Enum names use the same naming convention as variables, however they always end
+with "_t". The enum constants use all uper case characters and multiple words
+are separated with an underscore.
+
+enum theEnum_t {
+    THE_CONSTANT,
+    ANOTHER_CONSTANT
+};
+
+Names of recursive functions end with "_r"
+
+void HaskellIsFun_r(int val);
+
+Define names use all upper case characters and multiple words are separated
+with an underscore.
+
+#define THE_DEFINE 0
+
+Use 'const' as much as possible.
+
+Classes
+-------
+
+Every class should be put in the namespace Sketch3D.
+
+CamerlCase for class names.
+
+class MyClassIsNeat;
+
+Public class variables have the same naming convention as variables.
+
+class Vector3 {
+    public:
+        float x;
+        float y;
+        float z;
+};
+
+Private and protected class variables have the same naming convention as
+variables. However, they always end with an underscore.
+
+class MyClass {
+    private:
+        float x_;
+        float y_;
+        float z_;
+};
+
+Indent the name of class variables and methods to make nice columns.
+
+class MyClass {
+    public:
+        void        DatFunction();
+
+    private:
+        float       x_;
+        float       y_;
+        float       z_;
+        vector<int> vec_;
+};
+
+Ordering of class variables and methods should be as follows:
+
+1. List of friend classes
+2. public variables
+3. public methods
+4. protected variables
+5. protected methods
+6. private variables
+7. private methods
+
+This allows the public interface to be easily found at the beginning of the
+class.
+
+Always make class methods 'const' when they do not modify any class variables.
+
+Avoid use of 'const_cast'. When object is needed to be modified, but only const
+versions are accessible, create a function that clearly gives an editable
+version of the object. This keeps that control of the 'const-ness' in the hands
+of the object and not the user.
+
+Return 'const' objects unless the generaly usage of the object is to change its
+state.
+
+Functions overloading should be avoided in most cases. For example, instead of:
+
+const Entity* GetEntity(int index) const;
+const Entity* GetEntity(const string& name) const;
+const Entity* GetEntity(const Entity* parent) const;
+
+Use:
+
+const Entity* GetEntityByIndex(int index) const;
+const Entity* GetEntityByName(const string& name) const;
+const Entity* GetEntityByParent(const Entity* parent) const;
+
+Explicitly named functions tend to be less prone to programmer error and
+inadvertent calls to functions due to wrong data types being passed in as
+arguments.
+
+Overloading functions for the sake of adding 'const' accessible function is
+allowable:
+
+class Foo {
+    Entity*         GetEntityByIndex(int index);
+    const Entity*   GetEntityByIndex(int index) const;
+};
+
+File names
+----------
+
+Each class should be in a seperate source file unless it makes sense to groupe
+several smalle classes.
+The file name should be the same as the name of the class in CamelCase.
+
+class MyClass;
+
+Files:
+
+MyClass.cpp
+MyClass.h
+
+When a class spans across multiple files, these files have a name that starts
+with the name of the class followed by an underscore and a subsection name.
+
+class RenderWorld;
+
+files:
+
+RenderWorld_load.cpp
+RenderWorld_demo.cpp
+RenderWorld_portals.cpp
+
+Documentation
+-------------
+
+Doxygen is used to document functions, classes and files. Documentation is not
+required for small functions such as getters and setters.
