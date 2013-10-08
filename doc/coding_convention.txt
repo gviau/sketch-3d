@@ -165,6 +165,14 @@ Explicitly named functions tend to be less prone to programmer error and
 inadvertent calls to functions due to wrong data types being passed in as
 arguments.
 
+Overloading functions that have more parameters is allowable i.e when they are
+no mistake possible about which version is used:
+
+class Matrix3x3 {
+    void Translate(const Vector3& v);
+    void Translate(float dx, float dy, float dz);
+};
+
 Overloading functions for the sake of adding 'const' accessible function is
 allowable:
 
