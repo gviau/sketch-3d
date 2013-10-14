@@ -112,6 +112,21 @@ Vector3 Vector3::operator/(float f) const
     return Vector3(x / f, y / f, z / f);
 }
 
+Vector3 operator+(float f, const Vector3& v)
+{
+    return Vector3(v.x + f, v.y + f, v.z + f);
+}
+
+Vector3 operator-(float f, const Vector3& v)
+{
+    return Vector3(v.x - f, v.y - f, v.z - f);
+}
+
+Vector3 operator*(float f, const Vector3& v)
+{
+    return Vector3(v.x * f, v.y * f, v.z * f);
+}
+
 void Vector3::operator+=(float f)
 {
     x += f;

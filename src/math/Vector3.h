@@ -16,6 +16,14 @@ class Vector3 {
         float                   y;    /**< Y component */
         float                   z;    /**< Z component */
 
+        // USEFUL STATICS
+
+        static const Vector3    ZERO;   /**< Zero vector */
+        static const Vector3    ONE;    /**< One vector */
+        static const Vector3    RIGHT;  /**< Only the x component is set to 1 */
+        static const Vector3    UP;     /**< Only the y component is set to 1 */
+        static const Vector3    LOOK;   /**< Only the z component is set to 1 */
+
         /**
         * Default constructor. Initializes everything to 0.
         */
@@ -86,6 +94,10 @@ class Vector3 {
         inline Vector3          operator*(const Matrix3x3& m) const;
         inline Vector3          operator/(float f) const;
 
+        inline friend Vector3   operator+(float f, const Vector3& v);
+        inline friend Vector3   operator-(float f, const Vector3& v);
+        inline friend Vector3   operator*(float f, const Vector3& v);
+
         inline void             operator+=(float f);
         inline void             operator+=(const Vector3& v);
         inline void             operator-=(float f);
@@ -99,12 +111,6 @@ class Vector3 {
 
         inline Vector3&         operator=(const Vector3& v);
 
-        // USEFUL STATICS
-        static const Vector3    ZERO;   /**< Zero vector */
-        static const Vector3    ONE;    /**< One vector */
-        static const Vector3    RIGHT;  /**< Only the x component is set to 1 */
-        static const Vector3    UP;     /**< Only the y component is set to 1 */
-        static const Vector3    LOOK;   /**< Only the z component is set to 1 */
 };
 
 }
