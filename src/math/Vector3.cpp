@@ -66,37 +66,37 @@ Vector3 Vector3::Cross(const Vector3& v) const
                    x*v.y - y*v.x);
 }
 
-Vector3 Vector3::operator-() const
+INLINE Vector3 Vector3::operator-() const
 {
     return Vector3(-x, -y, -z);
 }
 
-Vector3 Vector3::operator+(float f) const
+INLINE Vector3 Vector3::operator+(float f) const
 {
     return Vector3(x + f, y + f, z + f);
 }
 
-Vector3 Vector3::operator+(const Vector3& v) const
+INLINE Vector3 Vector3::operator+(const Vector3& v) const
 {
     return Vector3(x + v.x, y + v.y, z + v.z);
 }
 
-Vector3 Vector3::operator-(float f) const
+INLINE Vector3 Vector3::operator-(float f) const
 {
     return Vector3(x - f, y - f, z - f);
 }
 
-Vector3 Vector3::operator-(const Vector3& v) const
+INLINE Vector3 Vector3::operator-(const Vector3& v) const
 {
     return Vector3(x - v.x, y - v.y, z - v.z);
 }
 
-Vector3 Vector3::operator*(float f) const
+INLINE Vector3 Vector3::operator*(float f) const
 {
     return Vector3(x * f, y * f, z * f);
 }
 
-Vector3 Vector3::operator*(const Matrix3x3& m) const
+INLINE Vector3 Vector3::operator*(const Matrix3x3& m) const
 {
     Vector3 v;
 
@@ -107,62 +107,62 @@ Vector3 Vector3::operator*(const Matrix3x3& m) const
     return v;
 }
 
-Vector3 Vector3::operator/(float f) const
+INLINE Vector3 Vector3::operator/(float f) const
 {
     return Vector3(x / f, y / f, z / f);
 }
 
-Vector3 operator+(float f, const Vector3& v)
+INLINE Vector3 operator+(float f, const Vector3& v)
 {
     return Vector3(v.x + f, v.y + f, v.z + f);
 }
 
-Vector3 operator-(float f, const Vector3& v)
+INLINE Vector3 operator-(float f, const Vector3& v)
 {
     return Vector3(v.x - f, v.y - f, v.z - f);
 }
 
-Vector3 operator*(float f, const Vector3& v)
+INLINE Vector3 operator*(float f, const Vector3& v)
 {
     return Vector3(v.x * f, v.y * f, v.z * f);
 }
 
-void Vector3::operator+=(float f)
+INLINE void Vector3::operator+=(float f)
 {
     x += f;
     y += f;
     z += f;
 }
 
-void Vector3::operator+=(const Vector3& v)
+INLINE void Vector3::operator+=(const Vector3& v)
 {
     x += v.x;
     y += v.y;
     z += v.z;
 }
 
-void Vector3::operator-=(float f)
+INLINE void Vector3::operator-=(float f)
 {
     x -= f;
     y -= f;
     z -= f;
 }
 
-void Vector3::operator-=(const Vector3& v)
+INLINE void Vector3::operator-=(const Vector3& v)
 {
     x -= v.x;
     y -= v.y;
     z -= v.z;
 }
 
-void Vector3::operator*=(float f)
+INLINE void Vector3::operator*=(float f)
 {
     x *= f;
     y *= f;
     z *= f;
 }
 
-void Vector3::operator*=(const Matrix3x3& m)
+INLINE void Vector3::operator*=(const Matrix3x3& m)
 {
     float nx, ny, nz;
 
@@ -175,28 +175,28 @@ void Vector3::operator*=(const Matrix3x3& m)
     z = nz;
 }
 
-void Vector3::operator/=(float f)
+INLINE void Vector3::operator/=(float f)
 {
     x /= f;
     y /= f;
     z /= f;
 }
 
-bool Vector3::operator==(const Vector3& v) const
+INLINE bool Vector3::operator==(const Vector3& v) const
 {
     return fabs(x - v.x) < EPSILON &&
            fabs(y - v.y) < EPSILON &&
            fabs(z - v.z) < EPSILON;
 }
 
-bool Vector3::operator!=(const Vector3& v) const
+INLINE bool Vector3::operator!=(const Vector3& v) const
 {
     return fabs(x - v.x) >= EPSILON ||
            fabs(y - v.y) >= EPSILON ||
            fabs(z - v.z) >= EPSILON;
 }
 
-Vector3& Vector3::operator=(const Vector3& v)
+INLINE Vector3& Vector3::operator=(const Vector3& v)
 {
     if ((*this) == v) {
         return *this;

@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_PLANE_H
 #define SKETCH_3D_PLANE_H
 
+#include "Common.h"
 #include "Vector3.h"
 
 namespace Sketch3D
@@ -52,23 +53,23 @@ class Plane
         /**
         * The normal will be normalized by the function
         */
-        inline void             SetNormal(const Vector3& normal);
+        INLINE void             SetNormal(const Vector3& normal);
 
         /**
         * The normal will be normalized by the function
         */
-        inline void             SetNormal(float nx, float ny, float nz);
+        INLINE void             SetNormal(float nx, float ny, float nz);
 
         /**
         * Sets a new normal, but don't normalize it. It assumes it is
         * normalized by the caller.
         */
-        inline void             SetNormalizedNormal(const Vector3& normal);
+        INLINE void             SetNormalizedNormal(const Vector3& normal);
 
-        inline void             SetDistance(float distance);
+        INLINE void             SetDistance(float distance);
 
-        inline const Vector3&   GetNormal() const;
-        inline float            GetDistance() const;
+        INLINE const Vector3&   GetNormal() const;
+        INLINE float            GetDistance() const;
 
     private:
         Vector3                 normal_;    /**< The plane's normal (A, B, C parameters) */

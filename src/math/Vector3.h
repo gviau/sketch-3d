@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_VECTOR_3_H
 #define SKETCH_3D_VECTOR_3_H
 
+#include "Common.h"
+
 namespace Sketch3D {
 
 // Forward dependencies
@@ -61,7 +63,7 @@ class Vector3 {
         Vector3                 Normalized() const;
 
         /**
-        * Inline normalization of the vector
+        * INLINE normalization of the vector
         */
         void                    Normalize();
     
@@ -83,33 +85,33 @@ class Vector3 {
         /**
         * Returns the negated vector
         */
-        inline Vector3          operator-() const;
+        INLINE Vector3          operator-() const;
 
         // BINARY OPERATORS
-        inline Vector3          operator+(float f) const;
-        inline Vector3          operator+(const Vector3& v) const;
-        inline Vector3          operator-(float f) const;
-        inline Vector3          operator-(const Vector3& v) const;
-        inline Vector3          operator*(float f) const;
-        inline Vector3          operator*(const Matrix3x3& m) const;
-        inline Vector3          operator/(float f) const;
+        INLINE Vector3          operator+(float f) const;
+        INLINE Vector3          operator+(const Vector3& v) const;
+        INLINE Vector3          operator-(float f) const;
+        INLINE Vector3          operator-(const Vector3& v) const;
+        INLINE Vector3          operator*(float f) const;
+        INLINE Vector3          operator*(const Matrix3x3& m) const;
+        INLINE Vector3          operator/(float f) const;
 
-        inline friend Vector3   operator+(float f, const Vector3& v);
-        inline friend Vector3   operator-(float f, const Vector3& v);
-        inline friend Vector3   operator*(float f, const Vector3& v);
+        INLINE friend Vector3   operator+(float f, const Vector3& v);
+        INLINE friend Vector3   operator-(float f, const Vector3& v);
+        INLINE friend Vector3   operator*(float f, const Vector3& v);
 
-        inline void             operator+=(float f);
-        inline void             operator+=(const Vector3& v);
-        inline void             operator-=(float f);
-        inline void             operator-=(const Vector3& v);
-        inline void             operator*=(float f);
-        inline void             operator*=(const Matrix3x3& m);
-        inline void             operator/=(float f);
+        INLINE void             operator+=(float f);
+        INLINE void             operator+=(const Vector3& v);
+        INLINE void             operator-=(float f);
+        INLINE void             operator-=(const Vector3& v);
+        INLINE void             operator*=(float f);
+        INLINE void             operator*=(const Matrix3x3& m);
+        INLINE void             operator/=(float f);
 
-        inline bool             operator==(const Vector3& v) const;
-        inline bool             operator!=(const Vector3& v) const;
+        INLINE bool             operator==(const Vector3& v) const;
+        INLINE bool             operator!=(const Vector3& v) const;
 
-        inline Vector3&         operator=(const Vector3& v);
+        INLINE Vector3&         operator=(const Vector3& v);
 
 };
 

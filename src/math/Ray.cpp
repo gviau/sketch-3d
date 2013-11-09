@@ -33,38 +33,38 @@ bool Ray::IntersectsPlane(const Plane& plane, float* t) const
     return true;
 }
 
-void Ray::SetOrigin(const Vector3& origin)
+INLINE void Ray::SetOrigin(const Vector3& origin)
 {
     origin_ = origin;
 }
 
-void Ray::SetOrigin(float ox, float oy, float oz)
+INLINE void Ray::SetOrigin(float ox, float oy, float oz)
 {
     origin_ = Vector3(ox, oy, oz);
 }
 
-void Ray::SetDirection(const Vector3& direction)
+INLINE void Ray::SetDirection(const Vector3& direction)
 {
     direction_ = direction.Normalized();
 }
 
-void Ray::SetDirection(float dx, float dy, float dz)
+INLINE void Ray::SetDirection(float dx, float dy, float dz)
 {
     direction_ = Vector3(dx, dy, dz);
     direction_.Normalize();
 }
 
-void Ray::SetNormalizedDirection(const Vector3& direction)
+INLINE void Ray::SetNormalizedDirection(const Vector3& direction)
 {
     direction_ = direction;
 }
 
-const Vector3& Ray::GetOrigin() const
+INLINE const Vector3& Ray::GetOrigin() const
 {
     return origin_;
 }
 
-const Vector3& Ray::GetDirection() const
+INLINE const Vector3& Ray::GetDirection() const
 {
     return direction_;
 }

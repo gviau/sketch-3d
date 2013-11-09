@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_RAY_H
 #define SKETCH_3D_RAY_H
 
+#include "Common.h"
 #include "Vector3.h"
 
 namespace Sketch3D
@@ -49,28 +50,28 @@ class Ray
         bool                    IntersectsPlane(const Plane& plane,
                                                 float* t) const;
         
-        inline void             SetOrigin(const Vector3& origin);
-        inline void             SetOrigin(float ox, float oy, float oz);
+        INLINE void             SetOrigin(const Vector3& origin);
+        INLINE void             SetOrigin(float ox, float oy, float oz);
 
         /**
         * The direction will be normalized by the function
         */
-        inline void             SetDirection(const Vector3& direction);
+        INLINE void             SetDirection(const Vector3& direction);
 
         /**
         * The direction will be normalized by the function
         */
-        inline void             SetDirection(float dx, float dy, float dz);
+        INLINE void             SetDirection(float dx, float dy, float dz);
 
         /**
         * Sets a new direction, but don't normalize it. It assumes it is
         * normalized by the caller.
         * @param direction The normalized vector to use as a new direction
         */
-        inline void             SetNormalizedDirection(const Vector3& direction);
+        INLINE void             SetNormalizedDirection(const Vector3& direction);
 
-        inline const Vector3&   GetOrigin() const;
-        inline const Vector3&   GetDirection() const;
+        INLINE const Vector3&   GetOrigin() const;
+        INLINE const Vector3&   GetDirection() const;
 
     private:
         Vector3                 origin_;     /**< The origin of the ray */

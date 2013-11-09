@@ -124,17 +124,17 @@ void Matrix3x3::RotateAroundAxis(const Vector3& axis, float angle)
     data_[8] = axis.z * axis.z * sum + cos;
 }
 
-float Matrix3x3::operator()(int col, int row) const
+INLINE float Matrix3x3::operator()(int col, int row) const
 {
     return data_[row*3 + col];
 }
 
-float& Matrix3x3::operator()(int col, int row)
+INLINE float& Matrix3x3::operator()(int col, int row)
 {
     return data_[row*3 + col];
 }
 
-Matrix3x3 Matrix3x3::operator-() const
+INLINE Matrix3x3 Matrix3x3::operator-() const
 {
     float data[9];
     for (int i = 0; i < 9; i++) {
@@ -144,7 +144,7 @@ Matrix3x3 Matrix3x3::operator-() const
     return Matrix3x3(data);
 }
 
-Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
+INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
 {
     Matrix3x3 mat;
 
@@ -159,7 +159,7 @@ Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
     return mat;
 }
 
-void Matrix3x3::operator*=(const Matrix3x3& m)
+INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
 {
     Matrix3x3 mat;
 
@@ -174,7 +174,7 @@ void Matrix3x3::operator*=(const Matrix3x3& m)
     (*this) = mat;
 }
 
-bool Matrix3x3::operator==(const Matrix3x3& m) const
+INLINE bool Matrix3x3::operator==(const Matrix3x3& m) const
 {
     for (int i = 0; i < 9; i++) {
         if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
@@ -185,7 +185,7 @@ bool Matrix3x3::operator==(const Matrix3x3& m) const
     return true;
 }
 
-bool Matrix3x3::operator!=(const Matrix3x3& m) const
+INLINE bool Matrix3x3::operator!=(const Matrix3x3& m) const
 {
     for (int i = 0; i < 9; i++) {
         if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
@@ -196,7 +196,7 @@ bool Matrix3x3::operator!=(const Matrix3x3& m) const
     return false;
 }
 
-Matrix3x3& Matrix3x3::operator=(const Matrix3x3& m)
+INLINE Matrix3x3& Matrix3x3::operator=(const Matrix3x3& m)
 {
     if ((*this) == m) {
         return *this;

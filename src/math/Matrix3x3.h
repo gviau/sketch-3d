@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_MATRIX_3X3_H
 #define SKETCH_3D_MATRIX_3X3_H
 
+#include "Common.h"
+
 namespace Sketch3D
 {
 
@@ -77,7 +79,7 @@ class Matrix3x3
         * @param row The row to access (y on a 2d grid)
         * @return the value contained at (col, row) position
         */
-        float                   operator()(int col, int row) const;
+        INLINE float            operator()(int col, int row) const;
 
         /**
         * Modify an element
@@ -85,22 +87,22 @@ class Matrix3x3
         * @param row The row to access (y on a 2d grid)
         * @return the value contained at (col, row) position
         */
-        float&                  operator()(int col, int row);
+        INLINE float&            operator()(int col, int row);
 
         // UNARY OPERATORS
         /**
         * Returns the negated matrix
         */
-        inline Matrix3x3        operator-() const;
+        INLINE Matrix3x3        operator-() const;
 
         // BINARY OPERATORS
-        inline Matrix3x3        operator*(const Matrix3x3& m) const;
-        inline void             operator*=(const Matrix3x3& m);
+        INLINE Matrix3x3        operator*(const Matrix3x3& m) const;
+        INLINE void             operator*=(const Matrix3x3& m);
 
-        inline bool             operator==(const Matrix3x3& m) const;
-        inline bool             operator!=(const Matrix3x3& m) const;
+        INLINE bool             operator==(const Matrix3x3& m) const;
+        INLINE bool             operator!=(const Matrix3x3& m) const;
 
-        inline Matrix3x3&       operator=(const Matrix3x3& m);
+        INLINE Matrix3x3&       operator=(const Matrix3x3& m);
 
         // USEFUL STATICS
         static const Matrix3x3  IDENTITY;   /**< Only the main diagonal is set to 1 */
