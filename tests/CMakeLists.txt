@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (tests)
 
-set (EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/builds/bin/")
+set (EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/")
 
 file(
     GLOB_RECURSE
@@ -18,7 +18,7 @@ include_directories(../src/math/)
 include_directories(../src/common/)
 
 link_directories(${Boost_LIBRARY_DIRS})
-link_directories(${CMAKE_SOURCE_DIR}/builds/lib/)
+link_directories(${CMAKE_SOURCE_DIR}/lib/)
 
 add_executable(
     tests
@@ -35,10 +35,12 @@ target_link_libraries(
     ${Boost_LIBRARIES}
 )
 
-get_target_property(tests_EXE tests_all LOCATION)
+add_test(sketch-3d_test ${CMAKE_SOURCE_DIR}/bin/tests)
 
-add_custom_target(
-    RUN_TESTS
-    ${tests_EXE} --report_level=no
-    DEPENDS tests_all
-)
+#get_target_property(tests_EXE tests_all LOCATION)
+
+#add_custom_target(
+#    RUN_TESTS
+#    ${tests_EXE} --report_level=no
+#    DEPENDS tests_all
+#)
