@@ -10,6 +10,7 @@ namespace Sketch3D
 const Matrix3x3 Matrix3x3::IDENTITY(1.0f, 0.0f, 0.0f,
                                     0.0f, 1.0f, 0.0f,
                                     0.0f, 0.0f, 1.0f);
+const Matrix3x3 Matrix3x3::ZERO;
 
 Matrix3x3::Matrix3x3()
 {
@@ -84,11 +85,11 @@ void Matrix3x3::RotationAroundY(float angle)
 
     data_[0] =  cos;
     data_[2] = -sin;
-    data_[3] =  sin;
-    data_[5] =  cos;
+    data_[6] =  sin;
+    data_[8] =  cos;
 
-    data_[4] = data_[8] = 1.0f;
-    data_[1] = data_[6] = data_[7] = 0.0f;
+    data_[4] = 1.0f;
+    data_[1] = data_[3] = data_[5] = data_[7] = 0.0f;
 }
 
 void Matrix3x3::RotationAroundZ(float angle)
@@ -148,10 +149,10 @@ INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
 {
     Matrix3x3 mat;
 
-    for (int i = 0; i < 9; i += 3) {
+    for (int i = 0; i < 9; i+=3) {
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < 3; k++) {
-                mat.data_[i+j] += m.data_[j + k * 3] * data_[i + k];
+                mat.data_[i + j] += data_[i + k] * m.data_[k*3 + j];
             }
         }
     }
@@ -166,7 +167,7 @@ INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
     for (int i = 0; i < 9; i += 3) {
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < 3; k++) {
-                mat.data_[i+j] += m.data_[j + k * 3] * data_[i + k];
+                mat.data_[i + j] += data_[i + k] * m.data_[k*3 + j];
             }
         }
     }
@@ -198,7 +199,7 @@ INLINE bool Matrix3x3::operator!=(const Matrix3x3& m) const
 
 INLINE Matrix3x3& Matrix3x3::operator=(const Matrix3x3& m)
 {
-    if ((*this) == m) {
+    if (this == &m) {
         return *this;
     }
 
