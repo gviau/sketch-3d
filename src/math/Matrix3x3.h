@@ -16,6 +16,9 @@ class Vector3;
 class Matrix3x3
 {
     public:
+        // USEFUL STATICS
+        static const Matrix3x3  IDENTITY;   /**< Only the main diagonal is set to 1 */
+        static const Matrix3x3  ZERO; /**< Everything to zero */
         /**
         * Default constructor. Initializes everything to 0.
         */
@@ -104,8 +107,6 @@ class Matrix3x3
 
         INLINE Matrix3x3&       operator=(const Matrix3x3& m);
 
-        // USEFUL STATICS
-        static const Matrix3x3  IDENTITY;   /**< Only the main diagonal is set to 1 */
     private:
         float                   data_[9];   /**< The matrix represented as a linear array */
 };
