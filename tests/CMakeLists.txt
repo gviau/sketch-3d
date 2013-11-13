@@ -22,7 +22,7 @@ link_directories(${CMAKE_SOURCE_DIR}/builds/lib/)
 
 add_executable(
     tests
-    main.cpp
+    Main.cpp
     ${math_files}
 )
 
