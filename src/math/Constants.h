@@ -1,5 +1,5 @@
 #ifndef SKETCH_3D_CONSTANTS_H
-#define SKETCH_3D_CONSTATNS_H
+#define SKETCH_3D_CONSTANTS_H
 
 namespace Sketch3D
 {
