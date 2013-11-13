@@ -6,5 +6,6 @@ CMakeFiles
 Makefile
 *.cmake
 CMakeCache.txt
-*/bin
-*/lib
+bin/
+lib/
+build/
