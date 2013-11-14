@@ -98,6 +98,8 @@ INLINE Vector3 Vector3::operator*(float f) const
 
 INLINE Vector3 Vector3::operator*(const Matrix3x3& m) const
 {
+    // We do the product the same way as if we were multiplying M * v, since
+    // it makes more since for linear transformation to do it that way.
     Vector3 v;
 
     v.x = x * m(0, 0) + y * m(1, 0) + z * m(2, 0);
@@ -164,6 +166,8 @@ INLINE void Vector3::operator*=(float f)
 
 INLINE void Vector3::operator*=(const Matrix3x3& m)
 {
+    // We do the product the same way as if we were multiplying M * v, since
+    // it makes more since for linear transformation to do it that way.
     float nx, ny, nz;
 
     nx = x * m(0, 0) + y * m(1, 0) + z * m(2, 0);
