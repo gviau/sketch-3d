@@ -6,12 +6,12 @@
 
 using namespace Sketch3D;
 
-bool CompareTo(float a, float b)
+static bool CompareTo(float a, float b)
 {
     return fabs(a - b) <= EPSILON;
 }
 
-BOOST_AUTO_TEST_CASE(test_dot_product)
+BOOST_AUTO_TEST_CASE(test_vector3_dot_product)
 {
     Vector3 u(5.0f, 10.0f, 0.0f);
     Vector3 v(1.0f, 1.0f, 1.0f);
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(test_dot_product)
     BOOST_REQUIRE(dot == 15.0f);
 }
 
-BOOST_AUTO_TEST_CASE(test_cross_product)
+BOOST_AUTO_TEST_CASE(test_vector3_cross_product)
 {
     Vector3 u = Vector3::RIGHT;
     Vector3 v = Vector3::UP;
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(test_cross_product)
     BOOST_REQUIRE(v.Cross(u) != Vector3::LOOK);
 }
 
-BOOST_AUTO_TEST_CASE(test_length)
+BOOST_AUTO_TEST_CASE(test_vector3_length)
 {
     Vector3 v(3.0f, 4.0f, 5.0f);
     float expectedSqrLength = 3.0f * 3.0f + 4.0f * 4.0f + 5.0f * 5.0f;
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_length)
     BOOST_REQUIRE(CompareTo(length, expectedLength));
 }
 
-BOOST_AUTO_TEST_CASE(test_normalize)
+BOOST_AUTO_TEST_CASE(test_vector3_normalize)
 {
     Vector3 v(3.0f, 4.0f, 5.0f);
     Vector3 u = v.Normalized();
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_normalize)
     BOOST_REQUIRE(v == w);
 }
 
-BOOST_AUTO_TEST_CASE(test_vector_matrix_multiply)
+BOOST_AUTO_TEST_CASE(test_vector3_matrix_multiply)
 {
     Vector3 v = Vector3::ONE;
     Matrix3x3 m = Matrix3x3::IDENTITY;

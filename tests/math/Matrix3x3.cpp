@@ -6,7 +6,7 @@
 
 using namespace Sketch3D;
 
-BOOST_AUTO_TEST_CASE(test_transpose)
+BOOST_AUTO_TEST_CASE(test_3x3_transpose)
 {
     Matrix3x3 m = Matrix3x3::IDENTITY;
     BOOST_REQUIRE(m.Transpose() == m);
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test_transpose)
     BOOST_REQUIRE(m.Transpose() == t);
 }
 
-BOOST_AUTO_TEST_CASE(test_rotation_around_x)
+BOOST_AUTO_TEST_CASE(test_3x3_rotation_around_x)
 {
     Matrix3x3 m;
     Vector3 v = Vector3::UP;
@@ -29,11 +29,11 @@ BOOST_AUTO_TEST_CASE(test_rotation_around_x)
     BOOST_REQUIRE(v == -Vector3::UP);
 
     v = Vector3::ONE;
-    v *= m;
+    v = m * v;
     BOOST_REQUIRE(v == Vector3(1.0f, -1.0f, -1.0f));
 }
 
-BOOST_AUTO_TEST_CASE(test_rotation_around_y)
+BOOST_AUTO_TEST_CASE(test_3x3_rotation_around_y)
 {
     Matrix3x3 m;
     Vector3 v = Vector3::LOOK;
@@ -42,11 +42,11 @@ BOOST_AUTO_TEST_CASE(test_rotation_around_y)
     BOOST_REQUIRE(v == -Vector3::LOOK);
 
     v = Vector3::ONE;
-    v *= m;
+    v = m * v;
     BOOST_REQUIRE(v == Vector3(-1.0f, 1.0f, -1.0f));
 }
 
-BOOST_AUTO_TEST_CASE(test_rotation_around_z)
+BOOST_AUTO_TEST_CASE(test_3x3_rotation_around_z)
 {
     Matrix3x3 m;
     Vector3 v = Vector3::RIGHT;
@@ -55,11 +55,11 @@ BOOST_AUTO_TEST_CASE(test_rotation_around_z)
     BOOST_REQUIRE(v == -Vector3::RIGHT);
 
     v = Vector3::ONE;
-    v *= m;
+    v = m * v;
     BOOST_REQUIRE(v == Vector3(-1.0f, -1.0f, 1.0f));
 }
 
-BOOST_AUTO_TEST_CASE(test_multiple_rotations)
+BOOST_AUTO_TEST_CASE(test_3x3_multiple_rotations)
 {
     Matrix3x3 m, n, o;
     m.RotationAroundX(PI_OVER_2);
@@ -74,11 +74,11 @@ BOOST_AUTO_TEST_CASE(test_multiple_rotations)
     BOOST_REQUIRE(w == Vector3(-0.737208f, 0.686816f, -1.40883f));
 }
 
-BOOST_AUTO_TEST_CASE(test_rotate_around_axis)
+BOOST_AUTO_TEST_CASE(test_3x3_rotate_around_axis)
 {
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix_matrix_multiply)
+BOOST_AUTO_TEST_CASE(test_3x3_matrix_matrix_multiply)
 {
     Matrix3x3 i = Matrix3x3::IDENTITY;
     Matrix3x3 m(1.0f, 2.0f, 3.0f,
