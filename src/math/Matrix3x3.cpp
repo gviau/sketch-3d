@@ -1,6 +1,5 @@
 #include "Matrix3x3.h"
 
-#include "Vector3.h"
 #include "Constants.h"
 #include <math.h>
 
@@ -158,6 +157,17 @@ INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
     }
 
     return mat;
+}
+
+INLINE Vector3 Matrix3x3::operator*(const Vector3& v) const
+{
+    Vector3 w;
+
+    w.x = v.x * data_[0] + v.y * data_[1] + v.z * data_[2];
+    w.y = v.x * data_[3] + v.y * data_[4] + v.z * data_[5];
+    w.z = v.x * data_[6] + v.y * data_[7] + v.z * data_[8];
+
+    return w;
 }
 
 INLINE void Matrix3x3::operator*=(const Matrix3x3& m)

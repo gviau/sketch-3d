@@ -2,12 +2,10 @@
 #define SKETCH_3D_MATRIX_3X3_H
 
 #include "Common.h"
+#include "Vector3.h"
 
 namespace Sketch3D
 {
-
-// Forward dependencies
-class Vector3;
 
 /**
 * @class Matrix3x3
@@ -100,6 +98,7 @@ class Matrix3x3
 
         // BINARY OPERATORS
         INLINE Matrix3x3        operator*(const Matrix3x3& m) const;
+        INLINE Vector3          operator*(const Vector3& v) const;
         INLINE void             operator*=(const Matrix3x3& m);
 
         INLINE bool             operator==(const Matrix3x3& m) const;
