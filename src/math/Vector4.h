@@ -9,9 +9,9 @@ namespace Sketch3D {
 class Matrix4x4;
 
 /**
-* @class Vector4
-* The Vector4 class represents a 4D vector.
-*/
+ * @class Vector4
+ * The Vector4 class represents a 4D vector.
+ */
 class Vector4 {
     public:
         float                   x;      /**< X component */
@@ -28,64 +28,64 @@ class Vector4 {
         static const Vector4    LOOK;   /**< Only the z component is set to 1 */
 
         /**
-        * Default constructor. Initializes everything to 0.
-        */
+         * Default constructor. Initializes everything to 0.
+         */
                                 Vector4();
 
         /**
-        * Constructor.
-        * @param x The x component
-        * @param y The y component
-        * @param z The z component
-        */
+         * Constructor.
+         * @param x The x component
+         * @param y The y component
+         * @param z The z component
+         */
                                 Vector4(float x, float y, float z);
 
         /**
-        * Copy constructor
-        * @param src The src vector that will be copied
-        */
+         * Copy constructor
+         * @param src The src vector that will be copied
+         */
                                 Vector4(const Vector4& src);
 
         /**
-        * Returns the length of the vector. It should be noted that the length
-        * is a costly operation since it requires a square root. You may want
-        * to check the SquaredLength function.
-        */
+         * Returns the length of the vector. It should be noted that the length
+         * is a costly operation since it requires a square root. You may want
+         * to check the SquaredLength function.
+         */
         float                   Length() const;
 
         /**
-        * Returns the squared length of the vector.
-        */
+         * Returns the squared length of the vector.
+         */
         float                   SquaredLength() const;
 
         /**
-        * Return the normalized vector
-        */
+         * Return the normalized vector
+         */
         Vector4                 Normalized() const;
 
         /**
-        * INLINE normalization of the vector
-        */
+         * INLINE normalization of the vector
+         */
         void                    Normalize();
     
         /**
-        * Computes the dot product between this vector and v.
-        * @param v The vector v with which the dot product will be computed
-        * @return the dot product
-        */
+         * Computes the dot product between this vector and v.
+         * @param v The vector v with which the dot product will be computed
+         * @return the dot product
+         */
         float                   Dot(const Vector4& v) const;
 
         /**
-        * Computes the cross product between this vector and v.
-        * @param v The vector v with which to compute the cross product
-        * @return a new vector perpendicular to this one and v
-        */
+         * Computes the cross product between this vector and v.
+         * @param v The vector v with which to compute the cross product
+         * @return a new vector perpendicular to this one and v
+         */
         Vector4                 Cross(const Vector4& v) const;
 
         // UNARY OPERATORS
         /**
-        * Returns the negated vector
-        */
+         * Returns the negated vector
+         */
         INLINE Vector4          operator-() const;
 
         // BINARY OPERATORS

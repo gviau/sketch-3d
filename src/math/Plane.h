@@ -7,63 +7,63 @@
 namespace Sketch3D
 {
 /**
-* @class Plane
-* Represents an infinite plane defined by its normal and its distance from the
-* origin.
-*/
+ * @class Plane
+ * Represents an infinite plane defined by its normal and its distance from the
+ * origin.
+ */
 class Plane
 {
     public:
         /**
-        * Default constructor. 
-        * Defaults to the origin with the plane pointing in the up direction
-        */
+         * Default constructor. 
+         * Defaults to the origin with the plane pointing in the up direction
+         */
                                 Plane();
 
         /**
-        * Constructor
-        * @param normal The normal vector. It does not need to be normalized
-        * since the constructor will normalize it.
-        * @param distance The distance from the origin
-        */
+         * Constructor
+         * @param normal The normal vector. It does not need to be normalized
+         * since the constructor will normalize it.
+         * @param distance The distance from the origin
+         */
                                 Plane(const Vector3& normal, float distance);
 
         /**
-        * Constructor. 
-        * The normal components don't need to be normalized since the
-        * Constructor will normalze the vector.
-        * @param nx The x normal's component
-        * @param ny The y normal's component
-        * @param nz The z normal's component
-        * @param distance The plane's distance
-        */
+         * Constructor. 
+         * The normal components don't need to be normalized since the
+         * Constructor will normalze the vector.
+         * @param nx The x normal's component
+         * @param ny The y normal's component
+         * @param nz The z normal's component
+         * @param distance The plane's distance
+         */
                                 Plane(float nx, float ny, float nz,
                                       float distance);
 
         /**
-        * Constructor.
-        * Constructs the plane from 3 points
-        * @param p1 The first point
-        * @param p2 The second point
-        * @param p3 The third point
-        */
+         * Constructor.
+         * Constructs the plane from 3 points
+         * @param p1 The first point
+         * @param p2 The second point
+         * @param p3 The third point
+         */
                                 Plane(const Vector3& p1, const Vector3& p2,
                                       const Vector3& p3);
 
         /**
-        * The normal will be normalized by the function
-        */
+         * The normal will be normalized by the function
+         */
         INLINE void             SetNormal(const Vector3& normal);
 
         /**
-        * The normal will be normalized by the function
-        */
+         * The normal will be normalized by the function
+         */
         INLINE void             SetNormal(float nx, float ny, float nz);
 
         /**
-        * Sets a new normal, but don't normalize it. It assumes it is
-        * normalized by the caller.
-        */
+         * Sets a new normal, but don't normalize it. It assumes it is
+         * normalized by the caller.
+         */
         INLINE void             SetNormalizedNormal(const Vector3& normal);
 
         INLINE void             SetDistance(float distance);

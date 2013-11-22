@@ -9,9 +9,9 @@ namespace Sketch3D {
 class Matrix3x3;
 
 /**
-* @class Vector3
-* The Vector3 class represents a 3D vector class.
-*/
+ * @class Vector3
+ * The Vector3 class represents a 3D vector class.
+ */
 class Vector3 {
     public:
         float                   x;    /**< X component */
@@ -27,64 +27,64 @@ class Vector3 {
         static const Vector3    LOOK;   /**< Only the z component is set to 1 */
 
         /**
-        * Default constructor. Initializes everything to 0.
-        */
+         * Default constructor. Initializes everything to 0.
+         */
                                 Vector3();
 
         /**
-        * Constructor.
-        * @param x The x component
-        * @param y The y component
-        * @param z The z component
-        */
+         * Constructor.
+         * @param x The x component
+         * @param y The y component
+         * @param z The z component
+         */
                                 Vector3(float x, float y, float z);
 
         /**
-        * Copy constructor
-        * @param src The src vector that will be copied
-        */
+         * Copy constructor
+         * @param src The src vector that will be copied
+         */
                                 Vector3(const Vector3& src);
 
         /**
-        * Returns the length of the vector. It should be noted that the length
-        * is a costly operation since it requires a square root. You may want
-        * to check the SquaredLength function.
-        */
+         * Returns the length of the vector. It should be noted that the length
+         * is a costly operation since it requires a square root. You may want
+         * to check the SquaredLength function.
+         */
         float                   Length() const;
 
         /**
-        * Returns the squared length of the vector.
-        */
+         * Returns the squared length of the vector.
+         */
         float                   SquaredLength() const;
 
         /**
-        * Return the normalized vector
-        */
+         * Return the normalized vector
+         */
         Vector3                 Normalized() const;
 
         /**
-        * INLINE normalization of the vector
-        */
+         * Inline normalization of the vector
+         */
         void                    Normalize();
     
         /**
-        * Computes the dot product between this vector and v.
-        * @param v The vector v with which the dot product will be computed
-        * @return the dot product
-        */
+         * Computes the dot product between this vector and v.
+         * @param v The vector v with which the dot product will be computed
+         * @return the dot product
+         */
         float                   Dot(const Vector3& v) const;
 
         /**
-        * Computes the cross product between this vector and v.
-        * @param v The vector v with which to compute the cross product
-        * @return a new vector perpendicular to this one and v
-        */
+         * Computes the cross product between this vector and v.
+         * @param v The vector v with which to compute the cross product
+         * @return a new vector perpendicular to this one and v
+         */
         Vector3                 Cross(const Vector3& v) const;
 
         // UNARY OPERATORS
         /**
-        * Returns the negated vector
-        */
+         * Returns the negated vector
+         */
         INLINE Vector3          operator-() const;
 
         // BINARY OPERATORS

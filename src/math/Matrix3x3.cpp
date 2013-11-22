@@ -188,7 +188,7 @@ INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
 INLINE bool Matrix3x3::operator==(const Matrix3x3& m) const
 {
     for (int i = 0; i < 9; i++) {
-        if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
+        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
             return false;
         }
     }
@@ -199,7 +199,7 @@ INLINE bool Matrix3x3::operator==(const Matrix3x3& m) const
 INLINE bool Matrix3x3::operator!=(const Matrix3x3& m) const
 {
     for (int i = 0; i < 9; i++) {
-        if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
+        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
             return true;
         }
     }

@@ -210,7 +210,7 @@ INLINE void Matrix4x4::operator*=(const Matrix4x4& m)
 INLINE bool Matrix4x4::operator==(const Matrix4x4& m) const
 {
     for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
+        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
             return false;
         }
     }
@@ -221,7 +221,7 @@ INLINE bool Matrix4x4::operator==(const Matrix4x4& m) const
 INLINE bool Matrix4x4::operator!=(const Matrix4x4& m) const
 {
     for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) >= EPSILON) {
+        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
             return true;
         }
     }
