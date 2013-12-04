@@ -1,8 +1,12 @@
 #include "Vector3.h"
 
-#include "Matrix3x3.h"
-#include "Constants.h"
 #include <math.h>
+
+#include "Constants.h"
+#include "Matrix3x3.h"
+#include "Platform.h"
+
+#include <iostream>
 
 namespace Sketch3D {
 
@@ -32,7 +36,25 @@ Vector3::Vector3(const Vector3& src)
 
 float Vector3::Length() const
 {
-    return sqrtf(x*x + y*y + z*z);
+    float f;
+    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
+        f = sqrtf(x*x + y*y + z*z);
+    } else {
+        __m128 u = {x, y, z, 0.0f};
+        __m128 v;
+
+        u = _mm_mul_ps(u, u);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x0000004e);
+        u = _mm_add_ps(u, v);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x00000011);
+        u = _mm_add_ps(u, v);
+        u = _mm_sqrt_ss(u);
+        _mm_store_ss(&f, u);
+    }
+    
+    return f;
 }
 
 float Vector3::SquaredLength() const
@@ -42,16 +64,75 @@ float Vector3::SquaredLength() const
 
 Vector3 Vector3::Normalized() const
 {
-    float length = Length();
-    return Vector3(x / length, y / length, z / length);
+    Vector3 result;
+    float length;
+    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
+        length = Length();
+        if (length != 0.0f) {
+            result.x /= length;
+            result.y /= length;
+            result.z /= length;
+        }
+    } else {
+        __m128 u = {x, y, z, 0.0f};
+        __m128 v;
+        __m128 w = u;
+
+        u = _mm_mul_ps(u, u);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x0000004e);
+        u = _mm_add_ps(u, v);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x00000011);
+        u = _mm_add_ps(u, v);
+
+        u = _mm_rsqrt_ps(u);
+        w = _mm_mul_ps(u, w);
+
+        float f[4];
+        _mm_store_ps(f, w);
+
+        result.x = f[0];
+        result.y = f[1];
+        result.z = f[2];
+    }
+
+    return result;
 }
 
 void Vector3::Normalize()
 {
-    float length = Length();
-    x /= length;
-    y /= length;
-    z /= length;
+    float length;
+    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
+        length = Length();
+        if (length != 0.0f) {
+            x /= length;
+            y /= length;
+            z /= length;
+        }
+    } else {
+        __m128 u = {x, y, z, 0.0f};
+        __m128 v;
+        __m128 w = u;
+
+        u = _mm_mul_ps(u, u);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x0000004e);
+        u = _mm_add_ps(u, v);
+        v = u;
+        v = _mm_shuffle_ps(v, v, 0x00000011);
+        u = _mm_add_ps(u, v);
+
+        u = _mm_rsqrt_ps(u);
+        w = _mm_mul_ps(u, w);
+
+        float f[4];
+        _mm_store_ps(f, w);
+
+        x = f[0];
+        y = f[1];
+        z = f[2];
+    }
 }
 
 float Vector3::Dot(const Vector3& v) const

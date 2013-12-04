@@ -6,9 +6,11 @@
 
 using namespace Sketch3D;
 
+// We use a greater epsilon for the tests because it SSE is enabled, some
+// computations, such as reciprocal square roots, might be a bit less precise.
 static bool CompareTo(float a, float b)
 {
-    return fabs(a - b) <= EPSILON;
+    return fabs(a - b) <= 0.001f;
 }
 
 BOOST_AUTO_TEST_CASE(test_vector3_dot_product)
@@ -49,8 +51,11 @@ BOOST_AUTO_TEST_CASE(test_vector3_normalize)
     Vector3 w(0.4242640687119285f,
               0.565685424949238f,
               0.7071067811865475f);
-    BOOST_REQUIRE(u == w);
-    BOOST_REQUIRE(v == w);
+
+    BOOST_REQUIRE(CompareTo(u.x, w.x) && CompareTo(u.y, w.y) &&
+                  CompareTo(u.z, w.z));
+    BOOST_REQUIRE(CompareTo(v.x, w.x) && CompareTo(v.y, w.y) &&
+                  CompareTo(v.z, w.z));
 }
 
 BOOST_AUTO_TEST_CASE(test_vector3_matrix_multiply)
