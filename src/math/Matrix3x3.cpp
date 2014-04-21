@@ -1,6 +1,8 @@
 #include "Matrix3x3.h"
 
 #include "Constants.h"
+#include "Vector3.h"
+
 #include <math.h>
 
 namespace Sketch3D
@@ -124,42 +126,7 @@ void Matrix3x3::RotateAroundAxis(const Vector3& axis, float angle)
     data_[8] = axis.z * axis.z * sum + cos;
 }
 
-INLINE float Matrix3x3::operator()(int col, int row) const
-{
-    return data_[row*3 + col];
-}
-
-INLINE float& Matrix3x3::operator()(int col, int row)
-{
-    return data_[row*3 + col];
-}
-
-INLINE Matrix3x3 Matrix3x3::operator-() const
-{
-    float data[9];
-    for (int i = 0; i < 9; i++) {
-        data[i] = -data_[i];
-    }
-
-    return Matrix3x3(data);
-}
-
-INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
-{
-    Matrix3x3 mat;
-
-    for (int i = 0; i < 9; i+=3) {
-        for (int j = 0; j < 3; j++) {
-            for (int k = 0; k < 3; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*3 + j];
-            }
-        }
-    }
-
-    return mat;
-}
-
-INLINE Vector3 Matrix3x3::operator*(const Vector3& v) const
+Vector3 Matrix3x3::operator*(const Vector3& v) const
 {
     Vector3 w;
 
@@ -168,56 +135,6 @@ INLINE Vector3 Matrix3x3::operator*(const Vector3& v) const
     w.z = v.x * data_[6] + v.y * data_[7] + v.z * data_[8];
 
     return w;
-}
-
-INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
-{
-    Matrix3x3 mat;
-
-    for (int i = 0; i < 9; i += 3) {
-        for (int j = 0; j < 3; j++) {
-            for (int k = 0; k < 3; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*3 + j];
-            }
-        }
-    }
-
-    (*this) = mat;
-}
-
-INLINE bool Matrix3x3::operator==(const Matrix3x3& m) const
-{
-    for (int i = 0; i < 9; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-INLINE bool Matrix3x3::operator!=(const Matrix3x3& m) const
-{
-    for (int i = 0; i < 9; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-INLINE Matrix3x3& Matrix3x3::operator=(const Matrix3x3& m)
-{
-    if (this == &m) {
-        return *this;
-    }
-
-    for (int i = 0; i < 9; i++) {
-        data_[i] = m.data_[i];
-    }
-
-    return *this;
 }
 
 }

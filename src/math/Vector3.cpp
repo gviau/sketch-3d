@@ -147,37 +147,7 @@ Vector3 Vector3::Cross(const Vector3& v) const
                    x*v.y - y*v.x);
 }
 
-INLINE Vector3 Vector3::operator-() const
-{
-    return Vector3(-x, -y, -z);
-}
-
-INLINE Vector3 Vector3::operator+(float f) const
-{
-    return Vector3(x + f, y + f, z + f);
-}
-
-INLINE Vector3 Vector3::operator+(const Vector3& v) const
-{
-    return Vector3(x + v.x, y + v.y, z + v.z);
-}
-
-INLINE Vector3 Vector3::operator-(float f) const
-{
-    return Vector3(x - f, y - f, z - f);
-}
-
-INLINE Vector3 Vector3::operator-(const Vector3& v) const
-{
-    return Vector3(x - v.x, y - v.y, z - v.z);
-}
-
-INLINE Vector3 Vector3::operator*(float f) const
-{
-    return Vector3(x * f, y * f, z * f);
-}
-
-INLINE Vector3 Vector3::operator*(const Matrix3x3& m) const
+Vector3 Vector3::operator*(const Matrix3x3& m) const
 {
     // We do the product the same way as if we were multiplying M * v, since
     // it makes more since for linear transformation to do it that way.
@@ -190,62 +160,7 @@ INLINE Vector3 Vector3::operator*(const Matrix3x3& m) const
     return v;
 }
 
-INLINE Vector3 Vector3::operator/(float f) const
-{
-    return Vector3(x / f, y / f, z / f);
-}
-
-INLINE Vector3 operator+(float f, const Vector3& v)
-{
-    return Vector3(v.x + f, v.y + f, v.z + f);
-}
-
-INLINE Vector3 operator-(float f, const Vector3& v)
-{
-    return Vector3(v.x - f, v.y - f, v.z - f);
-}
-
-INLINE Vector3 operator*(float f, const Vector3& v)
-{
-    return Vector3(v.x * f, v.y * f, v.z * f);
-}
-
-INLINE void Vector3::operator+=(float f)
-{
-    x += f;
-    y += f;
-    z += f;
-}
-
-INLINE void Vector3::operator+=(const Vector3& v)
-{
-    x += v.x;
-    y += v.y;
-    z += v.z;
-}
-
-INLINE void Vector3::operator-=(float f)
-{
-    x -= f;
-    y -= f;
-    z -= f;
-}
-
-INLINE void Vector3::operator-=(const Vector3& v)
-{
-    x -= v.x;
-    y -= v.y;
-    z -= v.z;
-}
-
-INLINE void Vector3::operator*=(float f)
-{
-    x *= f;
-    y *= f;
-    z *= f;
-}
-
-INLINE void Vector3::operator*=(const Matrix3x3& m)
+void Vector3::operator*=(const Matrix3x3& m)
 {
     // We do the product the same way as if we were multiplying M * v, since
     // it makes more since for linear transformation to do it that way.
@@ -258,40 +173,6 @@ INLINE void Vector3::operator*=(const Matrix3x3& m)
     x = nx;
     y = ny;
     z = nz;
-}
-
-INLINE void Vector3::operator/=(float f)
-{
-    x /= f;
-    y /= f;
-    z /= f;
-}
-
-INLINE bool Vector3::operator==(const Vector3& v) const
-{
-    return fabs(x - v.x) < EPSILON &&
-           fabs(y - v.y) < EPSILON &&
-           fabs(z - v.z) < EPSILON;
-}
-
-INLINE bool Vector3::operator!=(const Vector3& v) const
-{
-    return fabs(x - v.x) >= EPSILON ||
-           fabs(y - v.y) >= EPSILON ||
-           fabs(z - v.z) >= EPSILON;
-}
-
-INLINE Vector3& Vector3::operator=(const Vector3& v)
-{
-    if ((*this) == v) {
-        return *this;
-    }
-
-    x = v.x;
-    y = v.y;
-    z = v.z;
-
-    return *this;
 }
 
 }

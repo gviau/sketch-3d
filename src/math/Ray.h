@@ -77,6 +77,43 @@ class Ray
         Vector3                 origin_;     /**< The origin of the ray */
         Vector3                 direction_;  /**< The direction of the ray */
 };
+
+INLINE void Ray::SetOrigin(const Vector3& origin)
+{
+    origin_ = origin;
+}
+
+INLINE void Ray::SetOrigin(float ox, float oy, float oz)
+{
+    origin_ = Vector3(ox, oy, oz);
+}
+
+INLINE void Ray::SetDirection(const Vector3& direction)
+{
+    direction_ = direction.Normalized();
+}
+
+INLINE void Ray::SetDirection(float dx, float dy, float dz)
+{
+    direction_ = Vector3(dx, dy, dz);
+    direction_.Normalize();
+}
+
+INLINE void Ray::SetNormalizedDirection(const Vector3& direction)
+{
+    direction_ = direction;
+}
+
+INLINE const Vector3& Ray::GetOrigin() const
+{
+    return origin_;
+}
+
+INLINE const Vector3& Ray::GetDirection() const
+{
+    return direction_;
+}
+
 }
 
 #endif

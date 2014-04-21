@@ -75,6 +75,38 @@ class Plane
         Vector3                 normal_;    /**< The plane's normal (A, B, C parameters) */
         float                   distance_;  /**< The plane's distance (D parameter) */
 };
+
+INLINE void Plane::SetNormal(const Vector3& normal)
+{
+    normal_ = normal.Normalized();
+}
+
+INLINE void Plane::SetNormal(float nx, float ny, float nz)
+{
+    normal_ = Vector3(nx, ny, nz);
+    normal_.Normalize();
+}
+
+INLINE void Plane::SetNormalizedNormal(const Vector3& normal)
+{
+    normal_ = normal;
+}
+
+INLINE void Plane::SetDistance(float distance)
+{
+    distance_ = distance;
+}
+
+INLINE const Vector3& Plane::GetNormal() const
+{
+    return normal_;
+}
+
+INLINE float Plane::GetDistance() const
+{
+    return distance_;
+}
+
 }
 
 #endif

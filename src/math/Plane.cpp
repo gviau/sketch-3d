@@ -28,35 +28,4 @@ Plane::Plane(const Vector3& p1, const Vector3& p2, const Vector3& p3)
     distance_ = normal_.x * p1.x + normal_.y * p1.y + normal_.z * p1.z;
 }
 
-INLINE void Plane::SetNormal(const Vector3& normal)
-{
-    normal_ = normal.Normalized();
-}
-
-INLINE void Plane::SetNormal(float nx, float ny, float nz)
-{
-    normal_ = Vector3(nx, ny, nz);
-    normal_.Normalize();
-}
-
-INLINE void Plane::SetNormalizedNormal(const Vector3& normal)
-{
-    normal_ = normal;
-}
-
-INLINE void Plane::SetDistance(float distance)
-{
-    distance_ = distance;
-}
-
-INLINE const Vector3& Plane::GetNormal() const
-{
-    return normal_;
-}
-
-INLINE float Plane::GetDistance() const
-{
-    return distance_;
-}
-
 }

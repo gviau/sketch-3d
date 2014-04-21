@@ -149,37 +149,7 @@ Vector4 Vector4::Cross(const Vector4& v) const
                    x*v.y - y*v.x);
 }
 
-INLINE Vector4 Vector4::operator-() const
-{
-    return Vector4(-x, -y, -z);
-}
-
-INLINE Vector4 Vector4::operator+(float f) const
-{
-    return Vector4(x + f, y + f, z + f);
-}
-
-INLINE Vector4 Vector4::operator+(const Vector4& v) const
-{
-    return Vector4(x + v.x, y + v.y, z + v.z);
-}
-
-INLINE Vector4 Vector4::operator-(float f) const
-{
-    return Vector4(x - f, y - f, z - f);
-}
-
-INLINE Vector4 Vector4::operator-(const Vector4& v) const
-{
-    return Vector4(x - v.x, y - v.y, z - v.z);
-}
-
-INLINE Vector4 Vector4::operator*(float f) const
-{
-    return Vector4(x * f, y * f, z * f);
-}
-
-INLINE Vector4 Vector4::operator*(const Matrix4x4& m) const
+Vector4 Vector4::operator*(const Matrix4x4& m) const
 {
     // We do the product the same way as if we were multiplying M * v, since
     // it makes more since for linear transformation to do it that way.
@@ -198,62 +168,7 @@ INLINE Vector4 Vector4::operator*(const Matrix4x4& m) const
     return v;
 }
 
-INLINE Vector4 Vector4::operator/(float f) const
-{
-    return Vector4(x / f, y / f, z / f);
-}
-
-INLINE Vector4 operator+(float f, const Vector4& v)
-{
-    return Vector4(v.x + f, v.y + f, v.z + f);
-}
-
-INLINE Vector4 operator-(float f, const Vector4& v)
-{
-    return Vector4(v.x - f, v.y - f, v.z - f);
-}
-
-INLINE Vector4 operator*(float f, const Vector4& v)
-{
-    return Vector4(v.x * f, v.y * f, v.z * f);
-}
-
-INLINE void Vector4::operator+=(float f)
-{
-    x += f;
-    y += f;
-    z += f;
-}
-
-INLINE void Vector4::operator+=(const Vector4& v)
-{
-    x += v.x;
-    y += v.y;
-    z += v.z;
-}
-
-INLINE void Vector4::operator-=(float f)
-{
-    x -= f;
-    y -= f;
-    z -= f;
-}
-
-INLINE void Vector4::operator-=(const Vector4& v)
-{
-    x -= v.x;
-    y -= v.y;
-    z -= v.z;
-}
-
-INLINE void Vector4::operator*=(float f)
-{
-    x *= f;
-    y *= f;
-    z *= f;
-}
-
-INLINE void Vector4::operator*=(const Matrix4x4& m)
+void Vector4::operator*=(const Matrix4x4& m)
 {
     // We do the product the same way as if we were multiplying M * v, since
     // it makes more since for linear transformation to do it that way.
@@ -268,40 +183,6 @@ INLINE void Vector4::operator*=(const Matrix4x4& m)
     y = ny / w;
     z = nz / w;
     w = 1.0f;
-}
-
-INLINE void Vector4::operator/=(float f)
-{
-    x /= f;
-    y /= f;
-    z /= f;
-}
-
-INLINE bool Vector4::operator==(const Vector4& v) const
-{
-    return fabs(x - v.x) < EPSILON &&
-           fabs(y - v.y) < EPSILON &&
-           fabs(z - v.z) < EPSILON;
-}
-
-INLINE bool Vector4::operator!=(const Vector4& v) const
-{
-    return fabs(x - v.x) >= EPSILON ||
-           fabs(y - v.y) >= EPSILON ||
-           fabs(z - v.z) >= EPSILON;
-}
-
-INLINE Vector4& Vector4::operator=(const Vector4& v)
-{
-    if ((*this) == v) {
-        return *this;
-    }
-
-    x = v.x;
-    y = v.y;
-    z = v.z;
-
-    return *this;
 }
 
 }

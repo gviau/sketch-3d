@@ -1,6 +1,8 @@
 #include "Matrix4x4.h"
 
 #include "Constants.h"
+#include "Vector4.h"
+
 #include <math.h>
 
 namespace Sketch3D
@@ -140,42 +142,7 @@ void Matrix4x4::RotateAroundAxis(const Vector4& axis, float angle)
     data_[15] = 1.0f;
 }
 
-INLINE float Matrix4x4::operator()(int col, int row) const
-{
-    return data_[row*4 + col];
-}
-
-INLINE float& Matrix4x4::operator()(int col, int row)
-{
-    return data_[row*4 + col];
-}
-
-INLINE Matrix4x4 Matrix4x4::operator-() const
-{
-    float data[16];
-    for (int i = 0; i < 16; i++) {
-        data[i] = -data_[i];
-    }
-
-    return Matrix4x4(data);
-}
-
-INLINE Matrix4x4 Matrix4x4::operator*(const Matrix4x4& m) const
-{
-    Matrix4x4 mat;
-
-    for (int i = 0; i < 16; i += 4) {
-        for (int j = 0; j < 4; j++) {
-            for (int k = 0; k < 4; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*4 + j];
-            }
-        }
-    }
-
-    return mat;
-}
-
-INLINE Vector4 Matrix4x4::operator*(const Vector4& v) const
+Vector4 Matrix4x4::operator*(const Vector4& v) const
 {
     Vector4 w;
 
@@ -190,56 +157,6 @@ INLINE Vector4 Matrix4x4::operator*(const Vector4& v) const
     w.w = 1.0f;
 
     return w;
-}
-
-INLINE void Matrix4x4::operator*=(const Matrix4x4& m)
-{
-    Matrix4x4 mat;
-
-    for (int i = 0; i < 16; i += 4) {
-        for (int j = 0; j < 4; j++) {
-            for (int k = 0; k < 4; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*4 + j];
-            }
-        }
-    }
-
-    (*this) = mat;
-}
-
-INLINE bool Matrix4x4::operator==(const Matrix4x4& m) const
-{
-    for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-INLINE bool Matrix4x4::operator!=(const Matrix4x4& m) const
-{
-    for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-INLINE Matrix4x4& Matrix4x4::operator=(const Matrix4x4& m)
-{
-    if (this == &m) {
-        return *this;
-    }
-
-    for (int i = 0; i < 16; i++) {
-        data_[i] = m.data_[i];
-    }
-
-    return *this;
 }
 
 }
