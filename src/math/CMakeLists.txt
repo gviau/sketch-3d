@@ -13,10 +13,11 @@ file(
 file(
     GLOB_RECURSE
     header_files
-    *.h
+    ../../include/math/*.h
 )
 
-include_directories(../common/)
+include_directories(../../include/common/)
+include_directories(../../include/math/)
 
 add_library(
     math

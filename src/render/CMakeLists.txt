@@ -13,11 +13,12 @@ file(
 file(
     GLOB_RECURSE
     header_files
-    *.h
+    ../../include/render/*.h
 )
 
-include_directories (../common/)
-include_directories (../math/)
+include_directories (../../include/common/)
+include_directories (../../include/math/)
+include_directories (../../include/render/)
 include_directories (${SFML_INCLUDE_DIR})
 
 #link_directories(${SFML_LIBRARIES})

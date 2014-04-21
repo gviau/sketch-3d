@@ -21,9 +21,9 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
 )
 
-include_directories(../src/math/)
-include_directories(../src/common/)
-include_directories(../src/render/)
+include_directories(../include/math/)
+include_directories(../include/common/)
+include_directories(../include/render/)
 
 link_directories(${Boost_LIBRARY_DIRS})
 link_directories(${CMAKE_SOURCE_DIR}/lib/)
