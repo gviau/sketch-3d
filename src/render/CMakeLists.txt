@@ -18,6 +18,9 @@ file(
 
 include_directories (../common/)
 include_directories (../math/)
+include_directories (${SFML_INCLUDE_DIR})
+
+#link_directories(${SFML_LIBRARIES})
 
 add_library(
     render
@@ -29,4 +32,5 @@ add_library(
 target_link_libraries(
     render
     math
+    ${OPENGL_LIBRARIES}
 )

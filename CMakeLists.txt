@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 set (
-    CMAKE_MODULE_OATH
+    CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     "${CMAKE_SOURCE_DIR}/CMakeModules/"
 )
@@ -25,6 +25,26 @@ if (Boost_FOUND)
 else (Boost_FOUND)
     set (MISSING_MODULES ${MISSING_MODULES} "Boost")
 endif (Boost_FOUND)
+
+find_package(OpenGL)
+
+message(STATUS "OpenGL found? ${OPENGL_FOUND}")
+if (OPENGL_FOUND)
+    message (STATUS "OpenGL include: ${OPENGL_INCLUDE_DIR}")
+    message (STATUS "OpenGL libs: ${OPENGL_LIBRARIES}")
+else (OPENGL_FOUND)
+    set (MISSING_MODULES ${MISSING_MODULES} "OpenGL")
+endif (OPENGL_FOUND)
+
+find_package(SFML 2 COMPONENTS window REQUIRED)
+
+message(STATUS "SFML found? ${SFML_FOUND}")
+if (SFML_FOUND)
+    message (STATUS "SFML include: ${SFML_INCLUDE_DIR}")
+    message (STATUS "SFML libs: ${SFML_LIBRARIES}")
+else (SFML_FOUND)
+    set (MISSING_MODULES ${MISSING_MODULES} "SFML")
+endif (SFML_FOUND)
 
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
