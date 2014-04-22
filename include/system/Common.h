@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_COMMON_H
 #define SKETCH_3D_COMMON_H
 
-#include "../math/Constants.h"
+#include "math/Constants.h"
 #include <cmath>
 
 namespace Sketch3D

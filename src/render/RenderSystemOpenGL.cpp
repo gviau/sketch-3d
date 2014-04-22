@@ -1,17 +1,16 @@
-#include "RenderSystemOpenGL.h"
+#include "render/RenderSystemOpenGL.h"
 
-#if PLATFORM == PLATFORM_WIN32
-#include <Windows.h>
-#else
-#endif
+#include "system/Logger.h"
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
-#include "Logger.h"
-
 namespace Sketch3D {
-RenderSystemOpenGL::RenderSystemOpenGL(sf::Window& window) : RenderSystem(window) {
+RenderSystemOpenGL::RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width,
+									 unsigned int height, bool windowed) : RenderSystem(windowHandle,
+																						width, height,
+																						windowed)
+{
 	Logger::getInstance()->info("Current rendering API: OpenGL");
 }
 
@@ -21,7 +20,7 @@ RenderSystemOpenGL::~RenderSystemOpenGL() {
 #if PLATFORM == PLATFORM_WIN32
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(renderContext_);
-	ReleaseDC(window_.getSystemHandle(), deviceContext_);
+	ReleaseDC(windowHandle_, deviceContext_);
 #else if PLATFORM == PLATFORM_LINUX
 #endif
 }
@@ -32,7 +31,7 @@ bool RenderSystemOpenGL::initialize() {
 #if PLATFORM == PLATFORM_WIN32
 	PIXELFORMATDESCRIPTOR pixelFormat;
 	
-	deviceContext_ = GetDC(window_.getSystemHandle());
+	deviceContext_ = GetDC(windowHandle_);
 	if (!deviceContext_) {
 		Logger::getInstance()->error("Couldn't retrieve device context");
 		return false;
@@ -65,12 +64,11 @@ bool RenderSystemOpenGL::initialize() {
 #endif
 
 	// Some initial values
-	sf::Vector2u size = window_.getSize();
-	glViewport(0, 0, size.x, size.y);
+	glViewport(0, 0, width_, height_);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, size.x / size.y, 1.0f, 1000.0f);
+	gluPerspective(45.0f, width_ / height_, 1.0f, 1000.0f);
 
 	glMatrixMode(GL_MODELVIEW);
 
@@ -91,7 +89,7 @@ bool RenderSystemOpenGL::beginRender() {
 }
 
 void RenderSystemOpenGL::endRender() {
-	window_.display();
+	SwapBuffers(deviceContext_);
 }
 
 void RenderSystemOpenGL::render() {

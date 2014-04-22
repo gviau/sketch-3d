@@ -1,8 +1,8 @@
 #ifndef SKETCH_3D_RAY_H
 #define SKETCH_3D_RAY_H
 
-#include "Common.h"
-#include "Vector3.h"
+#include "system/Common.h"
+#include "math/Vector3.h"
 
 namespace Sketch3D
 {

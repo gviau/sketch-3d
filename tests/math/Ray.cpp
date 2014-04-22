@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
-#include "Plane.h"
-#include "Ray.h"
+#include "math/Plane.h"
+#include "math/Ray.h"
 
 using namespace Sketch3D;
 

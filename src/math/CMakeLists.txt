@@ -16,8 +16,7 @@ file(
     ../../include/math/*.h
 )
 
-include_directories(../../include/math/)
-include_directories (../../include/system/)
+include_directories(../../include)
 
 add_library(
     math

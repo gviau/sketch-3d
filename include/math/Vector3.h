@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_VECTOR_3_H
 #define SKETCH_3D_VECTOR_3_H
 
-#include "Common.h"
+#include "system/Common.h"
 
 namespace Sketch3D {
 

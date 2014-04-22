@@ -36,16 +36,6 @@ else (OPENGL_FOUND)
     set (MISSING_MODULES ${MISSING_MODULES} "OpenGL")
 endif (OPENGL_FOUND)
 
-find_package(SFML 2 COMPONENTS window REQUIRED)
-
-message(STATUS "SFML found? ${SFML_FOUND}")
-if (SFML_FOUND)
-    message (STATUS "SFML include: ${SFML_INCLUDE_DIR}")
-    message (STATUS "SFML libs: ${SFML_LIBRARIES}")
-else (SFML_FOUND)
-    set (MISSING_MODULES ${MISSING_MODULES} "SFML")
-endif (SFML_FOUND)
-
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
 endif (MISSING_MODULES)

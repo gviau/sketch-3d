@@ -16,7 +16,7 @@ file(
     ../../include/system/*.h
 )
 
-include_directories(../../include/system/)
+include_directories(../../include/)
 
 add_library(
     system

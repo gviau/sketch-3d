@@ -1,7 +1,7 @@
-#include "Ray.h"
+#include "math/Ray.h"
 
-#include "Constants.h"
-#include "Plane.h"
+#include "math/Constants.h"
+#include "math/Plane.h"
 
 namespace Sketch3D
 {

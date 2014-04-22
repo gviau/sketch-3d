@@ -1,20 +1,13 @@
-#ifndef SKETCH_3D_RENDER_SYSTEM_H2
+#ifndef SKETCH_3D_RENDER_SYSTEM_H
 #define SKETCH_3D_RENDER_SYSTEM_H
 
-#include <SFML/Window.hpp>
-
-#if PLATFORM == PLATFORM_WIN32
-#	include <Windows.h>
-#	define WINDOW_HANDLE HWND
-#	define DEVICE_CONTEXT HDC
-#	define RENDER_CONTEXT HGLRC
-#else if PLATFORM == PLATFORM_LINUX
-#	define WINDOW_HANDLE
-#	define DEVICE_CONTEXT
-#	define RENDER_CONTEXT
-#endif
+#include "system/Platform.h"
 
 namespace Sketch3D {
+
+#if PLATFORM == PLATFORM_WIN32
+#include <Windows.h>
+#endif
 
 /**
  * @interface RenderSystem
@@ -27,9 +20,15 @@ class RenderSystem {
 	public:
 		/**
 		 * Constructor. Initializes the underlying API.
-		 * @param window A SFML window to initialize the context
+		 * @param windowHandle The platform dependent of an already created window
+		 * @param width The width of the window
+		 * @param height The height of the window
+		 * @param windowed Is the window in window mode?
 		 */
-						RenderSystem(sf::Window& window) : window_(window) {}
+						RenderSystem(WindowHandle windowHandle, unsigned int width,
+									 unsigned int height, bool windowed) : windowHandle_(windowHandle),
+																		   width_(width), height_(height),
+																		   windowed_(windowed) {}
 
 		/**
 		 * Destructor. Free the underlying API
@@ -68,10 +67,16 @@ class RenderSystem {
 		virtual void	render() = 0;
 
 	protected:
-		sf::Window&		window_;
-
-		DEVICE_CONTEXT	deviceContext_;
-		RENDER_CONTEXT	renderContext_;
+#if PLATFORM == PLATFORM_WIN32
+		HWND			windowHandle_;	/**< Platform dependent window handle */
+		HDC				deviceContext_;	/**< Platform dependent device context */
+		HGLRC			renderContext_;	/**< Platform dependent render context */
+#elif PLATFORM == PLATFORM_LINUX
+		unsigned long	windowHandle_;
+#endif
+		unsigned int	width_;			/**< The width of the window */
+		unsigned int	height_;		/**< The height of the window */
+		bool			windowed_;		/**< IS the window in windowed mode ? */
 };
 
 }

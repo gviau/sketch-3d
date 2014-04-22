@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_SCENE_TREE_H
 #define SKETCH_3D_SCENE_TREE_H
 
-#include "CompositeNode.h"
+#include "render/CompositeNode.h"
 
 namespace Sketch3D {
 

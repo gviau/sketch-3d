@@ -1,8 +1,8 @@
 #ifndef SKETCH_3D_QUATERNION_H
 #define SKETCH_3D_QUATERNION_H
 
-#include "Matrix3x3.h"
-#include "Matrix4x4.h"
+#include "math/Matrix3x3.h"
+#include "math/Matrix4x4.h"
 
 namespace Sketch3D {
 

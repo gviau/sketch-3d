@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
-#include "Constants.h"
-#include "Matrix4x4.h"
-#include "Vector4.h"
+#include "math/Constants.h"
+#include "math/Matrix4x4.h"
+#include "math/Vector4.h"
 
 using namespace Sketch3D;
 

@@ -1,4 +1,4 @@
-#include "CompositeNode.h"
+#include "render/CompositeNode.h"
 
 namespace Sketch3D {
 

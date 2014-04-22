@@ -1,8 +1,8 @@
 #ifndef SKETCH_3D_PLANE_H
 #define SKETCH_3D_PLANE_H
 
-#include "Common.h"
-#include "Vector3.h"
+#include "system/common.h"
+#include "math/vector3.h"
 
 namespace Sketch3D
 {

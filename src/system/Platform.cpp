@@ -1,9 +1,9 @@
-#include "Platform.h"
+#include "system/Platform.h"
+
+#include "system/Logger.h"
 
 #include <cstring>
 #include <iostream>
-
-#include "Logger.h"
 
 namespace Sketch3D
 {

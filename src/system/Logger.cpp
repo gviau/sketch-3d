@@ -1,6 +1,6 @@
-#include "Logger.h"
+#include "system/Logger.h"
 
-#include "Platform.h"
+#include "system/Platform.h"
 
 #include <ctime>
 

@@ -1,7 +1,7 @@
-#include "Matrix3x3.h"
+#include "math/Matrix3x3.h"
 
-#include "Constants.h"
-#include "Vector3.h"
+#include "math/Constants.h"
+#include "math/Vector3.h"
 
 #include <math.h>
 

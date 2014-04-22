@@ -1,7 +1,7 @@
-#include "Matrix4x4.h"
+#include "math/Matrix4x4.h"
 
-#include "Constants.h"
-#include "Vector4.h"
+#include "math/Constants.h"
+#include "math/Vector4.h"
 
 #include <math.h>
 

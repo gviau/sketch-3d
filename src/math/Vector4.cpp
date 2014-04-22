@@ -1,12 +1,11 @@
-#include "Vector4.h"
+#include "math/Vector4.h"
 
-#include <math.h>
-
-#include "Constants.h"
-#include "Matrix4x4.h"
-#include "Platform.h"
+#include "math/Constants.h"
+#include "math/Matrix4x4.h"
+#include "system/Platform.h"
 
 #include <iostream>
+#include <math.h>
 
 namespace Sketch3D {
 

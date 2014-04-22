@@ -16,12 +16,7 @@ file(
     ../../include/render/*.h
 )
 
-include_directories (../../include/math/)
-include_directories (../../include/render/)
-include_directories (../../include/system/)
-include_directories (${SFML_INCLUDE_DIR})
-
-#link_directories(${SFML_LIBRARIES})
+include_directories (../../include)
 
 add_library(
     render

@@ -1,5 +1,5 @@
 #ifndef SKETCH_3D_PLATFORM_H
-#define SKETCH_3D_PLATFORM_h
+#define SKETCH_3D_PLATFORM_H
 
 #include <string>
 using namespace std;
@@ -31,8 +31,11 @@ namespace Sketch3D
 // Platform
 #if defined(__WIN32__) || defined(_WIN32)
 #   define PLATFORM PLATFORM_WIN32
+struct HWND__;
+typedef HWND__* WindowHandle;
 #else
 #   define PLATFORM PLATFORM_LINUX
+typedef unsigned long WindowHandle;
 #endif
 
 // Architecture (32 bits or 64 bits?)

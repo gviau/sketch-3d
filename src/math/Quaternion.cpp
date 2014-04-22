@@ -1,9 +1,9 @@
-#include "Quaternion.h"
+#include "math/Quaternion.h"
+
+#include "math/Constants.h"
+#include "math/Vector3.h"
 
 #include <math.h>
-
-#include "Constants.h"
-#include "Vector3.h"
 
 namespace Sketch3D
 {

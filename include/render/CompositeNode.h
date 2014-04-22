@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_COMPOSITE_NODE_H
 #define SKETCH_3D_COMPOSITE_NODE_H
 
-#include "Node.h"
+#include "render/Node.h"
 
 #include <map>
 using namespace std;

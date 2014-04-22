@@ -1,9 +1,9 @@
 #ifndef SKETCH_3D_NODE_H
 #define SKETCH_3D_NODE_H
 
-#include "Matrix4x4.h"
-#include "Quaternion.h"
-#include "Vector3.h"
+#include "math/Matrix4x4.h"
+#include "math/Quaternion.h"
+#include "math/Vector3.h"
 
 #include <string>
 using namespace std;

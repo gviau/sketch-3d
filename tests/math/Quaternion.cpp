@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
-#include "Constants.h"
-#include "Quaternion.h"
-#include "Vector3.h"
-#include "Vector4.h"
+#include "math/Constants.h"
+#include "math/Quaternion.h"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
 
 using namespace Sketch3D;
 
