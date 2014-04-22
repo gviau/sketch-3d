@@ -22,7 +22,7 @@ include_directories(
 )
 
 include_directories(../include/math/)
-include_directories(../include/common/)
+include_directories(../include/system/)
 include_directories(../include/render/)
 
 link_directories(${Boost_LIBRARY_DIRS})
@@ -43,6 +43,7 @@ target_link_libraries(
     tests
     math
     render
+    system
     ${Boost_LIBRARIES}
 )
 

@@ -8,11 +8,16 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
+#include "Logger.h"
+
 namespace Sketch3D {
 RenderSystemOpenGL::RenderSystemOpenGL(sf::Window& window) : RenderSystem(window) {
+	Logger::getInstance()->info("Current rendering API: OpenGL");
 }
 
 RenderSystemOpenGL::~RenderSystemOpenGL() {
+	Logger::getInstance()->info("Shutdown OpenGL");
+
 #if PLATFORM == PLATFORM_WIN32
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(renderContext_);
@@ -22,11 +27,14 @@ RenderSystemOpenGL::~RenderSystemOpenGL() {
 }
 
 bool RenderSystemOpenGL::initialize() {
+	Logger::getInstance()->info("Initializing OpenGL...");
+
 #if PLATFORM == PLATFORM_WIN32
 	PIXELFORMATDESCRIPTOR pixelFormat;
 	
 	deviceContext_ = GetDC(window_.getSystemHandle());
 	if (!deviceContext_) {
+		Logger::getInstance()->error("Couldn't retrieve device context");
 		return false;
 	}
 
@@ -45,10 +53,12 @@ bool RenderSystemOpenGL::initialize() {
 
 	renderContext_ = wglCreateContext(deviceContext_);
 	if (!renderContext_) {
+		Logger::getInstance()->error("Couldn't create render context");
 		return false;
 	}
 
 	if (!wglMakeCurrent(deviceContext_, renderContext_)) {
+		Logger::getInstance()->error("Couldn't set the new rendering context");
 		return false;
 	}
 #else if PLATFORM == PLATFORM_LINUX

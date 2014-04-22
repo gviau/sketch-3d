@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8)
 
-project (math)
+project (system)
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib/")
 
@@ -13,19 +13,18 @@ file(
 file(
     GLOB_RECURSE
     header_files
-    ../../include/math/*.h
+    ../../include/system/*.h
 )
 
-include_directories(../../include/math/)
-include_directories (../../include/system/)
+include_directories(../../include/system/)
 
 add_library(
-    math
+    system
     STATIC
     ${source_files}
     ${header_files}
 )
 
 target_link_libraries(
-    math
+    system
 )

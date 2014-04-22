@@ -3,6 +3,8 @@
 #include <cstring>
 #include <iostream>
 
+#include "Logger.h"
+
 namespace Sketch3D
 {
 #if COMPILER == COMPILER_MSVC
@@ -97,8 +99,8 @@ namespace Sketch3D
         __cpuid(CPUInfo, query);
         result._eax = CPUInfo[0];
         result._ebx = CPUInfo[1];
-        result._edx = CPUInfo[2];
-        result._ecx = CPUInfo[3];
+        result._ecx = CPUInfo[2];
+        result._edx = CPUInfo[3];
         return result._eax;
 
 #   else
@@ -199,43 +201,50 @@ namespace Sketch3D
             CpuidResult result;
 
             if (PerformCpuid(0, result)) {
+				bool continueFeatures = false;
                 if (memcmp(&result._ebx, "GenuineIntel", 12) == 0) {
-                    PerformCpuid(1, result);
+					continueFeatures = true;
+					Logger::getInstance()->info("CPU manufacturer: GenuineIntel");
 
-                    if (result._edx & CPUID_STD_MMX) {
-                        features |= PlatformInformation::MMX;
-                    }
-
-                    if (result._edx & CPUID_STD_SSE) {
-                        features |= PlatformInformation::SSE;
-                    }
-
-                    if (result._edx & CPUID_STD_SSE2) {
-                        features |= PlatformInformation::SSE2;
-                    }
                 } else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0) {
+					continueFeatures = true;
+					Logger::getInstance()->info("CPU manufacturer: AuthenticAMD");
+
+                } else {
+					Logger::getInstance()->warning("CPU manufacturer: Unknown");
+				}
+
+				if (continueFeatures) {
+					Logger::getInstance()->info("CPU features:");
                     PerformCpuid(1, result);
 
                     if (result._edx & CPUID_STD_MMX) {
                         features |= PlatformInformation::MMX;
+						Logger::getInstance()->info("MMX supported");
                     }
 
                     if (result._edx & CPUID_STD_SSE) {
                         features |= PlatformInformation::SSE;
+						Logger::getInstance()->info("SSE supported");
                     }
 
                     if (result._edx & CPUID_STD_SSE2) {
                         features |= PlatformInformation::SSE2;
+						Logger::getInstance()->info("SSE2 supported");
                     }
-                }
+				}
             }
-        }
+        } else {
+			Logger::getInstance()->warning("Couldn't perform CPUID operation");
+		}
 
         return features;
     }
 
     static unsigned int DetectCpuFeatures()
     {
+		Logger::getInstance()->info("Querying CPU info...");
+
         unsigned int features = QueryCpuFeatures();
         const unsigned int sse_features = PlatformInformation::SSE |
             PlatformInformation::SSE2;
