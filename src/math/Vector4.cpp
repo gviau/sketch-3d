@@ -70,9 +70,9 @@ Vector4 Vector4::Normalized() const
     if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
         length = Length();
         if (length != 0.0f) {
-            result.x /= length;
-            result.y /= length;
-            result.z /= length;
+            result.x = x / length;
+            result.y = y / length;
+            result.z = z / length;
         }
     } else {
         __m128 u = {x, y, z, 0.0f};
