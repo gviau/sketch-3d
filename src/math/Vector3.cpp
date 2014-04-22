@@ -88,7 +88,7 @@ Vector3 Vector3::Normalized() const
         u = _mm_rsqrt_ps(u);
         w = _mm_mul_ps(u, w);
 
-        float f[4];
+        SIMD_ALIGNED_DECL(float, f[4]);
         _mm_store_ps(f, w);
 
         result.x = f[0];
@@ -125,7 +125,7 @@ void Vector3::Normalize()
         u = _mm_rsqrt_ps(u);
         w = _mm_mul_ps(u, w);
 
-        float f[4];
+		SIMD_ALIGNED_DECL(float, f[4]);
         _mm_store_ps(f, w);
 
         x = f[0];
