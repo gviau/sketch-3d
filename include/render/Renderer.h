@@ -3,7 +3,6 @@
 
 #include "math/Vector3.h"
 #include "render/ResourceManager.h"
-#include "system/Platform.h"
 
 #include <string>
 using namespace std;
@@ -12,6 +11,7 @@ namespace Sketch3D {
 
 // Forward class declaration
 class RenderSystem;
+class Window;
 
 /**
  * @enum RenderSystem_t
@@ -41,14 +41,11 @@ class Renderer {
 		/**
 		 * Initialize the renderer
 		 * @param renderSystem The render system to use
-		 * @param handle The platform dependent window handle
-		 * @param width The width of the window
-		 * @param height The height of the window
-		 * @param windowed Is the window in fullscreen or not?
+		 * @param window The window for which to create a rendering context
 		 * @return true if the initialization went correctly
 		 */
-		bool				initialize(RenderSystem_t renderSystem, WindowHandle handle,
-									   unsigned int width, unsigned int height, bool windowed);
+		bool				initialize(RenderSystem_t renderSystem,
+									   const Window& window);
 
 		/**
 		 * Change the clear color

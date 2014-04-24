@@ -204,38 +204,38 @@ namespace Sketch3D
 				bool continueFeatures = false;
                 if (memcmp(&result._ebx, "GenuineIntel", 12) == 0) {
 					continueFeatures = true;
-					Logger::getInstance()->info("CPU manufacturer: GenuineIntel");
+					Logger::GetInstance()->Info("CPU manufacturer: GenuineIntel");
 
                 } else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0) {
 					continueFeatures = true;
-					Logger::getInstance()->info("CPU manufacturer: AuthenticAMD");
+					Logger::GetInstance()->Info("CPU manufacturer: AuthenticAMD");
 
                 } else {
-					Logger::getInstance()->warning("CPU manufacturer: Unknown");
+					Logger::GetInstance()->Warning("CPU manufacturer: Unknown");
 				}
 
 				if (continueFeatures) {
-					Logger::getInstance()->info("CPU features:");
+					Logger::GetInstance()->Info("CPU features:");
                     PerformCpuid(1, result);
 
                     if (result._edx & CPUID_STD_MMX) {
                         features |= PlatformInformation::MMX;
-						Logger::getInstance()->info("MMX supported");
+						Logger::GetInstance()->Info("MMX supported");
                     }
 
                     if (result._edx & CPUID_STD_SSE) {
                         features |= PlatformInformation::SSE;
-						Logger::getInstance()->info("SSE supported");
+						Logger::GetInstance()->Info("SSE supported");
                     }
 
                     if (result._edx & CPUID_STD_SSE2) {
                         features |= PlatformInformation::SSE2;
-						Logger::getInstance()->info("SSE2 supported");
+						Logger::GetInstance()->Info("SSE2 supported");
                     }
 				}
             }
         } else {
-			Logger::getInstance()->warning("Couldn't perform CPUID operation");
+			Logger::GetInstance()->Warning("Couldn't perform CPUID operation");
 		}
 
         return features;
@@ -243,7 +243,7 @@ namespace Sketch3D
 
     static unsigned int DetectCpuFeatures()
     {
-		Logger::getInstance()->info("Querying CPU info...");
+		Logger::GetInstance()->Info("Querying CPU info...");
 
         unsigned int features = QueryCpuFeatures();
         const unsigned int sse_features = PlatformInformation::SSE |

@@ -2,12 +2,9 @@
 #define SKETCH_3D_RENDER_SYSTEM_H
 
 #include "system/Platform.h"
+#include "system/WindowHandle.h"
 
 namespace Sketch3D {
-
-#if PLATFORM == PLATFORM_WIN32
-#include <Windows.h>
-#endif
 
 /**
  * @interface RenderSystem
@@ -27,7 +24,8 @@ class RenderSystem {
 		 */
 						RenderSystem(WindowHandle windowHandle, unsigned int width,
 									 unsigned int height, bool windowed) : windowHandle_(windowHandle),
-																		   width_(width), height_(height),
+																		   width_(width),
+																		   height_(height),
 																		   windowed_(windowed) {}
 
 		/**
@@ -67,13 +65,7 @@ class RenderSystem {
 		virtual void	render() = 0;
 
 	protected:
-#if PLATFORM == PLATFORM_WIN32
-		HWND			windowHandle_;	/**< Platform dependent window handle */
-		HDC				deviceContext_;	/**< Platform dependent device context */
-		HGLRC			renderContext_;	/**< Platform dependent render context */
-#elif PLATFORM == PLATFORM_LINUX
-		unsigned long	windowHandle_;
-#endif
+		WindowHandle	windowHandle_;	/**< The window's handle */
 		unsigned int	width_;			/**< The width of the window */
 		unsigned int	height_;		/**< The height of the window */
 		bool			windowed_;		/**< IS the window in windowed mode ? */

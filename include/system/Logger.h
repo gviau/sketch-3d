@@ -20,31 +20,31 @@ class Logger {
 		 */
 					   ~Logger();
 
-		static Logger*	getInstance();
+		static Logger*	GetInstance();
 
 		/**
 		 * Write a debug message in the log
 		 * @param message The message to write
 		 */
-		void			debug(const string& message);
+		void			Debug(const string& message);
 
 		/**
 		 * Write a normal message in the log
 		 * @param message The message to write
 		 */
-		void			info(const string& message);
+		void			Info(const string& message);
 
 		/**
 		 * Write a warning message in the log
 		 * @param message The message to write
 		 */
-		void			warning(const string& message);
+		void			Warning(const string& message);
 
 		/**
 		 * Write an error message in the log
 		 * @param message The message to write
 		 */
-		void			error(const string& message);
+		void			Error(const string& message);
 		
 	private:
 		static Logger	instance_;	/**< Singleton's instance */
@@ -69,7 +69,7 @@ class Logger {
 		/**
 		 * Return the current time as a string in the format H:M:S
 		 */
-		string			getCurrentTime() const;
+		string			GetCurrentTime() const;
 };
 
 }

@@ -22,36 +22,36 @@ Logger::~Logger() {
 	file_.close();
 }
 
-Logger* Logger::getInstance() {
+Logger* Logger::GetInstance() {
 	return &instance_;
 }
 
-void Logger::debug(const string& message) {
+void Logger::Debug(const string& message) {
 	file_ << "<p style=\"background-color:#aabbcc\">[DEBUG] ";
-	file_ << getCurrentTime() << " - ";
+	file_ << GetCurrentTime() << " - ";
 	file_ << message;
 	file_ << "</p>" << endl;
 }
 
-void Logger::info(const string& message) {
-	file_ << "<p>" << getCurrentTime() << " - " << message << "</p>" << endl;
+void Logger::Info(const string& message) {
+	file_ << "<p>" << GetCurrentTime() << " - " << message << "</p>" << endl;
 }
 
-void Logger::warning(const string& message) {
+void Logger::Warning(const string& message) {
 	file_ << "<p style=\"background-color:#ffbb12\">[WARNING] ";
-	file_ << getCurrentTime() << " - ";
+	file_ << GetCurrentTime() << " - ";
 	file_ << message;
 	file_ << "</p>" << endl;
 }
 
-void Logger::error(const string& message) {
+void Logger::Error(const string& message) {
 	file_ << "<p style=\"background-color:#ff0012\">[ERROR] ";
-	file_ << getCurrentTime() << " - ";
+	file_ << GetCurrentTime() << " - ";
 	file_ << message;
 	file_ << "</p>" << endl;
 }
 
-string Logger::getCurrentTime() const {
+string Logger::GetCurrentTime() const {
 	time_t t = time(0);
 	struct tm* now = localtime(&t);
 	string currentTime = "";

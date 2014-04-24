@@ -5,21 +5,25 @@
 
 namespace Sketch3D {
 
+// Forward declaration
+class RenderContextOpenGL;
+
 /**
  * @class RenderSystem
  * OpenGL implementation of the render system
  */
 class RenderSystemOpenGL : public RenderSystem {
 	public:
-		RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width,
-									 unsigned int height, bool windowed);
+		RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width, unsigned int height, bool windowed);
 		~RenderSystemOpenGL();
 		virtual bool initialize();
 		virtual void setClearColor(float red, float green, float blue, float alpha=1.0f);
 		virtual bool beginRender();
 		virtual void endRender();
 		virtual void render();
-	private:
+
+	public:
+		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */
 };
 
 }
