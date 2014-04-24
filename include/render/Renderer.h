@@ -36,7 +36,7 @@ class Renderer {
 		 */
 						   ~Renderer();
 
-		static Renderer*	getInstance();
+		static Renderer*	GetInstance();
 
 		/**
 		 * Initialize the renderer
@@ -44,7 +44,7 @@ class Renderer {
 		 * @param window The window for which to create a rendering context
 		 * @return true if the initialization went correctly
 		 */
-		bool				initialize(RenderSystem_t renderSystem,
+		bool				Initialize(RenderSystem_t renderSystem,
 									   const Window& window);
 
 		/**
@@ -52,24 +52,25 @@ class Renderer {
 		 * @param red The red component of the color
 		 * @param green The green component of the color
 		 * @param blue The blue component of the color
+		 * @param alpha The alpha component of the color
 		 */
-		void				setClearColor(float red, float green, float blue);
+		void				SetClearColor(float red, float green, float blue, float alpha=0.0f);
 
 		/**
 		 * Begin the rendering process
 		 * @return true if the rendering process has initialized correctly
 		 */
-		bool				beginRender();
+		bool				BeginRender();
 
 		/**
 		 * End the rendering process
 		 */
-		void				endRender();
+		void				EndRender();
 
 		/**
 		 * The actual rendering
 		 */
-		void				render();
+		void				Render();
 
 		/**
 		 * Set an orthogonal projection. This replace the current projection matrix
@@ -80,7 +81,7 @@ class Renderer {
 		 * @param near The near position of the viewing volume
 		 * @param far The far position of the viewing volume
 		 */
-		void				orthoProjection(float left, float right, float bottom,
+		void				OrthoProjection(float left, float right, float bottom,
 											float top, float near, float far);
 
 		/**
@@ -92,7 +93,7 @@ class Renderer {
 		 * @param near The near position of the viewing volume
 		 * @param far The far position of the viewing volume
 		 */
-		void				perspectiveProjection(float left, float right, float bottom,
+		void				PerspectiveProjection(float left, float right, float bottom,
 												  float top, float near, float far);
 
 		/**
@@ -101,7 +102,7 @@ class Renderer {
 		 * @param direction The direction of the camera
 		 * @param up The up vector to use for the camera. UP by default
 		 */
-		void				cameraLookAt(const Vector3& position,
+		void				CameraLookAt(const Vector3& position,
 										 const Vector3& direction,
 										 const Vector3& up=Vector3::UP);
 

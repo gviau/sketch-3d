@@ -60,42 +60,42 @@ class Node {
 		 * Render the node. Note that this call doesn't immediatly render the
 		 * node on the screen, but it prepares the rendering process.
 		 */
-		virtual void		render() const;
+		virtual void		Render() const;
 
 		/**
 		 * Translate the node by a certain amount. This amount is added to the
 		 * position that the node currently have
 		 * @param translation The translation to add
 		 */
-		void				translate(const Vector3& translation);
+		void				Translate(const Vector3& translation);
 
 		/**
 		 * Scale the node by a certain amount. This amount is multiplied by
 		 * the scale that the node currently have
 		 * @param scale The scaling factor to multiply
 		 */
-		void				scale(const Vector3& scale);
+		void				Scale(const Vector3& scale);
 
 		/**
 		 * Pitch the node by a certain amount. This amount is added to the
 		 * current orientation that the node currently have
 		 * @param angle The angle to pitch the node
 		 */
-		void				pitch(float angle);
+		void				Pitch(float angle);
 
 		/**
 		 * Yaw the node by a certain amount. This amount is added to the
 		 * current orientation that the node currently have
 		 * @param angle The angle to yaw the node
 		 */
-		void				yaw(float angle);
+		void				Yaw(float angle);
 
 		/**
 		 * Roll the node by a certain amount. This amount is added to the
 		 * current orientation that the node currently have
 		 * @param angle The angle to roll the node
 		 */
-		void				roll(float angle);
+		void				Roll(float angle);
 
 		/**
 		 * Rotate the node arount a specified axis. The amount of rotation is
@@ -103,18 +103,18 @@ class Node {
 		 * @param angle The angle to rotate the node
 		 * @param axis The axis around which the node should be rotated
 		 */
-		void				rotateAroundAxis(float angle, const Vector3& axis);
+		void				RotateAroundAxis(float angle, const Vector3& axis);
 
-		void				setParent(Node* parent);
-		void				setPosition(const Vector3& position);
-		void				setScale(const Vector3& scale);
-		void				setOrientation(const Quaternion& orientation);
+		void				SetParent(Node* parent);
+		void				SetPosition(const Vector3& position);
+		void				SetScale(const Vector3& scale);
+		void				SetOrientation(const Quaternion& orientation);
 
-		const string&		getName() const;
-		Node*				getParent() const;
-		const Vector3&		getPosition() const;
-		const Vector3&		getScale() const;
-		const Quaternion&	getOrientation() const;
+		const string&		GetName() const;
+		Node*				GetParent() const;
+		const Vector3&		GetPosition() const;
+		const Vector3&		GetScale() const;
+		const Quaternion&	GetOrientation() const;
 
 	protected:
 		static long long	nextNameIndex_;	/**< The next available number for the automatic name */

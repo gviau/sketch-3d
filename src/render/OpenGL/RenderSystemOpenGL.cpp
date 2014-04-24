@@ -24,7 +24,7 @@ RenderSystemOpenGL::~RenderSystemOpenGL() {
 	delete renderContext_;
 }
 
-bool RenderSystemOpenGL::initialize() {
+bool RenderSystemOpenGL::Initialize() {
 	Logger::GetInstance()->Info("Initializing OpenGL...");
 
 #if PLATFORM == PLATFORM_WIN32
@@ -59,21 +59,21 @@ bool RenderSystemOpenGL::initialize() {
 	return true;
 }
 
-void RenderSystemOpenGL::setClearColor(float red, float green, float blue, float alpha) {
+void RenderSystemOpenGL::SetClearColor(float red, float green, float blue, float alpha) {
 	glClearColor(red, green, blue, alpha);
 }
 
-bool RenderSystemOpenGL::beginRender() {
+bool RenderSystemOpenGL::BeginRender() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	return true;
 }
 
-void RenderSystemOpenGL::endRender() {
+void RenderSystemOpenGL::EndRender() {
 	renderContext_->SwapBuffers();
 }
 
-void RenderSystemOpenGL::render() {
+void RenderSystemOpenGL::Render() {
 	glLoadIdentity();
 	gluLookAt(0.0f, 1.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 

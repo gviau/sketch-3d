@@ -15,11 +15,11 @@ Renderer::~Renderer() {
 	delete renderSystem_;
 }
 
-Renderer* Renderer::getInstance() {
+Renderer* Renderer::GetInstance() {
 	return &instance_;
 }
 
-bool Renderer::initialize(RenderSystem_t renderSystem,
+bool Renderer::Initialize(RenderSystem_t renderSystem,
 						  const Window& window)
 {
 	switch (renderSystem) {
@@ -39,22 +39,23 @@ bool Renderer::initialize(RenderSystem_t renderSystem,
 			break;
 	}
 
-	return renderSystem_->initialize();
+	return renderSystem_->Initialize();
 }
 
-void Renderer::setClearColor(float red, float green, float blue) {
+void Renderer::SetClearColor(float red, float green, float blue, float alpha) {
+	renderSystem_->SetClearColor(red, green, blue, alpha);
 }
 
-bool Renderer::beginRender() {
-	return renderSystem_->beginRender();
+bool Renderer::BeginRender() {
+	return renderSystem_->BeginRender();
 }
 
-void Renderer::endRender() {
-	renderSystem_->endRender();
+void Renderer::EndRender() {
+	renderSystem_->EndRender();
 }
 
-void Renderer::render() {
-	renderSystem_->render();
+void Renderer::Render() {
+	renderSystem_->Render();
 }
 
 }

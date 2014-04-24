@@ -16,11 +16,11 @@ class RenderSystemOpenGL : public RenderSystem {
 	public:
 		RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width, unsigned int height, bool windowed);
 		~RenderSystemOpenGL();
-		virtual bool initialize();
-		virtual void setClearColor(float red, float green, float blue, float alpha=1.0f);
-		virtual bool beginRender();
-		virtual void endRender();
-		virtual void render();
+		virtual bool Initialize();
+		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);
+		virtual bool BeginRender();
+		virtual void EndRender();
+		virtual void Render();
 
 	public:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */

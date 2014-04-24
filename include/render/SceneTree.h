@@ -31,7 +31,7 @@ class SceneTree : public CompositeNode {
 		 * immediatly render the nodes on the screen, but it prepares the
 		 * rendering process.
 		 */
-		virtual void		render() const;
+		virtual void		Render() const;
 
 	private:
 };

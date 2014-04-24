@@ -47,21 +47,21 @@ class CompositeNode : public Node {
 		 * @param orientation The orientation of the node
 		 * @param parent The parent of this node. NULL by default
 		 */
-						CompositeNode(const string& name, const Vector3& position,
-									  const Vector3& scale, const Quaternion& orientation,
-									  Node* parent=NULL);
+							CompositeNode(const string& name, const Vector3& position,
+										  const Vector3& scale, const Quaternion& orientation,
+										  Node* parent=NULL);
 
 		/**
 		 * Destructor - free all children nodes
 		 */
-		virtual		   ~CompositeNode();
+		virtual			   ~CompositeNode();
 
 		/**
 		 * Render this node and its children. Note that this call doesn't
 		 * immediatly render the nodes on the screen, but it prepares the
 		 * rendering process.
 		 */
-		virtual void		render() const;
+		virtual void		Render() const;
 
 		/**
 		 * Add a node to this node's childrens. The name of the node must not already
@@ -69,14 +69,14 @@ class CompositeNode : public Node {
 		 * @param node The node to add to the list
 		 * @return true if the node could be added, false otherwise.
 		 */
-		bool				addChildren(const Node& node);
+		bool				AddChildren(const Node& node);
 
 		/**
 		 * Remove a node from this node
 		 * @param name The name of the node to remove
 		 * @return true if the node was found. False otherwise
 		 */
-		bool				removeChildren(const string& name);
+		bool				RemoveChildren(const string& name);
 
 	protected:
 		map<string, Node>	children_;	/**< The children of this node. The key is the name of the node */

@@ -34,70 +34,70 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 Node::~Node() {
 }
 
-void Node::render() const {
+void Node::Render() const {
 }
 
-void Node::translate(const Vector3& translation) {
+void Node::Translate(const Vector3& translation) {
 	position_ += translation;
 }
 
-void Node::scale(const Vector3& scale) {
+void Node::Scale(const Vector3& scale) {
 	scale_.x *= scale.x;
 	scale_.y *= scale.y;
 	scale_.z *= scale.z;
 }
 
-void Node::pitch(float angle) {
-	rotateAroundAxis(angle, Vector3::RIGHT);
+void Node::Pitch(float angle) {
+	RotateAroundAxis(angle, Vector3::RIGHT);
 }
 
-void Node::yaw(float angle) {
-	rotateAroundAxis(angle, Vector3::UP);
+void Node::Yaw(float angle) {
+	RotateAroundAxis(angle, Vector3::UP);
 }
 
-void Node::roll(float angle) {
-	rotateAroundAxis(angle, Vector3::LOOK);
+void Node::Roll(float angle) {
+	RotateAroundAxis(angle, Vector3::LOOK);
 }
 
-void Node::rotateAroundAxis(float angle, const Vector3& axis) {
+void Node::RotateAroundAxis(float angle, const Vector3& axis) {
 	Quaternion rot;
 	rot.MakeFromAngleAxis(angle, axis);
 	orientation_ *= rot;
 }
 
-void Node::setParent(Node* parent) {
+void Node::SetParent(Node* parent) {
 	parent_ = parent;
 }
 
-void Node::setPosition(const Vector3& position) {
+void Node::SetPosition(const Vector3& position) {
 	position_ = position;
 }
 
-void Node::setScale(const Vector3& scale) {
+void Node::SetScale(const Vector3& scale) {
 	scale_ = scale;
 }
 
-void Node::setOrientation(const Quaternion& orientation) {
+void Node::SetOrientation(const Quaternion& orientation) {
 	orientation_ = orientation;
 }
 
-const string& Node::getName() const {
+const string& Node::GetName() const {
 	return name_;
 }
 
-Node* Node::getParent() const {
+Node* Node::GetParent() const {
 	return parent_;
 }
 
-const Vector3& Node::getPosition() const {
+const Vector3& Node::GetPosition() const {
 	return position_;
 }
 
-const Vector3& Node::getScale() const {
+const Vector3& Node::GetScale() const {
 	return scale_;
 }
 
-const Quaternion& Node::getOrientation() const {
+const Quaternion& Node::GetOrientation() const {
 	return orientation_;
 }
 

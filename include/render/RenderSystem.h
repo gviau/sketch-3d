@@ -37,7 +37,7 @@ class RenderSystem {
 		 * Initialize the rendering system
 		 * @return true if the system was correctly initialized, false otherwise
 		 */
-		virtual bool	initialize()=0;
+		virtual bool	Initialize()=0;
 
 		/**
 		 * Change the clear color
@@ -46,23 +46,23 @@ class RenderSystem {
 		 * @param blue The blue component
 		 * @param alpha The alpha component
 		 */
-		virtual void	setClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
+		virtual void	SetClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
 
 		/**
 		 * Starts the rendering process.
 		 * @return true if the rendering process was correctly started, false otherwise
 		 */
-		virtual bool	beginRender() = 0;
+		virtual bool	BeginRender() = 0;
 
 		/**
 		 * Ends the rendering process
 		 */
-		virtual void	endRender() = 0;
+		virtual void	EndRender() = 0;
 
 		/**
 		 * The actual rendering process
 		 */
-		virtual void	render() = 0;
+		virtual void	Render() = 0;
 
 	protected:
 		WindowHandle	windowHandle_;	/**< The window's handle */

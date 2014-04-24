@@ -8,8 +8,8 @@ SceneTree::SceneTree() : CompositeNode("root") {
 SceneTree::~SceneTree() {
 }
 
-void SceneTree::render() const {
-	CompositeNode::render();
+void SceneTree::Render() const {
+	CompositeNode::Render();
 }
 
 }
