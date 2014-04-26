@@ -90,7 +90,11 @@ Vector4 Vector4::Normalized() const
         u = _mm_rsqrt_ps(u);
         w = _mm_mul_ps(u, w);
 
+#if COMPILER == COMPILER_MSVC
         SIMD_ALIGNED_DECL(float, f[4]);
+#elif COMPILER == COMPILER_GNUC
+        float f[4];
+#endif
         _mm_store_ps(f, w);
 
         result.x = f[0];
@@ -127,7 +131,11 @@ void Vector4::Normalize()
         u = _mm_rsqrt_ps(u);
         w = _mm_mul_ps(u, w);
 
+#if COMPILER == COMPILER_MSVC
         SIMD_ALIGNED_DECL(float, f[4]);
+#elif COMPILER == COMPILER_GNUC
+        float f[4];
+#endif
         _mm_store_ps(f, w);
 
         x = f[0];

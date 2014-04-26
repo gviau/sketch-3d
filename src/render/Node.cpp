@@ -1,11 +1,15 @@
 #include "render/Node.h"
 
+#include <sstream>
+
 namespace Sketch3D {
 
 long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent) {
-	name_ = "NewNode" + std::to_string(nextNameIndex_);
+    ostringstream convert;
+    convert << nextNameIndex_;
+	name_ = "NewNode" + convert.str();
 	nextNameIndex_ += 1;
 }
 
@@ -13,21 +17,23 @@ Node::Node(const string& name, Node* parent) : name_(name), parent_(parent) {
 }
 
 Node::Node(const Vector3& position, const Vector3& scale,
-		   const Quaternion& orientation, Node* parent) : position_(position),
+		   const Quaternion& orientation, Node* parent) : parent_(parent),
+                                                          position_(position),
 														  scale_(scale),
-														  orientation_(orientation),
-														  parent_(parent)
+														  orientation_(orientation)
 {
-	name_ = "NewNode" + std::to_string(nextNameIndex_);
+    ostringstream convert;
+    convert << nextNameIndex_;
+	name_ = "NewNode" + convert.str();
 	nextNameIndex_ += 1;
 }
 
 Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 		   const Quaternion& orientation, Node* parent) : name_(name),
+                                                          parent_(parent),
 														  position_(position),
 														  scale_(scale),
-														  orientation_(orientation),
-														  parent_(parent)
+														  orientation_(orientation)
 {
 }
 

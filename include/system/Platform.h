@@ -31,11 +31,8 @@ namespace Sketch3D
 // Platform
 #if defined(__WIN32__) || defined(_WIN32)
 #   define PLATFORM PLATFORM_WIN32
-struct HWND__;
-typedef HWND__* WindowHandle;
 #else
 #   define PLATFORM PLATFORM_LINUX
-typedef unsigned long WindowHandle;
 #endif
 
 // Architecture (32 bits or 64 bits?)
@@ -55,7 +52,7 @@ typedef unsigned long WindowHandle;
 #if COMPILER == COMPILER_MSVC
 #   define ALIGNED_DECL(type, var, alignment) __declspec(align(alignment)) type var
 #elif COMPILER == COMPILER_GNUC
-#   define ALIGNED_DECL(type, var, alignment) type var __atribute__((__aligned__(alignment)))
+#   define ALIGNED_DECL(type, var, alignment) type var __atribute__((aligned(alignment)))
 #else
 #   define ALIGNED_DECL(type, var, alignment) type var
 #endif
