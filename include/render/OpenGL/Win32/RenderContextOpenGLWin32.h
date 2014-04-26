@@ -15,9 +15,9 @@ class RenderContextOpenGLWin32 : public RenderContextOpenGL {
 	public:
 		/**
 		 * Constructor
-		 * @param deviceContext The device of the window
+		 * @param window The window for which the context will be created
 		 */
-						RenderContextOpenGLWin32(HDC deviceContext);
+						RenderContextOpenGLWin32(const Window& window);
 
 		/**
 		 * Destructor. Free the render context

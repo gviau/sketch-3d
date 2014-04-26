@@ -2,14 +2,14 @@
 
 #include "system/Logger.h"
 
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include "render/OpenGL/gl/GL.h"
+#include "render/OpenGL/gl/GLU.h"
 #include "render/OpenGL/gl/wglext.h"
 
 namespace Sketch3D {
 
-RenderContextOpenGLWin32::RenderContextOpenGLWin32(HDC deviceContext) : deviceContext_(deviceContext),
-																		renderContext_(NULL)
+RenderContextOpenGLWin32::RenderContextOpenGLWin32(const Window& window) : RenderContext(window),
+                                                                           renderContext_(NULL)
 {
 }
 
@@ -26,6 +26,12 @@ RenderContextOpenGLWin32::~RenderContextOpenGLWin32() {
 bool RenderContextOpenGLWin32::Initialize() {
 	Logger::GetInstance()->Debug("Initializing OpenGL context");
 
+    deviceContext_ = GetDC(reinterpret_cast<HWND>(window_.GetWindowHandle()));
+    if (!deviceContext_) {
+        Logger::GetInstance()->Error("Couldn't retrieve device context");
+        return false;
+    }
+
 	PIXELFORMATDESCRIPTOR pixelFormat;
 	ZeroMemory(&pixelFormat, sizeof(pixelFormat));
 	pixelFormat.nSize = sizeof(pixelFormat);
@@ -40,13 +46,12 @@ bool RenderContextOpenGLWin32::Initialize() {
 	int format = ChoosePixelFormat(deviceContext_, &pixelFormat);
 	if (format == 0) {
 		Logger::GetInstance()->Error("Failed to create a suitable pixel format "
-									 "for device context - cannot create OpenGL context");
-		return false;
+									 "for device context");
+        return false;
 	}
 
 	if (!SetPixelFormat(deviceContext_, format, &pixelFormat)) {
-		Logger::GetInstance()->Error("Couldn't set the pixel format - cannot "
-									 "create OpenGL context");
+		Logger::GetInstance()->Error("Couldn't set the pixel format");
 		return false;
 	}
 	

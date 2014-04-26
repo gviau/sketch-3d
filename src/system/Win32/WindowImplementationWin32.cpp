@@ -31,6 +31,10 @@ WindowImplementationWin32::WindowImplementationWin32(const string& title,
 }
 
 WindowImplementationWin32::~WindowImplementationWin32() {
+    Close();
+}
+
+void WindowImplementationWin32::Close() {
 	DestroyWindow(hwnd_);
 	UnregisterClass(className, GetModuleHandle(NULL));
 }

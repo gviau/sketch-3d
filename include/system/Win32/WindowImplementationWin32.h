@@ -17,6 +17,8 @@ class WindowImplementationWin32 : public WindowImplementation {
 		WindowImplementationWin32(const string& title, unsigned int width,
 								  unsigned int height, bool windowed);
 		virtual ~WindowImplementationWin32();
+        virtual void Close();
+        virtual void ProcessEvents();
 		virtual void SetVisible(bool val);
 		virtual void SetPosition(unsigned int x, unsigned int y);
 		virtual void SetSize(unsigned int width, unsigned int height);
@@ -24,12 +26,12 @@ class WindowImplementationWin32 : public WindowImplementation {
 		virtual WindowHandle GetHandle() const { return reinterpret_cast<WindowHandle>(hwnd_); }
 
 	private:
-		HWND		hwnd_;	/**< The window handle */
+		HWND		    hwnd_;	/**< The window handle */
 
 		/**
 		 * Register the window class before creating the actual window
 		 */
-		void		RegisterWindow();
+		void		    RegisterWindow();
 
 		/**
 		 * Process the message that the window receives
@@ -37,7 +39,7 @@ class WindowImplementationWin32 : public WindowImplementation {
 		 * @param wParam The first parameter
 		 * @param lParam The second parameter
 		 */
-		void		ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
+		void		    ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
 		/**
 		 * Function called whenever the window receives a message

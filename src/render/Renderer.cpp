@@ -24,10 +24,7 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 {
 	switch (renderSystem) {
 		case RENDER_SYSTEM_OPENGL:
-			renderSystem_ = new RenderSystemOpenGL(window.GetHandle(),
-												   window.GetWidth(),
-												   window.GetHeight(),
-												   window.IsWindowed());
+			renderSystem_ = new RenderSystemOpenGL(window);
 			break;
 
 		case RENDER_SYSTEM_DIRECT3D9:

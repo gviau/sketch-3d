@@ -9,6 +9,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
+class WindowEvent;
 class WindowImplementation;
 
 /**
@@ -57,6 +58,13 @@ class Window {
 		 * fullscreen otherwise.
 		 */
 		void					SetWindowed(bool val);
+
+        /**
+         * Poll the events from the window
+         * @param event The event that will be received
+         * @return true if there are still events to be processed
+         */
+        bool                    PollEvents(WindowEvent& event);
 
 		unsigned int			GetWidth() const { return width_; }
 		unsigned int			GetHeight() const { return height_; }

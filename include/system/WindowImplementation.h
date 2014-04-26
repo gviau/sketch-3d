@@ -1,8 +1,10 @@
 #ifndef SKETCH_3D_WINDOW_IMPLEMENTATION_H
 #define SKETCH_3D_WINDOW_IMPLEMENTATION_H
 
+#include "system/WindowEvent.h"
 #include "system/WindowHandle.h"
 
+#include <queue>
 #include <string>
 using namespace std;
 
@@ -15,20 +17,16 @@ namespace Sketch3D {
  */
 class WindowImplementation {
 	public:
-		/**
-		 * Constructor
-		 * @param title The title of the window
-		 * @param width The width of the window
-		 * @param height the height of the window
-		 * @param windowed Is the window in windowed mode?
-		 */
-								WindowImplementation(const string& title, unsigned int width,
-													 unsigned int height, bool windowed) {}
+        /**
+         * Close the window
+         */
+        virtual void            Close() = 0;
 
-		/**
-		 * Destructor
-		 */
-		virtual				   ~WindowImplementation() {}
+        /**
+         * Get the events from the window implementation. This function will
+         * fill the events queue.
+         */
+        virtual void            ProcessEvents() = 0;
 
 		/**
 		 * Show the window if the value is true, hide the window otherwise
@@ -55,15 +53,22 @@ class WindowImplementation {
 		 */
 		virtual void			SetWindowed(bool val) = 0;
 
+        /**
+         * Return an event from the queue
+         */
+        WindowEvent             PollEvent();
+
 		/**
 		 * Return the OS dependent window handle
 		 */
 		virtual WindowHandle	GetHandle() const = 0;
 
 		bool					IsOpen() const { return isOpen_; }
+        bool                    HasEvents() const { return !events_.empty(); }
 
 	protected:
 		bool					isOpen_;	/**< Is the window open? */
+        queue<WindowEvent>      events_;    /**< Events to be processed for the window */
 };
 
 }

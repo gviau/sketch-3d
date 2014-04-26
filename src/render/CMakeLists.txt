@@ -11,6 +11,7 @@ set(SRC
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/Renderer.cpp
+    ${SRC_PATH}/RenderSystem.cpp
 	${SRC_PATH}/SceneTree.cpp
 )
 
@@ -41,7 +42,18 @@ if (WIN32)
 	
 	source_group("Source Files" FILES ${OPENGL_SRC})
 	source_group("Header Files" FILES ${OPENGL_HEADER})
-else ()
+elseif (UNIX)
+    set(OPENGL_SRC
+        ${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
+        ${SRC_PATH}/OpenGL/Unix/RenderContextOpenGLUnix.cpp
+    )
+
+    set(OPENGL_HEADER
+        ${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
+        ${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
+        ${HEADER_PATH}/OpenGL/Unix/RenderContextOpenGLUnix.h
+    )
+
 endif ()
 
 include_directories (../../include)

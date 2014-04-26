@@ -1,20 +1,21 @@
 #include "render/OpenGL/RenderSystemOpenGL.h"
 
 #include "system/Logger.h"
+#include "system/Window.h"
 
 #include "render/OpenGL/gl/glew.h"
-#include <gl/GL.h>
+#include "render/OpenGL/gl/gl.h"
 
 #if PLATFORM == PLATFORM_WIN32
 #include "render/OpenGL/Win32/RenderContextOpenGLWin32.h"
 #elif PLATFORM == PLATFORM_LINUX
+#include "render/OpenGL/Unix/RenderContextOpenGLUnix.h"
 #endif
 
 namespace Sketch3D {
-RenderSystemOpenGL::RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width,
-									   unsigned int height, bool windowed) : RenderSystem(windowHandle, width,
-																						  height, windowed),
-																			 renderContext_(NULL)
+
+RenderSystemOpenGL::RenderSystemOpenGL(const Window& window) : RenderSystem(window),
+                                                               renderContext_(NULL)
 {
 	Logger::GetInstance()->Info("Current rendering API: OpenGL");
 }
@@ -28,21 +29,15 @@ bool RenderSystemOpenGL::Initialize() {
 	Logger::GetInstance()->Info("Initializing OpenGL...");
 
 #if PLATFORM == PLATFORM_WIN32
-	HDC deviceContext = GetDC(reinterpret_cast<HWND>(windowHandle_));
-	if (!deviceContext) {
-		Logger::GetInstance()->Error("Couldn't retrieve device context - "
-									 "cannot create OpenGL context");
-		return false;
-	}
+	renderContext_ = new RenderContextOpenGLWin32(window_);
+#elif PLATFORM == PLATFORM_LINUX
+    renderContext_ = new RenderContextOpenGLUnix(window_);
+#endif
 
-	renderContext_ = new RenderContextOpenGLWin32(deviceContext);
 	if (!renderContext_->Initialize()) {
 		Logger::GetInstance()->Error("Couldn't create OpenGL context");
 		return false;
 	}
-
-#else if PLATFORM == PLATFORM_LINUX
-#endif
 
 	// Some initial values
 	glViewport(0, 0, width_, height_);

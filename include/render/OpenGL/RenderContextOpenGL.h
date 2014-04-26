@@ -12,6 +12,7 @@ namespace Sketch3D {
  */
 class RenderContextOpenGL : public RenderContext {
 	public:
+        RenderContextOpenGL(const Window& window) : RenderContext(window) {}
 		virtual bool Initialize() = 0;
 		virtual void SwapBuffers() = 0;
 };

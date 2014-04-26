@@ -2,6 +2,7 @@
 #define SKETCH_3D_RENDER_SYSTEM_H
 
 #include "system/Platform.h"
+#include "system/Window.h"
 #include "system/WindowHandle.h"
 
 namespace Sketch3D {
@@ -17,16 +18,9 @@ class RenderSystem {
 	public:
 		/**
 		 * Constructor. Initializes the underlying API.
-		 * @param windowHandle The platform dependent of an already created window
-		 * @param width The width of the window
-		 * @param height The height of the window
-		 * @param windowed Is the window in window mode?
+         * @param window The window for which we want to create a context for
 		 */
-						RenderSystem(WindowHandle windowHandle, unsigned int width,
-									 unsigned int height, bool windowed) : windowHandle_(windowHandle),
-																		   width_(width),
-																		   height_(height),
-																		   windowed_(windowed) {}
+                        RenderSystem(const Window& window);
 
 		/**
 		 * Destructor. Free the underlying API
@@ -65,6 +59,7 @@ class RenderSystem {
 		virtual void	Render() = 0;
 
 	protected:
+        Window          window_;        /**< The window */
 		WindowHandle	windowHandle_;	/**< The window's handle */
 		unsigned int	width_;			/**< The width of the window */
 		unsigned int	height_;		/**< The height of the window */

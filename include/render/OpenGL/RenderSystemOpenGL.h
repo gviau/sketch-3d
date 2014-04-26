@@ -14,7 +14,7 @@ class RenderContextOpenGL;
  */
 class RenderSystemOpenGL : public RenderSystem {
 	public:
-		RenderSystemOpenGL(WindowHandle windowHandle, unsigned int width, unsigned int height, bool windowed);
+        RenderSystemOpenGL(const Window& window);
 		~RenderSystemOpenGL();
 		virtual bool Initialize();
 		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);

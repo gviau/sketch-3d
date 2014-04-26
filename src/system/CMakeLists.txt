@@ -10,6 +10,8 @@ set (SRC
 	 ${SRC_PATH}/Logger.cpp
 	 ${SRC_PATH}/Platform.cpp
 	 ${SRC_PATH}/Window.cpp
+     ${SRC_PATH}/WindowEvent.cpp
+     ${SRC_PATH}/WindowImplementation.cpp
 )
 
 set (HEADER
@@ -17,6 +19,7 @@ set (HEADER
 	 ${HEADER_PATH}/Logger.h
 	 ${HEADER_PATH}/Platform.h
 	 ${HEADER_PATH}/Window.h
+     ${HEADER_PATH}/WindowEvent.h
 	 ${HEADER_PATH}/WindowHandle.h
 	 ${HEADER_PATH}/WindowImplementation.h
 )
@@ -34,9 +37,21 @@ if (WIN32)
 	
 	source_group("Source Files" FILES ${PLATFORM_SRC})
 	source_group("Header Files" FILES ${PLATFORM_HEADER})
+elseif (UNIX)
+    set(PLATFORM_SRC
+        ${SRC_PATH}/Unix/WindowImplementationUnix.cpp
+    )
+
+    set(PLATFORM_HEADER
+        ${HEADER_PATH}/Unix/WindowImplementationUnix.h
+    )
+
+    source_group("Source Files" FILES ${PLATFORM_SRC})
+    source_group("Header Files" FILES ${PLATFORM_HEADER})
 endif()
 
 include_directories(../../include/)
+include_directories(${X11_INCLUDE_DIR})
 
 add_library(
     system
