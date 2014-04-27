@@ -14,8 +14,8 @@
 
 namespace Sketch3D {
 
-RenderSystemOpenGL::RenderSystemOpenGL(const Window& window) : RenderSystem(window),
-                                                               renderContext_(NULL)
+RenderSystemOpenGL::RenderSystemOpenGL(Window& window) : RenderSystem(window),
+                                                         renderContext_(NULL)
 {
 	Logger::GetInstance()->Info("Current rendering API: OpenGL");
 }
@@ -29,12 +29,12 @@ bool RenderSystemOpenGL::Initialize() {
 	Logger::GetInstance()->Info("Initializing OpenGL...");
 
 #if PLATFORM == PLATFORM_WIN32
-	renderContext_ = new RenderContextOpenGLWin32(window_);
+	renderContext_ = new RenderContextOpenGLWin32();
 #elif PLATFORM == PLATFORM_LINUX
-    renderContext_ = new RenderContextOpenGLUnix(window_);
+    renderContext_ = new RenderContextOpenGLUnix();
 #endif
 
-	if (!renderContext_->Initialize()) {
+	if (!renderContext_->Initialize(window_)) {
 		Logger::GetInstance()->Error("Couldn't create OpenGL context");
 		return false;
 	}

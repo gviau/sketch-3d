@@ -20,7 +20,7 @@ class RenderSystem {
 		 * Constructor. Initializes the underlying API.
          * @param window The window for which we want to create a context for
 		 */
-                        RenderSystem(const Window& window);
+                        RenderSystem(Window& window);
 
 		/**
 		 * Destructor. Free the underlying API
@@ -59,7 +59,7 @@ class RenderSystem {
 		virtual void	Render() = 0;
 
 	protected:
-        Window          window_;        /**< The window */
+        Window&         window_;        /**< The window */
 		WindowHandle	windowHandle_;	/**< The window's handle */
 		unsigned int	width_;			/**< The width of the window */
 		unsigned int	height_;		/**< The height of the window */

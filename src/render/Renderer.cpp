@@ -20,7 +20,7 @@ Renderer* Renderer::GetInstance() {
 }
 
 bool Renderer::Initialize(RenderSystem_t renderSystem,
-						  const Window& window)
+						  Window& window)
 {
 	switch (renderSystem) {
 		case RENDER_SYSTEM_OPENGL:

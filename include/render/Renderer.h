@@ -45,7 +45,7 @@ class Renderer {
 		 * @return true if the initialization went correctly
 		 */
 		bool				Initialize(RenderSystem_t renderSystem,
-									   const Window& window);
+									   Window& window);
 
 		/**
 		 * Change the clear color

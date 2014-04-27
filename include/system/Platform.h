@@ -69,10 +69,6 @@ namespace Sketch3D
 #   define HAVE_SSE 0
 #endif
 
-#if HAVE_SSE == 1
-#   include <emmintrin.h>
-#endif
-
 /**
  * @class PlatformInformation
  * This class provides methods to retrieve information about the cpu.

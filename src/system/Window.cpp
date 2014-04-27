@@ -24,6 +24,7 @@ Window::Window(const string& title, unsigned int width, unsigned int height,
 
 Window::~Window() {
 	delete windowImpl_;
+	windowImpl_ = NULL;
 }
 
 void Window::SetVisible(bool val) {

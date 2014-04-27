@@ -15,16 +15,15 @@ class RenderContextOpenGLWin32 : public RenderContextOpenGL {
 	public:
 		/**
 		 * Constructor
-		 * @param window The window for which the context will be created
 		 */
-						RenderContextOpenGLWin32(const Window& window);
+						RenderContextOpenGLWin32();
 
 		/**
 		 * Destructor. Free the render context
 		 */
 		virtual		   ~RenderContextOpenGLWin32();
 
-		virtual bool	Initialize();
+		virtual bool	Initialize(Window& window);
 		virtual void	SwapBuffers();
 
 	private:

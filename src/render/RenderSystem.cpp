@@ -4,7 +4,7 @@
 
 namespace Sketch3D {
 
-RenderSystem::RenderSystem(const Window& window) : window_(window) {
+RenderSystem::RenderSystem(Window& window) : window_(window) {
     windowHandle_ = window_.GetHandle();
     width_ = window_.GetWidth();
     height_ = window_.GetHeight();

@@ -41,6 +41,32 @@ float Vector4::Length() const
     if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
         f = sqrtf(x*x + y*y + z*z);
     } else {
+#if	PLATFORM == PLATFORM_WIN32
+		Vector4 v(x, y, z);
+		v.w = 0.0;
+		
+		float* pf = &f;
+		Vector4* pv = &v;
+
+		__asm {
+			mov		ecx, pf
+			mov		esi, pv
+			movups	xmm0, [esi]
+			mulps	xmm0, xmm0
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 4Eh
+			addps	xmm0, xmm1
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 11h
+			addps	xmm0, xmm1
+			sqrtss	xmm0, xmm0
+			movss	[ecx], xmm0
+		}
+
+#elif PLATFORM == PLATFORM_LINUX
+		f = sqrtf(x*x + y*y + z*z);
+#endif
+	/*
         __m128 u = {x, y, z, 0.0f};
         __m128 v;
 
@@ -53,6 +79,7 @@ float Vector4::Length() const
         u = _mm_add_ps(u, v);
         u = _mm_sqrt_ss(u);
         _mm_store_ss(&f, u);
+	*/
     }
 
     return f;
@@ -75,6 +102,35 @@ Vector4 Vector4::Normalized() const
             result.z = z / length;
         }
     } else {
+#if	PLATFORM == PLATFORM_WIN32
+		Vector4 v(x, y, z);
+		v.w = 0.0;
+		Vector4* pr = &result;
+		Vector4* pv = &v;
+
+		__asm {
+			mov		ecx, pr
+			mov		esi, pv
+			movups	xmm0, [esi]
+			movaps	xmm2, xmm0
+			mulps	xmm0, xmm0
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 4Eh
+			addps	xmm0, xmm1
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 11h
+			addps	xmm0, xmm1
+
+			rsqrtps	xmm0, xmm0
+			mulps	xmm2, xmm0
+			movups	[ecx], xmm2
+		}
+
+		result = *pr;
+#elif PLATFORM == PLATFORM_LINUX
+		f = sqrtf(x*x + y*y + z*z);
+#endif
+/*
         __m128 u = {x, y, z, 0.0f};
         __m128 v;
         __m128 w = u;
@@ -100,6 +156,7 @@ Vector4 Vector4::Normalized() const
         result.x = f[0];
         result.y = f[1];
         result.z = f[2];
+*/
     }
 
     return result;
@@ -116,6 +173,34 @@ void Vector4::Normalize()
             z /= length;
         }
     } else {
+#if	PLATFORM == PLATFORM_WIN32
+		Vector4 v(x, y, z);
+		v.w = 0.0;
+		Vector4* pv = &v;
+
+		__asm {
+			mov		esi, pv
+			movups	xmm0, [esi]
+			movaps	xmm2, xmm0
+			mulps	xmm0, xmm0
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 4Eh
+			addps	xmm0, xmm1
+			movaps	xmm1, xmm0
+			shufps	xmm1, xmm1, 11h
+			addps	xmm0, xmm1
+
+			rsqrtps	xmm0, xmm0
+			mulps	xmm2, xmm0
+			movups	[esi], xmm2
+		}
+		v.w = 1.0f;
+		(*this) = v;
+
+#elif PLATFORM == PLATFORM_LINUX
+		f = sqrtf(x*x + y*y + z*z);
+#endif
+/*
         __m128 u = {x, y, z, 0.0f};
         __m128 v;
         __m128 w = u;
@@ -141,6 +226,7 @@ void Vector4::Normalize()
         x = f[0];
         y = f[1];
         z = f[2];
+*/
     }
 }
 

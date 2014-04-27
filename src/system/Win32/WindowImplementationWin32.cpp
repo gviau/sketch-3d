@@ -39,6 +39,9 @@ void WindowImplementationWin32::Close() {
 	UnregisterClass(className, GetModuleHandle(NULL));
 }
 
+void WindowImplementationWin32::ProcessEvents() {
+}
+
 void WindowImplementationWin32::SetVisible(bool val) {
 	ShowWindow(hwnd_, val ? SW_SHOW : SW_HIDE);
 }
