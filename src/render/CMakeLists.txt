@@ -29,12 +29,12 @@ source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})
 
 if (WIN32)
-	set(OPENGL_SRC,
+	set(OPENGL_SRC
 		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
 		${SRC_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
-	set(OPENGL_HEADER,
+	set(OPENGL_HEADER
 		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h

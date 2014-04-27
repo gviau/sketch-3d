@@ -11,7 +11,7 @@ namespace Sketch3D {
 WindowImplementationWin32::WindowImplementationWin32(const string& title,
 													 unsigned int width,
 													 unsigned int height,
-													 bool windowed) : WindowImplementation(title, width, height, windowed)
+													 bool windowed)
 {
 	Logger::GetInstance()->Info("Win32 window creation");
 	

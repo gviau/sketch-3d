@@ -51,7 +51,10 @@ elseif (UNIX)
 endif()
 
 include_directories(../../include/)
-include_directories(${X11_INCLUDE_DIR})
+
+if (UNIX)
+	include_directories(${X11_INCLUDE_DIR})
+endif()
 
 add_library(
     system

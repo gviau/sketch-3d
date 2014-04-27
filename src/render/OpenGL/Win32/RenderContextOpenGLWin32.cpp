@@ -2,13 +2,13 @@
 
 #include "system/Logger.h"
 
-#include "render/OpenGL/gl/GL.h"
-#include "render/OpenGL/gl/GLU.h"
+#include "render/OpenGL/gl/glew.h"
 #include "render/OpenGL/gl/wglext.h"
+#include <gl/GL.h>
 
 namespace Sketch3D {
 
-RenderContextOpenGLWin32::RenderContextOpenGLWin32(const Window& window) : RenderContext(window),
+RenderContextOpenGLWin32::RenderContextOpenGLWin32(const Window& window) : RenderContextOpenGL(window),
                                                                            renderContext_(NULL)
 {
 }
@@ -26,7 +26,7 @@ RenderContextOpenGLWin32::~RenderContextOpenGLWin32() {
 bool RenderContextOpenGLWin32::Initialize() {
 	Logger::GetInstance()->Debug("Initializing OpenGL context");
 
-    deviceContext_ = GetDC(reinterpret_cast<HWND>(window_.GetWindowHandle()));
+    deviceContext_ = GetDC(reinterpret_cast<HWND>(window_.GetHandle()));
     if (!deviceContext_) {
         Logger::GetInstance()->Error("Couldn't retrieve device context");
         return false;
@@ -76,6 +76,11 @@ bool RenderContextOpenGLWin32::Initialize() {
 
 	if (!wglMakeCurrent(deviceContext_, renderContext_)) {
 		Logger::GetInstance()->Error("Couldn't set the new rendering context");
+		return false;
+	}
+
+	if (GLEW_OK != glewInit()) {
+		Logger::GetInstance()->Error("Couldn't initialize GLEW library");
 		return false;
 	}
 
