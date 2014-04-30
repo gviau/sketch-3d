@@ -27,15 +27,17 @@ CompositeNode::~CompositeNode() {
 }
 
 void CompositeNode::Render() const {
-	map<string, Node>::const_iterator it = children_.begin();
+	Node::ConcreteRender();
+
+	map<string, Node*>::const_iterator it = children_.begin();
 	for (; it != children_.end(); ++it) {
-		it->second.Render();
+		it->second->Render();
 	}
 }
 
-bool CompositeNode::AddChildren(const Node& node) {
-	string name = node.GetName();
-	map<string, Node>::iterator it = children_.find(name);
+bool CompositeNode::AddChildren(Node* node) {
+	string name = node->GetName();
+	map<string, Node*>::iterator it = children_.find(name);
 	if (it != children_.end()) {
 		return false;
 	}
@@ -45,7 +47,7 @@ bool CompositeNode::AddChildren(const Node& node) {
 }
 
 bool CompositeNode::RemoveChildren(const string& name) {
-	map<string, Node>::iterator it = children_.find(name);
+	map<string, Node*>::iterator it = children_.find(name);
 	if (it == children_.end()) {
 		return false;
 	}

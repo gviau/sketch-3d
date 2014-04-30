@@ -69,7 +69,7 @@ class CompositeNode : public Node {
 		 * @param node The node to add to the list
 		 * @return true if the node could be added, false otherwise.
 		 */
-		bool				AddChildren(const Node& node);
+		bool				AddChildren(Node* node);
 
 		/**
 		 * Remove a node from this node
@@ -79,7 +79,7 @@ class CompositeNode : public Node {
 		bool				RemoveChildren(const string& name);
 
 	protected:
-		map<string, Node>	children_;	/**< The children of this node. The key is the name of the node */
+		map<string, Node*>	children_;	/**< The children of this node. The key is the name of the node */
 };
 
 }

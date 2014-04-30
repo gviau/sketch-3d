@@ -9,7 +9,10 @@ SceneTree::~SceneTree() {
 }
 
 void SceneTree::Render() const {
-	CompositeNode::Render();
+	map<string, Node*>::const_iterator it = children_.begin();
+	for (; it != children_.end(); ++it) {
+		it->second->Render();
+	}
 }
 
 }
