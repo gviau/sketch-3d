@@ -1,8 +1,11 @@
 #ifndef SKETCH_3D_RENDERER_H
 #define SKETCH_3D_RENDERER_H
 
+#include "math/Matrix4x4.h"
 #include "math/Vector3.h"
+
 #include "render/ResourceManager.h"
+#include "render/SceneTree.h"
 
 #include <string>
 using namespace std;
@@ -20,6 +23,16 @@ class Window;
 enum RenderSystem_t {
 	RENDER_SYSTEM_OPENGL,
 	RENDER_SYSTEM_DIRECT3D9
+};
+
+/**
+ * @enum RenderMode
+ * Enum that give the possible rendering mode
+ */
+enum RenderMode_t {
+	RENDER_MODE_FILL,
+	RENDER_MODE_WIREFRAME,
+	RENDER_MODE_POINT
 };
 
 /**
@@ -97,20 +110,49 @@ class Renderer {
 												  float top, float near, float far);
 
 		/**
+		 * Set a perspective projection. This replace the current projection matrix
+		 * @param fov The field of view in degrees in the y direction
+		 * @param aspect The aspect ration
+		 * @param near The near position of the viewing volume
+		 * @param far The far position of the viewing volume
+		 */
+		void				PerspectiveProjection(float fov, float aspect,
+												  float near, float far);
+
+		/**
 		 * Set a new camera position, looking direction and up vector
 		 * @param position The position of the camera
-		 * @param direction The direction of the camera
+		 * @param point The point to look at
 		 * @param up The up vector to use for the camera. UP by default
 		 */
 		void				CameraLookAt(const Vector3& position,
-										 const Vector3& direction,
+										 const Vector3& point,
 										 const Vector3& up=Vector3::UP);
+
+		/**
+		 * Set the renderer's fill mode
+		 * @param mode The mode to use for rendering the geometry
+		 */
+		void				SetRenderFillMode(RenderMode_t mode);
+
+		const Matrix4x4&	GetProjectionMatrix() const;
+		const Matrix4x4&	GetViewMatrix() const;
+		const Matrix4x4&	GetViewProjectionMatrix() const;
+
+		const SceneTree&	GetSceneTree() const;
+		SceneTree&			GetSceneTree();
 
 	private:
 		static Renderer		instance_;	/**< Singleton instance of this class */
 
 		ResourceManager		resourceManager_;	/**< The resource manager of the renderer */
 		RenderSystem*		renderSystem_;		/**< The render system that is currently being used */
+
+		Matrix4x4			projection_;		/**< The projection matrix */
+		Matrix4x4			view_;				/**< The view matrix */
+		Matrix4x4			viewProjection_;	/**< Pre-computed view-projection matrix */
+
+		SceneTree			sceneTree_;			/**< The scene tree to render */
 
 		/**
 		 * Constructor
@@ -125,7 +167,7 @@ class Renderer {
 		/**
 		 * Assignment operator - here only to disallow assignment
 		 */
-							Renderer& operator=(const Renderer& rhs);
+							Renderer& operator=(const Renderer& rhs);		
 };
 
 }
