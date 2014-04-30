@@ -10,6 +10,10 @@ using namespace std;
 
 namespace Sketch3D {
 
+// Forward declaration
+class Material;
+class Mesh;
+
 /**
  * @class Node
  * This class provides the base functionnality of a node the SceneTree
@@ -63,6 +67,11 @@ class Node {
 		virtual void		Render() const;
 
 		/**
+		 * This function sends the data required for the rendering.
+		 */
+		virtual void		ConcreteRender() const;
+
+		/**
 		 * Translate the node by a certain amount. This amount is added to the
 		 * position that the node currently have
 		 * @param translation The translation to add
@@ -109,12 +118,16 @@ class Node {
 		void				SetPosition(const Vector3& position);
 		void				SetScale(const Vector3& scale);
 		void				SetOrientation(const Quaternion& orientation);
+		void				SetMesh(Mesh* mesh);
+		void				SetMaterial(Material* material);
 
 		const string&		GetName() const;
 		Node*				GetParent() const;
 		const Vector3&		GetPosition() const;
 		const Vector3&		GetScale() const;
 		const Quaternion&	GetOrientation() const;
+		Mesh*				GetMesh() const;
+		Material*			GetMaterial() const;
 
 	protected:
 		static long long	nextNameIndex_;	/**< The next available number for the automatic name */
@@ -127,6 +140,9 @@ class Node {
 		Quaternion			orientation_;	/**< The orientation of this node */
 
 		Matrix4x4			cachedTransformation_;	/**< The cached matrix transformation */
+
+		Mesh*				mesh_; /**< Geometric represention of the node */
+		Material*			material_; /**< The material of the node. It will be applied to the mesh, if any */
 };
 
 }

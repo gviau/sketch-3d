@@ -8,15 +8,19 @@ set(HEADER_PATH "${CMAKE_SOURCE_DIR}/include/render")
 
 set(SRC
 	${SRC_PATH}/CompositeNode.cpp
+	${SRC_PATH}/Material.cpp
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/Renderer.cpp
     ${SRC_PATH}/RenderSystem.cpp
 	${SRC_PATH}/SceneTree.cpp
+	${SRC_PATH}/Shader.cpp
+	${SRC_PATH}/Texture.cpp
 )
 
 set(HEADER
 	${HEADER_PATH}/CompositeNode.h
+	${HEADER_PATH}/Material.h
 	${HEADER_PATH}/Mesh.h
 	${HEADER_PATH}/Node.h
 	${HEADER_PATH}/RenderContext.h
@@ -24,6 +28,8 @@ set(HEADER
 	${HEADER_PATH}/RenderSystem.h
 	${HEADER_PATH}/ResourceManager.h
 	${HEADER_PATH}/SceneTree.h
+	${HEADER_PATH}/Shader.h
+	${HEADER_PATH}/Texture.h
 )
 source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})
@@ -31,12 +37,14 @@ source_group("Header Files" FILES ${HEADER})
 if (WIN32)
 	set(OPENGL_SRC
 		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
+		${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
 		${SRC_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
 	set(OPENGL_HEADER
 		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
+		${HEADER_PATH}/OpenGL/ShaderOpenGL.h
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
