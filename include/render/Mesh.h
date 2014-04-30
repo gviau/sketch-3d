@@ -1,8 +1,6 @@
 #ifndef SKETCH_3D_MESH_H
 #define SKETCH_3D_MESH_H
 
-#include "math/Vector3.h"
-
 #include <string>
 #include <vector>
 using namespace std;
@@ -38,8 +36,13 @@ class Mesh {
 		static Mesh				CreateCube(float width, float height, float depth);
 
 	protected:
-		vector<Vector3>			vertices_;	/**< The vertices that compose the model */
+		vector<float>			vertices_;	/**< The vertices that compose the model */
 		vector<unsigned int>	indices_;	/**< The indices of the model */
+
+		// TEMP
+		unsigned int			vbo_;		/**< Vertex buffer object */
+		unsigned int			ibo_;		/**< Index buffer object */
+		unsigned int			vao_;		/**< Vertex array object */
 
 		/**
 		 * Private constructor. Used to create prefabs
