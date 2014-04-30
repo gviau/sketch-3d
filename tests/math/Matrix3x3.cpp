@@ -11,8 +11,8 @@ BOOST_AUTO_TEST_CASE(test_3x3_transpose)
     Matrix3x3 m = Matrix3x3::IDENTITY;
     BOOST_REQUIRE(m.Transpose() == m);
 
-    m(1, 0) = 5.0f;
-    m(2, 0) = 10.0f;
+    m[0][1] = 5.0f;
+    m[0][2] = 10.0f;
 
     Matrix3x3 t(1.0f, 0.0f, 0.0f,
                 5.0f, 1.0f, 0.0f,

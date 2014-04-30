@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_MATRIX_4X4_H
 #define SKETCH_3D_MATRIX_4X4_H
 
+#include "math/Matrix3x3.h"
+
 #include "system/Common.h"
 
 namespace Sketch3D
@@ -11,7 +13,7 @@ class Vector4;
 
 /**
  * @class Matrix4x4
- * Represents a 4x4 matrix.
+ * Represents a column-major 4x4 matrix.
  */
 class Matrix4x4
 {
@@ -34,7 +36,7 @@ class Matrix4x4
 
         /**
          * Constructor
-         * @param data An array of 9 floats to populate the matrix
+         * @param data An array of 16 floats to populate the matrix
          */
                                 Matrix4x4(float* data);
 
@@ -78,20 +80,18 @@ class Matrix4x4
 
         // ACCESS OPERATORS
         /**
-         * Access an element
-         * @param col The column to access (x on a 2d grid)
-         * @param row The row to access (y on a 2d grid)
-         * @return the value contained at (col, row) position
+         * Access a row of the matrix
+         * @param row The row to access
+         * @return The row contained at 'row' index
          */
-        INLINE float            operator()(int col, int row) const;
+        INLINE const float*		operator[] (int row) const;
 
         /**
-         * Modify an element
-         * @param col The column to access (x on a 2d grid)
-         * @param row The row to access (y on a 2d grid)
-         * @return the value contained at (col, row) position
+         * Modify a row of the matrix
+         * @param row The row to access
+         * @return The row contained at 'row' index
          */
-        INLINE float&            operator()(int col, int row);
+		INLINE float*            operator[] (int row);
 
         // UNARY OPERATORS
         /**
@@ -107,27 +107,37 @@ class Matrix4x4
         INLINE bool             operator==(const Matrix4x4& m) const;
         INLINE bool             operator!=(const Matrix4x4& m) const;
 
+		INLINE Matrix4x4&		operator=(const Matrix3x3& m);
         INLINE Matrix4x4&       operator=(const Matrix4x4& m);
 
+		/**
+		 * Return the matrix as a column-major linear array.
+		 * @param The returned array
+		 */
+		INLINE void				GetData(float* data) const;
+
     private:
-        float                   data_[16];   /**< The matrix represented as a linear array */
+		float                   data_[4][4];	/**< The matrix represented as 2d array */
 };
 
-INLINE float Matrix4x4::operator()(int col, int row) const
+INLINE const float* Matrix4x4::operator[] (int row) const
 {
-    return data_[row*4 + col];
+    return data_[row];
 }
 
-INLINE float& Matrix4x4::operator()(int col, int row)
-{
-    return data_[row*4 + col];
+INLINE float* Matrix4x4::operator[] (int row) {
+    return data_[row];
 }
 
 INLINE Matrix4x4 Matrix4x4::operator-() const
 {
     float data[16];
-    for (int i = 0; i < 16; i++) {
-        data[i] = -data_[i];
+	int idx = 0;
+    for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			data[idx] = -data_[i][j];
+			idx += 1;
+		}
     }
 
     return Matrix4x4(data);
@@ -136,53 +146,90 @@ INLINE Matrix4x4 Matrix4x4::operator-() const
 INLINE Matrix4x4 Matrix4x4::operator*(const Matrix4x4& m) const
 {
     Matrix4x4 mat;
+    mat.data_[0][0] = data_[0][0] * m.data_[0][0] + data_[0][1] * m.data_[1][0] + data_[0][2] * m.data_[2][0] + data_[0][3] * m.data_[3][0];
+    mat.data_[0][1] = data_[0][0] * m.data_[0][1] + data_[0][1] * m.data_[1][1] + data_[0][2] * m.data_[2][1] + data_[0][3] * m.data_[3][1];
+    mat.data_[0][2] = data_[0][0] * m.data_[0][2] + data_[0][1] * m.data_[1][2] + data_[0][2] * m.data_[2][2] + data_[0][3] * m.data_[3][2];
+    mat.data_[0][3] = data_[0][0] * m.data_[0][3] + data_[0][1] * m.data_[1][3] + data_[0][2] * m.data_[2][3] + data_[0][3] * m.data_[3][3];
 
-    for (int i = 0; i < 16; i += 4) {
-        for (int j = 0; j < 4; j++) {
-            for (int k = 0; k < 4; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*4 + j];
-            }
-        }
-    }
+    mat.data_[1][0] = data_[1][0] * m.data_[0][0] + data_[1][1] * m.data_[1][0] + data_[1][2] * m.data_[2][0] + data_[1][3] * m.data_[3][0];
+    mat.data_[1][1] = data_[1][0] * m.data_[0][1] + data_[1][1] * m.data_[1][1] + data_[1][2] * m.data_[2][1] + data_[1][3] * m.data_[3][1];
+    mat.data_[1][2] = data_[1][0] * m.data_[0][2] + data_[1][1] * m.data_[1][2] + data_[1][2] * m.data_[2][2] + data_[1][3] * m.data_[3][2];
+    mat.data_[1][3] = data_[1][0] * m.data_[0][3] + data_[1][1] * m.data_[1][3] + data_[1][2] * m.data_[2][3] + data_[1][3] * m.data_[3][3];
+
+    mat.data_[2][0] = data_[2][0] * m.data_[0][0] + data_[2][1] * m.data_[1][0] + data_[2][2] * m.data_[2][0] + data_[2][3] * m.data_[3][0];
+    mat.data_[2][1] = data_[2][0] * m.data_[0][1] + data_[2][1] * m.data_[1][1] + data_[2][2] * m.data_[2][1] + data_[2][3] * m.data_[3][1];
+    mat.data_[2][2] = data_[2][0] * m.data_[0][2] + data_[2][1] * m.data_[1][2] + data_[2][2] * m.data_[2][2] + data_[2][3] * m.data_[3][2];
+    mat.data_[2][3] = data_[2][0] * m.data_[0][3] + data_[2][1] * m.data_[1][3] + data_[2][2] * m.data_[2][3] + data_[2][3] * m.data_[3][3];
+
+    mat.data_[3][0] = data_[3][0] * m.data_[0][0] + data_[3][1] * m.data_[1][0] + data_[3][2] * m.data_[2][0] + data_[3][3] * m.data_[3][0];
+    mat.data_[3][1] = data_[3][0] * m.data_[0][1] + data_[3][1] * m.data_[1][1] + data_[3][2] * m.data_[2][1] + data_[3][3] * m.data_[3][1];
+    mat.data_[3][2] = data_[3][0] * m.data_[0][2] + data_[3][1] * m.data_[1][2] + data_[3][2] * m.data_[2][2] + data_[3][3] * m.data_[3][2];
+    mat.data_[3][3] = data_[3][0] * m.data_[0][3] + data_[3][1] * m.data_[1][3] + data_[3][2] * m.data_[2][3] + data_[3][3] * m.data_[3][3];
 
     return mat;
 }
 
 INLINE void Matrix4x4::operator*=(const Matrix4x4& m)
 {
-    Matrix4x4 mat;
+	Matrix4x4 mat = ZERO;
+    mat.data_[0][0] = data_[0][0] * m.data_[0][0] + data_[0][1] * m.data_[1][0] + data_[0][2] * m.data_[2][0] + data_[0][3] * m.data_[3][0];
+    mat.data_[0][1] = data_[0][0] * m.data_[0][1] + data_[0][1] * m.data_[1][1] + data_[0][2] * m.data_[2][1] + data_[0][3] * m.data_[3][1];
+    mat.data_[0][2] = data_[0][0] * m.data_[0][2] + data_[0][1] * m.data_[1][2] + data_[0][2] * m.data_[2][2] + data_[0][3] * m.data_[3][2];
+    mat.data_[0][3] = data_[0][0] * m.data_[0][3] + data_[0][1] * m.data_[1][3] + data_[0][2] * m.data_[2][3] + data_[0][3] * m.data_[3][3];
 
-    for (int i = 0; i < 16; i += 4) {
-        for (int j = 0; j < 4; j++) {
-            for (int k = 0; k < 4; k++) {
-                mat.data_[i + j] += data_[i + k] * m.data_[k*4 + j];
-            }
-        }
-    }
+    mat.data_[1][0] = data_[1][0] * m.data_[0][0] + data_[1][1] * m.data_[1][0] + data_[1][2] * m.data_[2][0] + data_[1][3] * m.data_[3][0];
+    mat.data_[1][1] = data_[1][0] * m.data_[0][1] + data_[1][1] * m.data_[1][1] + data_[1][2] * m.data_[2][1] + data_[1][3] * m.data_[3][1];
+    mat.data_[1][2] = data_[1][0] * m.data_[0][2] + data_[1][1] * m.data_[1][2] + data_[1][2] * m.data_[2][2] + data_[1][3] * m.data_[3][2];
+    mat.data_[1][3] = data_[1][0] * m.data_[0][3] + data_[1][1] * m.data_[1][3] + data_[1][2] * m.data_[2][3] + data_[1][3] * m.data_[3][3];
+
+    mat.data_[2][0] = data_[2][0] * m.data_[0][0] + data_[2][1] * m.data_[1][0] + data_[2][2] * m.data_[2][0] + data_[2][3] * m.data_[3][0];
+    mat.data_[2][1] = data_[2][0] * m.data_[0][1] + data_[2][1] * m.data_[1][1] + data_[2][2] * m.data_[2][1] + data_[2][3] * m.data_[3][1];
+    mat.data_[2][2] = data_[2][0] * m.data_[0][2] + data_[2][1] * m.data_[1][2] + data_[2][2] * m.data_[2][2] + data_[2][3] * m.data_[3][2];
+    mat.data_[2][3] = data_[2][0] * m.data_[0][3] + data_[2][1] * m.data_[1][3] + data_[2][2] * m.data_[2][3] + data_[2][3] * m.data_[3][3];
+
+    mat.data_[3][0] = data_[3][0] * m.data_[0][0] + data_[3][1] * m.data_[1][0] + data_[3][2] * m.data_[2][0] + data_[3][3] * m.data_[3][0];
+    mat.data_[3][1] = data_[3][0] * m.data_[0][1] + data_[3][1] * m.data_[1][1] + data_[3][2] * m.data_[2][1] + data_[3][3] * m.data_[3][1];
+    mat.data_[3][2] = data_[3][0] * m.data_[0][2] + data_[3][1] * m.data_[1][2] + data_[3][2] * m.data_[2][2] + data_[3][3] * m.data_[3][2];
+    mat.data_[3][3] = data_[3][0] * m.data_[0][3] + data_[3][1] * m.data_[1][3] + data_[3][2] * m.data_[2][3] + data_[3][3] * m.data_[3][3];
 
     (*this) = mat;
 }
 
 INLINE bool Matrix4x4::operator==(const Matrix4x4& m) const
 {
-    for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return false;
-        }
-    }
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (fabs(data_[i][j] - m.data_[i][j]) > EPSILON) {
+				return false;
+			}
+		}
+	}
 
     return true;
 }
 
 INLINE bool Matrix4x4::operator!=(const Matrix4x4& m) const
 {
-    for (int i = 0; i < 16; i++) {
-        if (fabs(data_[i] - m.data_[i]) > EPSILON) {
-            return true;
-        }
-    }
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (fabs(data_[i][j] - m.data_[i][j]) > EPSILON) {
+				return true;
+			}
+		}
+	}
 
     return false;
+}
+
+INLINE Matrix4x4& Matrix4x4::operator=(const Matrix3x3& m)
+{
+    for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			data_[i][j] = m[i][j];
+		}
+    }
+
+    return *this;
 }
 
 INLINE Matrix4x4& Matrix4x4::operator=(const Matrix4x4& m)
@@ -191,11 +238,22 @@ INLINE Matrix4x4& Matrix4x4::operator=(const Matrix4x4& m)
         return *this;
     }
 
-    for (int i = 0; i < 16; i++) {
-        data_[i] = m.data_[i];
+    for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			data_[i][j] = m.data_[i][j];
+		}
     }
 
     return *this;
+}
+
+INLINE void Matrix4x4::GetData(float* data) const {
+	int idx = 0;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			data[idx++] = data_[j][i];
+		}
+	}
 }
 
 }

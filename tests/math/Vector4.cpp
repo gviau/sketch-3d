@@ -65,14 +65,14 @@ BOOST_AUTO_TEST_CASE(test_vector4_matrix_multiply)
 
     BOOST_REQUIRE(v * m == Vector4::ONE);
 
-    m(1, 0) = 5.0f;
-    m(2, 0) = 10.0f;
+    m[0][1] = 5.0f;
+    m[0][2] = 10.0f;
 
     v *= m;
 
     BOOST_REQUIRE(v == Vector4(16.0f, 1.0f, 1.0f));
 
-    m(1, 2) = 10.0f;
+    m[2][1] = 10.0f;
 
     v *= m;
 

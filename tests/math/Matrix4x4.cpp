@@ -11,9 +11,9 @@ BOOST_AUTO_TEST_CASE(test_4x4_transpose)
     Matrix4x4 m = Matrix4x4::IDENTITY;
     BOOST_REQUIRE(m.Transpose() == m);
 
-    m(1, 0) = 5.0f;
-    m(2, 0) = 10.0f;
-    m(3, 0) = 15.0f;
+    m[0][1] = 5.0f;
+    m[0][2] = 10.0f;
+    m[0][3] = 15.0f;
 
     Matrix4x4 t(1.0f, 0.0f, 0.0f, 0.0f,
                 5.0f, 1.0f, 0.0f, 0.0f,

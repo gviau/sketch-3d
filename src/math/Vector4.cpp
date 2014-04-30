@@ -248,10 +248,10 @@ Vector4 Vector4::operator*(const Matrix4x4& m) const
     // it makes more since for linear transformation to do it that way.
     Vector4 v;
 
-    v.x = x * m(0, 0) + y * m(1, 0) + z * m(2, 0) + m(3, 0);
-    v.y = x * m(0, 1) + y * m(1, 1) + z * m(2, 1) + m(3, 1);
-    v.z = x * m(0, 2) + y * m(1, 2) + z * m(2, 2) + m(3, 2);
-    v.w = x * m(0, 3) + y * m(1, 3) + z * m(2, 3) + m(3, 3);
+    v.x = x * m[0][0] + y * m[0][1] + z * m[0][2] + m[0][3];
+    v.y = x * m[1][0] + y * m[1][1] + z * m[1][2] + m[1][3];
+    v.z = x * m[2][0] + y * m[2][1] + z * m[2][2] + m[2][3];
+    v.w = x * m[3][0] + y * m[3][1] + z * m[3][2] + m[3][3];
 
     v.x /= v.w;
     v.y /= v.w;
@@ -267,10 +267,10 @@ void Vector4::operator*=(const Matrix4x4& m)
     // it makes more since for linear transformation to do it that way.
     float nx, ny, nz;
 
-    nx = x * m(0, 0) + y * m(1, 0) + z * m(2, 0) + m(3, 0);
-    ny = x * m(0, 1) + y * m(1, 1) + z * m(2, 1) + m(3, 1);
-    nz = x * m(0, 2) + y * m(1, 2) + z * m(2, 2) + m(3, 2);
-    w  = x * m(0, 3) + y * m(1, 3) + z * m(2, 3) + m(3, 3);
+    nx = x * m[0][0] + y * m[0][1] + z * m[0][2] + m[0][3];
+    ny = x * m[1][0] + y * m[1][1] + z * m[1][2] + m[1][3];
+    nz = x * m[2][0] + y * m[2][1] + z * m[2][2] + m[2][3];
+    w  = x * m[3][0] + y * m[3][1] + z * m[3][2] + m[3][3];
 
     x = nx / w;
     y = ny / w;

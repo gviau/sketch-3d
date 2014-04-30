@@ -46,17 +46,17 @@ void Quaternion::Normalize()
 void Quaternion::MakeFromRotationMatrix(const Matrix3x3& mat)
 {
     Matrix4x4 m;
-    m(0, 0) = mat(0, 0);
-    m(0, 1) = mat(0, 1);
-    m(0, 2) = mat(0, 2);
-
-    m(1, 0) = mat(1, 0);
-    m(1, 1) = mat(1, 1);
-    m(1, 2) = mat(1, 2);
-
-    m(2, 0) = mat(2, 0);
-    m(2, 1) = mat(2, 1);
-    m(2, 2) = mat(2, 2);
+    m[0][0] = mat[0][0];
+    m[0][1] = mat[0][1];
+    m[0][2] = mat[0][2];
+				
+    m[1][0] = mat[1][0];
+    m[1][1] = mat[1][1];
+    m[1][2] = mat[1][2];
+				
+    m[2][0] = mat[2][0];
+    m[2][1] = mat[2][1];
+    m[2][2] = mat[2][2];
 
     MakeFromRotationMatrix(m);
 }
@@ -67,35 +67,35 @@ void Quaternion::MakeFromRotationMatrix(const Matrix4x4& mat)
     // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
     // article "Quaternion Calculus and Fast Animation".
 
-    float trace = mat(0, 0) + mat(1, 1) + mat(2, 2);
+    float trace = mat[0][0] + mat[1][1] + mat[2][2];
     float root;
 
     if (trace > 0.0f) {
         root = sqrtf(trace + 1.0f);
         w = 0.5f * root;
         root = 0.5f / root;
-        x = (mat(2, 1) - mat(1, 2)) * root;
-        y = (mat(0, 2) - mat(2, 0)) * root;
-        z = (mat(1, 0) - mat(0, 1)) * root;
+        x = (mat[2][1] - mat[1][2]) * root;
+        y = (mat[0][2] - mat[2][0]) * root;
+        z = (mat[1][0] - mat[0][1]) * root;
     } else {
         int i = 0;
-        if (mat(1, 1) > mat(0, 0)) {
+        if (mat[1][1] > mat[0][0]) {
             i = 1;
         }
-        if (mat(2, 2) > mat(i, i)) {
+        if (mat[2][2] > mat[i][i]) {
             i = 2;
         }
 
         int j = (i + 1) % 3;
         int k = (j + 1) % 3;
 
-        root = sqrtf(mat(i, i) - mat(j, j) - mat(k, k) + 1.0f);
+        root = sqrtf(mat[i][i] - mat[j][j] - mat[k][k] + 1.0f);
         float* apkQuat[3] = { &x, &y, &z };
         *apkQuat[i] = root * 0.5f;
         root = 0.5f / root;
-        w = (mat(k, j) - mat(j, k)) * root;
-        *apkQuat[j] = (mat(j, i) + mat(i, j)) * root;
-        *apkQuat[k] = (mat(k, i) + mat(i, k)) * root;
+        w = (mat[k][j] - mat[j][k]) * root;
+        *apkQuat[j] = (mat[j][i] + mat[i][j]) * root;
+        *apkQuat[k] = (mat[k][i] + mat[i][k]) * root;
     }
 }
 
@@ -116,23 +116,53 @@ void Quaternion::MakeFromAxes(const Vector3& xAxis, const Vector3& yAxis,
 {
     Matrix3x3 mat;
 
-    mat(0, 0) = xAxis.x;
-    mat(1, 0) = xAxis.y;
-    mat(2, 0) = xAxis.z;
-
-    mat(0, 1) = yAxis.x;
-    mat(1, 1) = yAxis.y;
-    mat(2, 1) = yAxis.z;
-
-    mat(0, 2) = zAxis.x;
-    mat(1, 2) = zAxis.y;
-    mat(2, 2) = zAxis.z;
+    mat[0][0] = xAxis.x;
+    mat[1][0] = xAxis.y;
+    mat[2][0] = xAxis.z;
+	   		
+    mat[0][1] = yAxis.x;
+    mat[1][1] = yAxis.y;
+    mat[2][1] = yAxis.z;
+	   		
+    mat[0][2] = zAxis.x;
+    mat[1][2] = zAxis.y;
+    mat[2][2] = zAxis.z;
 
     MakeFromRotationMatrix(mat);
 }
 
 void Quaternion::ToRotationMatrix(Matrix3x3& mat) const
 {
+	float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+
+	x2 = x + x;
+	y2 = y + y;
+	z2 = z + z;
+
+	xx = x * x2;
+	xy = x * y2;
+	xz = x * z2;
+
+	yy = y * y2;
+	yz = y * z2;
+	zz = z * z2;
+
+	wx = w * x2;
+	wy = w * y2;
+	wz = w * z2;
+
+	mat[0][0] = 1.0f - (yy + zz);
+	mat[0][1] = xy - wz;
+	mat[0][2] = xz + wy;
+
+	mat[1][0] = xy + wz;
+	mat[1][1] = 1.0f - (xx + zz);
+	mat[1][2] = yz - wx;
+
+	mat[2][0] = xz - wy;
+	mat[2][1] = yz + wx;
+	mat[2][2] = 1.0f - (xx + yy);
+	/*
     float xx, xy, xz, xw, yy, yz, yw, zz, zw, tx, ty, tz;
 
     tx = x + x;
@@ -151,17 +181,18 @@ void Quaternion::ToRotationMatrix(Matrix3x3& mat) const
     zz = tz * z;
     zw = tz * w;
 
-    mat(0, 0) = 1.0f - (yy + zz);
-    mat(0, 1) = (xy - zw);
-    mat(0, 2) = (xz + yw);
-
-    mat(1, 0) = (xy + zw);
-    mat(1, 1) = 1.0f - (xx + zz);
-    mat(1, 2) = (yz - xw);
-
-    mat(2, 0) = (xz - yw);
-    mat(2, 1) = (yz + xw);
-    mat(2, 2) = 1.0f - (xx + yy);
+    mat[0][0] = 1.0f - (yy + zz);
+    mat[0][1] = (xy - zw);
+    mat[0][2] = (xz + yw);
+		 
+    mat[1][0] = (xy + zw);
+    mat[1][1] = 1.0f - (xx + zz);
+    mat[1][2] = (yz - xw);
+		 
+    mat[2][0] = (xz - yw);
+    mat[2][1] = (yz + xw);
+    mat[2][2] = 1.0f - (xx + yy);
+	*/
 }
 
 void Quaternion::ToRotationMatrix(Matrix4x4& mat) const
@@ -171,11 +202,11 @@ void Quaternion::ToRotationMatrix(Matrix4x4& mat) const
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            mat(i, j) = m(i,  j);
+            mat[i][j] = m[i][j];
         }
     }
 
-    mat(3, 3) = 1.0f;
+    mat[3][3] = 1.0f;
 }
 
 void Quaternion::ToAngleAxis(float& angle, Vector3& axis) const
@@ -200,17 +231,17 @@ void Quaternion::ToAxes(Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const
     Matrix3x3 mat;
     ToRotationMatrix(mat);
 
-    xAxis.x = mat(0, 0);
-    xAxis.y = mat(1, 0);
-    xAxis.z = mat(2, 0);
-
-    yAxis.x = mat(0, 1);
-    yAxis.y = mat(1, 1);
-    yAxis.z = mat(2, 1);
-
-    zAxis.x = mat(0, 2);
-    zAxis.y = mat(1, 2);
-    zAxis.z = mat(2, 2);
+    xAxis.x = mat[0][0];
+    xAxis.y = mat[1][0];
+    xAxis.z = mat[2][0];
+				 		
+    yAxis.x = mat[0][1];
+    yAxis.y = mat[1][1];
+    yAxis.z = mat[2][1];
+				 		
+    zAxis.x = mat[0][2];
+    zAxis.y = mat[1][2];
+    zAxis.z = mat[2][2];
 }
 
 Vector3 Quaternion::GetXAxis() const

@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(test_quaternion_make_from_axes)
     q.ToRotationMatrix(m);
     v *= m;
 
-    BOOST_REQUIRE(v == Vector3(1.0f, 1.0f, -1.0f));
+    BOOST_REQUIRE(v == Vector3(1.0f, -1.0f, 1.0f));
 }
 
 BOOST_AUTO_TEST_CASE(test_quaternion_to_angle_axis)
@@ -157,25 +157,24 @@ BOOST_AUTO_TEST_CASE(test_quaternion_to_axes)
     zAxis = q.GetZAxis();
 
     BOOST_REQUIRE(xAxis ==  Vector3::RIGHT);
-    BOOST_REQUIRE(yAxis ==  Vector3::LOOK);
-    BOOST_REQUIRE(zAxis == -Vector3::UP);
+    BOOST_REQUIRE(yAxis == -Vector3::LOOK);
+    BOOST_REQUIRE(zAxis ==  Vector3::UP);
 
     q.ToAxes(xAxis, yAxis, zAxis);
 
     BOOST_REQUIRE(xAxis ==  Vector3::RIGHT);
-    BOOST_REQUIRE(yAxis ==  Vector3::LOOK);
-    BOOST_REQUIRE(zAxis == -Vector3::UP);
+    BOOST_REQUIRE(yAxis == -Vector3::LOOK);
+    BOOST_REQUIRE(zAxis ==  Vector3::UP);
 }
 
 BOOST_AUTO_TEST_CASE(test_quaternion_add_rotation)
 {
     Quaternion q, r, t, k;
-    q.MakeFromAngleAxis(PI_OVER_2, Vector3::RIGHT);
-    r.MakeFromAngleAxis(40.0f * DEG_2_RAD, Vector3::UP);
-    t.MakeFromAngleAxis(310.0f * DEG_2_RAD, Vector3::LOOK);
+    q.MakeFromAngleAxis(-PI_OVER_2, Vector3::RIGHT);
+    r.MakeFromAngleAxis(-40.0f * DEG_2_RAD, Vector3::UP);
+    t.MakeFromAngleAxis(-310.0f * DEG_2_RAD, Vector3::LOOK);
 
-    k = t * r * q;
-    k.Normalize();
+    k = q * r * t;
 
     Vector4 v = Vector4::ONE;
     Matrix4x4 m;

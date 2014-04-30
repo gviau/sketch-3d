@@ -229,11 +229,11 @@ Vector3 Vector3::operator*(const Matrix3x3& m) const
     // it makes more since for linear transformation to do it that way.
     Vector3 v;
 
-    v.x = x * m(0, 0) + y * m(1, 0) + z * m(2, 0);
-    v.y = x * m(0, 1) + y * m(1, 1) + z * m(2, 1);
-    v.z = x * m(0, 2) + y * m(1, 2) + z * m(2, 2);
+    v.x = x * m[0][0] + y * m[0][1] + z * m[0][2];
+    v.y = x * m[1][0] + y * m[1][1] + z * m[1][2];
+    v.z = x * m[2][0] + y * m[2][1] + z * m[2][2];
 
-    return v;
+    return m * (*this);
 }
 
 void Vector3::operator*=(const Matrix3x3& m)
@@ -242,9 +242,9 @@ void Vector3::operator*=(const Matrix3x3& m)
     // it makes more since for linear transformation to do it that way.
     float nx, ny, nz;
 
-    nx = x * m(0, 0) + y * m(1, 0) + z * m(2, 0);
-    ny = y * m(0, 1) + y * m(1, 1) + z * m(2, 1);
-    nz = z * m(0, 2) + y * m(1, 2) + z * m(2, 2);
+    nx = x * m[0][0] + y * m[0][1] + z * m[0][2];
+    ny = x * m[1][0] + y * m[1][1] + z * m[1][2];
+    nz = x * m[2][0] + y * m[2][1] + z * m[2][2];
 
     x = nx;
     y = ny;
