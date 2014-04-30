@@ -6,6 +6,8 @@
 #include "render/OpenGL/gl/glew.h"
 #include "render/OpenGL/gl/gl.h"
 
+#include "render/Renderer.h"
+
 #if PLATFORM == PLATFORM_WIN32
 #include "render/OpenGL/Win32/RenderContextOpenGLWin32.h"
 #elif PLATFORM == PLATFORM_LINUX
@@ -42,11 +44,7 @@ bool RenderSystemOpenGL::Initialize() {
 	// Some initial values
 	glViewport(0, 0, width_, height_);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, width_ / height_, 1.0f, 1000.0f);
-
-	glMatrixMode(GL_MODELVIEW);
+	Renderer::GetInstance()->PerspectiveProjection(45.0f, (float)width_ / (float)height_, 1.0f, 1000.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -69,23 +67,23 @@ void RenderSystemOpenGL::EndRender() {
 }
 
 void RenderSystemOpenGL::Render() {
-	glLoadIdentity();
-	gluLookAt(0.0f, 1.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
 	static float angle = 0.0f;
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-	angle += 1.0f;
+	angle += 0.02f;
+}
 
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(-1.0f, 0.0f, 0.0f);
-
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
-
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(1.0f, 0.0f, 0.0f);
-	glEnd();
+void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) {
+	switch (mode) {
+		case RENDER_MODE_FILL:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			break;
+		case RENDER_MODE_WIREFRAME:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			break;
+		case RENDER_MODE_POINT:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			break;
+	}
 }
 
 }

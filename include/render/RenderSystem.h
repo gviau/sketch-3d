@@ -7,6 +7,9 @@
 
 namespace Sketch3D {
 
+// Forward declaration
+enum RenderMode_t;
+
 /**
  * @interface RenderSystem
  * This class serves as an interface for the underlying implementation of the
@@ -57,6 +60,12 @@ class RenderSystem {
 		 * The actual rendering process
 		 */
 		virtual void	Render() = 0;
+
+		/**
+		 * Set the renderer's fill mode
+		 * @param mode The mode to use for rendering the geometry
+		 */
+		virtual void	SetRenderFillMode(RenderMode_t mode) = 0;
 
 	protected:
         Window&         window_;        /**< The window */

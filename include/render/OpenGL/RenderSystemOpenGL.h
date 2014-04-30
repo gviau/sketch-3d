@@ -21,6 +21,7 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual bool BeginRender();
 		virtual void EndRender();
 		virtual void Render();
+		virtual void SetRenderFillMode(RenderMode_t mode);
 
 	public:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */
