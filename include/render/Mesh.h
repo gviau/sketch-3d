@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_MESH_H
 #define SKETCH_3D_MESH_H
 
+#include "render/ResourceManager.h"
+
 #include <string>
 #include <vector>
 using namespace std;
@@ -20,29 +22,23 @@ class Mesh {
 		 */
 								Mesh(const string& filename);
 
+        /**
+         * Destructor - release the buffer objects
+         */
+                               ~Mesh();
+
 		/**
 		 * Render the model
 		 */
 		void					Render() const;
 
-		//  USEFUL STATIC FUNCTIONS
-		/**
-		 * Create a mesh representing an unit cube
-		 * @param width The width of the cube
-		 * @param height The height of the cube
-		 * @param depth The depth of the cube
-		 * @return a newly created mesh
-		 */
-		static Mesh				CreateCube(float width, float height, float depth);
-
 	protected:
-		vector<float>			vertices_;	/**< The vertices that compose the model */
-		vector<unsigned int>	indices_;	/**< The indices of the model */
+		vector<LoadedModel_t*>*	model_;		/**< The data representing the mesh */
 
 		// TEMP
-		unsigned int			vbo_;		/**< Vertex buffer object */
-		unsigned int			ibo_;		/**< Index buffer object */
-		unsigned int			vao_;		/**< Vertex array object */
+		unsigned int*	    vbo_;		/**< Vertex buffer objects */
+		unsigned int*	    ibo_;		/**< Index buffer objects */
+		unsigned int*   	vao_;		/**< Vertex array objects */
 
 		/**
 		 * Private constructor. Used to create prefabs

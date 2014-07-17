@@ -13,6 +13,7 @@ set(SRC
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/Renderer.cpp
     ${SRC_PATH}/RenderSystem.cpp
+	${SRC_PATH}/ResourceManager.cpp
 	${SRC_PATH}/SceneTree.cpp
 	${SRC_PATH}/Shader.cpp
 	${SRC_PATH}/Texture.cpp
@@ -65,6 +66,7 @@ elseif (UNIX)
 endif ()
 
 include_directories (../../include)
+include_directories (${ASSIMP_INCLUDE_DIR}/../)
 
 add_library(
     render

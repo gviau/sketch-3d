@@ -80,9 +80,9 @@ void Node::ConcreteRender() const {
 	model[2][3] = position_.z;
 
 	Matrix4x4 modelViewProjection = viewProjection * model;
-	Matrix4x4 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
+	Matrix3x3 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
 	shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
-	shader->SetUniformMatrix4x4("modelView", modelView);
+	shader->SetUniformMatrix3x3("modelView", modelView);
 
 	// Send data to render
 	mesh_->Render();
