@@ -7,10 +7,11 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declarations
-class Vector3;
-class Vector4;
 class Matrix3x3;
 class Matrix4x4;
+class Vector3;
+class Vector4;
+class Texture2D;
 
 /**
  * @class Shader
@@ -42,6 +43,7 @@ class Shader {
 		virtual void	SetUniformVector4(const string& uniform, const Vector4& value) = 0;
 		virtual void	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
 		virtual void	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
+		virtual void	SetUniformTexture(const string& uniform, const Texture2D& value) = 0;
 
 		bool			IsActive() { return active_; }
 

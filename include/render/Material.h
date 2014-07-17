@@ -6,6 +6,7 @@ namespace Sketch3D {
 // Forward declarations
 class Mesh;
 class Shader;
+class Texture2D;
 
 /**
  * @class Material
@@ -28,10 +29,24 @@ class Material {
 		void		Apply(Mesh& mesh) const;
 
 		void		SetShader(Shader* shader);
+		
+		/**
+		 * Set one of the four textures of the material.
+		 * @param num The texture number to set. This parameter has to be in
+		 * [1, 4], otherwise the set will silently fail.
+		 * @param texture The texture to set
+		 */
+		void		SetTexture(int num, Texture2D* texture);
+
 		Shader*		GetShader() const;
+		Texture2D*	GetTexture(int num) const;
 
 	private:
 		Shader*		shader_;	/**< Shader used by the material */
+		Texture2D*	texture1_;	/**< First texture of the material */
+		Texture2D*	texture2_;	/**< Second texture of the material */
+		Texture2D*	texture3_;	/**< Third texture of the material */
+		Texture2D*	texture4_;	/**< Fourth texture of the material */
 };
 
 }

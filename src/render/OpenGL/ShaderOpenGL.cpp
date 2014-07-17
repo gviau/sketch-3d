@@ -5,6 +5,9 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
+#include "render/Renderer.h"
+#include "render/RenderSystem.h"
+
 #include "system/Logger.h"
 
 #include <fstream>
@@ -14,7 +17,8 @@ namespace Sketch3D {
 
 ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 						   const string& fragmentFilename) : Shader(vertexFilename,
-																	fragmentFilename)
+																	fragmentFilename),
+															 currentTextureUnit_(0)
 {
 	Logger::GetInstance()->Debug("Shader creation");
 
@@ -69,35 +73,88 @@ void ShaderOpenGL::SetActive(bool val) {
 }
 
 void ShaderOpenGL::SetUniformInt(const string& uniform, int value) {
-	glUniform1i(glGetUniformLocation(program_, uniform.c_str()), value);
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	glUniform1i(location, value);
 }
 
 void ShaderOpenGL::SetUniformFloat(const string& uniform, float value) {
-	glUniform1f(glGetUniformLocation(program_, uniform.c_str()), value);
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	glUniform1f(location, value);
 }
 
 void ShaderOpenGL::SetUniformVector2(const string& uniform, float value1, float value2) {
-	glUniform2f(glGetUniformLocation(program_, uniform.c_str()), value1, value2);
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	glUniform2f(location, value1, value2);
 }
 
 void ShaderOpenGL::SetUniformVector3(const string& uniform, const Vector3& value) {
-	glUniform3f(glGetUniformLocation(program_, uniform.c_str()), value.x, value.y, value.z);
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	glUniform3f(location, value.x, value.y, value.z);
 }
 
 void ShaderOpenGL::SetUniformVector4(const string& uniform, const Vector4& value) {
-	glUniform4f(glGetUniformLocation(program_, uniform.c_str()), value.x, value.y, value.z, value.w);
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
 void ShaderOpenGL::SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) {
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
 	float data[9];
 	value.GetData(data);
-	glUniformMatrix3fv(glGetUniformLocation(program_, uniform.c_str()), 1, false, data);
+	glUniformMatrix3fv(location, 1, false, data);
 }
 
 void ShaderOpenGL::SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) {
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
 	float data[16];
 	value.GetData(data);
-	glUniformMatrix4fv(glGetUniformLocation(program_, uniform.c_str()), 1, false, data);
+	glUniformMatrix4fv(location, 1, false, data);
+}
+
+void ShaderOpenGL::SetUniformTexture(const string& uniform, const Texture2D& value) {
+	GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
+		return;
+	}
+
+	int texture = Renderer::GetInstance()->renderSystem_->textures_[&value];
+	glUniform1i(location, texture);
 }
 
 char* ShaderOpenGL::ReadShader(const string& filename) {

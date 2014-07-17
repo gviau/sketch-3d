@@ -5,9 +5,15 @@
 #include "system/Window.h"
 #include "system/WindowHandle.h"
 
+#include <map>
+#include <vector>
+using namespace std;
+
 namespace Sketch3D {
 
 // Forward declaration
+class ShaderOpenGL;
+class Texture2D;
 enum RenderMode_t;
 
 /**
@@ -18,23 +24,25 @@ enum RenderMode_t;
  * This interface is basically the context of the API.
  */
 class RenderSystem {
+		friend class ShaderOpenGL;
+
 	public:
 		/**
 		 * Constructor. Initializes the underlying API.
          * @param window The window for which we want to create a context for
 		 */
-                        RenderSystem(Window& window);
+										RenderSystem(Window& window);
 
 		/**
 		 * Destructor. Free the underlying API
 		 */
-		virtual		   ~RenderSystem() {}
+		virtual						   ~RenderSystem() {}
 
 		/**
 		 * Initialize the rendering system
 		 * @return true if the system was correctly initialized, false otherwise
 		 */
-		virtual bool	Initialize()=0;
+		virtual bool					Initialize()=0;
 
 		/**
 		 * Change the clear color
@@ -43,36 +51,66 @@ class RenderSystem {
 		 * @param blue The blue component
 		 * @param alpha The alpha component
 		 */
-		virtual void	SetClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
+		virtual void					SetClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
 
 		/**
 		 * Starts the rendering process.
 		 * @return true if the rendering process was correctly started, false otherwise
 		 */
-		virtual bool	BeginRender() = 0;
+		virtual bool					BeginRender() = 0;
 
 		/**
 		 * Ends the rendering process
 		 */
-		virtual void	EndRender() = 0;
+		virtual void					EndRender() = 0;
 
 		/**
 		 * The actual rendering process
 		 */
-		virtual void	Render() = 0;
+		virtual void					Render() = 0;
 
 		/**
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		virtual void	SetRenderFillMode(RenderMode_t mode) = 0;
+		virtual void					SetRenderFillMode(RenderMode_t mode) = 0;
+
+		/**
+		 * Create a texture using the underlying API
+		 * @param texture The texture object to use for the internal
+		 * representation.
+		 */
+		virtual void					CreateTexture(const Texture2D& texture) = 0;
+
+		/**
+		 * Enable the specified texture. There can be up to 8 enabled textures
+		 * at once. If a texture is set using an index already in use, then
+		 * the new texture will be used instead of the old one.
+		 * @param index The texture index to use. The index has to be in
+		 * [0, maxActiveTextures_], otherwise the function will silently fail.
+		 * @param texture The texture to set.
+		 */
+		virtual void					EnableTexture(unsigned int index, const Texture2D& texture) = 0;
+
+		int								GetMaxActiveTextures() const { return maxActiveTextures_; }
 
 	protected:
-        Window&         window_;        /**< The window */
-		WindowHandle	windowHandle_;	/**< The window's handle */
-		unsigned int	width_;			/**< The width of the window */
-		unsigned int	height_;		/**< The height of the window */
-		bool			windowed_;		/**< IS the window in windowed mode ? */
+        Window&							window_;        /**< The window */
+		WindowHandle					windowHandle_;	/**< The window's handle */
+		unsigned int					width_;			/**< The width of the window */
+		unsigned int					height_;		/**< The height of the window */
+		bool							windowed_;		/**< Is the window in windowed mode ? */
+
+		map<const Texture2D*, size_t>	textures_;		/**< Texture mapped to the API representation of the texture */
+		vector<int>						activeTextures_;/**< Currently active textures */
+
+		// Device capabilities
+		int								maxActiveTextures_; /**< Maximum number of active textures supported by the GPU */
+
+		/**
+		 * Fill in the device capabilities
+		 */
+		virtual void					FillDeviceCapabilities() = 0;
 };
 
 }

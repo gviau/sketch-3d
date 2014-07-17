@@ -5,6 +5,9 @@
 
 #include "gl/glew.h"
 
+#include <map>
+using namespace std;
+
 namespace Sketch3D {
 
 /**
@@ -23,9 +26,12 @@ class ShaderOpenGL : public Shader {
 		virtual void SetUniformVector4(const string& uniform, const Vector4& value);
 		virtual void SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
 		virtual void SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
+		virtual void SetUniformTexture(const string& uniform, const Texture2D& value);
 
 	private:
-		GLuint	program_;	/**< Represents the shader program */
+		GLuint				program_;	/**< Represents the shader program */
+		map<GLint, GLuint>	textures_;	/**< Allows the shader to map textures to its different texture units */
+		unsigned int		currentTextureUnit_;	/**< The current texture unit to use to set the texture */
 
 		/**
 		 * Read the shader file and output a string to pass to the GLSL

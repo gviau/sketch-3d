@@ -17,6 +17,7 @@ set(SRC
 	${SRC_PATH}/SceneTree.cpp
 	${SRC_PATH}/Shader.cpp
 	${SRC_PATH}/Texture.cpp
+	${SRC_PATH}/Texture2D.cpp
 )
 
 set(HEADER
@@ -31,6 +32,7 @@ set(HEADER
 	${HEADER_PATH}/SceneTree.h
 	${HEADER_PATH}/Shader.h
 	${HEADER_PATH}/Texture.h
+	${HEADER_PATH}/Texture2D.h
 )
 source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})
@@ -67,6 +69,7 @@ endif ()
 
 include_directories (../../include)
 include_directories (${ASSIMP_INCLUDE_DIR}/../)
+include_directories (${DevIL_INCLUDE_DIR})
 
 add_library(
     render

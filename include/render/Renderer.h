@@ -14,6 +14,7 @@ namespace Sketch3D {
 
 // Forward class declaration
 class RenderSystem;
+class ShaderOpenGL;
 class Window;
 
 /**
@@ -43,6 +44,8 @@ enum RenderMode_t {
  * rendering context
  */
 class Renderer {
+		friend class ShaderOpenGL;
+
 	public:
 		/**
 		 * Destructor
@@ -145,7 +148,6 @@ class Renderer {
 	private:
 		static Renderer		instance_;	/**< Singleton instance of this class */
 
-		ResourceManager		resourceManager_;	/**< The resource manager of the renderer */
 		RenderSystem*		renderSystem_;		/**< The render system that is currently being used */
 
 		Matrix4x4			projection_;		/**< The projection matrix */

@@ -22,9 +22,13 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual void EndRender();
 		virtual void Render();
 		virtual void SetRenderFillMode(RenderMode_t mode);
+		virtual void CreateTexture(const Texture2D& texture);
+		virtual void EnableTexture(unsigned int index, const Texture2D& texture);
 
-	public:
+	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */
+
+		virtual void FillDeviceCapabilities();
 };
 
 }
