@@ -36,6 +36,26 @@ else (OPENGL_FOUND)
     set (MISSING_MODULES ${MISSING_MODULES} "OpenGL")
 endif (OPENGL_FOUND)
 
+find_package(Assimp)
+
+message(STATUS "Assimp found? ${ASSIMP_FOUND}")
+if (ASSIMP_FOUND)
+	message (STATUS "Assimp include: ${ASSIMP_INCLUDE_DIR}")
+	message (STATUS "Assimp libs: ${ASSIMP_LIBRARY}")
+else ()
+	set (MISSING_MODULES ${MISSING_MODULES} "Assimp")
+endif ()
+
+find_package (DevIL)
+
+message (STATUS "DevIL found? ${DevIL_FOUND}")
+if (DevIL_FOUND)
+	message (STATUS "DevIL include: ${DevIL_INCLUDE_DIR}")
+	message (STATUS "DevIL libs: ${DevIL_LIBRARIES}")
+else ()
+	set (MISSING_MODULES ${MISSING_MODULES} "DevIL")
+endif ()
+
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
 endif (MISSING_MODULES)
