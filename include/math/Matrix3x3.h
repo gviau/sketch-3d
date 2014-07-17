@@ -7,6 +7,7 @@ namespace Sketch3D
 {
 
 // Forward dependencies
+class Matrix4x4;
 class Vector3;
 
 /**
@@ -44,6 +45,12 @@ class Matrix3x3
          * @param src The matrix to copy
          */
                                 Matrix3x3(const Matrix3x3& src);
+
+		/**
+		 * Copy constructor. Assign only the 3x3 sub matrix part
+		 * @param src The matrix to copy
+		 */
+								Matrix3x3(const Matrix4x4& src);
 
         /**
          * Return the transpose this matrix
@@ -107,6 +114,7 @@ class Matrix3x3
         INLINE bool             operator!=(const Matrix3x3& m) const;
 
         INLINE Matrix3x3&       operator=(const Matrix3x3& m);
+		Matrix3x3&				operator=(const Matrix4x4& m);
 
 		/**
 		 * Return the matrix as a column-major linear array.

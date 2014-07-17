@@ -1,14 +1,13 @@
 #ifndef SKETCH_3D_MATRIX_4X4_H
 #define SKETCH_3D_MATRIX_4X4_H
 
-#include "math/Matrix3x3.h"
-
 #include "system/Common.h"
 
 namespace Sketch3D
 {
 
 // Forward dependencies
+class Matrix3x3;
 class Vector4;
 
 /**
@@ -45,6 +44,12 @@ class Matrix4x4
          * @param src The matrix to copy
          */
                                 Matrix4x4(const Matrix4x4& src);
+
+		/**
+		 * Copy constructor. Assign only the 3x3 sub matrix part
+		 * @param src The matrix to copy
+		 */
+								Matrix4x4(const Matrix3x3& src);
 
         /**
          * Return the transpose this matrix
@@ -107,7 +112,7 @@ class Matrix4x4
         INLINE bool             operator==(const Matrix4x4& m) const;
         INLINE bool             operator!=(const Matrix4x4& m) const;
 
-		INLINE Matrix4x4&		operator=(const Matrix3x3& m);
+		Matrix4x4&				operator=(const Matrix3x3& m);
         INLINE Matrix4x4&       operator=(const Matrix4x4& m);
 
 		/**
@@ -219,17 +224,6 @@ INLINE bool Matrix4x4::operator!=(const Matrix4x4& m) const
 	}
 
     return false;
-}
-
-INLINE Matrix4x4& Matrix4x4::operator=(const Matrix3x3& m)
-{
-    for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			data_[i][j] = m[i][j];
-		}
-    }
-
-    return *this;
 }
 
 INLINE Matrix4x4& Matrix4x4::operator=(const Matrix4x4& m)

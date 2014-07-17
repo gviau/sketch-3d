@@ -1,6 +1,7 @@
 #include "math/Matrix3x3.h"
 
 #include "math/Constants.h"
+#include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 
 #include <math.h>
@@ -58,6 +59,15 @@ Matrix3x3::Matrix3x3(const Matrix3x3& src)
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			data_[i][j] = src.data_[i][j];
+		}
+	}
+}
+
+Matrix3x3::Matrix3x3(const Matrix4x4& src)
+{
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			data_[i][j] = src[i][j];
 		}
 	}
 }
@@ -146,6 +156,17 @@ Vector3 Matrix3x3::operator*(const Vector3& v) const
     w.z = v.x * data_[2][0] + v.y * data_[2][1] + v.z * data_[2][2];
 
     return w;
+}
+
+Matrix3x3& Matrix3x3::operator=(const Matrix4x4& m)
+{
+    for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			data_[i][j] = m[i][j];
+		}
+    }
+
+    return *this;
 }
 
 }

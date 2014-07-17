@@ -1,6 +1,7 @@
 #include "math/Matrix4x4.h"
 
 #include "math/Constants.h"
+#include "math/Matrix3x3.h"
 #include "math/Vector4.h"
 
 #include <math.h>
@@ -69,6 +70,14 @@ Matrix4x4::Matrix4x4(const Matrix4x4& src)
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			data_[i][j] = src.data_[i][j];
+		}
+	}
+}
+
+Matrix4x4::Matrix4x4(const Matrix3x3& src) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			data_[i][j] = src[i][j];
 		}
 	}
 }
@@ -169,6 +178,17 @@ Vector4 Matrix4x4::operator*(const Vector4& v) const
     w.w = 1.0f;
 
     return w;
+}
+
+Matrix4x4& Matrix4x4::operator=(const Matrix3x3& m)
+{
+    for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			data_[i][j] = m[i][j];
+		}
+    }
+
+    return *this;
 }
 
 }
