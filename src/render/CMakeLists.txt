@@ -41,6 +41,7 @@ if (WIN32)
 	set(OPENGL_SRC
 		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
 		${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
+		${SRC_PATH}/OpenGL/Texture2DOpenGL.cpp
 		${SRC_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
@@ -68,8 +69,8 @@ elseif (UNIX)
 endif ()
 
 include_directories (../../include)
-include_directories (${ASSIMP_INCLUDE_DIR}/../)
-include_directories (${DevIL_INCLUDE_DIR})
+include_directories (${ASSIMP_INCLUDE_DIR})
+include_directories (${FreeImage_INCLUDE_DIRS})
 
 add_library(
     render

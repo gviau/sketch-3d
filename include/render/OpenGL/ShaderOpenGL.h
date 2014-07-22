@@ -26,7 +26,7 @@ class ShaderOpenGL : public Shader {
 		virtual void SetUniformVector4(const string& uniform, const Vector4& value);
 		virtual void SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
 		virtual void SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
-		virtual void SetUniformTexture(const string& uniform, const Texture2D& value);
+		virtual void SetUniformTexture(const string& uniform, int activeTexture);
 
 	private:
 		GLuint				program_;	/**< Represents the shader program */

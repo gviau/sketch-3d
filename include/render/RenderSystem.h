@@ -80,7 +80,7 @@ class RenderSystem {
 		 * @param texture The texture object to use for the internal
 		 * representation.
 		 */
-		virtual void					CreateTexture(const Texture2D& texture) = 0;
+		virtual void					CreateTexture(Texture2D*& texture) = 0;
 
 		/**
 		 * Enable the specified texture. There can be up to 8 enabled textures
@@ -89,8 +89,9 @@ class RenderSystem {
 		 * @param index The texture index to use. The index has to be in
 		 * [0, maxActiveTextures_], otherwise the function will silently fail.
 		 * @param texture The texture to set.
+         * @return The texture unit used
 		 */
-		virtual void					EnableTexture(unsigned int index, const Texture2D& texture) = 0;
+		virtual int					    EnableTexture(const Texture2D* texture) = 0;
 
 		int								GetMaxActiveTextures() const { return maxActiveTextures_; }
 
@@ -100,9 +101,6 @@ class RenderSystem {
 		unsigned int					width_;			/**< The width of the window */
 		unsigned int					height_;		/**< The height of the window */
 		bool							windowed_;		/**< Is the window in windowed mode ? */
-
-		map<const Texture2D*, size_t>	textures_;		/**< Texture mapped to the API representation of the texture */
-		vector<int>						activeTextures_;/**< Currently active textures */
 
 		// Device capabilities
 		int								maxActiveTextures_; /**< Maximum number of active textures supported by the GPU */

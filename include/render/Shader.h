@@ -43,7 +43,7 @@ class Shader {
 		virtual void	SetUniformVector4(const string& uniform, const Vector4& value) = 0;
 		virtual void	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
 		virtual void	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
-		virtual void	SetUniformTexture(const string& uniform, const Texture2D& value) = 0;
+		virtual void	SetUniformTexture(const string& uniform, int activeTexture) = 0;
 
 		bool			IsActive() { return active_; }
 

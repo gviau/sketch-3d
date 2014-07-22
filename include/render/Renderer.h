@@ -138,6 +138,19 @@ class Renderer {
 		 */
 		void				SetRenderFillMode(RenderMode_t mode);
 
+        /**
+         * Create the texture from the alread loaded data
+         * @param texture The texture object from which to create the texture.
+         */
+        void                CreateTexture(Texture2D*& texture);
+
+        /**
+         * Enable a texture
+         * @param texture The texture that is used
+         * @return The texture unit used
+         */
+        int                EnableTexture(const Texture2D* texture);
+
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;
 		const Matrix4x4&	GetViewProjectionMatrix() const;

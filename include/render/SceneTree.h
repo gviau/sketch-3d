@@ -33,7 +33,33 @@ class SceneTree : public CompositeNode {
 		 */
 		virtual void		Render() const;
 
-	private:
+        /**
+         * Construct the parts of a node. If the part sent to this function are null, they won't be loaded.
+         *  This function uses default post processing steps upon loading the files. The steps are the following:
+		 *	- aiProcess_Triangulate : Triangulates all faces;
+		 *	- aiProcess_GenNormals : Generates normals if none are present;
+		 *	- aiProcess_GenUVCoords : Generates the UV coordinates if the texture coordinates aren't correct;
+         * @param filename The name of the file from which the model should be loaded
+         * @param mesh A pointer to a mesh to load the geometry. If null, then it won't be loaded
+         * @param material A pointer to a material to load the textures. The material won't have any shader attached to it.
+         * The user will therefore have to attach one to it to be able to render the node. If null, then the textures won't
+         * be loaded.
+         * @return true if the loading was succesful, false otherwise.
+         */
+        bool                ConstructNode(const string& filename, Mesh* mesh, Material* material) const;
+
+        /**
+         * Construct the parts of a node. If the part sent to this function are null, they won't be loaded.
+         * @param filename The name of the file from which the model should be loaded
+         * @param mesh A pointer to a mesh to load the geometry. If null, then it won't be loaded
+         * @param prostProcessingFlags A unsigned int containing bits indicating
+		 * which Assimp's post processing flags the loader should use.
+         * @param material A pointer to a material to load the textures. The material won't have any shader attached to it.
+         * The user will therefore have to attach one to it to be able to render the node. If null, then the textures won't
+         * be loaded.
+         * @return true if the loading was succesful, false otherwise.
+         */
+        bool                ConstructNode(const string& filename, Mesh* mesh, unsigned int postProcessingFlags, Material* material) const;
 };
 
 }

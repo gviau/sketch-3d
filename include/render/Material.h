@@ -1,12 +1,18 @@
 #ifndef SKETCH_3D_MATERIAL_H
 #define SKETCH_3D_MATERIAL_H
 
+#include <vector>
+using namespace std;
+
 namespace Sketch3D {
 
 // Forward declarations
 class Mesh;
 class Shader;
 class Texture2D;
+
+// TODO
+// support more than one textures per mesh
 
 /**
  * @class Material
@@ -20,33 +26,17 @@ class Material {
 		/**
 		 * Constructor. Sets the shader for the material
 		 */
-					Material(Shader* shader);
+					                Material(Shader* shader);
 
-		/**
-		 * Apply the material for the next render on a mesh
-		 * @param mesh The mesh on which to apply the material
-		 */
-		void		Apply(Mesh& mesh) const;
+		void		                SetShader(Shader* shader);
+	    void                        SetTextures(vector<Texture2D*>*& textures);
 
-		void		SetShader(Shader* shader);
-		
-		/**
-		 * Set one of the four textures of the material.
-		 * @param num The texture number to set. This parameter has to be in
-		 * [1, 4], otherwise the set will silently fail.
-		 * @param texture The texture to set
-		 */
-		void		SetTexture(int num, Texture2D* texture);
-
-		Shader*		GetShader() const;
-		Texture2D*	GetTexture(int num) const;
+		Shader*		                GetShader() const;
+        const vector<Texture2D*>*  GetTextures() const;
 
 	private:
-		Shader*		shader_;	/**< Shader used by the material */
-		Texture2D*	texture1_;	/**< First texture of the material */
-		Texture2D*	texture2_;	/**< Second texture of the material */
-		Texture2D*	texture3_;	/**< Third texture of the material */
-		Texture2D*	texture4_;	/**< Fourth texture of the material */
+		Shader*		                shader_;	/**< Shader used by the material */
+        vector<Texture2D*>*         textures_;  /**< Textures used to render a mesh. Those are ordered to go with a specific mesh */
 };
 
 }

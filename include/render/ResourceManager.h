@@ -70,10 +70,42 @@ class ResourceManager {
 		 * @param filename The name of the file loaded
 		 * @param loadedModel A list of structures containing information about the
 		 * loaded model
+         * @param textureHashes A list of names' hash of loaded textures to retrieve from this class
 		 * @return true if the model was loaded correctly, false otherwise
 		 */
 		bool							LoadModel(const string& filename,
-												  vector<LoadedModel_t*>*& loadedModel);
+												  vector<LoadedModel_t*>*& loadedModel,
+                                                  vector<Texture2D*>*& textures);
+
+		/**
+		 * Load a model from a file. This function accepts a third parameters
+		 * which sets the Assimp post processing flags.
+		 * @param filename The name of the file loaded
+		 * @param prostProcessingFlags A unsigned int containing bits indicating
+		 * which Assimp's post processing flags the loader should use.
+		 * @param loadedModel A structure containing information about the
+		 * loaded model
+         * @param textureHashes A list of names' hash of loaded textures to retrieve from this class
+		 * @return true if the model was loaded correctly, false otherwise
+		 */
+		bool							LoadModel(const string& filename,
+												  unsigned int postProcessingFlags,
+												  vector<LoadedModel_t*>*& loadedModel,
+                                                  vector<Texture2D*>*& textures);
+
+        /**
+         * Load a model's geometry from a file. This function uses default post processing
+		 * steps upon loading the files. The steps are the following:
+		 *	- aiProcess_Triangulate : Triangulates all faces;
+		 *	- aiProcess_GenNormals : Generates normals if none are present;
+		 *	- aiProcess_GenUVCoords : Generates the UV coordinates if the texture coordinates aren't correct;
+		 * @param filename The name of the file loaded
+		 * @param loadedModel A list of structures containing information about the
+		 * loaded model
+		 * @return true if the model was loaded correctly, false otherwise
+		 */
+        bool                            LoadModelGeometryFromFile(const string& filename,
+                                                                  vector<LoadedModel_t*>*& loadedModel);
 
 		/**
 		 * Load a model from a file. This function accepts a third parameters
@@ -85,10 +117,18 @@ class ResourceManager {
 		 * loaded model
 		 * @return true if the model was loaded correctly, false otherwise
 		 */
-		bool							LoadModel(const string& filename,
-												  unsigned int postProcessingFlags,
-												  vector<LoadedModel_t*>*& loadedModel);
+		bool							LoadModelGeometryFromFile(const string& filename,
+												                  unsigned int postProcessingFlags,
+												                  vector<LoadedModel_t*>*& loadedModel);
 
+        /**
+         * Load a model's textures from a file.
+         * @param filename The name of the file loaded
+         * @param textureHashes A list of names' hash of loaded textures to retrieve from this class
+         * @return true if the textures were loaded correctly, false otherwise
+         */
+        bool                            LoadTexturesFromFile(const string& filename,
+                                                             vector<Texture2D*>*& textureHashes);
 		/**
 		 * Load an image from a file
 		 * @param filename The name of the file loaded
@@ -96,7 +136,7 @@ class ResourceManager {
 		 * @return true if the image was loaded correctly, false otherwise.
 		 */
 		bool							LoadTexture(const string& filename,
-													Texture2D* texture);
+													Texture2D*& texture);
 
 	private:
 		static ResourceManager			instance_;	/**< The singleton's instance */
@@ -105,8 +145,25 @@ class ResourceManager {
 		Assimp::Importer*				importer_;	/**< The object providing the functionnality to load models. */
 		map<size_t,
             vector<LoadedModel_t*> >	models_;	/**< The cached imported models */
-		map<size_t,
-			pair<unsigned int, unsigned char*> >	textures_;	/**< The cached loaded textures */
+        map<size_t, vector<Texture2D*>> modelTextures_; /**< Textures loaded from a model file */
+		map<size_t, pair<Texture2D*, unsigned char*>>	        textures_;	/**< The cached loaded textures */
+
+        /**
+         * Load the model geometry from an already loaded assimp scene
+         * @param scene The Assimp scene containing the meshes to load
+         * @parram loadedModel The structure to fill
+         */
+        void                            LoadModelGeometryFromFile(const aiScene* scene,
+                                                                  vector<LoadedModel_t*>& loadedModel) const;
+
+        /**
+         * Load a model's textures from a file.
+         * @param filename The name of the file loaded
+         * @param textureHashes A list of names' hash of loaded textures to retrieve from this class
+         * @return true if the textures were loaded correctly, false otherwise
+         */
+        bool                            LoadTexturesFromFile(const string& filename,
+                                                             vector<Texture2D*>& textures);
 
         /**
          * Reserve memory in advance for the cached model data, so that we don't have to constantly
@@ -168,14 +225,6 @@ class ResourceManager {
 		 */
 		void							LoadMeshTangents(const aiMesh* mesh,
 														 LoadedModel_t* loadedModel) const;
-
-		/**
-		 * Setup the Texture2D object from the cached image
-		 * @param image A pair containing the DevIL image name as well as the cached data
-		 * @param texture A pointer to the object to set the data to
-		 */
-		void							LoadCachedTexture(const pair<unsigned int, unsigned char*>& image,
-														  Texture2D* texture);
 
 		/**
 		 * Constructor. Sets the base file path to "./"

@@ -1,12 +1,14 @@
 #include "render/ResourceManager.h"
 
+#include "render/Renderer.h"
+
 #include "system/Logger.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include <IL/il.h>
+#include <FreeImage.h>
 
 #include <queue>
 using namespace std;
@@ -24,7 +26,6 @@ const unsigned int ResourceManager::POST_PROCESS_NORMAL_TANGENT_UV = aiProcess_T
 ResourceManager::ResourceManager() {
 	Logger::GetInstance()->Info("Initializing ResourceManager");
 	importer_ = new Assimp::Importer();
-	ilInit();
 	SetBaseFilePath("./");
 }
 
@@ -41,9 +42,10 @@ ResourceManager::~ResourceManager() {
     }
 
 	Logger::GetInstance()->Info("Freeing images from ResourceManager");
-	map<size_t, pair<ILuint, ILubyte*> >::iterator t_it = textures_.begin();
+	map<size_t, pair<Texture2D*, unsigned char*>>::iterator t_it = textures_.begin();
 	for (; t_it != textures_.end(); ++t_it) {
-		ilDeleteImages(1, &(t_it->second.first));
+        delete t_it->second.first;
+        delete t_it->second.second;
 	}
 
 	Logger::GetInstance()->Info("Done freeing ResourceManager");
@@ -58,13 +60,71 @@ void ResourceManager::SetBaseFilePath(const string& filePath) {
 	Logger::GetInstance()->Info("Setting base file path for resources to: " + baseFilePath_);
 }
 
-bool ResourceManager::LoadModel(const string& filename, vector<LoadedModel_t*>*& loadedModel) {
-	return LoadModel(filename, POST_PROCESS_NORMAL_UV, loadedModel);
+bool ResourceManager::LoadModel(const string& filename, vector<LoadedModel_t*>*& loadedModel, vector<Texture2D*>*& textures) {
+    return LoadModel(filename, POST_PROCESS_NORMAL_UV, loadedModel, textures);
 }
 
-bool ResourceManager::LoadModel(const string& filename,
-								unsigned int postProcessingFlags,
-								vector<LoadedModel_t*>*& loadedModel)
+bool ResourceManager::LoadModel(const string& filename, unsigned int postProcessingFlags, vector<LoadedModel_t*>*& loadedModel,
+                                vector<Texture2D*>*& textures)
+{
+    hash<string> hashFunction;
+    size_t filenameHash = hashFunction(filename);
+    bool foundModel = false;
+    bool foundTextures = false;
+
+	map<size_t, vector<LoadedModel_t*>>::iterator m_it = models_.find(filenameHash);
+	if (m_it != models_.end()) {
+        loadedModel = &(m_it->second);
+		foundModel = true;
+	}
+
+    map<size_t, vector<Texture2D*>>::iterator t_it = modelTextures_.find(filenameHash);
+    if (t_it != modelTextures_.end()) {
+        textures = &(t_it->second);
+        foundTextures = true;
+    }
+
+    if (foundModel && foundTextures) {
+        return true;
+    }
+
+    Logger::GetInstance()->Info("Loading model: " + filename + " ...");
+
+	string path = baseFilePath_ + filename;
+	const aiScene* scene = importer_->ReadFile(path, postProcessingFlags);
+	if (!scene) {
+		Logger::GetInstance()->Error("Couldn't load model : " + string(importer_->GetErrorString()));
+		return false;
+	}
+
+    if (!foundModel) {
+        models_[filenameHash] = vector<LoadedModel_t*>();
+        vector<LoadedModel_t*>* model = &models_[filenameHash];
+        LoadModelGeometryFromFile(scene, *model);
+        loadedModel = &(models_[filenameHash]);
+
+        foundModel = true;
+    }
+
+    if (!foundTextures) {
+        vector<Texture2D*>* tex;
+        LoadTexturesFromFile(filename, tex);
+        modelTextures_[filenameHash] = *tex;
+        textures = &(modelTextures_[filenameHash]);
+
+        foundTextures = true;
+    }
+
+    return foundModel;
+}
+
+bool ResourceManager::LoadModelGeometryFromFile(const string& filename, vector<LoadedModel_t*>*& loadedModel) {
+	return LoadModelGeometryFromFile(filename, POST_PROCESS_NORMAL_UV, loadedModel);
+}
+
+bool ResourceManager::LoadModelGeometryFromFile(const string& filename,
+								                unsigned int postProcessingFlags,
+								                vector<LoadedModel_t*>*& loadedModel)
 {
     hash<string> hashFunction;
     size_t filenameHash = hashFunction(filename);
@@ -87,54 +147,137 @@ bool ResourceManager::LoadModel(const string& filename,
 
     models_[filenameHash] = vector<LoadedModel_t*>();
     vector<LoadedModel_t*>* model = &models_[filenameHash];
-    PreallocateMemory(scene, scene->mRootNode, *model);
-	LoadCachedModel(scene, scene->mRootNode, 0, *model);
-
+    LoadModelGeometryFromFile(scene, *model);
     loadedModel = &(models_[filenameHash]);
 
 	return true;
 }
 
+bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Texture2D*>*& textures) {
+    hash<string> hashFunction;
+    size_t filenameHash = hashFunction(filename);
+
+    map<size_t, vector<Texture2D*>>::iterator it = modelTextures_.find(filenameHash);
+    if (it != modelTextures_.end()) {
+        textures = &(it->second);
+        
+        return true;
+    }
+
+	string path = baseFilePath_ + filename;
+	const aiScene* scene = importer_->ReadFile(path, 0);
+	if (!scene) {
+		Logger::GetInstance()->Error("Couldn't load model : " + string(importer_->GetErrorString()));
+		return false;
+	}
+
+    vector<Texture2D*> textures_;
+    queue<const aiNode*> nodes;
+    nodes.push(scene->mRootNode);
+    const aiNode* node = nullptr;
+
+    while (!nodes.empty()) {
+        node = nodes.front();
+        nodes.pop();
+
+        for (size_t i = 0; i < node->mNumMeshes; i++) {
+            const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+            const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+            // TODO
+            // Allow only one texture. Find a better way?
+            aiString textureName;
+            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+                aiReturn ret = material->GetTexture(aiTextureType_DIFFUSE, 0, &textureName);
+
+                if (ret != AI_SUCCESS) {
+                    textures_.push_back(nullptr);
+                    continue;
+                }
+
+                Texture2D* texture = new Texture2D;
+                if (!LoadTexture(textureName.C_Str(), texture)) {
+                    // TODO
+                    // Pink texture for invalid texture?
+                    delete texture;
+                    textures_.push_back(nullptr);
+                    continue;
+                }
+
+                textures_.push_back(texture);
+            }
+        }
+
+        for (size_t i = 0; i < node->mNumChildren; i++) {
+            nodes.push(node->mChildren[i]);
+        }
+    }
+
+    modelTextures_[filenameHash] = textures_;
+    textures = &(modelTextures_[filenameHash]);
+
+    return true;
+}
+
 bool ResourceManager::LoadTexture(const string& filename,
-								  Texture2D* texture)
+								  Texture2D*& texture)
 {
     hash<string> hashFunction;
     size_t filenameHash = hashFunction(filename);
 
-	map<size_t, pair<ILuint, ILubyte*> >::iterator it = textures_.find(filenameHash);
+	map<size_t, pair<Texture2D*, unsigned char*>>::iterator it = textures_.find(filenameHash);
 	if (it != textures_.end()) {
-		ilBindImage(it->second.first);
-		LoadCachedTexture(it->second, texture);
+        texture = it->second.first;
 		return true;
 	}
 
 	Logger::GetInstance()->Info("Loading image " + filename + " ...");
+    string path = baseFilePath_ + filename;
 
-	ILuint imageName;
-	ilGenImages(1, &imageName);
-	ilBindImage(imageName);
+    FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
 
-	string path = baseFilePath_ + filename;
-	if (!ilLoadImage(path.c_str())) {
+    format = FreeImage_GetFileType(path.c_str());
+    if (format == FIF_UNKNOWN) {
+        format = FreeImage_GetFIFFromFilename(path.c_str());
+    }
+
+    if ((format == FIF_UNKNOWN) || !FreeImage_FIFSupportsReading(format)) {
+        Logger::GetInstance()->Error("File format unsupported for image " + filename);
+        texture = nullptr;
+        return false;
+    }
+
+    FIBITMAP* dib = FreeImage_Load(format, path.c_str());
+
+    if (dib == nullptr) {
 		Logger::GetInstance()->Error("Couldn't load image " + filename);
-		texture = NULL;
-		ilDeleteImage(imageName);
+		texture = nullptr;
 		return false;
-	}
+    }
 
-	ILubyte* data = ilGetData();
-	if (!data) {
-		Logger::GetInstance()->Error("Couldn't access data from image " + filename);
-		texture = NULL;
-		ilDeleteImage(imageName);
-		return false;
-	}
+    size_t width = FreeImage_GetWidth(dib);
+    size_t height = FreeImage_GetHeight(dib);
+    size_t bpp = FreeImage_GetBPP(dib);
 
-	pair<ILuint, ILubyte*> image = pair<ILuint, ILubyte*>(imageName, data);
-	textures_[filenameHash] = image;
-	LoadCachedTexture(image, texture);
+    texture = new Texture2D(width, height, FILTER_MODE_BILINEAR, WRAP_MODE_REPEAT,
+                            (bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32);
+
+    size_t bytesPerPixel = (bpp == 24) ? 3 : 4;
+    unsigned char* data = new unsigned char[width * height * bytesPerPixel];
+    memcpy((void*)data, (void*)FreeImage_GetBits(dib), width * height * bytesPerPixel);
+    texture->data_ = data;
+
+    FreeImage_Unload(dib);
+
+	textures_[filenameHash] = pair<Texture2D*, unsigned char*>(texture, data);
+    Renderer::GetInstance()->CreateTexture(texture);
 
 	return true;
+}
+
+void ResourceManager::LoadModelGeometryFromFile(const aiScene* scene, vector<LoadedModel_t*>& loadedModel) const {
+    PreallocateMemory(scene, scene->mRootNode, loadedModel);
+	LoadCachedModel(scene, scene->mRootNode, 0, loadedModel);
 }
 
 void ResourceManager::PreallocateMemory(const aiScene* scene, const aiNode* node,
@@ -269,23 +412,6 @@ void ResourceManager::LoadMeshTangents(const aiMesh* mesh,
 			loadedModel->tangent.push_back(tangent.z);
 		}
 	}
-}
-
-void ResourceManager::LoadCachedTexture(const pair<ILuint, ILubyte*>& image,
-										Texture2D* texture)
-{
-	unsigned int width = ilGetInteger(IL_IMAGE_WIDTH);
-	unsigned int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	unsigned int bytesPerPixel = ilGetInteger(IL_IMAGE_BPP);
-	TextureFormat_t format = (bytesPerPixel == 3) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32;
-
-	size_t textureSize = width * height * bytesPerPixel;
-	texture->data_.resize(textureSize);
-	memcpy(&texture->data_[0], image.second, textureSize);
-
-	texture->SetWidth(width);
-	texture->SetHeight(height);
-	texture->SetTextureFormat(format);
 }
 
 }

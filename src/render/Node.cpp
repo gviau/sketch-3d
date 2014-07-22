@@ -7,6 +7,10 @@
 
 #include <sstream>
 
+// TEMP
+#include "render/OpenGL/gl/glew.h"
+#include <gl/GL.h>
+
 namespace Sketch3D {
 
 long long Node::nextNameIndex_ = 0;
@@ -59,10 +63,9 @@ void Node::Render() const {
 }
 
 void Node::ConcreteRender() const {
-	// Apply the material on the mesh that is about to be rendered
-	material_->Apply(*mesh_);
-
 	Shader* shader = material_->GetShader();
+    shader->SetActive(true);
+
 	const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
 	Matrix4x4 model;
 
@@ -84,8 +87,29 @@ void Node::ConcreteRender() const {
 	shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
 	shader->SetUniformMatrix3x3("modelView", modelView);
 
-	// Send data to render
-	mesh_->Render();
+	// Get the rendering data
+    vector<LoadedModel_t*>* modelData;
+    unsigned int* bufferObjects;
+    mesh_->GetRenderInfo(modelData, bufferObjects);
+
+    // textures
+    const vector<Texture2D*>* textures = material_->GetTextures();
+
+    // TEMP
+    // Render the mesh
+    for (size_t i = 0; i < modelData->size(); i++) {
+        Texture2D* texture = (*textures)[i];
+        if (texture != nullptr) {
+            int textureUnit = Renderer::GetInstance()->EnableTexture(texture);
+            if (textureUnit != -1) {
+                shader->SetUniformTexture("texture", 0);
+            }
+        }
+
+        glBindVertexArray(bufferObjects[i]);
+	    glDrawElements(GL_TRIANGLES, (*modelData)[i]->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
 }
 
 void Node::Translate(const Vector3& translation) {

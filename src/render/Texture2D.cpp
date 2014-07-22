@@ -14,17 +14,6 @@ Texture2D::Texture2D(unsigned int width, unsigned int height,
 {
 }
 
-Texture2D::Texture2D(const string& filename, FilterMode_t filterMode,
-					 WrapMode_t wrapMode) : Texture(0, 0, filterMode, wrapMode),
-											format_(TEXTURE_FORMAT_RGB24)
-{
-	LoadTexture(filename);
-}
-
-bool Texture2D::LoadTexture(const string& filename) {
-	return ResourceManager::GetInstance()->LoadTexture(filename, this);
-}
-
 void Texture2D::SetTextureFormat(TextureFormat_t format) {
 	format_ = format;
 }

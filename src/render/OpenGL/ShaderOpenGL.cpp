@@ -55,6 +55,7 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 	// TEMP
 	glBindAttribLocation(program_, 0, "in_vertex");
 	glBindAttribLocation(program_, 1, "in_normal");
+    glBindAttribLocation(program_, 2, "in_uv");
 
 	Logger::GetInstance()->Debug("Shader program linking");
 	glLinkProgram(program_);
@@ -146,15 +147,14 @@ void ShaderOpenGL::SetUniformMatrix4x4(const string& uniform, const Matrix4x4& v
 	glUniformMatrix4fv(location, 1, false, data);
 }
 
-void ShaderOpenGL::SetUniformTexture(const string& uniform, const Texture2D& value) {
+void ShaderOpenGL::SetUniformTexture(const string& uniform, int activeTexture) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
 		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
 		return;
 	}
 
-	int texture = Renderer::GetInstance()->renderSystem_->textures_[&value];
-	glUniform1i(location, texture);
+	glUniform1i(location, activeTexture);
 }
 
 char* ShaderOpenGL::ReadShader(const string& filename) {

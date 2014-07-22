@@ -44,8 +44,8 @@ class Texture {
 		 * @param wrapMode The wrap mode to use
 		 */
 						Texture(unsigned int width, unsigned int height,
-								FilterMode_t filterMode=FILTER_MODE_POINT,
-								WrapMode_t wrapMode=WRAP_MODE_CLAMP);
+								FilterMode_t filterMode=FILTER_MODE_BILINEAR,
+								WrapMode_t wrapMode=WRAP_MODE_REPEAT);
 
 		void			SetWidth(unsigned int width);
 		void			SetHeight(unsigned int height);

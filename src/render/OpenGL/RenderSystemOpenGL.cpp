@@ -44,10 +44,6 @@ bool RenderSystemOpenGL::Initialize() {
 
 	FillDeviceCapabilities();
 
-	for (int i = 0; i < maxActiveTextures_; i++) {
-		activeTextures_.push_back(-1);
-	}
-
 	// Some initial values
 	glViewport(0, 0, width_, height_);
 
@@ -93,18 +89,18 @@ void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) {
 	}
 }
 
-void RenderSystemOpenGL::CreateTexture(const Texture2D& texture) {
+void RenderSystemOpenGL::CreateTexture(Texture2D*& texture) {
 	GLuint tex;
 	glGenTextures(1, &tex);
 	
 	// We have to replace our currently bound texture on the last slot (the
 	// one less likely to be used) so we can bind this new texture for its
 	// creation.
-	glActiveTexture(GL_TEXTURE0 + maxActiveTextures_ - 1);
+    //glActiveTexture(GL_TEXTURE0);// + textures_.size());
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	int filter, wrap, format;
-	switch (texture.filterMode_) {
+	switch (texture->filterMode_) {
 		case FILTER_MODE_POINT:
 			filter = GL_NEAREST;
 			break;
@@ -119,7 +115,7 @@ void RenderSystemOpenGL::CreateTexture(const Texture2D& texture) {
 			filter = GL_LINEAR;
 	}
 
-	switch (texture.wrapMode_) {
+	switch (texture->wrapMode_) {
 		case WRAP_MODE_CLAMP:
 			wrap = GL_CLAMP;
 			break;
@@ -129,43 +125,37 @@ void RenderSystemOpenGL::CreateTexture(const Texture2D& texture) {
 			break;
 	}
 
-	switch (texture.format_) {
+    // FreeImage loads pixels in reverse
+	switch (texture->format_) {
 		case TEXTURE_FORMAT_RGB24:
-			format = GL_RGB;
+            format = GL_BGR;
 			break;
 
 		case TEXTURE_FORMAT_RGBA32:
-			format = GL_RGBA;
+			format = GL_BGRA;
 			break;
-
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, texture.width_, texture.height_, 0,
-				 format, GL_UNSIGNED_BYTE, &texture.data_[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, (format == GL_BGR) ? 3 : 4, texture->width_, texture->height_, 0,
+				 format, GL_UNSIGNED_BYTE, texture->data_);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
-	textures_[&texture] = tex;
-
-	if (activeTextures_[maxActiveTextures_ - 1] != -1) {
-		glBindTexture(GL_TEXTURE_2D, activeTextures_[maxActiveTextures_ - 1]);
-	}
+	textures_[texture] = pair<size_t, size_t>(tex, textures_.size());
 }
 
-void RenderSystemOpenGL::EnableTexture(unsigned int index, const Texture2D& texture) {
-	if (index >= (unsigned int)maxActiveTextures_) {
-		return;
+int RenderSystemOpenGL::EnableTexture(const Texture2D* texture) {
+	map<const Texture2D*, pair<size_t, size_t>>::iterator it = textures_.find(texture);
+	if (it == textures_.end()) {
+		return -1;
 	}
 
-	map<const Texture2D*, size_t>::iterator it = textures_.find(&texture);
-	if (it != textures_.end()) {
-		return;
-	}
+    glActiveTexture(GL_TEXTURE0);// + it->second.second);
+    glBindTexture(GL_TEXTURE_2D, it->second.first);
 
-	glActiveTexture(GL_TEXTURE0 + index);
-	glBindTexture(GL_TEXTURE_2D, it->second);
+    return it->second.second;
 }
 
 void RenderSystemOpenGL::FillDeviceCapabilities() {

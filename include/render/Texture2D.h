@@ -30,7 +30,7 @@ enum TextureFormat_t {
 class Texture2D : public Texture {
 
 	friend class RenderSystemOpenGL;
-	friend class ResourceManager;
+    friend class ResourceManager;
 
 	public:
 		/**
@@ -49,32 +49,18 @@ class Texture2D : public Texture {
 		 * @param format The format to use
 		 */
 								Texture2D(unsigned int width, unsigned int height,
-										  FilterMode_t filterMode=FILTER_MODE_POINT,
-										  WrapMode_t wrapMode=WRAP_MODE_CLAMP,
+										  FilterMode_t filterMode=FILTER_MODE_BILINEAR,
+										  WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										  TextureFormat_t format=TEXTURE_FORMAT_RGB24);
-
-		/**
-		 * Constructor. The format is set to TEXTURE_FORMAT_RGB24 by default
-		 * @param filename The name of the file to load the texture from
-		 * @param filterMode The filter mode to use
-		 * @param wrapMode The wrap mode to use
-		 */
-								Texture2D(const string& filename,
-										  FilterMode_t filterMode=FILTER_MODE_POINT,
-										  WrapMode_t wrapMode=WRAP_MODE_CLAMP);
-
-		/**
-		 * Load a texture from a file.
-		 * @param filename The name of the file to load the texture from
-		 */
-		bool					LoadTexture(const string& filename);
 
 		void					SetTextureFormat(TextureFormat_t format);
 		TextureFormat_t			GetTextureFormat() const;
 
+        const unsigned char* GetData() const { return data_; }
+
 	private:
 		TextureFormat_t			format_;	/**< The format of the texture */
-		vector<unsigned char>	data_;		/**< The actual texture data */
+		unsigned char*	        data_;		/**< The actual texture data */
 };
 
 }
