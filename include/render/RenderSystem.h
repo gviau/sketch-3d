@@ -24,8 +24,6 @@ enum RenderMode_t;
  * This interface is basically the context of the API.
  */
 class RenderSystem {
-		friend class ShaderOpenGL;
-
 	public:
 		/**
 		 * Constructor. Initializes the underlying API.
@@ -75,23 +73,11 @@ class RenderSystem {
 		 */
 		virtual void					SetRenderFillMode(RenderMode_t mode) = 0;
 
-		/**
-		 * Create a texture using the underlying API
-		 * @param texture The texture object to use for the internal
-		 * representation.
-		 */
-		virtual void					CreateTexture(Texture2D*& texture) = 0;
-
-		/**
-		 * Enable the specified texture. There can be up to 8 enabled textures
-		 * at once. If a texture is set using an index already in use, then
-		 * the new texture will be used instead of the old one.
-		 * @param index The texture index to use. The index has to be in
-		 * [0, maxActiveTextures_], otherwise the function will silently fail.
-		 * @param texture The texture to set.
-         * @return The texture unit used
-		 */
-		virtual int					    EnableTexture(const Texture2D* texture) = 0;
+        /**
+         * Create an empty texture
+         * @return A pointer to a texture
+         */
+        virtual Texture2D*              CreateTexture2D() const = 0;
 
 		int								GetMaxActiveTextures() const { return maxActiveTextures_; }
 

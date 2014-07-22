@@ -15,6 +15,9 @@ Texture::Texture(unsigned int width, unsigned int height,
 {
 }
 
+Texture::~Texture() {
+}
+
 void Texture::SetWidth(unsigned int width) {
 	width_ = width;
 }

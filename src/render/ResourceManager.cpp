@@ -195,7 +195,7 @@ bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Textur
                     continue;
                 }
 
-                Texture2D* texture = new Texture2D;
+                Texture2D* texture = Renderer::GetInstance()->CreateTexture2D();
                 if (!LoadTexture(textureName.C_Str(), texture)) {
                     // TODO
                     // Pink texture for invalid texture?
@@ -243,7 +243,6 @@ bool ResourceManager::LoadTexture(const string& filename,
 
     if ((format == FIF_UNKNOWN) || !FreeImage_FIFSupportsReading(format)) {
         Logger::GetInstance()->Error("File format unsupported for image " + filename);
-        texture = nullptr;
         return false;
     }
 
@@ -251,7 +250,6 @@ bool ResourceManager::LoadTexture(const string& filename,
 
     if (dib == nullptr) {
 		Logger::GetInstance()->Error("Couldn't load image " + filename);
-		texture = nullptr;
 		return false;
     }
 
@@ -259,8 +257,11 @@ bool ResourceManager::LoadTexture(const string& filename,
     size_t height = FreeImage_GetHeight(dib);
     size_t bpp = FreeImage_GetBPP(dib);
 
-    texture = new Texture2D(width, height, FILTER_MODE_BILINEAR, WRAP_MODE_REPEAT,
-                            (bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32);
+    texture->SetWidth(width);
+    texture->SetHeight(height);
+    texture->SetFilterMode(FILTER_MODE_BILINEAR);
+    texture->SetWrapMode(WRAP_MODE_REPEAT);
+    texture->SetTextureFormat((bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32);
 
     size_t bytesPerPixel = (bpp == 24) ? 3 : 4;
     unsigned char* data = new unsigned char[width * height * bytesPerPixel];
@@ -269,8 +270,12 @@ bool ResourceManager::LoadTexture(const string& filename,
 
     FreeImage_Unload(dib);
 
+    if (!texture->Create()) {
+        Logger::GetInstance()->Error("Couldn't create texture");
+        return false;
+    }
+
 	textures_[filenameHash] = pair<Texture2D*, unsigned char*>(texture, data);
-    Renderer::GetInstance()->CreateTexture(texture);
 
 	return true;
 }

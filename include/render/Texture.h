@@ -47,6 +47,11 @@ class Texture {
 								FilterMode_t filterMode=FILTER_MODE_BILINEAR,
 								WrapMode_t wrapMode=WRAP_MODE_REPEAT);
 
+        /**
+         * Destructor
+         */
+        virtual        ~Texture();
+
 		void			SetWidth(unsigned int width);
 		void			SetHeight(unsigned int height);
 		void			SetFilterMode(FilterMode_t mode);

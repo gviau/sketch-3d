@@ -22,8 +22,7 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual void EndRender();
 		virtual void Render();
 		virtual void SetRenderFillMode(RenderMode_t mode);
-		virtual void CreateTexture(Texture2D*& texture);
-		virtual int EnableTexture(const Texture2D* texture);
+        virtual Texture2D* CreateTexture2D() const;
 
 	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */

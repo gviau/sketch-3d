@@ -100,10 +100,8 @@ void Node::ConcreteRender() const {
     for (size_t i = 0; i < modelData->size(); i++) {
         Texture2D* texture = (*textures)[i];
         if (texture != nullptr) {
-            int textureUnit = Renderer::GetInstance()->EnableTexture(texture);
-            if (textureUnit != -1) {
-                shader->SetUniformTexture("texture", 0);
-            }
+            texture->Bind(0);
+            shader->SetUniformTexture("texture", 0);
         }
 
         glBindVertexArray(bufferObjects[i]);

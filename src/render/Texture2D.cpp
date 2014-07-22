@@ -14,6 +14,9 @@ Texture2D::Texture2D(unsigned int width, unsigned int height,
 {
 }
 
+Texture2D::~Texture2D() {
+}
+
 void Texture2D::SetTextureFormat(TextureFormat_t format) {
 	format_ = format;
 }

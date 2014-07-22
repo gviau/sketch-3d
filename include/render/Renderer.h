@@ -44,8 +44,6 @@ enum RenderMode_t {
  * rendering context
  */
 class Renderer {
-		friend class ShaderOpenGL;
-
 	public:
 		/**
 		 * Destructor
@@ -139,17 +137,10 @@ class Renderer {
 		void				SetRenderFillMode(RenderMode_t mode);
 
         /**
-         * Create the texture from the alread loaded data
-         * @param texture The texture object from which to create the texture.
+         * Create a 2D texture object
+         * @return A pointer to a 2D texture
          */
-        void                CreateTexture(Texture2D*& texture);
-
-        /**
-         * Enable a texture
-         * @param texture The texture that is used
-         * @return The texture unit used
-         */
-        int                EnableTexture(const Texture2D* texture);
+        Texture2D*          CreateTexture2D() const;
 
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;

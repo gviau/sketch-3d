@@ -53,12 +53,30 @@ class Texture2D : public Texture {
 										  WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										  TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
+        /**
+         * Destructor
+         */
+        virtual                ~Texture2D();
+
+        /**
+         * Create the actual texture handle
+         * @param 
+         * @return true if the texture was created correctly
+         */
+        virtual bool            Create() = 0;
+
+        /**
+         * Activate the texture
+         * @param unit On which texture unit should we bind the texture
+         */
+        virtual void            Bind(unsigned int unit) = 0;
+
 		void					SetTextureFormat(TextureFormat_t format);
 		TextureFormat_t			GetTextureFormat() const;
 
         const unsigned char* GetData() const { return data_; }
 
-	private:
+	protected:
 		TextureFormat_t			format_;	/**< The format of the texture */
 		unsigned char*	        data_;		/**< The actual texture data */
 };

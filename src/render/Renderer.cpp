@@ -147,12 +147,8 @@ void Renderer::SetRenderFillMode(RenderMode_t mode) {
 	renderSystem_->SetRenderFillMode(mode);
 }
 
-void Renderer::CreateTexture(Texture2D*& texture) {
-    renderSystem_->CreateTexture(texture);
-}
-
-int Renderer::EnableTexture(const Texture2D* texture) {
-    return renderSystem_->EnableTexture(texture);
+Texture2D* Renderer::CreateTexture2D() const {
+    return renderSystem_->CreateTexture2D();
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {

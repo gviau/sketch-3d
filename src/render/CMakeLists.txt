@@ -49,6 +49,7 @@ if (WIN32)
 		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
 		${HEADER_PATH}/OpenGL/ShaderOpenGL.h
+		${HEADER_PATH}/OpenGL/Texture2DOpenGL.h
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
