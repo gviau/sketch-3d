@@ -60,12 +60,12 @@ void ResourceManager::SetBaseFilePath(const string& filePath) {
 	Logger::GetInstance()->Info("Setting base file path for resources to: " + baseFilePath_);
 }
 
-bool ResourceManager::LoadModel(const string& filename, vector<LoadedModel_t*>*& loadedModel, vector<Texture2D*>*& textures) {
+bool ResourceManager::LoadModel(const string& filename, vector<LoadedModel_t*>*& loadedModel, vector<vector<Texture2D*>>*& textures) {
     return LoadModel(filename, POST_PROCESS_NORMAL_UV, loadedModel, textures);
 }
 
 bool ResourceManager::LoadModel(const string& filename, unsigned int postProcessingFlags, vector<LoadedModel_t*>*& loadedModel,
-                                vector<Texture2D*>*& textures)
+                                vector<vector<Texture2D*>>*& textures)
 {
     hash<string> hashFunction;
     size_t filenameHash = hashFunction(filename);
@@ -78,7 +78,7 @@ bool ResourceManager::LoadModel(const string& filename, unsigned int postProcess
 		foundModel = true;
 	}
 
-    map<size_t, vector<Texture2D*>>::iterator t_it = modelTextures_.find(filenameHash);
+    map<size_t, vector<vector<Texture2D*>>>::iterator t_it = modelTextures_.find(filenameHash);
     if (t_it != modelTextures_.end()) {
         textures = &(t_it->second);
         foundTextures = true;
@@ -107,7 +107,7 @@ bool ResourceManager::LoadModel(const string& filename, unsigned int postProcess
     }
 
     if (!foundTextures) {
-        vector<Texture2D*>* tex;
+        vector<vector<Texture2D*>>* tex;
         LoadTexturesFromFile(filename, tex);
         modelTextures_[filenameHash] = *tex;
         textures = &(modelTextures_[filenameHash]);
@@ -153,11 +153,11 @@ bool ResourceManager::LoadModelGeometryFromFile(const string& filename,
 	return true;
 }
 
-bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Texture2D*>*& textures) {
+bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<vector<Texture2D*>>*& textures) {
     hash<string> hashFunction;
     size_t filenameHash = hashFunction(filename);
 
-    map<size_t, vector<Texture2D*>>::iterator it = modelTextures_.find(filenameHash);
+    map<size_t, vector<vector<Texture2D*>>>::iterator it = modelTextures_.find(filenameHash);
     if (it != modelTextures_.end()) {
         textures = &(it->second);
         
@@ -171,7 +171,7 @@ bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Textur
 		return false;
 	}
 
-    vector<Texture2D*> textures_;
+    vector<vector<Texture2D*>> textures_;
     queue<const aiNode*> nodes;
     nodes.push(scene->mRootNode);
     const aiNode* node = nullptr;
@@ -184,15 +184,17 @@ bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Textur
             const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-            // TODO
-            // Allow only one texture. Find a better way?
+            textures_.push_back(vector<Texture2D*>());
             aiString textureName;
-            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-                aiReturn ret = material->GetTexture(aiTextureType_DIFFUSE, 0, &textureName);
+            unsigned int idx = 0;
+
+            // TODO
+            // Manage textures more effiently
+            while (true) {
+                aiReturn ret = material->GetTexture(aiTextureType_DIFFUSE, idx, &textureName);
 
                 if (ret != AI_SUCCESS) {
-                    textures_.push_back(nullptr);
-                    continue;
+                    break;
                 }
 
                 Texture2D* texture = Renderer::GetInstance()->CreateTexture2D();
@@ -200,11 +202,11 @@ bool ResourceManager::LoadTexturesFromFile(const string& filename, vector<Textur
                     // TODO
                     // Pink texture for invalid texture?
                     delete texture;
-                    textures_.push_back(nullptr);
-                    continue;
+                    break;
                 }
 
-                textures_.push_back(texture);
+                textures_[textures_.size() - 1].push_back(texture);
+                idx += 1;
             }
         }
 

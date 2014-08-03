@@ -14,7 +14,7 @@ namespace Sketch3D {
 
 // Forward class declaration
 class RenderSystem;
-class ShaderOpenGL;
+class Shader;
 class Window;
 
 /**
@@ -135,6 +135,14 @@ class Renderer {
 		 * @param mode The mode to use for rendering the geometry
 		 */
 		void				SetRenderFillMode(RenderMode_t mode);
+
+        /**
+         * Create a shader object
+         * @param vertexFilename The vertex shader filename
+         * @param fragmentFilename The fragment shader filename
+         * @return A pointer to a shader
+         */
+        Shader*             CreateShader(const string& vertexFilename, const string& fragmentFilename) const;
 
         /**
          * Create a 2D texture object

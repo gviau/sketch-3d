@@ -22,6 +22,7 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual void EndRender();
 		virtual void Render();
 		virtual void SetRenderFillMode(RenderMode_t mode);
+        virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename);
         virtual Texture2D* CreateTexture2D() const;
 
 	private:

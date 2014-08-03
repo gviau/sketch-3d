@@ -25,7 +25,7 @@ bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, Material* mate
 
 bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, unsigned int postProcessingFlags, Material* material) const {
     vector<LoadedModel_t*>* modelData;
-    vector<Texture2D*>* textures;
+    vector<vector<Texture2D*>>* textures;
 
     if (mesh && material) {
         ResourceManager::GetInstance()->LoadModel(filename, postProcessingFlags, modelData, textures);

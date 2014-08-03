@@ -75,7 +75,7 @@ class ResourceManager {
 		 */
 		bool							LoadModel(const string& filename,
 												  vector<LoadedModel_t*>*& loadedModel,
-                                                  vector<Texture2D*>*& textures);
+                                                  vector<vector<Texture2D*>>*& textures);
 
 		/**
 		 * Load a model from a file. This function accepts a third parameters
@@ -91,7 +91,7 @@ class ResourceManager {
 		bool							LoadModel(const string& filename,
 												  unsigned int postProcessingFlags,
 												  vector<LoadedModel_t*>*& loadedModel,
-                                                  vector<Texture2D*>*& textures);
+                                                  vector<vector<Texture2D*>>*& textures);
 
         /**
          * Load a model's geometry from a file. This function uses default post processing
@@ -128,7 +128,7 @@ class ResourceManager {
          * @return true if the textures were loaded correctly, false otherwise
          */
         bool                            LoadTexturesFromFile(const string& filename,
-                                                             vector<Texture2D*>*& textureHashes);
+                                                             vector<vector<Texture2D*>>*& textureHashes);
 		/**
 		 * Load an image from a file
 		 * @param filename The name of the file loaded
@@ -145,7 +145,7 @@ class ResourceManager {
 		Assimp::Importer*				importer_;	/**< The object providing the functionnality to load models. */
 		map<size_t,
             vector<LoadedModel_t*> >	models_;	/**< The cached imported models */
-        map<size_t, vector<Texture2D*>> modelTextures_; /**< Textures loaded from a model file */
+        map<size_t, vector<vector<Texture2D*>>> modelTextures_; /**< Textures loaded from a model file */
 		map<size_t, pair<Texture2D*, unsigned char*>>	        textures_;	/**< The cached loaded textures */
 
         /**

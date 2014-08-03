@@ -26,17 +26,17 @@ class Material {
 		/**
 		 * Constructor. Sets the shader for the material
 		 */
-					                Material(Shader* shader);
+					                        Material(Shader* shader);
 
-		void		                SetShader(Shader* shader);
-	    void                        SetTextures(vector<Texture2D*>*& textures);
+		void		                        SetShader(Shader* shader);
+	    void                                SetTextures(vector<vector<Texture2D*>>*& textures);
 
-		Shader*		                GetShader() const;
-        const vector<Texture2D*>*  GetTextures() const;
+		Shader*		                        GetShader() const;
+        const vector<vector<Texture2D*>>*   GetTextures() const;
 
 	private:
-		Shader*		                shader_;	/**< Shader used by the material */
-        vector<Texture2D*>*         textures_;  /**< Textures used to render a mesh. Those are ordered to go with a specific mesh */
+		Shader*		                        shader_;	/**< Shader used by the material */
+        vector<vector<Texture2D*>>*         textures_;  /**< Textures used to render a mesh. Those are ordered to go with a specific mesh */
 };
 
 }

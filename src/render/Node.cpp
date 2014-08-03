@@ -93,15 +93,18 @@ void Node::ConcreteRender() const {
     mesh_->GetRenderInfo(modelData, bufferObjects);
 
     // textures
-    const vector<Texture2D*>* textures = material_->GetTextures();
+    const vector<vector<Texture2D*>>* textures = material_->GetTextures();
 
     // TEMP
     // Render the mesh
     for (size_t i = 0; i < modelData->size(); i++) {
-        Texture2D* texture = (*textures)[i];
-        if (texture != nullptr) {
-            texture->Bind(0);
-            shader->SetUniformTexture("texture", 0);
+        vector<Texture2D*> meshTextures = (*textures)[i];
+        for (size_t j = 0; j < meshTextures.size(); j++) {
+            Texture2D* texture = meshTextures[j];
+            if (texture != nullptr) {
+                texture->Bind(j);
+                shader->SetUniformTexture("texture" + to_string(j), j);
+            }
         }
 
         glBindVertexArray(bufferObjects[i]);

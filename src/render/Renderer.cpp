@@ -147,6 +147,10 @@ void Renderer::SetRenderFillMode(RenderMode_t mode) {
 	renderSystem_->SetRenderFillMode(mode);
 }
 
+Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename) const {
+    return renderSystem_->CreateShader(vertexFilename, fragmentFilename);
+}
+
 Texture2D* Renderer::CreateTexture2D() const {
     return renderSystem_->CreateTexture2D();
 }

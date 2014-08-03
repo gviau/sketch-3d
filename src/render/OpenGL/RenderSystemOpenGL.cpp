@@ -4,6 +4,7 @@
 #include "render/OpenGL/gl/gl.h"
 
 #include "render/Renderer.h"
+#include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
 
 #include "system/Logger.h"
@@ -87,6 +88,11 @@ void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 			break;
 	}
+}
+
+Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
+    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename));
+    return shaders_[shaders_.size() - 1];
 }
 
 Texture2D* RenderSystemOpenGL::CreateTexture2D() const {

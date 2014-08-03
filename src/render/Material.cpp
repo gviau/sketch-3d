@@ -15,7 +15,7 @@ void Material::SetShader(Shader* shader) {
 	shader_ = shader;
 }
 
-void Material::SetTextures(vector<Texture2D*>*& textures) {
+void Material::SetTextures(vector<vector<Texture2D*>>*& textures) {
     textures_ = textures;
 }
 
@@ -23,7 +23,7 @@ Shader* Material::GetShader() const {
 	return shader_;
 }
 
-const vector<Texture2D*>* Material::GetTextures() const {
+const vector<vector<Texture2D*>>* Material::GetTextures() const {
     return textures_;
 }
 

@@ -12,7 +12,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
-class ShaderOpenGL;
+class Shader;
 class Texture2D;
 enum RenderMode_t;
 
@@ -34,7 +34,7 @@ class RenderSystem {
 		/**
 		 * Destructor. Free the underlying API
 		 */
-		virtual						   ~RenderSystem() {}
+		virtual						   ~RenderSystem();
 
 		/**
 		 * Initialize the rendering system
@@ -74,6 +74,14 @@ class RenderSystem {
 		virtual void					SetRenderFillMode(RenderMode_t mode) = 0;
 
         /**
+         * Create an empty shader
+         * @param vertexFilename The vertex shader filename
+         * @param fragmentFilename The fragment shader filename
+         * @return A pointer to a shader
+         */
+        virtual Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename) = 0;
+
+        /**
          * Create an empty texture
          * @return A pointer to a texture
          */
@@ -87,6 +95,8 @@ class RenderSystem {
 		unsigned int					width_;			/**< The width of the window */
 		unsigned int					height_;		/**< The height of the window */
 		bool							windowed_;		/**< Is the window in windowed mode ? */
+
+        vector<Shader*>                 shaders_;       /**< List of all shaders created */
 
 		// Device capabilities
 		int								maxActiveTextures_; /**< Maximum number of active textures supported by the GPU */
