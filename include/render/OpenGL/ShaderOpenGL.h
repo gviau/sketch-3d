@@ -19,14 +19,14 @@ class ShaderOpenGL : public Shader {
 		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename);
 
 		virtual void SetActive(bool val);
-		virtual void SetUniformInt(const string& uniform, int value);
-		virtual void SetUniformFloat(const string& uniform, float value);
-		virtual void SetUniformVector2(const string& uniform, float value1, float value2);
-		virtual void SetUniformVector3(const string& uniform, const Vector3& value);
-		virtual void SetUniformVector4(const string& uniform, const Vector4& value);
-		virtual void SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
-		virtual void SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
-		virtual void SetUniformTexture(const string& uniform, int activeTexture);
+		virtual bool SetUniformInt(const string& uniform, int value);
+		virtual bool SetUniformFloat(const string& uniform, float value);
+		virtual bool SetUniformVector2(const string& uniform, float value1, float value2);
+		virtual bool SetUniformVector3(const string& uniform, const Vector3& value);
+		virtual bool SetUniformVector4(const string& uniform, const Vector4& value);
+		virtual bool SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
+		virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
+		virtual bool SetUniformTexture(const string& uniform, int activeTexture);
 
 	private:
 		GLuint				program_;	/**< Represents the shader program */

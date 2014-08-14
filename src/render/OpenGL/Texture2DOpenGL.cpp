@@ -1,7 +1,7 @@
 #include "render/OpenGL/Texture2DOpenGL.h"
 
 namespace Sketch3D {
-Texture2DOpenGL::Texture2DOpenGL() : textureName_(0) {
+Texture2DOpenGL::Texture2DOpenGL() : Texture2D(), textureName_(0) {
 }
 
 Texture2DOpenGL::Texture2DOpenGL(unsigned int width, unsigned int height, FilterMode_t filterMode,

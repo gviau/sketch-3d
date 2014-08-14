@@ -63,6 +63,8 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 }
 
 void ShaderOpenGL::SetActive(bool val) {
+    // TODO find a way to do that correctly
+    /*
 	if (val != active_) {
 		active_ = val;
 		if (active_) {
@@ -70,91 +72,104 @@ void ShaderOpenGL::SetActive(bool val) {
 		} else {
 			glUseProgram(0);
 		}
-	}
+	}*/
+    if (val) {
+        glUseProgram(program_);
+    } else {
+        glUseProgram(0);
+    }
 }
 
-void ShaderOpenGL::SetUniformInt(const string& uniform, int value) {
+bool ShaderOpenGL::SetUniformInt(const string& uniform, int value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+        Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform1i(location, value);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformFloat(const string& uniform, float value) {
+bool ShaderOpenGL::SetUniformFloat(const string& uniform, float value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform1f(location, value);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformVector2(const string& uniform, float value1, float value2) {
+bool ShaderOpenGL::SetUniformVector2(const string& uniform, float value1, float value2) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform2f(location, value1, value2);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformVector3(const string& uniform, const Vector3& value) {
+bool ShaderOpenGL::SetUniformVector3(const string& uniform, const Vector3& value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform3f(location, value.x, value.y, value.z);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformVector4(const string& uniform, const Vector4& value) {
+bool ShaderOpenGL::SetUniformVector4(const string& uniform, const Vector4& value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform4f(location, value.x, value.y, value.z, value.w);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) {
+bool ShaderOpenGL::SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	float data[9];
 	value.GetData(data);
 	glUniformMatrix3fv(location, 1, false, data);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) {
+bool ShaderOpenGL::SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	float data[16];
 	value.GetData(data);
 	glUniformMatrix4fv(location, 1, false, data);
+    return true;
 }
 
-void ShaderOpenGL::SetUniformTexture(const string& uniform, int activeTexture) {
+bool ShaderOpenGL::SetUniformTexture(const string& uniform, int activeTexture) {
 	GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
-		Logger::GetInstance()->Error("Couldn't find uniform location of name " + uniform);
-		return;
+		Logger::GetInstance()->Warning("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(program_));
+		return false;
 	}
 
 	glUniform1i(location, activeTexture);
+    return true;
 }
 
 char* ShaderOpenGL::ReadShader(const string& filename) {

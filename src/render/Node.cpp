@@ -102,14 +102,19 @@ void Node::ConcreteRender() const {
         for (size_t j = 0; j < meshTextures.size(); j++) {
             Texture2D* texture = meshTextures[j];
             if (texture != nullptr) {
-                texture->Bind(j);
-                shader->SetUniformTexture("texture" + to_string(j), j);
+                if (shader->SetUniformTexture("texture" + to_string(j), j)) {
+                    texture->Bind(j);
+                }
+            } else {
+                glBindTexture(GL_TEXTURE_2D, 0);
             }
         }
 
         glBindVertexArray(bufferObjects[i]);
 	    glDrawElements(GL_TRIANGLES, (*modelData)[i]->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 

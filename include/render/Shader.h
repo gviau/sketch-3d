@@ -36,14 +36,14 @@ class Shader {
 		virtual void	SetActive(bool val) = 0;
 
 		// UNIFORM SETTERS
-		virtual void	SetUniformInt(const string& uniform, int value) = 0;
-		virtual void	SetUniformFloat(const string& uniform, float value) = 0;
-		virtual void	SetUniformVector2(const string& uniform, float value1, float value2) = 0;
-		virtual void	SetUniformVector3(const string& uniform, const Vector3& value) = 0;
-		virtual void	SetUniformVector4(const string& uniform, const Vector4& value) = 0;
-		virtual void	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
-		virtual void	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
-		virtual void	SetUniformTexture(const string& uniform, int activeTexture) = 0;
+		virtual bool	SetUniformInt(const string& uniform, int value) = 0;
+		virtual bool	SetUniformFloat(const string& uniform, float value) = 0;
+		virtual bool	SetUniformVector2(const string& uniform, float value1, float value2) = 0;
+		virtual bool	SetUniformVector3(const string& uniform, const Vector3& value) = 0;
+		virtual bool	SetUniformVector4(const string& uniform, const Vector4& value) = 0;
+		virtual bool	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
+		virtual bool	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
+		virtual bool	SetUniformTexture(const string& uniform, int activeTexture) = 0;
 
 		bool			IsActive() { return active_; }
 

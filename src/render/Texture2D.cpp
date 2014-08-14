@@ -4,13 +4,13 @@
 
 namespace Sketch3D {
 
-Texture2D::Texture2D() : Texture() {
+Texture2D::Texture2D() : Texture(), data_(nullptr) {
 }
 
 Texture2D::Texture2D(unsigned int width, unsigned int height,
 					 FilterMode_t filterMode, WrapMode_t wrapMode,
 					 TextureFormat_t format) : Texture(width, height, filterMode, wrapMode),
-											   format_(format)
+											   format_(format), data_(nullptr)
 {
 }
 

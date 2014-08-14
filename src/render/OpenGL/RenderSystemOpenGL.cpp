@@ -50,8 +50,11 @@ bool RenderSystemOpenGL::Initialize() {
 
 	Renderer::GetInstance()->PerspectiveProjection(45.0f, (float)width_ / (float)height_, 1.0f, 1000.0f);
 
+    //glEnable(GL_CULL_FACE);
+    glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
+    SetRenderFillMode(RenderMode_t::RENDER_MODE_FILL);
 
 	return true;
 }
@@ -79,7 +82,7 @@ void RenderSystemOpenGL::Render() {
 void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) {
 	switch (mode) {
 		case RENDER_MODE_FILL:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glPolygonMode(GL_FRONT, GL_FILL);
 			break;
 		case RENDER_MODE_WIREFRAME:
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

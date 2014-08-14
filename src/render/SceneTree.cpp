@@ -28,14 +28,23 @@ bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, unsigned int p
     vector<vector<Texture2D*>>* textures;
 
     if (mesh && material) {
-        ResourceManager::GetInstance()->LoadModel(filename, postProcessingFlags, modelData, textures);
+        if (!ResourceManager::GetInstance()->LoadModel(filename, postProcessingFlags, modelData, textures)) {
+            return false;
+        }
+
         mesh->Initialize(modelData);
         material->SetTextures(textures);
     } else if (mesh) {
-        ResourceManager::GetInstance()->LoadModelGeometryFromFile(filename, postProcessingFlags, modelData);
+        if (!ResourceManager::GetInstance()->LoadModelGeometryFromFile(filename, postProcessingFlags, modelData)) {
+            return false;
+        }
+
         mesh->Initialize(modelData);
     } else if (material) {
-        ResourceManager::GetInstance()->LoadTexturesFromFile(filename, textures);
+        if (!ResourceManager::GetInstance()->LoadTexturesFromFile(filename, textures)) {
+            return false;
+        }
+
         material->SetTextures(textures);
     }
 

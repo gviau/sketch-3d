@@ -13,6 +13,7 @@ set(SRC
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/Renderer.cpp
     ${SRC_PATH}/RenderSystem.cpp
+	${SRC_PATH}/RenderTexture.cpp
 	${SRC_PATH}/ResourceManager.cpp
 	${SRC_PATH}/SceneTree.cpp
 	${SRC_PATH}/Shader.cpp
@@ -28,6 +29,7 @@ set(HEADER
 	${HEADER_PATH}/RenderContext.h
 	${HEADER_PATH}/Renderer.h
 	${HEADER_PATH}/RenderSystem.h
+	${HEADER_PATH}/RenderTexture.h
 	${HEADER_PATH}/ResourceManager.h
 	${HEADER_PATH}/SceneTree.h
 	${HEADER_PATH}/Shader.h
@@ -40,6 +42,7 @@ source_group("Header Files" FILES ${HEADER})
 if (WIN32)
 	set(OPENGL_SRC
 		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
+		${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
 		${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
 		${SRC_PATH}/OpenGL/Texture2DOpenGL.cpp
 		${SRC_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.cpp
@@ -48,6 +51,7 @@ if (WIN32)
 	set(OPENGL_HEADER
 		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
+		${HEADER_PATH}/OpenGL/RenderTextureOpenGL.h
 		${HEADER_PATH}/OpenGL/ShaderOpenGL.h
 		${HEADER_PATH}/OpenGL/Texture2DOpenGL.h
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h
