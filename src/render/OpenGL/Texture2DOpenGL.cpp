@@ -5,7 +5,7 @@ Texture2DOpenGL::Texture2DOpenGL() : Texture2D(), textureName_(0) {
 }
 
 Texture2DOpenGL::Texture2DOpenGL(unsigned int width, unsigned int height, FilterMode_t filterMode,
-                                 WrapMode_t wrapMode, TextureFormat_t format) : Texture2D(width, height, filterMode, wrapMode, format)
+                                 WrapMode_t wrapMode, TextureFormat_t format) : Texture2D(width, height, filterMode, wrapMode, format), textureName_(0)
 {
 }
 
@@ -68,6 +68,15 @@ bool Texture2DOpenGL::Create() {
 void Texture2DOpenGL::Bind(unsigned int unit) {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, textureName_);
+}
+
+void Texture2DOpenGL::SetPixelDataImp(unsigned char* data) {
+    if (textureName_ != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureName_);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 }

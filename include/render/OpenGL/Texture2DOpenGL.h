@@ -55,6 +55,11 @@ class Texture2DOpenGL : public Texture2D {
 
     private:
         GLuint          textureName_;   /**< OpenGL texture's name */
+
+        /**
+         * Sends the pixel data to the texture object
+         */
+        virtual void    SetPixelDataImp(unsigned char* data);
 };
 
 }

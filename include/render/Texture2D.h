@@ -71,14 +71,27 @@ class Texture2D : public Texture {
          */
         virtual void            Bind(unsigned int unit) = 0;
 
+        /**
+         * Set the data array
+         * @param data The new data array
+         * @param width The width of the new data. Must be of the same width than this texture
+         * @param height The height of the new data. Must be of the same height than this texture
+         */
+        void                    SetPixelData(unsigned char* data, size_t width, size_t height);
+
 		void					SetTextureFormat(TextureFormat_t format);
 		TextureFormat_t			GetTextureFormat() const;
 
-        const unsigned char* GetData() const { return data_; }
+        const unsigned char*    GetData() const { return data_; }
 
 	protected:
 		TextureFormat_t			format_;	/**< The format of the texture */
 		unsigned char*	        data_;		/**< The actual texture data */
+
+        /**
+         * Sends the data to the texture object
+         */
+        virtual void            SetPixelDataImp(unsigned char* data) = 0;
 };
 
 }
