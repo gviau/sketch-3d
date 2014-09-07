@@ -1,15 +1,8 @@
 #include "render/Node.h"
 
-#include "render/Material.h"
-#include "render/Mesh.h"
-#include "render/Renderer.h"
-#include "render/Shader.h"
+#include "render/RenderQueue.h"
 
 #include <sstream>
-
-// TEMP
-#include "render/OpenGL/gl/glew.h"
-#include <gl/GL.h>
 
 namespace Sketch3D {
 
@@ -58,64 +51,8 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 Node::~Node() {
 }
 
-void Node::Render() const {
-	ConcreteRender();
-}
-
-void Node::ConcreteRender() const {
-	Shader* shader = material_->GetShader();
-    shader->SetActive(true);
-
-	const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
-	Matrix4x4 model;
-
-	// Setup the transformation matrix for this node
-	model[0][0] = scale_.x;
-	model[1][1] = scale_.y;
-	model[2][2] = scale_.z;
-
-	Matrix4x4 rotation;
-	orientation_.ToRotationMatrix(rotation);
-	model = rotation * model;
-
-	model[0][3] = position_.x;
-	model[1][3] = position_.y;
-	model[2][3] = position_.z;
-
-	Matrix4x4 modelViewProjection = viewProjection * model;
-	Matrix3x3 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
-	shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
-	shader->SetUniformMatrix3x3("modelView", modelView);
-
-	// Get the rendering data
-    vector<LoadedModel_t*>* modelData;
-    unsigned int* bufferObjects;
-    mesh_->GetRenderInfo(modelData, bufferObjects);
-
-    // textures
-    const vector<vector<Texture2D*>>* textures = material_->GetTextures();
-
-    // TEMP
-    // Render the mesh
-    for (size_t i = 0; i < modelData->size(); i++) {
-        vector<Texture2D*> meshTextures = (*textures)[i];
-        for (size_t j = 0; j < meshTextures.size(); j++) {
-            Texture2D* texture = meshTextures[j];
-            if (texture != nullptr) {
-                if (shader->SetUniformTexture("texture" + to_string(j), j)) {
-                    texture->Bind(j);
-                }
-            } else {
-                glBindTexture(GL_TEXTURE_2D, 0);
-            }
-        }
-
-        glBindVertexArray(bufferObjects[i]);
-	    glDrawElements(GL_TRIANGLES, (*modelData)[i]->indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+void Node::Render(RenderQueue& renderQueue) const {
+    renderQueue.AddItem(*this);
 }
 
 void Node::Translate(const Vector3& translation) {

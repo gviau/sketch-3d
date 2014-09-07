@@ -13,6 +13,7 @@ namespace Sketch3D {
 // Forward declaration
 class Material;
 class Mesh;
+class RenderQueue;
 
 /**
  * @class Node
@@ -61,15 +62,10 @@ class Node {
 		virtual			   ~Node();
 
 		/**
-		 * Render the node. Note that this call doesn't immediatly render the
-		 * node on the screen, but it prepares the rendering process.
-		 */
-		virtual void		Render() const;
-
-		/**
 		 * This function sends the data required for the rendering.
+         * @param renderQueue The render queue to use for drawing
 		 */
-		virtual void		ConcreteRender() const;
+		virtual void        Render(RenderQueue& renderQueue) const;
 
 		/**
 		 * Translate the node by a certain amount. This amount is added to the

@@ -2,6 +2,7 @@
 
 #include "render/Material.h"
 #include "render/Mesh.h"
+#include "render/RenderQueue.h"
 #include "render/ResourceManager.h"
 
 namespace Sketch3D {
@@ -12,11 +13,13 @@ SceneTree::SceneTree() : CompositeNode("root") {
 SceneTree::~SceneTree() {
 }
 
-void SceneTree::Render() const {
+void SceneTree::Render() {
 	map<string, Node*>::const_iterator it = children_.begin();
 	for (; it != children_.end(); ++it) {
-		it->second->Render();
+        it->second->Render(renderQueue_);
 	}
+
+    renderQueue_.Render();
 }
 
 bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, Material* material) const {

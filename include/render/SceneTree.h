@@ -2,6 +2,7 @@
 #define SKETCH_3D_SCENE_TREE_H
 
 #include "render/CompositeNode.h"
+#include "render/RenderQueue.h"
 
 namespace Sketch3D {
 
@@ -31,7 +32,7 @@ class SceneTree : public CompositeNode {
 		 * immediatly render the nodes on the screen, but it prepares the
 		 * rendering process.
 		 */
-		virtual void		Render() const;
+		void		        Render();
 
         /**
          * Construct the parts of a node. If the part sent to this function are null, they won't be loaded.
@@ -60,6 +61,9 @@ class SceneTree : public CompositeNode {
          * @return true if the loading was succesful, false otherwise.
          */
         bool                ConstructNode(const string& filename, Mesh* mesh, unsigned int postProcessingFlags, Material* material) const;
+
+    private:
+        RenderQueue         renderQueue_;   /**< The render queue used for drawing */
 };
 
 }

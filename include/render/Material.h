@@ -11,6 +11,12 @@ class Mesh;
 class Shader;
 class Texture2D;
 
+enum TransluencyType_t {
+    TRANSLUENCY_TYPE_OPAQUE,
+    TRANSLUENCY_TYPE_ADDITIVE,
+    TRANSLUENCY_TYPE_SUBTRACTIVE
+};
+
 // TODO
 // support more than one textures per mesh
 
@@ -30,13 +36,16 @@ class Material {
 
 		void		                        SetShader(Shader* shader);
 	    void                                SetTextures(vector<vector<Texture2D*>>*& textures);
+        void                                SetTransluencyType(TransluencyType_t type);
 
 		Shader*		                        GetShader() const;
         const vector<vector<Texture2D*>>*   GetTextures() const;
+        TransluencyType_t                   GetTransluencyType() const;
 
 	private:
 		Shader*		                        shader_;	/**< Shader used by the material */
         vector<vector<Texture2D*>>*         textures_;  /**< Textures used to render a mesh. Those are ordered to go with a specific mesh */
+        TransluencyType_t                   transluencyType_;   /**< The transluency type for this material */
 };
 
 }

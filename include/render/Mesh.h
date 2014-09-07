@@ -10,6 +10,15 @@ using namespace std;
 namespace Sketch3D {
 
 /**
+ * @enum MeshType_t
+ * The type of mesh that will be rendered, static or dynamic
+ */
+enum MeshType_t {
+    MESH_TYPE_STATIC,
+    MESH_TYPE_DYNAMIC,
+};
+
+/**
  * @class Mesh
  * This class holds the representation of a 3D model. It is reponsible to send
  * the needed data to the underlying rendering system.
@@ -24,8 +33,9 @@ class Mesh {
 		/**
 		 * Constructor. Read a mesh from a file and load the data in memory
 		 * @param filename The name of the file containing the model data
+         * @param meshType The type of mesh that will be rendered, static or dynamic
 		 */
-								Mesh(const string& filename);
+                                Mesh(const string& filename, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * Destructor - release the buffer objects
@@ -35,8 +45,16 @@ class Mesh {
         /**
          * Initialize the mesh with geometry data
          * @param modelData A pointer to a vector of pointers to a structure containing the model data
+         * @param meshType The type of mesh that will be rendered, static or dynamic
          */
-        void                    Initialize(vector<LoadedModel_t*>*& modelData);
+        void                    Initialize(vector<LoadedModel_t*>*& modelData, MeshType_t meshType=MESH_TYPE_STATIC);
+
+        /**
+         * Updates the mesh with new model data. This only works for dynamic mesh
+         * @param modelData The new model data to use
+         * @return false if the mesh is static, true otherwise
+         */
+        bool                    UpdateMeshData(vector<LoadedModel_t*>*& modelData);
 
 		/**
 		 * Get the rendering information about the mesh for rendering
@@ -47,6 +65,8 @@ class Mesh {
 
 	protected:
 		vector<LoadedModel_t*>*	model_;		/**< The data representing the mesh */
+
+        MeshType_t              meshType_;  /**< The type of the mesh */
 
 		// TEMP
 		unsigned int*	    vbo_;		/**< Vertex buffer objects */

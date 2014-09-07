@@ -6,14 +6,26 @@
 
 namespace Sketch3D {
 
-Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr) {
+uint32_t Texture2D::nextAvailableId_ = 0;
+
+Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr), id_(MAX_TEXTURE_ID) {
+    if (nextAvailableId_ == MAX_TEXTURE_ID) {
+        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
+    } else {
+        id_ = nextAvailableId_++;
+    }
 }
 
 Texture2D::Texture2D(unsigned int width, unsigned int height,
 					 FilterMode_t filterMode, WrapMode_t wrapMode,
 					 TextureFormat_t format) : Texture(width, height, filterMode, wrapMode),
-											   format_(format), data_(nullptr)
+											   format_(format), data_(nullptr), id_(MAX_TEXTURE_ID)
 {
+    if (nextAvailableId_ == MAX_TEXTURE_ID) {
+        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
+    } else {
+        id_ = nextAvailableId_++;
+    }
 }
 
 Texture2D::~Texture2D() {

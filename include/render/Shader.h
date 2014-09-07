@@ -1,10 +1,13 @@
 #ifndef SKETCH_3D_SHADER_H
 #define SKETCH_3D_SHADER_H
 
+#include <stdint.h>
 #include <string>
 using namespace std;
 
 namespace Sketch3D {
+
+#define MAX_SHADER_ID 4096  // 12 bits max
 
 // Forward declarations
 class Matrix3x3;
@@ -26,7 +29,7 @@ class Shader {
 		 * @param vertexFilename The filename of the vertex shader
 		 * @param fragmentFilename The filename of the fragment shader
 		 */
-		Shader(const string& vertexFilename, const string& fragmentFilename) : active_(false) {}
+		Shader(const string& vertexFilename, const string& fragmentFilename);
 
 		/**
 		 * Activate or deactivate the shader
@@ -45,10 +48,15 @@ class Shader {
 		virtual bool	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
 		virtual bool	SetUniformTexture(const string& uniform, int activeTexture) = 0;
 
-		bool			IsActive() { return active_; }
+		bool			IsActive() const { return active_; }
+
+        uint16_t        GetId() const { return id_; }
 
 	protected:
 		bool			active_;	/**< Is the shader active? */
+        uint16_t        id_;        /**< Id of the shader */
+
+        static uint16_t nextAvailableId_;
 };
 
 }

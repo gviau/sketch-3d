@@ -3,11 +3,14 @@
 
 #include "render/Texture.h"
 
+#include <stdint.h>
 #include <string>
 #include <vector>
 using namespace std;
 
 namespace Sketch3D {
+
+#define MAX_TEXTURE_ID 1048576  // 20 bits max
 
 // Forward declaration
 class RenderSystemOpenGL;
@@ -83,10 +86,14 @@ class Texture2D : public Texture {
 		TextureFormat_t			GetTextureFormat() const;
 
         const unsigned char*    GetData() const { return data_; }
+        uint32_t                GetId() const { return id_; }
 
 	protected:
 		TextureFormat_t			format_;	/**< The format of the texture */
 		unsigned char*	        data_;		/**< The actual texture data */
+        uint32_t                id_;        /**< Id of the texture */
+
+        static uint32_t         nextAvailableId_;
 
         /**
          * Sends the data to the texture object

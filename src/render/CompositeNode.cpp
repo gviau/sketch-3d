@@ -26,12 +26,10 @@ CompositeNode::CompositeNode(const string& name, const Vector3& position,
 CompositeNode::~CompositeNode() {
 }
 
-void CompositeNode::Render() const {
-	Node::ConcreteRender();
-
+void CompositeNode::Render(RenderQueue& renderQueue) const {
 	map<string, Node*>::const_iterator it = children_.begin();
 	for (; it != children_.end(); ++it) {
-		it->second->Render();
+		it->second->Render(renderQueue);
 	}
 }
 

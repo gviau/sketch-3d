@@ -60,8 +60,9 @@ class CompositeNode : public Node {
 		 * Render this node and its children. Note that this call doesn't
 		 * immediatly render the nodes on the screen, but it prepares the
 		 * rendering process.
+         * @param renderQueue The render queue to use for drawing
 		 */
-		virtual void		Render() const;
+		virtual void		Render(RenderQueue& renderQueue ) const;
 
 		/**
 		 * Add a node to this node's childrens. The name of the node must not already

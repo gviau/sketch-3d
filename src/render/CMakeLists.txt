@@ -12,6 +12,8 @@ set(SRC
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/Renderer.cpp
+	${SRC_PATH}/RenderQueue.cpp
+	${SRC_PATH}/RenderQueueItem.cpp
     ${SRC_PATH}/RenderSystem.cpp
 	${SRC_PATH}/RenderTexture.cpp
 	${SRC_PATH}/ResourceManager.cpp
@@ -28,6 +30,8 @@ set(HEADER
 	${HEADER_PATH}/Node.h
 	${HEADER_PATH}/RenderContext.h
 	${HEADER_PATH}/Renderer.h
+	${HEADER_PATH}/RenderQueue.h
+	${HEADER_PATH}/RenderQueueItem.h
 	${HEADER_PATH}/RenderSystem.h
 	${HEADER_PATH}/RenderTexture.h
 	${HEADER_PATH}/ResourceManager.h
@@ -41,6 +45,7 @@ source_group("Header Files" FILES ${HEADER})
 
 if (WIN32)
 	set(OPENGL_SRC
+		${SRC_PATH}/OpenGL/RenderQueueOpenGL.cpp
 		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
 		${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
 		${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
@@ -49,6 +54,7 @@ if (WIN32)
 	)
 	
 	set(OPENGL_HEADER
+		${HEADER_PATH}/OpenGL/RenderQueueOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
 		${HEADER_PATH}/OpenGL/RenderTextureOpenGL.h
