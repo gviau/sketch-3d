@@ -17,6 +17,15 @@ class Vector4;
 class Texture2D;
 
 /**
+ * @enum ShaderType_t
+ * Shows the possible shaders
+ */
+enum ShaderType_t {
+    SHADER_TYPE_VERTEX,
+    SHADER_TYPE_FRAGMENT,
+};
+
+/**
  * @class Shader
  * This class make it possible to use easily a set of shader to render an
  * object as well as to pass properties to the shader. It acts as an interface
@@ -47,6 +56,8 @@ class Shader {
 		virtual bool	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
 		virtual bool	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
 		virtual bool	SetUniformTexture(const string& uniform, int activeTexture) = 0;
+
+        virtual bool    SelectSubroutine(const string& subroutine, ShaderType_t type) = 0;
 
 		bool			IsActive() const { return active_; }
 
