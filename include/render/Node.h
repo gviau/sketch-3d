@@ -67,6 +67,11 @@ class Node {
 		 */
 		virtual void        Render(RenderQueue& renderQueue) const;
 
+        /**
+         * Immediately draw the node
+         */
+        virtual void        ImmediateRender() const;
+
 		/**
 		 * Translate the node by a certain amount. This amount is added to the
 		 * position that the node currently have
