@@ -31,23 +31,44 @@ Texture2D::Texture2D(unsigned int width, unsigned int height,
 Texture2D::~Texture2D() {
 }
 
-void Texture2D::SetPixelData(unsigned char* data, size_t width, size_t height) {
-    if (format_ != TEXTURE_FORMAT_RGBA32) {
-        Logger::GetInstance()->Warning("Operation not supported for format different than RGBA32 in SetPixelData");
-        return;
+bool Texture2D::SetPixelDataBytes(unsigned char* data, size_t width, size_t height) {
+    if (format_ >= TEXTURE_FORMAT_R32F) {
+        Logger::GetInstance()->Warning("Operation not supported for format different than byte texture format in SetPixelDataBytes");
+        return false;
     }
     
     if (width_ != width) {
-        Logger::GetInstance()->Warning("New pixel data isn't of appropriate width in SetPixelData");
-        return;
+        Logger::GetInstance()->Warning("New pixel data isn't of appropriate width in SetPixelDataBytes");
+        return false;
     }
 
     if (height_ != height) {
-        Logger::GetInstance()->Warning("New pixel data isn't of appropriate height in SetPixelData");
-        return;
+        Logger::GetInstance()->Warning("New pixel data isn't of appropriate height in SetPixelDataBytes");
+        return false;
     }
 
-    SetPixelDataImp(data);
+    SetPixelDataBytesImp(data);
+    return true;
+}
+
+bool Texture2D::SetPixelDataFloats(float* data, size_t width, size_t height) {
+    if (format_ < TEXTURE_FORMAT_R32F) {
+        Logger::GetInstance()->Warning("Operation not supported for format different than floating point texture format in SetPixelDataFloats");
+        return false;
+    }
+    
+    if (width_ != width) {
+        Logger::GetInstance()->Warning("New pixel data isn't of appropriate width in SetPixelDataFloats");
+        return false;
+    }
+
+    if (height_ != height) {
+        Logger::GetInstance()->Warning("New pixel data isn't of appropriate height in SetPixelDataFloats");
+        return false;
+    }
+
+    SetPixelDataFloatsImp(data);
+    return true;
 }
 
 void Texture2D::SetTextureFormat(TextureFormat_t format) {

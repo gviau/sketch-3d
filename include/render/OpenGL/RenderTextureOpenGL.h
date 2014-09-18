@@ -3,10 +3,10 @@
 
 #include "render/RenderTexture.h"
 
-namespace Sketch3D {
+#include <vector>
+using namespace std;
 
-// Forward declaration
-class Texture2DOpenGL;
+namespace Sketch3D {
 
 /**
  * @class RenderTextureOpenGL
@@ -19,43 +19,51 @@ class RenderTextureOpenGL : public RenderTexture {
          * @param width The width of the render texture
          * @param height The height of the render texture
          * @param format The format of the render texture
-         * @param texture The receiving color texture to use for this render texture. Must be of the same size as
-         * the render texture
          */
-                        RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format, Texture2DOpenGL* texture);
+                            RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format);
 
         /**
          * Destructor
          */
-        virtual        ~RenderTextureOpenGL();
+        virtual            ~RenderTextureOpenGL();
 
         /**
          * Add a depthbuffer to the current render texture.
-         * @return true if the depth buffer could be attached
+         * @return false if there is already a texture bound to the depth buffer or if there was an error, true otherwise
          */
-        virtual bool    AddDepthBuffer();
+        virtual bool        AddDepthBuffer();
+
+        /**
+         * Attach a texture to the depth buffer.
+         * @param texture The texture to attach
+         * @return false if there is already a depth buffer attached or if there was an error, true otherwise
+         */
+        virtual bool        AttachTextureToDepthBuffer(Texture2D* texture);
 
         /**
          * Create the render texture
+         * @param textures The receiving color textures to use for this render texture. Must be of the same size as
+         * the render texture
          * @return true if the render texture could be created, false otherwise
          */
-        virtual bool    Create();
+        virtual bool        AttachTextures(const vector<Texture2D*>& textures);
 
         /**
          * Bind the render texture, that is, use it for the current rendering
          */
-        virtual void    Bind() const;
+        virtual void        Bind() const;
 
         /**
          * Unbind the render texture, that is, use the normal framebuffer (the screen) for rendering
          */
-        virtual void    Unbind() const;
+        virtual void        Unbind() const;
 
     private:
         size_t              framebuffer_; /**< OpenGL's name of the framebuffer */
         size_t              renderbuffer_;    /**< OpenGL's name of the renderbuffer */
-        Texture2DOpenGL*    texture_;   /**< The texture used to receive the output of the rendering */
-        bool                isValidForCreation_;    /**< Is the texture passed in the constructor valid for creation of the render texture */
+        vector<Texture2D*>  textures_;   /**< The textures used to receive the output of the rendering */
+        bool                depthBufferBound_;  /**< Used to determine if there is a texture attached to the depth buffer */
+        bool                texturesAttached_;  /**< Used to determine if the textures were correctly attached to the frame buffer */
 };
 
 }

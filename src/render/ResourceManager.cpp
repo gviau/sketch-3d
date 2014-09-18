@@ -263,13 +263,13 @@ bool ResourceManager::LoadTexture(const string& filename,
     texture->SetHeight(height);
     texture->SetFilterMode(FILTER_MODE_BILINEAR);
     texture->SetWrapMode(WRAP_MODE_REPEAT);
-    texture->SetTextureFormat((bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32);
+    texture->SetTextureFormat((bpp == 24) ? TEXTURE_FORMAT_BGR24 : TEXTURE_FORMAT_BGRA32);
 
     size_t bytesPerPixel = (bpp == 24) ? 3 : 4;
-    unsigned char* data = new unsigned char[width * height * bytesPerPixel];
-    memcpy((void*)data, (void*)FreeImage_GetBits(dib), width * height * bytesPerPixel);
-    texture->data_ = data;
+    size_t size = width * height * bytesPerPixel;
+    texture->data_ = new unsigned char[size];
 
+    memcpy((void*)texture->data_, (void*)FreeImage_GetBits(dib), size);
     FreeImage_Unload(dib);
 
     if (!texture->Create()) {
@@ -277,7 +277,7 @@ bool ResourceManager::LoadTexture(const string& filename,
         return false;
     }
 
-	textures_[filenameHash] = pair<Texture2D*, unsigned char*>(texture, data);
+    textures_[filenameHash] = pair<Texture2D*, unsigned char*>(texture, reinterpret_cast<unsigned char*>(texture->data_));
 
 	return true;
 }

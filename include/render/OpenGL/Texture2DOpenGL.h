@@ -31,35 +31,43 @@ class Texture2DOpenGL : public Texture2D {
 		 * @param wrapMode The wrap mode to use
 		 * @param format The format to use
 		 */
-				        Texture2DOpenGL(unsigned int width, unsigned int height,
-										  FilterMode_t filterMode=FILTER_MODE_BILINEAR,
-										  WrapMode_t wrapMode=WRAP_MODE_REPEAT,
-										  TextureFormat_t format=TEXTURE_FORMAT_RGB24);
+				            Texture2DOpenGL(unsigned int width, unsigned int height,
+										    FilterMode_t filterMode=FILTER_MODE_BILINEAR,
+										    WrapMode_t wrapMode=WRAP_MODE_REPEAT,
+										    TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
         /**
          * Destructor. Free the OpenGL texture
          */
-        virtual        ~Texture2DOpenGL();
+        virtual            ~Texture2DOpenGL();
 
         /**
          * Create the actual texture handle
          * @return true if the texture was created correctly
          */
-        virtual bool    Create();
+        virtual bool        Create();
 
         /**
          * Bind the texture to a texture unit
          * @param unit On which texture unit should we bind the texture
          */
-        virtual void    Bind(unsigned int unit);
+        virtual void        Bind(unsigned int unit);
+
+        /**
+         * Get the data from the texture. If the pointer is null, try to get it from the opengl texture
+         */
+        virtual const void* GetData() const;
 
     private:
-        GLuint          textureName_;   /**< OpenGL texture's name */
+        GLuint              textureName_;   /**< OpenGL texture's name */
 
         /**
          * Sends the pixel data to the texture object
          */
-        virtual void    SetPixelDataImp(unsigned char* data);
+        virtual void        SetPixelDataBytesImp(unsigned char* data);
+        virtual void        SetPixelDataFloatsImp(float* data);
+
+        void                GetOpenglTextureFormat(TextureFormat_t textureFormat, GLuint& internalFormat, GLuint& format, GLuint& type, GLuint& bpp) const;
 };
 
 }

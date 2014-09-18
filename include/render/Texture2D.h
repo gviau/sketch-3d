@@ -22,7 +22,15 @@ class ResourceManager;
  */
 enum TextureFormat_t {
 	TEXTURE_FORMAT_RGB24,
-	TEXTURE_FORMAT_RGBA32
+	TEXTURE_FORMAT_RGBA32,
+    TEXTURE_FORMAT_BGR24,
+    TEXTURE_FORMAT_BGRA32,
+
+    // There should be a separation between byte texture format and floating point texture format
+    TEXTURE_FORMAT_R32F,
+    TEXTURE_FORMAT_RG32F,
+    TEXTURE_FORMAT_RGB32F,
+    TEXTURE_FORMAT_RGBA32F
 };
 
 /**
@@ -75,22 +83,32 @@ class Texture2D : public Texture {
         virtual void            Bind(unsigned int unit) = 0;
 
         /**
-         * Set the data array
+         * Set the data as an array of bytes. Will only work with texture formats that doesn't require floats
          * @param data The new data array
          * @param width The width of the new data. Must be of the same width than this texture
          * @param height The height of the new data. Must be of the same height than this texture
+         * @return true if the operation was succesful, false otherwise
          */
-        void                    SetPixelData(unsigned char* data, size_t width, size_t height);
+        bool                    SetPixelDataBytes(unsigned char* data, size_t width, size_t height);
+
+        /**
+         * Set the data as an array of floats. Will only work with texture formats that doesn't require bytes
+         * @param data The new data array
+         * @param width The width of the new data. Must be of the same width than this texture
+         * @param height The height of the new data. Must be of the same height than this texture
+         * @return true if the operation was succesful, false otherwise
+         */
+        bool                    SetPixelDataFloats(float* data, size_t width, size_t height);
 
 		void					SetTextureFormat(TextureFormat_t format);
 		TextureFormat_t			GetTextureFormat() const;
 
-        const unsigned char*    GetData() const { return data_; }
+        virtual const void*     GetData() const = 0;
         uint32_t                GetId() const { return id_; }
 
 	protected:
 		TextureFormat_t			format_;	/**< The format of the texture */
-		unsigned char*	        data_;		/**< The actual texture data */
+		void*	                data_;		/**< The actual texture data */
         uint32_t                id_;        /**< Id of the texture */
 
         static uint32_t         nextAvailableId_;
@@ -98,7 +116,8 @@ class Texture2D : public Texture {
         /**
          * Sends the data to the texture object
          */
-        virtual void            SetPixelDataImp(unsigned char* data) = 0;
+        virtual void            SetPixelDataBytesImp(unsigned char* data) = 0;
+        virtual void            SetPixelDataFloatsImp(float* data) = 0;
 };
 
 }

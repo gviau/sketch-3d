@@ -4,6 +4,7 @@
 #include "render/OpenGL/gl/gl.h"
 
 #include "render/Renderer.h"
+#include "render/OpenGL/RenderTextureOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
 
@@ -93,6 +94,18 @@ void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) {
 	}
 }
 
+void RenderSystemOpenGL::SetViewport(size_t x, size_t y, size_t width, size_t height) {
+    glViewport(x, y, width, height);
+}
+
+void RenderSystemOpenGL::EnableDepthTest(bool val) {
+    if (val) {
+        glEnable(GL_DEPTH_TEST);
+    } else {
+        glDisable(GL_DEPTH_TEST);
+    }
+}
+
 Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
     shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename));
     return shaders_[shaders_.size() - 1];
@@ -100,6 +113,10 @@ Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const str
 
 Texture2D* RenderSystemOpenGL::CreateTexture2D() const {
     return new Texture2DOpenGL;
+}
+
+RenderTexture* RenderSystemOpenGL::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
+    return new RenderTextureOpenGL(width, height, format);
 }
 
 void RenderSystemOpenGL::FillDeviceCapabilities() {

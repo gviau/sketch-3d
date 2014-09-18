@@ -28,15 +28,24 @@ class RenderTexture {
         /**
          * Add a depthbuffer to the current render texture. There can only be one depthbuffer at once. Also, you should call
          * this function before creating the render texture
-         * @return true if the depth buffer could be attached
+         * @return false if there is already a texture bound to the depth buffer or if there was an error, true otherwise
          */
         virtual bool    AddDepthBuffer() = 0;
 
         /**
+         * Attach a texture to the depth buffer.
+         * @param texture The texture to attach
+         * @return false if there is already a depth buffer attached or if there was an error, true otherwise
+         */
+        virtual bool    AttachTextureToDepthBuffer(Texture2D* texture) = 0;
+
+        /**
          * Create the render texture
+         * @param textures The receiving color textures to use for this render texture. Must be of the same size as
+         * the render texture
          * @return true if the render texture could be created, false otherwise
          */
-        virtual bool    Create() = 0;
+        virtual bool    AttachTextures(const vector<Texture2D*>& textures) = 0;
 
         /**
          * Bind the render texture, that is, use it for the current rendering

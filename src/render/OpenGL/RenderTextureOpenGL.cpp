@@ -8,12 +8,9 @@
 
 namespace Sketch3D {
 
-RenderTextureOpenGL::RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format, Texture2DOpenGL* texture) :
-        RenderTexture(width, height, format), framebuffer_(0), renderbuffer_(0), texture_(texture), isValidForCreation_(true)
+RenderTextureOpenGL::RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format) :
+        RenderTexture(width, height, format), framebuffer_(0), renderbuffer_(0), depthBufferBound_(false), texturesAttached_(false)
 {
-    if (texture_ != nullptr && texture_->width_ != width_ || texture_->height_ != height_ || texture_->format_ != format_) {
-        isValidForCreation_ = false;
-    }
 }
 
 RenderTextureOpenGL::~RenderTextureOpenGL() {
@@ -26,11 +23,13 @@ RenderTextureOpenGL::~RenderTextureOpenGL() {
     }
 }
 
-bool RenderTextureOpenGL::AddDepthBuffer() {
-    if (!isValidForCreation_) {
+bool RenderTextureOpenGL::AddDepthBuffer() {   
+    if (depthBufferBound_) {
         return false;
+    } else if (renderbuffer_ != 0) {
+        return true;
     }
-    
+
     if (framebuffer_ == 0) {
         glGenFramebuffers(1, &framebuffer_);
     }
@@ -46,30 +45,73 @@ bool RenderTextureOpenGL::AddDepthBuffer() {
     return true;
 }
 
-bool RenderTextureOpenGL::Create() {
-    if (!isValidForCreation_) {
+bool RenderTextureOpenGL::AttachTextureToDepthBuffer(Texture2D* texture) {
+    if (depthBufferBound_) {
+        return true;
+    } else if (renderbuffer_ != 0) {
         return false;
+    }
+
+
+    // TODO implement
+    return false;
+}
+
+bool RenderTextureOpenGL::AttachTextures(const vector<Texture2D*>& textures) {
+    if (texturesAttached_) {
+        return true;
+    }
+
+    vector<GLuint> textureNames;
+    textures_ = textures;
+    for (size_t i = 0; i < textures_.size(); i++) {
+        Texture2DOpenGL* texture = dynamic_cast<Texture2DOpenGL*>(textures_[i]);
+
+        if (texture != nullptr) {
+            if (texture->width_ != width_) {
+                Logger::GetInstance()->Error("Couldn't create render texture, texture #" + to_string(i) + " doesn't have the appropriate width.");
+                return false;
+            }
+
+            if (texture->height_ != height_) {
+                Logger::GetInstance()->Error("Couldn't create render texture, texture #" + to_string(i) + " doesn't have the appropriate height.");
+                return false;
+            }
+
+            if (texture->format_ != format_) {
+                Logger::GetInstance()->Error("Couldn't create render texture, texture #" + to_string(i) + " doesn't have the appropriate format.");
+                return false;
+            }
+
+            textureNames.push_back(texture->textureName_);
+        } else {
+            Logger::GetInstance()->Error("Couldn't create render texture, texture #" + to_string(i) + " is null.");
+            return false;
+        }
     }
 
     if (framebuffer_ == 0) {
         glGenFramebuffers(1, &framebuffer_);
     }
 
-    if (texture_ != nullptr) {
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_->textureName_, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-            Logger::GetInstance()->Info("Render texture #" + to_string(framebuffer_) + " was succesfully created");
-            return true;
-        }
-
-        glDeleteFramebuffers(1, &framebuffer_);
+    for (size_t i = 0; i < textureNames.size(); i++) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureNames[i], 0);
     }
 
-    Logger::GetInstance()->Error("Couldn't create render texture");
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        texturesAttached_ = true;
+        Logger::GetInstance()->Info("Render texture #" + to_string(framebuffer_) + " was succesfully created");
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return true;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &framebuffer_);
+    framebuffer_ = 0;
+
+    Logger::GetInstance()->Error("Couldn't create render texture, frame buffer is not complete");
 
     return false;
 }
@@ -79,16 +121,15 @@ void RenderTextureOpenGL::Bind() const {
         return;
     }
 
-    if (renderbuffer_ != 0 && framebuffer_ != 0) {
-        //glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_);
+    if (framebuffer_ != 0) {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
-    } else if (framebuffer_ != 0) {
-        //texture_->Bind(1);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
-        //glDrawBuffer(GL_COLOR_ATTACHMENT0);
-    } else if (renderbuffer_ != 0) {
-        glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_);
+
+        GLenum* buffers = new GLenum[textures_.size()];
+        for (size_t i = 0; i < textures_.size(); i++) {
+            buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+        }
+        glDrawBuffers(textures_.size(), buffers);
+        delete[] buffers;
     }
 }
 

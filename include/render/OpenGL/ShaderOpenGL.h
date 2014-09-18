@@ -27,6 +27,7 @@ class ShaderOpenGL : public Shader {
 		virtual bool SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
 		virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
 		virtual bool SetUniformTexture(const string& uniform, int activeTexture);
+        virtual bool SelectSubroutine(const string& subroutine, ShaderType_t type);
 
 	private:
 		GLuint				program_;	/**< Represents the shader program */

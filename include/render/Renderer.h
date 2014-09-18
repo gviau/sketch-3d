@@ -14,6 +14,7 @@ namespace Sketch3D {
 
 // Forward class declaration
 class RenderSystem;
+class RenderTexture;
 class Shader;
 class Window;
 
@@ -137,6 +138,21 @@ class Renderer {
 		void				SetRenderFillMode(RenderMode_t mode);
 
         /**
+         * Sets the camera viewport dimension
+         * @param x The left position of the viewport
+         * @param y The upper position of the viewport
+         * @param width The width of the viewport
+         * @param height The height of the viewport
+         */
+        void                SetViewport(size_t x, size_t y, size_t width, size_t height);
+
+        /**
+         * Enable or disable depth testing
+         * @param val Enabled if true, disabled otherwise
+         */
+        void                EnableDepthTest(bool val);
+
+        /**
          * Create a shader object
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
@@ -149,6 +165,15 @@ class Renderer {
          * @return A pointer to a 2D texture
          */
         Texture2D*          CreateTexture2D() const;
+
+        /**
+         * Create a render texture
+         * @param width The width of the render texture
+         * @param height The height of the render texture
+         * @param format The format of the render texture
+         * @return A pointer to a render texture
+         */
+        RenderTexture*      CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
 
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;

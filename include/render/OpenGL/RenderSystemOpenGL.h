@@ -22,8 +22,11 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual void EndRender();
 		virtual void Render();
 		virtual void SetRenderFillMode(RenderMode_t mode);
+        virtual void SetViewport(size_t x, size_t y, size_t width, size_t height);
+        virtual void EnableDepthTest(bool val);
         virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename);
         virtual Texture2D* CreateTexture2D() const;
+        virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
 
 	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */

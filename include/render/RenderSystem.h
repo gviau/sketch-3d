@@ -12,9 +12,11 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
+class RenderTexture;
 class Shader;
 class Texture2D;
 enum RenderMode_t;
+enum TextureFormat_t;
 
 /**
  * @interface RenderSystem
@@ -74,6 +76,21 @@ class RenderSystem {
 		virtual void					SetRenderFillMode(RenderMode_t mode) = 0;
 
         /**
+         * Sets the camera viewport dimension
+         * @param x The left position of the viewport
+         * @param y The upper position of the viewport
+         * @param width The width of the viewport
+         * @param height The height of the viewport
+         */
+        virtual void                    SetViewport(size_t x, size_t y, size_t width, size_t height) = 0;
+
+        /**
+         * Enable or disable depth testing
+         * @param val Enabled if true, disabled otherwise
+         */
+        virtual void                    EnableDepthTest(bool val) = 0;
+
+        /**
          * Create an empty shader
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
@@ -86,6 +103,15 @@ class RenderSystem {
          * @return A pointer to a texture
          */
         virtual Texture2D*              CreateTexture2D() const = 0;
+
+        /**
+         * Create a render texture
+         * @param width The width of the render texture
+         * @param height The height of the render texture
+         * @param format The format of the render texture
+         * @return A pointer to a render texture
+         */
+        virtual RenderTexture*          CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const = 0;
 
 		int								GetMaxActiveTextures() const { return maxActiveTextures_; }
 

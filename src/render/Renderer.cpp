@@ -147,12 +147,24 @@ void Renderer::SetRenderFillMode(RenderMode_t mode) {
 	renderSystem_->SetRenderFillMode(mode);
 }
 
+void Renderer::SetViewport(size_t x, size_t y, size_t width, size_t height) {
+    renderSystem_->SetViewport(x, y, width, height);
+}
+
+void Renderer::EnableDepthTest(bool val) {
+    renderSystem_->EnableDepthTest(val);
+}
+
 Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename) const {
     return renderSystem_->CreateShader(vertexFilename, fragmentFilename);
 }
 
 Texture2D* Renderer::CreateTexture2D() const {
     return renderSystem_->CreateTexture2D();
+}
+
+RenderTexture* Renderer::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
+    return renderSystem_->CreateRenderTexture(width, height, format);
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {
