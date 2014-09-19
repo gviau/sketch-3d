@@ -1,6 +1,9 @@
 #ifndef SKETCH_3D_MESH_H
 #define SKETCH_3D_MESH_H
 
+#include "math/Vector2.h"
+#include "math/Vector3.h"
+
 #include "render/ResourceManager.h"
 
 #include <string>
@@ -8,6 +11,11 @@
 using namespace std;
 
 namespace Sketch3D {
+
+/**
+ * @struct SurfaceTriangles_t
+ * Structure containing the information about a surface to draw regarding the vertices
+ */
 
 /**
  * @enum MeshType_t
@@ -43,18 +51,49 @@ class Mesh {
                                ~Mesh();
 
         /**
-         * Initialize the mesh with geometry data
-         * @param modelData A pointer to a vector of pointers to a structure containing the model data
-         * @param meshType The type of mesh that will be rendered, static or dynamic
+         * Load the model from a file
+         * @param filename
          */
-        void                    Initialize(vector<LoadedModel_t*>*& modelData, MeshType_t meshType=MESH_TYPE_STATIC);
+        void                    Load(const string& filename);
 
         /**
-         * Updates the mesh with new model data. This only works for dynamic mesh
-         * @param modelData The new model data to use
-         * @return false if the mesh is static, true otherwise
+         * Initialize the mesh with geometry data
+         * @param meshType The type of mesh that will be rendered, static or dynamic
          */
-        bool                    UpdateMeshData(vector<LoadedModel_t*>*& modelData);
+        void                    Initialize(MeshType_t meshType=MESH_TYPE_STATIC);
+
+        /**
+         * Add vertices to the mesh
+         * @param vertices The list of vertices to add
+         */
+        void                    SetVertices(const vector<Vector3>& vertices);
+
+        /**
+         * Add normals to the mesh
+         * @param normals The list of normals to add
+         */
+        void                    SetNormals(const vector<Vector3>& normals);
+
+        /**
+         * Add texture coords to the mesh
+         * @param texCoords The list of texture coords to add
+         */
+        void                    SetTextureCoords(const vector<Vector2>& texCoords);
+
+        /**
+         * Add tangents to the mesh
+         * @param tangents The list of tangents to add
+         */
+        void                    SetTangents(const vector<Vector3>& tangents);
+
+        Vector3*                GetVertices() const { return vertices_; }
+        Vector3*                GetNormals() const { return normals_; }
+        Vector2*                GetTexCoords() const { return texCoords_; }
+        Vector3*                GetTangents() const { return tangents_; }
+        size_t                  GetNumVertices() const { return numVertices_; }
+        size_t                  GetNumNormals() const { return numNormals_; }
+        size_t                  GetNumTexCoords() const { return numTexCoords_; }
+        size_t                  GetNumTangents() const { return numTangents_; }
 
 		/**
 		 * Get the rendering information about the mesh for rendering
@@ -67,6 +106,21 @@ class Mesh {
 		vector<LoadedModel_t*>*	model_;		/**< The data representing the mesh */
 
         MeshType_t              meshType_;  /**< The type of the mesh */
+
+        Vector3*                vertices_;  /**< List of vertices */
+        Vector3*                normals_;   /**< List of normals */
+        Vector2*                texCoords_; /**< List texture coordinates */
+        Vector3*                tangents_;  /**< List of tangents */
+        size_t                  numVertices_;
+        size_t                  numNormals_;
+        size_t                  numTexCoords_;
+        size_t                  numTangents_;
+
+        // If those variable are set to true, then don't free the memory for the corresponding list
+        bool                    referencedVertices_;
+        bool                    referencedNormals_;
+        bool                    referencedTexCoords_;
+        bool                    referencedTangents_;
 
 		// TEMP
 		unsigned int*	    vbo_;		/**< Vertex buffer objects */

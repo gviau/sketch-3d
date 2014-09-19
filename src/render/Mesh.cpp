@@ -4,16 +4,107 @@
 #include <gl/GL.h>
 
 namespace Sketch3D {
-Mesh::Mesh() : model_(nullptr), meshType_(MESH_TYPE_STATIC), vbo_(nullptr), ibo_(nullptr), vao_(nullptr) {
+Mesh::Mesh() : model_(nullptr), meshType_(MESH_TYPE_STATIC), vertices_(nullptr), normals_(nullptr), texCoords_(nullptr),
+               tangents_(nullptr), numVertices_(0), numNormals_(0), numTexCoords_(0), numTangents_(0), referencedVertices_(false),
+               referencedNormals_(false), referencedTexCoords_(false), referencedTangents_(false), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+{
 }
 
-Mesh::Mesh(const string& filename, MeshType_t meshType) : model_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr) {
+Mesh::Mesh(const string& filename, MeshType_t meshType) : model_(nullptr), meshType_(MESH_TYPE_STATIC), vertices_(nullptr), normals_(nullptr), texCoords_(nullptr),
+               tangents_(nullptr), numVertices_(0), numNormals_(0), numTexCoords_(0), numTangents_(0), referencedVertices_(false),
+               referencedNormals_(false), referencedTexCoords_(false), referencedTangents_(false), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+{
     ResourceManager::GetInstance()->LoadModelGeometryFromFile(filename, model_);
-    Initialize(model_, meshType);
+    Initialize(meshType);
 }
 
-void Mesh::Initialize(vector<LoadedModel_t*>*& modelData, MeshType_t meshType) {
-    model_ = modelData;
+Mesh::~Mesh() {
+    if (!referencedVertices_) {
+        delete[] vertices_;
+    }
+
+    if (!referencedNormals_) {
+        delete[] normals_;
+    }
+
+    if (!referencedTexCoords_) {
+        delete[] texCoords_;
+    }
+
+    if (!referencedTangents_) {
+        delete[] tangents_;
+    }
+
+    glDeleteBuffers(model_->size(), vbo_);
+    glDeleteBuffers(model_->size(), ibo_);
+    glDeleteVertexArrays(model_->size(), vao_);
+
+    delete[] vbo_;
+    delete[] ibo_;
+    delete[] vao_;
+}
+
+void Mesh::Load(const string& filename) {
+
+}
+
+void Mesh::SetVertices(const vector<Vector3>& vertices) {
+    if (!referencedVertices_ && vertices_ != nullptr) {
+        delete[] vertices_;
+    }
+    numVertices_ = vertices.size();
+
+    if (numVertices_ > 0) {
+        vertices_ = new Vector3[numVertices_];
+        memcpy(vertices_, &vertices[0], numVertices_ * sizeof(Vector3));
+
+        referencedVertices_ = false;
+    }
+}
+
+void Mesh::SetNormals(const vector<Vector3>& normals) {
+    if (!referencedNormals_ && normals_ != nullptr) {
+        delete[] normals_;
+    }
+    numNormals_ = normals.size();
+
+    if (numNormals_ > 0) {
+        normals_ = new Vector3[numNormals_];
+        memcpy(normals_, &normals[0], numNormals_ * sizeof(Vector3));
+
+        referencedNormals_ = false;
+    }
+}
+
+void Mesh::SetTextureCoords(const vector<Vector2>& texCoords) {
+    if (!referencedTexCoords_ && texCoords_ != nullptr) {
+        delete[] texCoords_;
+    }
+    numTexCoords_ = texCoords.size();
+
+    if (texCoords_ > 0) {
+        texCoords_ = new Vector2[numTexCoords_];
+        memcpy(texCoords_, &texCoords[0], numTexCoords_ * sizeof(Vector2));
+
+        referencedTexCoords_ = false;
+    }
+}
+
+void Mesh::SetTangents(const vector<Vector3>& tangents) {
+    if (!referencedTangents_ && tangents_ != nullptr) {
+        delete[] tangents_;
+    }
+    numTangents_ = tangents.size();
+
+    if (numTangents_ > 0) {
+        tangents_ = new Vector3[numTangents_];
+        memcpy(tangents_, &tangents[0], numTangents_ * sizeof(Vector3));
+
+        referencedTangents_ = false;
+    }
+}
+
+void Mesh::Initialize(MeshType_t meshType) {
     meshType_ = meshType;
 
 	// TEMP - construct the buffers
@@ -64,16 +155,6 @@ void Mesh::Initialize(vector<LoadedModel_t*>*& modelData, MeshType_t meshType) {
 	    glBindBuffer(GL_ARRAY_BUFFER, 0);
 	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
-}
-
-Mesh::~Mesh() {
-    glDeleteBuffers(model_->size(), vbo_);
-    glDeleteBuffers(model_->size(), ibo_);
-    glDeleteVertexArrays(model_->size(), vao_);
-
-    delete[] vbo_;
-    delete[] ibo_;
-    delete[] vao_;
 }
 
 bool Mesh::UpdateMeshData(vector<LoadedModel_t*>*& modelData) {
