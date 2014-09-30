@@ -89,16 +89,16 @@ void Node::ImmediateRender() const {
     shader->SetUniformMatrix3x3("modelView", modelView);
 
     // Get the rendering data
-    vector<LoadedModel_t*>* modelData;
     unsigned int* bufferObjects;
-    mesh_->GetRenderInfo(modelData, bufferObjects);
+    vector<ModelSurface_t> surfaces;
+    mesh_->GetRenderInfo(bufferObjects, surfaces);
 
     // textures
     const vector<vector<Texture2D*>>* textures = material_->GetTextures();
 
     // TEMP
     // Render the mesh
-    for (size_t i = 0; i < modelData->size(); i++) {
+    for (size_t i = 0; i < surfaces.size(); i++) {
         if (textures->size() > 0) {
             vector<Texture2D*> meshTextures = (*textures)[i];
             for (size_t j = 0; j < meshTextures.size(); j++) {
@@ -114,7 +114,7 @@ void Node::ImmediateRender() const {
         }
 
         glBindVertexArray(bufferObjects[i]);
-            glDrawElements(GL_TRIANGLES, (*modelData)[i]->indices.size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
 
         glBindTexture(GL_TEXTURE_2D, 0);

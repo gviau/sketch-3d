@@ -10,12 +10,46 @@
 #include <vector>
 using namespace std;
 
+// Forward declaration
+namespace Assimp {
+	class Importer;
+}
+
 namespace Sketch3D {
+
+// Forward declaration
+class Material;
 
 /**
  * @struct SurfaceTriangles_t
  * Structure containing the information about a surface to draw regarding the vertices
  */
+struct SurfaceTriangles_t {
+                    SurfaceTriangles_t() : vertices(nullptr), normals(nullptr), texCoords(nullptr), tangents(nullptr),
+                                           indices(nullptr), numVertices(0), numNormals(0), numTexCoords(0), numTangents(0),
+                                           numIndices(0) {}
+
+    Vector3*        vertices;   /**< List of vertices */
+    Vector3*        normals;    /**< List of normals */
+    Vector2*        texCoords;  /**< List texture coordinates */
+    Vector3*        tangents;   /**< List of tangents */
+    unsigned short* indices;    /**< List of indices */
+    size_t          numVertices;
+    size_t          numNormals;
+    size_t          numTexCoords;
+    size_t          numTangents;
+    size_t          numIndices;
+};
+
+/**
+ * @struct ModelSurface_t
+ * Struct representing a surface geometry data paired with a material
+ */
+struct ModelSurface_t {
+    int                 id;
+    const Material*     material;
+    SurfaceTriangles_t* geometry;
+};
 
 /**
  * @enum MeshType_t
@@ -54,7 +88,13 @@ class Mesh {
          * Load the model from a file
          * @param filename
          */
-        void                    Load(const string& filename);
+        void                    Load(const string& filename, MeshType_t meshType=MESH_TYPE_STATIC);
+
+        /**
+         * Add a model surface to the mesh
+         * @param modelSurface The model surface to add
+         */
+        void                    AddSurface(const ModelSurface_t& surface);
 
         /**
          * Initialize the mesh with geometry data
@@ -63,69 +103,28 @@ class Mesh {
         void                    Initialize(MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
-         * Add vertices to the mesh
-         * @param vertices The list of vertices to add
+         * If the mesh is a dynamic mesh, re-uploads the mesh data
          */
-        void                    SetVertices(const vector<Vector3>& vertices);
-
-        /**
-         * Add normals to the mesh
-         * @param normals The list of normals to add
-         */
-        void                    SetNormals(const vector<Vector3>& normals);
-
-        /**
-         * Add texture coords to the mesh
-         * @param texCoords The list of texture coords to add
-         */
-        void                    SetTextureCoords(const vector<Vector2>& texCoords);
-
-        /**
-         * Add tangents to the mesh
-         * @param tangents The list of tangents to add
-         */
-        void                    SetTangents(const vector<Vector3>& tangents);
-
-        Vector3*                GetVertices() const { return vertices_; }
-        Vector3*                GetNormals() const { return normals_; }
-        Vector2*                GetTexCoords() const { return texCoords_; }
-        Vector3*                GetTangents() const { return tangents_; }
-        size_t                  GetNumVertices() const { return numVertices_; }
-        size_t                  GetNumNormals() const { return numNormals_; }
-        size_t                  GetNumTexCoords() const { return numTexCoords_; }
-        size_t                  GetNumTangents() const { return numTangents_; }
+        void                    UpdateMeshData() const;
 
 		/**
 		 * Get the rendering information about the mesh for rendering
-         * @param modelData A list of structures containing the model data
          * @param bufferObjects A pointer to buffer object names
+         * @param surfaces The list of surfaces
 		 */
-		void					GetRenderInfo(vector<LoadedModel_t*>*& modelData, unsigned int*& bufferObjects) const;
+        void					GetRenderInfo(unsigned int*& bufferObjects, vector<ModelSurface_t>& surfaces) const;
 
 	protected:
-		vector<LoadedModel_t*>*	model_;		/**< The data representing the mesh */
-
         MeshType_t              meshType_;  /**< The type of the mesh */
-
-        Vector3*                vertices_;  /**< List of vertices */
-        Vector3*                normals_;   /**< List of normals */
-        Vector2*                texCoords_; /**< List texture coordinates */
-        Vector3*                tangents_;  /**< List of tangents */
-        size_t                  numVertices_;
-        size_t                  numNormals_;
-        size_t                  numTexCoords_;
-        size_t                  numTangents_;
-
-        // If those variable are set to true, then don't free the memory for the corresponding list
-        bool                    referencedVertices_;
-        bool                    referencedNormals_;
-        bool                    referencedTexCoords_;
-        bool                    referencedTangents_;
+        vector<ModelSurface_t>  surfaces_;  /**< List of surfaces for the model */
+        string                  filename_;  /**< The name of the file loaded, if we loaded it from a file */
+        bool                    fromCache_; /**< Set to true if the model is cached, false otherwise */
+        Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
 
 		// TEMP
-		unsigned int*	    vbo_;		/**< Vertex buffer objects */
-		unsigned int*	    ibo_;		/**< Index buffer objects */
-		unsigned int*   	vao_;		/**< Vertex array objects */
+		unsigned int*	        vbo_;		/**< Vertex buffer objects */
+		unsigned int*	        ibo_;		/**< Index buffer objects */
+		unsigned int*   	    vao_;		/**< Vertex array objects */
 };
 
 }

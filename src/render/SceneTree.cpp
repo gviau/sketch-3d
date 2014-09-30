@@ -30,6 +30,7 @@ bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, unsigned int p
     vector<LoadedModel_t*>* modelData;
     vector<vector<Texture2D*>>* textures;
 
+    /*
     if (mesh && material) {
         if (!ResourceManager::GetInstance()->LoadModel(filename, postProcessingFlags, modelData, textures)) {
             return false;
@@ -50,7 +51,7 @@ bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, unsigned int p
 
         material->SetTextures(textures);
     }
-
+    */
     return true;
 }
 
