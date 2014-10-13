@@ -67,6 +67,7 @@ else (WIN32)
 endif (WIN32)
 
 add_subdirectory (src)
+add_subdirectory (samples)
 
 enable_testing()
 include(CTest)

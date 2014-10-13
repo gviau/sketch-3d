@@ -47,23 +47,32 @@ set(HEADER
 source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})
 
+set(OPENGL_SRC
+	${SRC_PATH}/OpenGL/RenderQueueOpenGL.cpp
+	${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
+	${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
+	${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
+	${SRC_PATH}/OpenGL/Texture2DOpenGL.cpp
+	${SRC_PATH}/OpenGL/glew.c
+)
+
+set(OPENGL_HEADER
+	${HEADER_PATH}/OpenGL/RenderQueueOpenGL.h
+	${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
+	${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
+	${HEADER_PATH}/OpenGL/RenderTextureOpenGL.h
+	${HEADER_PATH}/OpenGL/ShaderOpenGL.h
+	${HEADER_PATH}/OpenGL/Texture2DOpenGL.h
+)
+
 if (WIN32)
 	set(OPENGL_SRC
-		${SRC_PATH}/OpenGL/RenderQueueOpenGL.cpp
-		${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
-		${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
-		${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
-		${SRC_PATH}/OpenGL/Texture2DOpenGL.cpp
+		${OPENGL_SRC}
 		${SRC_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
 	set(OPENGL_HEADER
-		${HEADER_PATH}/OpenGL/RenderQueueOpenGL.h
-		${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
-		${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
-		${HEADER_PATH}/OpenGL/RenderTextureOpenGL.h
-		${HEADER_PATH}/OpenGL/ShaderOpenGL.h
-		${HEADER_PATH}/OpenGL/Texture2DOpenGL.h
+		${OPENGL_HEADER}
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
@@ -86,6 +95,8 @@ endif ()
 include_directories (../../include)
 include_directories (${ASSIMP_INCLUDE_DIR})
 include_directories (${FreeImage_INCLUDE_DIRS})
+
+add_definitions(-DGLEW_BUILD)
 
 add_library(
     render

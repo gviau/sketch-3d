@@ -1,5 +1,7 @@
 #include "render/TextureManager.h"
 
+#include "render/Texture2D.h"
+
 namespace Sketch3D {
 
 TextureManager TextureManager::instance_;

@@ -17,6 +17,7 @@ set(_assimp_INCLUDE_SEARCH_DIRS_SYSTEM
   )
 
 set(_assimp_LIB_SEARCH_DIRS_SYSTEM
+	C:/Assimp/lib/x86
 	C:/Assimp/lib/x64
     C:/Assimp/lib
     C:/Assimp
