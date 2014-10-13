@@ -2,10 +2,14 @@
 
 #include "math/Constants.h"
 #include "render/OpenGL/RenderSystemOpenGL.h"
+#include "render/Texture2D.h"
+#include "render/TextureManager.h"
 #include "system/Logger.h"
 #include "system/Window.h"
 
 #include <math.h>
+
+#include <FreeImage.h>
 
 namespace Sketch3D {
 
@@ -155,12 +159,28 @@ void Renderer::EnableDepthTest(bool val) {
     renderSystem_->EnableDepthTest(val);
 }
 
-Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename) const {
-    return renderSystem_->CreateShader(vertexFilename, fragmentFilename);
+Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const {
+    return renderSystem_->CreateShader(vertexFilename, fragmentFilename, vertexInputs);
 }
 
 Texture2D* Renderer::CreateTexture2D() const {
     return renderSystem_->CreateTexture2D();
+}
+
+Texture2D* Renderer::CreateTexture2DFromFile(const string& filename) const {
+    // Check cache first
+    if (TextureManager::GetInstance()->CheckIfTextureLoaded(filename)) {
+        return TextureManager::GetInstance()->LoadFromCache(filename);
+    }
+
+    Texture2D* texture = renderSystem_->CreateTexture2D();
+    if (!texture->Load(filename)) {
+        Logger::GetInstance()->Error("Couldn't create texture from file " + filename);
+        delete texture;
+        return nullptr;
+    }
+
+    return texture;
 }
 
 RenderTexture* Renderer::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {

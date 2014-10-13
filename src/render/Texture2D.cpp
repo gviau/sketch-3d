@@ -1,14 +1,15 @@
 #include "render/Texture2D.h"
 
-#include "render/ResourceManager.h"
-
+#include "render/TextureManager.h"
 #include "system/Logger.h"
+
+#include <FreeImage.h>
 
 namespace Sketch3D {
 
 uint32_t Texture2D::nextAvailableId_ = 0;
 
-Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr), id_(MAX_TEXTURE_ID) {
+Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false) {
     if (nextAvailableId_ == MAX_TEXTURE_ID) {
         Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
     } else {
@@ -19,7 +20,7 @@ Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr
 Texture2D::Texture2D(unsigned int width, unsigned int height,
 					 FilterMode_t filterMode, WrapMode_t wrapMode,
 					 TextureFormat_t format) : Texture(width, height, filterMode, wrapMode),
-											   format_(format), data_(nullptr), id_(MAX_TEXTURE_ID)
+											   format_(format), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false)
 {
     if (nextAvailableId_ == MAX_TEXTURE_ID) {
         Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
@@ -29,6 +30,73 @@ Texture2D::Texture2D(unsigned int width, unsigned int height,
 }
 
 Texture2D::~Texture2D() {
+    if (!fromCache_) {
+        free(data_);
+    } else {
+        TextureManager::GetInstance()->RemoveReferenceFromCache(filename_);
+    }
+}
+
+bool Texture2D::Load(const string& filename) {
+    if (filename_ == filename) {
+        return true;
+    }
+
+    // Delete last texture if present
+    if (data_ != nullptr) {
+        if (fromCache_) {
+            TextureManager::GetInstance()->RemoveReferenceFromCache(filename_);
+        } else {
+            free(data_);
+            data_ = nullptr;
+        }
+    }
+
+    // Create image then cache it for future loads
+    FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
+
+    format = FreeImage_GetFileType(filename.c_str());
+    if (format == FIF_UNKNOWN) {
+        format = FreeImage_GetFIFFromFilename(filename.c_str());
+    }
+
+    if ((format == FIF_UNKNOWN) || !FreeImage_FIFSupportsReading(format)) {
+        Logger::GetInstance()->Error("File format unsupported for image " + filename);
+        return false;
+    }
+
+    FIBITMAP* dib = FreeImage_Load(format, filename.c_str());
+    if (dib == nullptr) {
+        Logger::GetInstance()->Error("Couldn't load image " + filename);
+        return false;
+    }
+
+    width_ = FreeImage_GetWidth(dib);
+    height_ = FreeImage_GetHeight(dib);
+    size_t bpp = FreeImage_GetBPP(dib);
+
+    filterMode_ = FILTER_MODE_BILINEAR;
+    wrapMode_ = WRAP_MODE_REPEAT;
+    format_ = (bpp == 24) ? TEXTURE_FORMAT_BGR24 : TEXTURE_FORMAT_BGRA32;
+
+    size_t bytesPerPixel = (format_ == TEXTURE_FORMAT_BGR24) ? 3 : 4;
+    size_t size = width_ * height_ * bytesPerPixel;
+    data_ = malloc(size);
+
+    memcpy(data_, (void*)FreeImage_GetBits(dib), size);
+    FreeImage_Unload(dib);
+
+    if (!Create()) {
+        Logger::GetInstance()->Error("Couldn't create texture handle for image " + filename);
+        return false;
+    }
+
+    TextureManager::GetInstance()->CacheTexture(filename, this);
+    filename_ = filename;
+    fromCache_ = true;
+
+    Logger::GetInstance()->Info("Successfully loaded image " + filename);
+    return true;
 }
 
 bool Texture2D::SetPixelDataBytes(unsigned char* data, size_t width, size_t height) {

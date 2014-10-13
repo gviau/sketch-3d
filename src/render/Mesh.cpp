@@ -1,6 +1,10 @@
 #include "render/Mesh.h"
 
 #include "render/ModelManager.h"
+#include "render/Renderer.h"
+#include "render/Texture2D.h"
+#include "render/TextureManager.h"
+#include "system/Logger.h"
 
 #include "render/OpenGL/gl/glew.h"
 #include <gl/GL.h>
@@ -8,6 +12,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+
+#include <FreeImage.h>
 
 #include <queue>
 
@@ -36,7 +42,16 @@ Mesh::~Mesh() {
                 delete[] model.geometry->texCoords;
                 delete[] model.geometry->tangents;
                 delete[] model.geometry->indices;
+
+                for (size_t j = 0; j < model.geometry->numTextures; j++) {
+                    if (TextureManager::GetInstance()->CheckIfTextureLoaded(model.geometry->textures[j]->GetFilename())) {
+                        TextureManager::GetInstance()->RemoveReferenceFromCache(model.geometry->textures[j]->GetFilename());
+                    }
+                }
+                delete[] model.geometry->textures;
             }
+        } else {
+            ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
         }
 
         glDeleteBuffers(surfaces_.size(), vbo_);
@@ -58,7 +73,22 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     if (surfaces_.size() != 0) {
         if (fromCache_) {
             ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
-            fromCache_ = false;
+        } else {
+            for (size_t i = 0; i < surfaces_.size(); i++) {
+                ModelSurface_t& model = surfaces_[i];
+                delete[] model.geometry->vertices;
+                delete[] model.geometry->normals;
+                delete[] model.geometry->texCoords;
+                delete[] model.geometry->tangents;
+                delete[] model.geometry->indices;
+
+                for (size_t j = 0; j < model.geometry->numTextures; j++) {
+                    if (TextureManager::GetInstance()->CheckIfTextureLoaded(model.geometry->textures[j]->GetFilename())) {
+                        TextureManager::GetInstance()->RemoveReferenceFromCache(model.geometry->textures[j]->GetFilename());
+                    }
+                }
+                delete[] model.geometry->textures;
+            }
         }
     }
 
@@ -72,6 +102,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     }
 
     // Load if not present in cache and cache it for future loads
+    delete importer_;
     importer_ = new Assimp::Importer;
     const aiScene* scene = importer_->ReadFile(filename, aiProcessPreset_TargetRealtime_Fast);
 
@@ -148,6 +179,22 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
                 }
             }
 
+            if (scene->HasMaterials()) {
+                const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+                
+                // Get all the textures referenced by the material
+                surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE);
+                surface->textures = new Texture2D* [surface->numTextures];
+
+                for (size_t j = 0; j < surface->numTextures; j++) {
+                    aiString textureName;
+                    material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
+
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(textureName.C_Str());
+                    surface->textures[j] = texture;
+                }
+            }
+
             ModelSurface_t modelSurface;
             modelSurface.geometry = surface;
 
@@ -164,6 +211,8 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     filename_ = filename;
     Initialize(meshType);
     fromCache_ = true;
+
+    Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
 }
 
 void Mesh::AddSurface(const ModelSurface_t& surface) {

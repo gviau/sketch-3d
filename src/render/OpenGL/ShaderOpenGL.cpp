@@ -16,9 +16,10 @@ using namespace std;
 namespace Sketch3D {
 
 ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
-						   const string& fragmentFilename) : Shader(vertexFilename,
-																	fragmentFilename),
-															 currentTextureUnit_(0)
+						   const string& fragmentFilename,
+                           const vector<string>& vertexInputs) : Shader(vertexFilename,
+																	    fragmentFilename),
+															     currentTextureUnit_(0)
 {
 	Logger::GetInstance()->Debug("Shader creation");
 
@@ -53,9 +54,9 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 	LogShaderErrors(fragment, fragmentFilename);
 	
 	// TEMP
-	glBindAttribLocation(program_, 0, "in_vertex");
-	glBindAttribLocation(program_, 1, "in_normal");
-    glBindAttribLocation(program_, 2, "in_uv");
+    for (size_t i = 0; i < vertexInputs.size(); i++) {
+        glBindAttribLocation(program_, i, vertexInputs[i].c_str());
+    }
 
 	Logger::GetInstance()->Debug("Shader program linking");
 	glLinkProgram(program_);

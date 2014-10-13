@@ -3,8 +3,6 @@
 
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
-
-#include "render/ResourceManager.h"
 #include "render/SceneTree.h"
 
 #include <string>
@@ -16,7 +14,10 @@ namespace Sketch3D {
 class RenderSystem;
 class RenderTexture;
 class Shader;
+class Texture2D;
 class Window;
+
+enum TextureFormat_t;
 
 /**
  * @enum RenderSystem_t
@@ -156,15 +157,22 @@ class Renderer {
          * Create a shader object
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
+         * @param vertexInputs The vertex inputs in order
          * @return A pointer to a shader
          */
-        Shader*             CreateShader(const string& vertexFilename, const string& fragmentFilename) const;
+        Shader*             CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const;
 
         /**
          * Create a 2D texture object
          * @return A pointer to a 2D texture
          */
         Texture2D*          CreateTexture2D() const;
+
+        /**
+         * Create a 2D texture object from a file
+         * @return A pointer to a 2D texture
+         */
+        Texture2D*          CreateTexture2DFromFile(const string& filename) const;
 
         /**
          * Create a render texture

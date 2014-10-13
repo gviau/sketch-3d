@@ -106,8 +106,8 @@ void RenderSystemOpenGL::EnableDepthTest(bool val) {
     }
 }
 
-Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
-    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename));
+Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) {
+    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename, vertexInputs));
     return shaders_[shaders_.size() - 1];
 }
 

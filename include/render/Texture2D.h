@@ -14,7 +14,6 @@ namespace Sketch3D {
 
 // Forward declaration
 class RenderSystemOpenGL;
-class ResourceManager;
 	
 /**
  * @enum TextureFormat_t
@@ -41,7 +40,6 @@ enum TextureFormat_t {
 class Texture2D : public Texture {
 
 	friend class RenderSystemOpenGL;
-    friend class ResourceManager;
 
 	public:
 		/**
@@ -70,8 +68,14 @@ class Texture2D : public Texture {
         virtual                ~Texture2D();
 
         /**
+         * Load the texture from a file
+         * @param filename The name of file from which the texture will be loaded
+         * @return true if the texture was loaded, false otherwise
+         */
+        virtual bool            Load(const string& filename);
+
+        /**
          * Create the actual texture handle
-         * @param 
          * @return true if the texture was created correctly
          */
         virtual bool            Create() = 0;
@@ -100,6 +104,8 @@ class Texture2D : public Texture {
          */
         bool                    SetPixelDataFloats(float* data, size_t width, size_t height);
 
+        string                  GetFilename() const { return filename_; }
+
 		void					SetTextureFormat(TextureFormat_t format);
 		TextureFormat_t			GetTextureFormat() const;
 
@@ -107,9 +113,11 @@ class Texture2D : public Texture {
         uint32_t                GetId() const { return id_; }
 
 	protected:
+        string                  filename_;  /**< The name of the loaded file */
 		TextureFormat_t			format_;	/**< The format of the texture */
 		void*	                data_;		/**< The actual texture data */
         uint32_t                id_;        /**< Id of the texture */
+        bool                    fromCache_; /**< Set to true if the texture is cached, false otherwise */
 
         static uint32_t         nextAvailableId_;
 

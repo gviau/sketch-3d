@@ -4,8 +4,6 @@
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
-#include "render/ResourceManager.h"
-
 #include <string>
 #include <vector>
 using namespace std;
@@ -19,6 +17,7 @@ namespace Sketch3D {
 
 // Forward declaration
 class Material;
+class Texture2D;
 
 /**
  * @struct SurfaceTriangles_t
@@ -26,19 +25,21 @@ class Material;
  */
 struct SurfaceTriangles_t {
                     SurfaceTriangles_t() : vertices(nullptr), normals(nullptr), texCoords(nullptr), tangents(nullptr),
-                                           indices(nullptr), numVertices(0), numNormals(0), numTexCoords(0), numTangents(0),
-                                           numIndices(0) {}
+                                           indices(nullptr), textures(nullptr), numVertices(0), numNormals(0), numTexCoords(0), numTangents(0),
+                                           numIndices(0), numTextures(0) {}
 
     Vector3*        vertices;   /**< List of vertices */
     Vector3*        normals;    /**< List of normals */
     Vector2*        texCoords;  /**< List texture coordinates */
     Vector3*        tangents;   /**< List of tangents */
     unsigned short* indices;    /**< List of indices */
+    Texture2D**     textures;   /**< List of textures to apply to the surface */
     size_t          numVertices;
     size_t          numNormals;
     size_t          numTexCoords;
     size_t          numTangents;
     size_t          numIndices;
+    size_t          numTextures;
 };
 
 /**

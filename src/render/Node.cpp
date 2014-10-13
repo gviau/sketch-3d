@@ -5,6 +5,7 @@
 #include "render/Renderer.h"
 #include "render/RenderQueue.h"
 #include "render/Shader.h"
+#include "render/Texture2D.h"
 
 #include <sstream>
 
@@ -93,23 +94,17 @@ void Node::ImmediateRender() const {
     vector<ModelSurface_t> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
-    // textures
-    const vector<vector<Texture2D*>>* textures = material_->GetTextures();
-
     // TEMP
     // Render the mesh
     for (size_t i = 0; i < surfaces.size(); i++) {
-        if (textures->size() > 0) {
-            vector<Texture2D*> meshTextures = (*textures)[i];
-            for (size_t j = 0; j < meshTextures.size(); j++) {
-                Texture2D* texture = meshTextures[j];
-                if (texture != nullptr) {
-                    if (shader->SetUniformTexture("texture" + to_string(j), j)) {
-                        texture->Bind(j);
-                    }
-                } else {
-                    glBindTexture(GL_TEXTURE_2D, 0);
+        for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
+            Texture2D* texture = surfaces[i].geometry->textures[j];
+            if (texture != nullptr) {
+                if (shader->SetUniformTexture("texture" + to_string(j), j)) {
+                    texture->Bind(j);
                 }
+            } else {
+                glBindTexture(GL_TEXTURE_2D, 0);
             }
         }
 

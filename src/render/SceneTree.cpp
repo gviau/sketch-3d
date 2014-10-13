@@ -3,7 +3,6 @@
 #include "render/Material.h"
 #include "render/Mesh.h"
 #include "render/RenderQueue.h"
-#include "render/ResourceManager.h"
 
 namespace Sketch3D {
 
@@ -23,12 +22,13 @@ void SceneTree::Render() {
 }
 
 bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, Material* material) const {
-    return ConstructNode(filename, mesh, ResourceManager::POST_PROCESS_NORMAL_UV, material);
+    //return ConstructNode(filename, mesh, ResourceManager::POST_PROCESS_NORMAL_UV, material);
+    return false;
 }
 
 bool SceneTree::ConstructNode(const string& filename, Mesh* mesh, unsigned int postProcessingFlags, Material* material) const {
-    vector<LoadedModel_t*>* modelData;
-    vector<vector<Texture2D*>>* textures;
+    //vector<LoadedModel_t*>* modelData;
+    //vector<vector<Texture2D*>>* textures;
 
     /*
     if (mesh && material) {

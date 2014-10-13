@@ -18,11 +18,11 @@ set(SRC
 	${SRC_PATH}/RenderQueueItem.cpp
     ${SRC_PATH}/RenderSystem.cpp
 	${SRC_PATH}/RenderTexture.cpp
-	${SRC_PATH}/ResourceManager.cpp
 	${SRC_PATH}/SceneTree.cpp
 	${SRC_PATH}/Shader.cpp
 	${SRC_PATH}/Texture.cpp
 	${SRC_PATH}/Texture2D.cpp
+	${SRC_PATH}/TextureManager.cpp
 )
 
 set(HEADER
@@ -38,11 +38,11 @@ set(HEADER
 	${HEADER_PATH}/RenderQueueItem.h
 	${HEADER_PATH}/RenderSystem.h
 	${HEADER_PATH}/RenderTexture.h
-	${HEADER_PATH}/ResourceManager.h
 	${HEADER_PATH}/SceneTree.h
 	${HEADER_PATH}/Shader.h
 	${HEADER_PATH}/Texture.h
 	${HEADER_PATH}/Texture2D.h
+	${HEADER_PATH}/TextureManager.h
 )
 source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})

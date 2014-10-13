@@ -94,9 +94,10 @@ class RenderSystem {
          * Create an empty shader
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
+         * @param vertexInputs List of vertex inputs in order
          * @return A pointer to a shader
          */
-        virtual Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename) = 0;
+        virtual Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) = 0;
 
         /**
          * Create an empty texture

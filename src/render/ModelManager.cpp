@@ -19,6 +19,7 @@ ModelManager::~ModelManager() {
             delete[] model.geometry->texCoords;
             delete[] model.geometry->tangents;
             delete[] model.geometry->indices;
+            delete[] model.geometry->textures;
         }
     }
 }
@@ -29,15 +30,13 @@ ModelManager* ModelManager::GetInstance() {
 
 bool ModelManager::CheckIfModelLoaded(const string& filename) const {
     CacheMap_t::const_iterator it = cachedModels_.find(filename);
-    if (it != cachedModels_.end()) {
-        return true;
-    }
-
-    return false;
+    return (it != cachedModels_.end());
 }
 
 void ModelManager::CacheModel(const string& filename, const vector<ModelSurface_t>& model) {
-    cachedModels_[filename] = pair<int, vector<ModelSurface_t>>(1, model);
+    if (!CheckIfModelLoaded(filename)) {
+        cachedModels_[filename] = pair<int, vector<ModelSurface_t>>(1, model);
+    }
 }
 
 vector<ModelSurface_t> ModelManager::LoadFromCache(const string& filename) {
@@ -58,6 +57,7 @@ void ModelManager::RemoveReferenceFromCache(const string& filename) {
             delete[] model.geometry->texCoords;
             delete[] model.geometry->tangents;
             delete[] model.geometry->indices;
+            delete[] model.geometry->textures;
         }
 
         cachedModels_.erase(filename);

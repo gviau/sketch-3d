@@ -6,6 +6,7 @@
 #include "gl/glew.h"
 
 #include <map>
+#include <vector>
 using namespace std;
 
 namespace Sketch3D {
@@ -16,7 +17,7 @@ namespace Sketch3D {
  */
 class ShaderOpenGL : public Shader {
 	public:
-		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename);
+		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);
 
 		virtual void SetActive(bool val);
 		virtual bool SetUniformInt(const string& uniform, int value);
