@@ -4,11 +4,18 @@ project(Sample_Shadow)
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/")
 
-add_custom_command(
-	TARGET
-	Sample_Shadow
-	POST_BUILD WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Debug/"
-)
+if (MSVC)
+	configure_file(
+		${SKETCH3D_TEMPLATES_PATH}/VisualStudioUserFile.vcxproj.user.in
+		${CMAKE_CURRENT_BINARY_DIR}/Sample_Shadow.vcxproj.user
+		@ONLY
+	)
+	configure_file(
+		${SKETCH3D_TEMPLATES_PATH}/VisualStudioUserFile.vcproj.user.in
+		${CMAKE_CURRENT_BINARY_DIR}/Sample_Shadow.vcproj.user
+		@ONLY
+	)
+endif ()
 
 set(HEADER_FILES include/Shadow.h)
 set(SOURCE_FILES src/Shadow.cpp)
