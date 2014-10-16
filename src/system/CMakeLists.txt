@@ -9,6 +9,7 @@ set(HEADER_PATH "${CMAKE_SOURCE_DIR}/include/system")
 set (SRC
 	 ${SRC_PATH}/Logger.cpp
 	 ${SRC_PATH}/Platform.cpp
+	 ${SRC_PATH}/Utils.cpp
 	 ${SRC_PATH}/Window.cpp
      ${SRC_PATH}/WindowEvent.cpp
      ${SRC_PATH}/WindowImplementation.cpp
@@ -18,6 +19,7 @@ set (HEADER
 	 ${HEADER_PATH}/Common.h
 	 ${HEADER_PATH}/Logger.h
 	 ${HEADER_PATH}/Platform.h
+	 ${HEADER_PATH}/Utils.h
 	 ${HEADER_PATH}/Window.h
      ${HEADER_PATH}/WindowEvent.h
 	 ${HEADER_PATH}/WindowHandle.h
