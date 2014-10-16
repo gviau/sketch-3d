@@ -52,9 +52,29 @@ bool RenderTextureOpenGL::AttachTextureToDepthBuffer(Texture2D* texture) {
         return false;
     }
 
+    if (texture->GetWidth() != width_ || texture->GetHeight() != height_) {
+        Logger::GetInstance()->Error("Texture used as attachment for the depth buffer isn't of the same size as the render texture");
+        return false;
+    }
 
-    // TODO implement
-    return false;
+    if (framebuffer_ == 0) {
+        glGenFramebuffers(1, &framebuffer_);
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, dynamic_cast<Texture2DOpenGL*>(texture)->textureName_, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        Logger::GetInstance()->Info("Couldn't attach texture to depth buffer");
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return false;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    depthBufferBound_ = true;
+    Logger::GetInstance()->Info("Texture successfully attached to depth buffer");
+
+    return true;
 }
 
 bool RenderTextureOpenGL::AttachTextures(const vector<Texture2D*>& textures) {
@@ -124,18 +144,20 @@ void RenderTextureOpenGL::Bind() const {
     if (framebuffer_ != 0) {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 
-        GLenum* buffers = new GLenum[textures_.size()];
-        for (size_t i = 0; i < textures_.size(); i++) {
-            buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+        size_t numBuffers = textures_.size() + depthBufferBound_;
+        GLenum* buffers = new GLenum[numBuffers];
+        if (depthBufferBound_) {
+            buffers[0] = GL_NONE;
         }
-        glDrawBuffers(textures_.size(), buffers);
-        delete[] buffers;
-    }
-}
 
-void RenderTextureOpenGL::Unbind() const {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        for (size_t i = depthBufferBound_; i < numBuffers; i++) {
+            buffers[i] = GL_COLOR_ATTACHMENT0 + (i - depthBufferBound_);
+        }
+        glDrawBuffers(numBuffers, buffers);
+        delete[] buffers;
+
+        glViewport(0, 0, width_, height_);
+    }
 }
 
 }

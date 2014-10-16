@@ -14,23 +14,6 @@ namespace Sketch3D {
 
 // Forward declaration
 class RenderSystemOpenGL;
-	
-/**
- * @enum TextureFormat_t
- * The format of the texture, describing how to interpret the bytes
- */
-enum TextureFormat_t {
-	TEXTURE_FORMAT_RGB24,
-	TEXTURE_FORMAT_RGBA32,
-    TEXTURE_FORMAT_BGR24,
-    TEXTURE_FORMAT_BGRA32,
-
-    // There should be a separation between byte texture format and floating point texture format
-    TEXTURE_FORMAT_R32F,
-    TEXTURE_FORMAT_RG32F,
-    TEXTURE_FORMAT_RGB32F,
-    TEXTURE_FORMAT_RGBA32F
-};
 
 /**
  * @class Texture2D
@@ -58,7 +41,7 @@ class Texture2D : public Texture {
 		 * @param format The format to use
 		 */
 								Texture2D(unsigned int width, unsigned int height,
-										  FilterMode_t filterMode=FILTER_MODE_BILINEAR,
+										  FilterMode_t filterMode=FILTER_MODE_NEAREST,
 										  WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										  TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
@@ -72,7 +55,7 @@ class Texture2D : public Texture {
          * @param filename The name of file from which the texture will be loaded
          * @return true if the texture was loaded, false otherwise
          */
-        virtual bool            Load(const string& filename);
+        bool                    Load(const string& filename);
 
         /**
          * Create the actual texture handle
@@ -106,15 +89,11 @@ class Texture2D : public Texture {
 
         string                  GetFilename() const { return filename_; }
 
-		void					SetTextureFormat(TextureFormat_t format);
-		TextureFormat_t			GetTextureFormat() const;
-
         virtual const void*     GetData() const = 0;
         uint32_t                GetId() const { return id_; }
 
 	protected:
         string                  filename_;  /**< The name of the loaded file */
-		TextureFormat_t			format_;	/**< The format of the texture */
 		void*	                data_;		/**< The actual texture data */
         uint32_t                id_;        /**< Id of the texture */
         bool                    fromCache_; /**< Set to true if the texture is cached, false otherwise */

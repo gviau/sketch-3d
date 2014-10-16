@@ -32,7 +32,7 @@ class Texture2DOpenGL : public Texture2D {
 		 * @param format The format to use
 		 */
 				            Texture2DOpenGL(unsigned int width, unsigned int height,
-										    FilterMode_t filterMode=FILTER_MODE_BILINEAR,
+										    FilterMode_t filterMode=FILTER_MODE_NEAREST,
 										    WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										    TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 

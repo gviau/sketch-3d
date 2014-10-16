@@ -46,12 +46,12 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 	return renderSystem_->Initialize();
 }
 
-void Renderer::SetClearColor(float red, float green, float blue, float alpha) {
+void Renderer::SetClearColor(float red, float green, float blue, float alpha) const {
 	renderSystem_->SetClearColor(red, green, blue, alpha);
 }
 
-bool Renderer::BeginRender() {
-	return renderSystem_->BeginRender();
+void Renderer::Clear(int buffer) const {
+	renderSystem_->Clear(buffer);
 }
 
 void Renderer::EndRender() {
@@ -147,7 +147,7 @@ void Renderer::CameraLookAt(const Vector3& position, const Vector3& point,
 	viewProjection_ = projection_ * view_;
 }
 
-void Renderer::SetRenderFillMode(RenderMode_t mode) {
+void Renderer::SetRenderFillMode(RenderMode_t mode) const {
 	renderSystem_->SetRenderFillMode(mode);
 }
 
@@ -155,8 +155,20 @@ void Renderer::SetViewport(size_t x, size_t y, size_t width, size_t height) {
     renderSystem_->SetViewport(x, y, width, height);
 }
 
-void Renderer::EnableDepthTest(bool val) {
+void Renderer::EnableDepthTest(bool val) const {
     renderSystem_->EnableDepthTest(val);
+}
+
+void Renderer::EnableDepthWrite(bool val) const {
+    renderSystem_->EnableDepthWrite(val);
+}
+
+void Renderer::SetDepthComparisonFunc(DepthFunc_t comparison) const {
+    renderSystem_->SetDepthComparisonFunc(comparison);
+}
+
+void Renderer::SetCullingMethod(CullingMethod_t cullingMethod) const {
+    renderSystem_->SetCullingMethod(cullingMethod);
 }
 
 Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const {
@@ -183,8 +195,28 @@ Texture2D* Renderer::CreateTexture2DFromFile(const string& filename) const {
     return texture;
 }
 
+Texture3D* Renderer::CreateTexture3D() const {
+    return renderSystem_->CreateTexture3D();
+}
+
 RenderTexture* Renderer::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
     return renderSystem_->CreateRenderTexture(width, height, format);
+}
+
+void Renderer::BindScreenBuffer() const {
+    renderSystem_->BindScreenBuffer();
+}
+
+void Renderer::EnableBlending(bool val) const {
+    renderSystem_->EnableBlending(val);
+}
+
+void Renderer::SetBlendingEquation(BlendingEquation_t equation) const {
+    renderSystem_->SetBlendingEquation(equation);
+}
+
+void Renderer::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const {
+    renderSystem_->SetBlendingFactor(srcFactor, dstFactor);
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {

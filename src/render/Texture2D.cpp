@@ -9,7 +9,7 @@ namespace Sketch3D {
 
 uint32_t Texture2D::nextAvailableId_ = 0;
 
-Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false) {
+Texture2D::Texture2D() : Texture(), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false) {
     if (nextAvailableId_ == MAX_TEXTURE_ID) {
         Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
     } else {
@@ -19,8 +19,8 @@ Texture2D::Texture2D() : Texture(), format_(TEXTURE_FORMAT_RGB24), data_(nullptr
 
 Texture2D::Texture2D(unsigned int width, unsigned int height,
 					 FilterMode_t filterMode, WrapMode_t wrapMode,
-					 TextureFormat_t format) : Texture(width, height, filterMode, wrapMode),
-											   format_(format), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false)
+					 TextureFormat_t format) : Texture(width, height, filterMode, wrapMode, format),
+											   data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false)
 {
     if (nextAvailableId_ == MAX_TEXTURE_ID) {
         Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
@@ -75,7 +75,7 @@ bool Texture2D::Load(const string& filename) {
     height_ = FreeImage_GetHeight(dib);
     size_t bpp = FreeImage_GetBPP(dib);
 
-    filterMode_ = FILTER_MODE_BILINEAR;
+    filterMode_ = FILTER_MODE_NEAREST;
     wrapMode_ = WRAP_MODE_REPEAT;
     format_ = (bpp == 24) ? TEXTURE_FORMAT_BGR24 : TEXTURE_FORMAT_BGRA32;
 
@@ -100,7 +100,7 @@ bool Texture2D::Load(const string& filename) {
 }
 
 bool Texture2D::SetPixelDataBytes(unsigned char* data, size_t width, size_t height) {
-    if (format_ >= TEXTURE_FORMAT_R32F) {
+    if (format_ >= TEXTURE_FORMAT_R32F || format_ == TEXTURE_FORMAT_DEPTH) {
         Logger::GetInstance()->Warning("Operation not supported for format different than byte texture format in SetPixelDataBytes");
         return false;
     }
@@ -120,7 +120,7 @@ bool Texture2D::SetPixelDataBytes(unsigned char* data, size_t width, size_t heig
 }
 
 bool Texture2D::SetPixelDataFloats(float* data, size_t width, size_t height) {
-    if (format_ < TEXTURE_FORMAT_R32F) {
+    if (format_ < TEXTURE_FORMAT_R32F || format_ == TEXTURE_FORMAT_DEPTH) {
         Logger::GetInstance()->Warning("Operation not supported for format different than floating point texture format in SetPixelDataFloats");
         return false;
     }
@@ -137,14 +137,6 @@ bool Texture2D::SetPixelDataFloats(float* data, size_t width, size_t height) {
 
     SetPixelDataFloatsImp(data);
     return true;
-}
-
-void Texture2D::SetTextureFormat(TextureFormat_t format) {
-	format_ = format;
-}
-
-TextureFormat_t Texture2D::GetTextureFormat() const {
-	return format_;
 }
 
 }

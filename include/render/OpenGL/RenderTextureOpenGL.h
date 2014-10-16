@@ -49,14 +49,10 @@ class RenderTextureOpenGL : public RenderTexture {
         virtual bool        AttachTextures(const vector<Texture2D*>& textures);
 
         /**
-         * Bind the render texture, that is, use it for the current rendering
+         * Bind the render texture, that is, use it for the current rendering. This function will resize the
+         * viewport to match the render texture width and height.
          */
         virtual void        Bind() const;
-
-        /**
-         * Unbind the render texture, that is, use the normal framebuffer (the screen) for rendering
-         */
-        virtual void        Unbind() const;
 
     private:
         size_t              framebuffer_; /**< OpenGL's name of the framebuffer */

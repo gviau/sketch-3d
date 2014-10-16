@@ -15,6 +15,12 @@ namespace Sketch3D {
 class RenderTexture;
 class Shader;
 class Texture2D;
+class Texture3D;
+
+enum BlendingEquation_t;
+enum BlendingFactor_t;
+enum CullingMethod_t;
+enum DepthFunc_t;
 enum RenderMode_t;
 enum TextureFormat_t;
 
@@ -51,13 +57,13 @@ class RenderSystem {
 		 * @param blue The blue component
 		 * @param alpha The alpha component
 		 */
-		virtual void					SetClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
+		virtual void					SetClearColor(float red, float green, float blue, float alpha=1.0f) const = 0;
 
 		/**
-		 * Starts the rendering process.
-		 * @return true if the rendering process was correctly started, false otherwise
+		 * Clears the current framebuffer
+         * @param buffer Which buffers to clear
 		 */
-		virtual bool					BeginRender() = 0;
+		virtual void				    Clear(int buffer) const = 0;
 
 		/**
 		 * Ends the rendering process
@@ -73,7 +79,7 @@ class RenderSystem {
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		virtual void					SetRenderFillMode(RenderMode_t mode) = 0;
+		virtual void					SetRenderFillMode(RenderMode_t mode) const = 0;
 
         /**
          * Sets the camera viewport dimension
@@ -88,7 +94,25 @@ class RenderSystem {
          * Enable or disable depth testing
          * @param val Enabled if true, disabled otherwise
          */
-        virtual void                    EnableDepthTest(bool val) = 0;
+        virtual void                    EnableDepthTest(bool val) const = 0;
+
+        /**
+         * Enable or disable depth writing. This will only work if depth testing is enabled
+         * @param val Enabled if true, disabled otherwise
+         */
+        virtual void                    EnableDepthWrite(bool val) const = 0;
+
+        /**
+         * Sets the depth compare function to use
+         * @param comparison The comparison function to use
+         */
+        virtual void                    SetDepthComparisonFunc(DepthFunc_t comparison) const = 0;
+
+        /**
+         * Select the culling method
+         * @param cullingMethod The culling method to use
+         */
+        virtual void                    SetCullingMethod(CullingMethod_t cullingMethod) const = 0;
 
         /**
          * Create an empty shader
@@ -106,6 +130,12 @@ class RenderSystem {
         virtual Texture2D*              CreateTexture2D() const = 0;
 
         /**
+         * Create an empty texture
+         * @return A pointer to a texture
+         */
+        virtual Texture3D*              CreateTexture3D() const = 0;
+
+        /**
          * Create a render texture
          * @param width The width of the render texture
          * @param height The height of the render texture
@@ -114,6 +144,31 @@ class RenderSystem {
          */
         virtual RenderTexture*          CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const = 0;
 
+        /**
+         * Binds the render system frame buffer that is used to draw on the screen
+         */
+        virtual void                    BindScreenBuffer() const = 0;
+
+        /**
+         * Enable blending
+         * @param val if true, enables blending, deactivate it otherwise
+         */
+        virtual void                    EnableBlending(bool val) const = 0;
+
+        /**
+         * Specifies the blending equation to use
+         */
+        virtual void                    SetBlendingEquation(BlendingEquation_t equation) const = 0;
+
+        /**
+         * Specifies the blending factor to use
+         * @param srcFactor The factor to use for the source pixel (the pixel being processed)
+         * @param dstFactor the factor to use for the destination pixel (the pixel already present in the framebuffer)
+         */
+        virtual void                    SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const = 0;
+
+        size_t                          GetWidth() const { return width_; }
+        size_t                          GetHeight() const { return height_; }
 		int								GetMaxActiveTextures() const { return maxActiveTextures_; }
 
 	protected:

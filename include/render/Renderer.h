@@ -15,9 +15,73 @@ class RenderSystem;
 class RenderTexture;
 class Shader;
 class Texture2D;
+class Texture3D;
 class Window;
 
 enum TextureFormat_t;
+
+/**
+ * @enum BlendingEquation_t
+ * Specifies the equation to use in the blending process
+ */
+enum BlendingEquation_t {
+    BLENDING_EQUATION_ADD,
+    BLENDING_EQUATION_SUBTRACT,
+    BLENDING_EQUATION_REVERSE_SUBTRACT,
+    BLENDING_EQUATION_MIN,
+    BLENDING_EQUATION_MAX
+};
+
+/**
+ * @enum BlendingFactors_t
+ * Enumeration of all the possible blending factors for the blending equation
+ */
+enum BlendingFactor_t {
+    BLENDING_FACTOR_ZERO,
+    BLENDING_FACTOR_ONE,
+    BLENDING_FACTOR_SRC_COLOR,
+    BLENDING_FACTOR_ONE_MINUS_SRC_COLOR,
+    BLENDING_FACTOR_DST_COLOR,
+    BLENDING_FACTOR_ONE_MINUS_DST_COLOR,
+    BLENDING_FACTOR_SRC_ALPHA,
+    BLENDING_FACTOR_ONE_MINUS_SRC_ALPHA,
+    BLENDING_FACTOR_DST_ALPHA,
+    BLENDING_FACTOR_ONE_MINUS_DST_ALPHA,
+    BLENDING_FACTOR_SRC_ALPHA_SATURATE
+};
+
+/**
+ * @enum ClearBuffer_t
+ * Determines which buffer to clear. Those enum should be combined with OR operations
+ */
+enum ClearBuffer_t {
+    CLEAR_BUFFER_COLOR      = 0x01,
+    CLEAR_BUFFER_DEPTH      = 0X02
+};
+
+/**
+ * @enum CullingMethod_t
+ * Determines if the culling should be for front face or back face
+ */
+enum CullingMethod_t {
+    CULLING_METHOD_FRONT_FACE,
+    CULLING_METHOD_BACK_FACE
+};
+
+/**
+ * @enum DepthFunc_t
+ * Sets the possible depth comparison functions
+ */
+enum DepthFunc_t {
+    DEPTH_FUNC_NEVER,
+    DEPTH_FUNC_ALWAYS,
+    DEPTH_FUNC_LESS,
+    DEPTH_FUNC_LEQUAL,
+    DEPTH_FUNC_EQUAL,
+    DEPTH_FUNC_GEQUAL,
+    DEPTH_FUNC_GREATER,
+    DEPTH_FUNC_NOTEQUAL
+};
 
 /**
  * @enum RenderSystem_t
@@ -70,13 +134,13 @@ class Renderer {
 		 * @param blue The blue component of the color
 		 * @param alpha The alpha component of the color
 		 */
-		void				SetClearColor(float red, float green, float blue, float alpha=0.0f);
+		void				SetClearColor(float red, float green, float blue, float alpha=0.0f) const;
 
 		/**
-		 * Begin the rendering process
-		 * @return true if the rendering process has initialized correctly
+		 * Clears the current framebuffer
+         * @param buffer Which buffers to clear
 		 */
-		bool				BeginRender();
+		void				Clear(int buffer=(CLEAR_BUFFER_COLOR|CLEAR_BUFFER_DEPTH)) const;
 
 		/**
 		 * End the rendering process
@@ -136,7 +200,7 @@ class Renderer {
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		void				SetRenderFillMode(RenderMode_t mode);
+		void				SetRenderFillMode(RenderMode_t mode) const;
 
         /**
          * Sets the camera viewport dimension
@@ -151,7 +215,25 @@ class Renderer {
          * Enable or disable depth testing
          * @param val Enabled if true, disabled otherwise
          */
-        void                EnableDepthTest(bool val);
+        void                EnableDepthTest(bool val) const;
+
+        /**
+         * Enable or disable depth writing. This will only work if depth testing is enabled
+         * @param val Enabled if true, disabled otherwise
+         */
+        void                EnableDepthWrite(bool val) const;
+
+        /**
+         * Sets the depth compare function to use
+         * @param comparison The comparison function to use
+         */
+        void                SetDepthComparisonFunc(DepthFunc_t comparison) const;
+
+        /**
+         * Select the culling method
+         * @param cullingMethod The culling method to use
+         */
+        void                SetCullingMethod(CullingMethod_t cullingMethod) const;
 
         /**
          * Create a shader object
@@ -175,6 +257,12 @@ class Renderer {
         Texture2D*          CreateTexture2DFromFile(const string& filename) const;
 
         /**
+         * Create a 3D texture object
+         * @return A pointer to a 3D texture
+         */
+        Texture3D*          CreateTexture3D() const;
+
+        /**
          * Create a render texture
          * @param width The width of the render texture
          * @param height The height of the render texture
@@ -182,6 +270,29 @@ class Renderer {
          * @return A pointer to a render texture
          */
         RenderTexture*      CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
+
+        /**
+         * Binds the render system frame buffer that is used to draw on the screen
+         */
+        void                BindScreenBuffer() const;
+
+        /**
+         * Enable blending
+         * @param val if true, enables blending, deactivate it otherwise
+         */
+        void                EnableBlending(bool val) const;
+
+        /**
+         * Specifies the blending equation to use
+         */
+        void                SetBlendingEquation(BlendingEquation_t equation) const;
+
+        /**
+         * Specifies the blending factor to use
+         * @param srcFactor The factor to use for the source pixel (the pixel being processed)
+         * @param dstFactor the factor to use for the destination pixel (the pixel already present in the framebuffer)
+         */
+        void                SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
 
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;

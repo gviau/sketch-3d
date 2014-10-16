@@ -10,26 +10,27 @@ Texture2DOpenGL::Texture2DOpenGL(unsigned int width, unsigned int height, Filter
 }
 
 Texture2DOpenGL::~Texture2DOpenGL() {
+    if (textureName_ != 0) {
+        glDeleteTextures(1, &textureName_);
+    }
 }
 
 bool Texture2DOpenGL::Create() {
-	glGenTextures(1, &textureName_);
+    if (textureName_ == 0) {
+	    glGenTextures(1, &textureName_);
+    }
+
 	glBindTexture(GL_TEXTURE_2D, textureName_);
 
 	GLuint filter, wrap, format, components, type, bpp;
 	switch (filterMode_) {
-		case FILTER_MODE_POINT:
+		case FILTER_MODE_NEAREST:
 			filter = GL_NEAREST;
 			break;
 
-		case FILTER_MODE_BILINEAR:
+		case FILTER_MODE_LINEAR:
 			filter = GL_LINEAR;
 			break;
-
-			// TODO
-		case FILTER_MODE_TRILINEAR:
-		default:
-			filter = GL_LINEAR;
 	}
 
 	switch (wrapMode_) {
@@ -40,6 +41,10 @@ bool Texture2DOpenGL::Create() {
 		case WRAP_MODE_REPEAT:
 			wrap = GL_REPEAT;
 			break;
+
+        case WRAP_MODE_CLAMP_TO_BORDER:
+            wrap = GL_CLAMP_TO_BORDER;
+            break;
 	}
 
     GetOpenglTextureFormat(format_, format, components, type, bpp);
@@ -49,6 +54,11 @@ bool Texture2DOpenGL::Create() {
 				     components, type, data_);
     } else {
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width_, height_);
+
+        if (format == GL_DEPTH_COMPONENT16) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        }
     }
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
@@ -168,6 +178,15 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             format = GL_RGBA;
             type = GL_FLOAT;
             bpp = 4;
+            break;
+
+        case TEXTURE_FORMAT_DEPTH:
+            internalFormat = GL_DEPTH_COMPONENT16;
+            format = GL_DEPTH_COMPONENT;
+            type = GL_UNSIGNED_INT;
+
+            // Not needed
+            bpp = 0;
             break;
 	}
 }
