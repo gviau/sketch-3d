@@ -50,9 +50,11 @@ void RenderQueue::AddItem(const Node& node, Layer_t layer) {
     // Find a better way. This is kind of a ugly hack
     // Set uniforms
     Matrix4x4* modelViewProjection = new Matrix4x4(viewProjection * model);
+    Matrix4x4* uniformModel = new Matrix4x4(model);
 
     item->uniforms_["modelViewProjection"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX4X4, (void*)modelViewProjection);
     item->uniforms_["modelView"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX3X3, (void*)modelView);
+    item->uniforms_["model"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX4X4, (void*)uniformModel);
 
     // TODO add uniforms from material
 }
@@ -121,23 +123,33 @@ void RenderQueue::Render() {
 
         // TEMP
         // Render the mesh
+        // Material's textures
+        const map<string, Texture*>& materialTextures = item->material_->GetTextures();
+        map<string, Texture*>::const_iterator t_it = materialTextures.begin();
+
+        int lastTextureIdx = 0;
+        for (; t_it != materialTextures.end(); ++t_it) {
+            if (t_it->second != nullptr) {
+                if (shader->SetUniformTexture(t_it->first, lastTextureIdx)) {
+                    t_it->second->Bind(lastTextureIdx);
+                    lastTextureIdx += 1;
+                }
+            }
+        }
+
         for (size_t i = 0; i < surfaces.size(); i++) {
             for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
                 Texture2D* texture = surfaces[i].geometry->textures[j];
                 if (texture != nullptr) {
-                    if (shader->SetUniformTexture("texture" + to_string(j), j)) {
-                        texture->Bind(j);
+                    if (shader->SetUniformTexture("texture" + to_string(j), lastTextureIdx + j)) {
+                        texture->Bind(lastTextureIdx + j);
                     }
-                } else {
-                    glBindTexture(GL_TEXTURE_2D, 0);
                 }
             }
 
             glBindVertexArray(bufferObjects[i]);
                 glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
             glBindVertexArray(0);
-
-            glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
 
