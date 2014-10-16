@@ -2,6 +2,7 @@
 
 #include "render/Material.h"
 #include "render/Mesh.h"
+#include "render/ModelManager.h"
 #include "render/Renderer.h"
 #include "render/RenderQueue.h"
 #include "render/Shader.h"
@@ -57,6 +58,21 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 {
 }
 
+Node::Node(const Node& src) : parent_(src.parent_),
+                              position_(src.position_),
+                              scale_(src.scale_),
+                              orientation_(src.orientation_),
+                              material_(src.material_)
+{
+    // TODO
+    // Better manage name copy
+    name_ = src.name_ + "_c";
+
+    // TODO
+    // Better manager mesh and textures copy
+    *mesh_  = *src.mesh_;
+}
+
 Node::~Node() {
 }
 
@@ -95,24 +111,35 @@ void Node::ImmediateRender() const {
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
     // TEMP
+    // Material's textures
+    const map<string, Texture*>& materialTextures = material_->GetTextures();
+    map<string, Texture*>::const_iterator it = materialTextures.begin();
+
+    int lastTextureIdx = 0;
+    for (; it != materialTextures.end(); ++it) {
+        if (it->second != nullptr) {
+            if (shader->SetUniformTexture(it->first, lastTextureIdx)) {
+                it->second->Bind(lastTextureIdx);
+                lastTextureIdx += 1;
+            }
+        }
+    }
+
     // Render the mesh
     for (size_t i = 0; i < surfaces.size(); i++) {
+        // Textures associated with the surface
         for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
             Texture2D* texture = surfaces[i].geometry->textures[j];
             if (texture != nullptr) {
-                if (shader->SetUniformTexture("texture" + to_string(j), j)) {
-                    texture->Bind(j);
+                if (shader->SetUniformTexture("texture" + to_string(j), lastTextureIdx + j)) {
+                    texture->Bind(lastTextureIdx + j);
                 }
-            } else {
-                glBindTexture(GL_TEXTURE_2D, 0);
             }
         }
 
         glBindVertexArray(bufferObjects[i]);
             glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 

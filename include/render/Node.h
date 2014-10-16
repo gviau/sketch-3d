@@ -56,6 +56,12 @@ class Node {
 								 const Vector3& scale, const Quaternion& orientation,
 								 Node* parent=NULL);
 
+        /**
+         * Copy constructor
+         * @param src The node to copy
+         */
+                            Node(const Node& src);
+
 		/**
 		 * Destructor
 		 */
