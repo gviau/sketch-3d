@@ -41,6 +41,15 @@ class Vector4 {
                                 Vector4(float x, float y, float z);
 
         /**
+         * Constructor
+         * @param x The x component
+         * @param y The y component
+         * @param z The z component
+         * @param w The w component
+         */
+                                Vector4(float x, float y, float z, float w);
+
+        /**
          * Copy constructor
          * @param src The src vector that will be copied
          */

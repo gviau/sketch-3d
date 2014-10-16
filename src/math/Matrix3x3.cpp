@@ -2,6 +2,7 @@
 
 #include "math/Constants.h"
 #include "math/Matrix4x4.h"
+#include "math/Vector2.h"
 #include "math/Vector3.h"
 
 #include <math.h>
@@ -86,6 +87,12 @@ Matrix3x3 Matrix3x3::Transpose() const
     return Matrix3x3(data);
 }
 
+void Matrix3x3::Translate(const Vector2& translation) {
+    *this = Matrix3x3::IDENTITY;
+    data_[0][2] = translation.x;
+    data_[1][2] = translation.y;
+}
+
 void Matrix3x3::RotationAroundX(float angle)
 {
     float cos = cosf(angle);
@@ -145,6 +152,18 @@ void Matrix3x3::RotateAroundAxis(const Vector3& axis, float angle)
     data_[2][0] = axis.z * axis.x * sum - (axis.y * sin);
     data_[2][1] = axis.z * axis.y * sum + (axis.x * sin);
     data_[2][2] = axis.z * axis.z * sum + cos;
+}
+
+void Matrix3x3::Scale(const Vector3& scale) {
+    *this = Matrix4x4::IDENTITY;
+    data_[0][0] = scale.x;
+    data_[1][1] = scale.y;
+    data_[2][2] = scale.z;
+}
+
+Vector3 Matrix3x3::operator*(const Vector2& v) const {
+    Vector3 w(v.x, v.y, 1.0f);
+    return *this * w;
 }
 
 Vector3 Matrix3x3::operator*(const Vector3& v) const

@@ -8,6 +8,7 @@ namespace Sketch3D
 
 // Forward dependencies
 class Matrix3x3;
+class Vector3;
 class Vector4;
 
 /**
@@ -57,6 +58,12 @@ class Matrix4x4
         Matrix4x4               Transpose() const;
 
         /**
+         * Transform this matrix into a translation matrix
+         * @param translation A vector representing the translation
+         */
+        void                    Translate(const Vector3& translation);
+
+        /**
          * Transform this matrix into a rotation matrix around the x axis
          * @param angle The angle in radians to rotate
          */
@@ -80,8 +87,14 @@ class Matrix4x4
          * normalized.
          * @param angle The angle in radians to rotate
          */
-        void                    RotateAroundAxis(const Vector4& axis,
+        void                    RotateAroundAxis(const Vector3& axis,
                                                  float angle);
+
+        /**
+         * Transform this matrix into a scale matrix
+         * @param scale A vector representing the amount to scale on each axis
+         */
+        void                    Scale(const Vector3& scale);
 
         // ACCESS OPERATORS
         /**
@@ -106,6 +119,7 @@ class Matrix4x4
 
         // BINARY OPERATORS
         INLINE Matrix4x4        operator*(const Matrix4x4& m) const;
+        Vector4                 operator*(const Vector3& v) const;
         Vector4					operator*(const Vector4& v) const;
         INLINE void             operator*=(const Matrix4x4& m);
 

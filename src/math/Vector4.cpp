@@ -27,6 +27,13 @@ Vector4::Vector4(float x, float y, float z)
     w = 1.0f;
 }
 
+Vector4::Vector4(float x, float y, float z, float w) {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->w = w;
+}
+
 Vector4::Vector4(const Vector4& src)
 {
     x = src.x;

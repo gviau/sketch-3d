@@ -2,6 +2,7 @@
 
 #include "math/Constants.h"
 #include "math/Matrix3x3.h"
+#include "math/Vector3.h"
 #include "math/Vector4.h"
 
 #include <math.h>
@@ -96,6 +97,13 @@ Matrix4x4 Matrix4x4::Transpose() const
     return Matrix4x4(data);
 }
 
+void Matrix4x4::Translate(const Vector3& translation) {
+    *this = Matrix4x4::IDENTITY;
+    data_[0][3] = translation.x;
+    data_[1][3] = translation.y;
+    data_[2][3] = translation.z;
+}
+
 void Matrix4x4::RotationAroundX(float angle)
 {
     float cos = cosf(angle);
@@ -141,7 +149,7 @@ void Matrix4x4::RotationAroundZ(float angle)
         data_[3][0] = data_[3][1] = data_[3][2] = 0.0f;
 }
 
-void Matrix4x4::RotateAroundAxis(const Vector4& axis, float angle)
+void Matrix4x4::RotateAroundAxis(const Vector3& axis, float angle)
 {
     float cos = cosf(angle);
     float sin = sinf(angle);
@@ -161,6 +169,18 @@ void Matrix4x4::RotateAroundAxis(const Vector4& axis, float angle)
 
     data_[0][3] = data_[1][3] = data_[2][3] = data_[3][0] = data_[3][1] = data_[3][2] = 0.0f;
     data_[3][3] = 1.0f;
+}
+
+void Matrix4x4::Scale(const Vector3& scale) {
+    *this = Matrix4x4::IDENTITY;
+    data_[0][0] = scale.x;
+    data_[1][1] = scale.y;
+    data_[2][2] = scale.z;
+}
+
+Vector4 Matrix4x4::operator*(const Vector3& v) const {
+    Vector4 w(v.x, v.y, v.z);
+    return *this * w;
 }
 
 Vector4 Matrix4x4::operator*(const Vector4& v) const
