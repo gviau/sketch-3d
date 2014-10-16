@@ -22,6 +22,7 @@ set(SRC
 	${SRC_PATH}/Shader.cpp
 	${SRC_PATH}/Texture.cpp
 	${SRC_PATH}/Texture2D.cpp
+	${SRC_PATH}/Texture3D.cpp
 	${SRC_PATH}/TextureManager.cpp
 )
 
@@ -42,6 +43,7 @@ set(HEADER
 	${HEADER_PATH}/Shader.h
 	${HEADER_PATH}/Texture.h
 	${HEADER_PATH}/Texture2D.h
+	${HEADER_PATH}/Texture3D.h
 	${HEADER_PATH}/TextureManager.h
 )
 source_group("Source Files" FILES ${SRC})
@@ -53,6 +55,7 @@ set(OPENGL_SRC
 	${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
 	${SRC_PATH}/OpenGL/ShaderOpenGL.cpp
 	${SRC_PATH}/OpenGL/Texture2DOpenGL.cpp
+	${SRC_PATH}/OpenGL/Texture3DOpenGL.cpp
 	${SRC_PATH}/OpenGL/glew.c
 )
 
@@ -63,6 +66,7 @@ set(OPENGL_HEADER
 	${HEADER_PATH}/OpenGL/RenderTextureOpenGL.h
 	${HEADER_PATH}/OpenGL/ShaderOpenGL.h
 	${HEADER_PATH}/OpenGL/Texture2DOpenGL.h
+	${HEADER_PATH}/OpenGL/Texture3DOpenGL.h
 )
 
 if (WIN32)
