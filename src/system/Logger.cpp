@@ -53,15 +53,17 @@ void Logger::Error(const string& message) {
 
 string Logger::GetCurrentTime() const {
 	time_t t = time(0);
-	struct tm* now = localtime(&t);
+	struct tm now;
+    localtime_s(&now, &t);
+
 	string currentTime = "";
 	char hour[3];
 	char mins[3];
 	char secs[3];
 
-	sprintf(hour, "%02d", now->tm_hour);
-	sprintf(mins, "%02d", now->tm_min);
-	sprintf(secs, "%02d", now->tm_sec);
+	sprintf_s(hour, 3, "%02d", now.tm_hour);
+	sprintf_s(mins, 3, "%02d", now.tm_min);
+	sprintf_s(secs, 3, "%02d", now.tm_sec);
 
 	currentTime = string(hour) + ":" + string(mins) + ":" + string(secs);
 	return currentTime;

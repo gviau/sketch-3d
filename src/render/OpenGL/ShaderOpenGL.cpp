@@ -40,6 +40,11 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 	// Create the vertex shader
 	Logger::GetInstance()->Debug("Vertex shader creation");
 	const char* vertexFile = ReadShader(vertexFilename);
+    if (vertexFile == nullptr) {
+        Logger::GetInstance()->Error("Couldn't read vertex shader file " + vertexFilename);
+        return;
+    }
+
 	glShaderSource(vertex, 1, &vertexFile, NULL);
 	glCompileShader(vertex);
 	glAttachShader(program_, vertex);
@@ -48,6 +53,11 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 	// Create the fragment shader
 	Logger::GetInstance()->Debug("Fragment shader creation");
 	const char* fragmentFile = ReadShader(fragmentFilename);
+    if (fragmentFile == nullptr) {
+        Logger::GetInstance()->Error("Couldn't read fragment shader file " + fragmentFilename);
+        return;
+    }
+
 	glShaderSource(fragment, 1, &fragmentFile, NULL);
 	glCompileShader(fragment);
 	glAttachShader(program_, fragment);
@@ -197,9 +207,10 @@ bool ShaderOpenGL::SelectSubroutine(const string& subroutine, ShaderType_t type)
 
 char* ShaderOpenGL::ReadShader(const string& filename) {
     char* content = NULL;
-	FILE* fp = fopen(filename.c_str(), "r");
+	FILE* fp;
+    errno_t err = fopen_s(&fp, filename.c_str(), "r");
 
-	if (fp == NULL) {
+	if (err != 0) {
 		Logger::GetInstance()->Error("Can't open file : " + filename);
 	} else {
 		fseek( fp, 0, SEEK_END );
@@ -211,7 +222,9 @@ char* ShaderOpenGL::ReadShader(const string& filename) {
 			content[size] = '\0';
 		}
 
-		fclose(fp);
+        if (fp != nullptr) {
+		    fclose(fp);
+        }
 	}
 
     return content;
