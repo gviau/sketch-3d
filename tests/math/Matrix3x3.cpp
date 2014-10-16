@@ -2,6 +2,7 @@
 
 #include "math/Constants.h"
 #include "math/Matrix3x3.h"
+#include "math/Vector2.h"
 #include "math/Vector3.h"
 
 using namespace Sketch3D;
@@ -18,6 +19,16 @@ BOOST_AUTO_TEST_CASE(test_3x3_transpose)
                 5.0f, 1.0f, 0.0f,
                 10.0f, 0.0f, 1.0f);
     BOOST_REQUIRE(m.Transpose() == t);
+}
+
+BOOST_AUTO_TEST_CASE(test_3x3_translation)
+{
+    Matrix3x3 m;
+    m.Translate(Vector2(5.0f, 10.0f));
+
+    Vector2 v(0.0f, 0.0f);
+
+    BOOST_REQUIRE(m * v == Vector3(5.0f, 10.0f, 1.0f));
 }
 
 BOOST_AUTO_TEST_CASE(test_3x3_rotation_around_x)
@@ -76,6 +87,16 @@ BOOST_AUTO_TEST_CASE(test_3x3_multiple_rotations)
 
 BOOST_AUTO_TEST_CASE(test_3x3_rotate_around_axis)
 {
+}
+
+BOOST_AUTO_TEST_CASE(test_3x3_scale)
+{
+    Matrix3x3 m;
+    Vector3 scale(2.0f, 2.0f, 2.0f);
+    m.Scale(scale);
+
+    Vector3 v = Vector3::ONE;
+    BOOST_REQUIRE(m * v == scale);
 }
 
 BOOST_AUTO_TEST_CASE(test_3x3_matrix_matrix_multiply)

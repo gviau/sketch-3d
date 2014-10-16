@@ -2,6 +2,7 @@
 
 #include "math/Constants.h"
 #include "math/Matrix4x4.h"
+#include "math/Vector3.h"
 #include "math/Vector4.h"
 
 using namespace Sketch3D;
@@ -20,6 +21,17 @@ BOOST_AUTO_TEST_CASE(test_4x4_transpose)
                 10.0f, 0.0f, 1.0f, 0.0f,
                 15.0f, 0.0f, 0.0f, 1.0f);
     BOOST_REQUIRE(m.Transpose() == t);
+}
+
+BOOST_AUTO_TEST_CASE(test_4x4_translation)
+{
+    Matrix4x4 m;
+    Vector3 translation(5.0f, 10.0f, 15.0f);
+    m.Translate(translation);
+
+    Vector3 v = Vector3::ZERO;
+
+    BOOST_REQUIRE(m * v == Vector4(5.0f, 10.0f, 15.0f));
 }
 
 BOOST_AUTO_TEST_CASE(test_4x4_rotation_around_x)
@@ -78,6 +90,15 @@ BOOST_AUTO_TEST_CASE(test_4x4_multiple_rotations)
 
 BOOST_AUTO_TEST_CASE(test_4x4_rotate_around_axis)
 {
+}
+
+BOOST_AUTO_TEST_CASE(test_4x4_scale)
+{
+    Matrix4x4 m;
+    m.Scale(Vector3(2.0f, 2.0f, 2.0f));
+
+    Vector3 v = Vector3::ONE;
+    BOOST_REQUIRE(m * v == Vector4(2.0f, 2.0f, 2.0f));
 }
 
 BOOST_AUTO_TEST_CASE(test_4x4_matrix_matrix_multiply)
