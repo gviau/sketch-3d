@@ -81,9 +81,21 @@ class Mesh {
                                 Mesh(const string& filename, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
+         * Copy constructor
+         * @param src The mesh to copy
+         */
+                                Mesh(const Mesh& mesh);
+
+        /**
          * Destructor - release the buffer objects
          */
                                ~Mesh();
+
+        /**
+         * Assignment operator
+         * @param rhs The mesh to assign
+         */
+        Mesh&                   operator= (const Mesh& mesh);
 
         /**
          * Load the model from a file
@@ -126,6 +138,11 @@ class Mesh {
 		unsigned int*	        vbo_;		/**< Vertex buffer objects */
 		unsigned int*	        ibo_;		/**< Index buffer objects */
 		unsigned int*   	    vao_;		/**< Vertex array objects */
+
+        /**
+         * Free the mesh memory
+         */
+        void                    FreeMeshMemory();
 };
 
 }

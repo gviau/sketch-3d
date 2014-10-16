@@ -5,6 +5,7 @@
 #include "render/Texture2D.h"
 #include "render/TextureManager.h"
 #include "system/Logger.h"
+#include "system/Utils.h"
 
 #include "render/OpenGL/gl/glew.h"
 #include <gl/GL.h>
@@ -30,38 +31,38 @@ Mesh::Mesh(const string& filename, MeshType_t meshType) : meshType_(MESH_TYPE_ST
     Initialize(meshType);
 }
 
-Mesh::~Mesh() {
-    delete importer_;
-
-    if (surfaces_.size() > 0) {
-        if (!fromCache_) {
-            for (size_t i = 0; i < surfaces_.size(); i++) {
-                ModelSurface_t& model = surfaces_[i];
-                delete[] model.geometry->vertices;
-                delete[] model.geometry->normals;
-                delete[] model.geometry->texCoords;
-                delete[] model.geometry->tangents;
-                delete[] model.geometry->indices;
-
-                for (size_t j = 0; j < model.geometry->numTextures; j++) {
-                    if (TextureManager::GetInstance()->CheckIfTextureLoaded(model.geometry->textures[j]->GetFilename())) {
-                        TextureManager::GetInstance()->RemoveReferenceFromCache(model.geometry->textures[j]->GetFilename());
-                    }
-                }
-                delete[] model.geometry->textures;
-            }
-        } else {
-            ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
-        }
-
-        glDeleteBuffers(surfaces_.size(), vbo_);
-        glDeleteBuffers(surfaces_.size(), ibo_);
-        glDeleteVertexArrays(surfaces_.size(), vao_);
-
-        delete[] vbo_;
-        delete[] ibo_;
-        delete[] vao_;
+Mesh::Mesh(const Mesh& src) : meshType_(src.meshType_), filename_(src.filename_), fromCache_(false), importer_(nullptr),
+        vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+{
+    if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+        Load(filename_, meshType_);
+        Initialize(meshType_);
     }
+}
+
+Mesh::~Mesh() {
+    FreeMeshMemory();
+}
+
+Mesh& Mesh::operator= (const Mesh& rhs) {
+    if (this != &rhs) {
+        FreeMeshMemory();
+
+        meshType_ = rhs.meshType_;
+        filename_ = rhs.filename_;
+        fromCache_ = false;
+        importer_ = nullptr;
+        vbo_ = nullptr;
+        ibo_ = nullptr;
+        vao_ = nullptr;
+
+        if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+            Load(filename_, meshType_);
+            Initialize(meshType_);
+        }
+    }
+
+    return *this;
 }
 
 void Mesh::Load(const string& filename, MeshType_t meshType) {
@@ -105,6 +106,21 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     delete importer_;
     importer_ = new Assimp::Importer;
     const aiScene* scene = importer_->ReadFile(filename, aiProcessPreset_TargetRealtime_Fast);
+    if (scene == nullptr) {
+        Logger::GetInstance()->Error("Couldn't load mesh " + filename);
+        delete importer_;
+        importer_ = nullptr;
+        return;
+    }
+
+    // Retrive the path from which the mesh was loaded
+    vector<string> tokens = Tokenize(filename, '/');
+    string meshPath = "";
+    if (tokens.size() > 0 ) {
+        for (size_t i = 0; i < tokens.size() - 1; i++) {
+            meshPath += tokens[i] + "/";
+        }
+    }
 
     queue<const aiNode*> nodes;
     nodes.push(scene->mRootNode);
@@ -190,7 +206,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
                     aiString textureName;
                     material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(textureName.C_Str());
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
                     surface->textures[j] = texture;
                 }
             }
@@ -396,6 +412,44 @@ void Mesh::UpdateMeshData() const {
 void Mesh::GetRenderInfo(unsigned int*& bufferObjects, vector<ModelSurface_t>& surfaces) const {
     bufferObjects = vao_;
     surfaces = surfaces_;
+}
+
+void Mesh::FreeMeshMemory() {
+    delete importer_;
+
+    if (surfaces_.size() > 0) {
+        if (!fromCache_) {
+            for (size_t i = 0; i < surfaces_.size(); i++) {
+                ModelSurface_t& model = surfaces_[i];
+                delete[] model.geometry->vertices;
+                delete[] model.geometry->normals;
+                delete[] model.geometry->texCoords;
+                delete[] model.geometry->tangents;
+                delete[] model.geometry->indices;
+
+                for (size_t j = 0; j < model.geometry->numTextures; j++) {
+                    Texture2D* texture = model.geometry->textures[j];
+
+                    if (texture != nullptr) {
+                        if (TextureManager::GetInstance()->CheckIfTextureLoaded(texture->GetFilename())) {
+                            TextureManager::GetInstance()->RemoveReferenceFromCache(texture->GetFilename());
+                        }
+                    }
+                }
+                delete[] model.geometry->textures;
+            }
+        } else {
+            ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
+        }
+
+        glDeleteBuffers(surfaces_.size(), vbo_);
+        glDeleteBuffers(surfaces_.size(), ibo_);
+        glDeleteVertexArrays(surfaces_.size(), vao_);
+
+        delete[] vbo_;
+        delete[] ibo_;
+        delete[] vao_;
+    }
 }
 
 }
