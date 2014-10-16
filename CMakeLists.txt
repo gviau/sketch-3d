@@ -3,7 +3,12 @@ cmake_minimum_required (VERSION 2.8)
 set (
     CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
-    "${CMAKE_SOURCE_DIR}/CMakeModules/"
+    "${CMAKE_SOURCE_DIR}/CMakeModules/Packages"
+)
+
+set (
+	SKETCH3D_TEMPLATES_PATH
+	"${CMAKE_SOURCE_DIR}/CMakeModules/Templates"
 )
 
 set (Boost_USE_STATIC_LIBS OFF)
