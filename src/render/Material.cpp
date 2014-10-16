@@ -2,7 +2,6 @@
 
 #include "render/Mesh.h"
 #include "render/Shader.h"
-#include "render/Texture2D.h"
 
 #include "system/Logger.h"
 
@@ -15,8 +14,10 @@ void Material::SetShader(Shader* shader) {
 	shader_ = shader;
 }
 
-void Material::SetTextures(vector<vector<Texture2D*>>*& textures) {
-    textures_ = textures;
+bool Material::AddTexture(const string& textureName, Texture* texture) {
+    bool firstTexture = (textures_.find(textureName) == textures_.end());
+    textures_[textureName] = texture;
+    return firstTexture;
 }
 
 void Material::SetTransluencyType(TransluencyType_t type) {
@@ -27,7 +28,7 @@ Shader* Material::GetShader() const {
 	return shader_;
 }
 
-const vector<vector<Texture2D*>>* Material::GetTextures() const {
+const map<string, Texture*>& Material::GetTextures() const {
     return textures_;
 }
 

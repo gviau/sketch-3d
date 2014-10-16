@@ -1,7 +1,8 @@
 #ifndef SKETCH_3D_MATERIAL_H
 #define SKETCH_3D_MATERIAL_H
 
-#include <vector>
+#include <map>
+#include <string>
 using namespace std;
 
 namespace Sketch3D {
@@ -9,16 +10,13 @@ namespace Sketch3D {
 // Forward declarations
 class Mesh;
 class Shader;
-class Texture2D;
+class Texture;
 
 enum TransluencyType_t {
     TRANSLUENCY_TYPE_OPAQUE,
     TRANSLUENCY_TYPE_ADDITIVE,
     TRANSLUENCY_TYPE_SUBTRACTIVE
 };
-
-// TODO
-// support more than one textures per mesh
 
 /**
  * @class Material
@@ -34,17 +32,25 @@ class Material {
 		 */
 					                        Material(Shader* shader);
 
+        /**
+         * Add a texture mapped with a name for the shader. Those textures will be used on every surface.
+         * This allows a material to specify special textures that may not be part of the original mesh.
+         * @param textureName The name to give to this texture to reference it in the shader
+         * @param texture The texture to use
+         * @return false if the texture that the user added overwritted a previous texture with the same name, true otherwise
+         */
+        bool                                AddTexture(const string& textureName, Texture* texture);
+
 		void		                        SetShader(Shader* shader);
-	    void                                SetTextures(vector<vector<Texture2D*>>*& textures);
         void                                SetTransluencyType(TransluencyType_t type);
 
+        const map<string, Texture*>&        GetTextures() const;
 		Shader*		                        GetShader() const;
-        const vector<vector<Texture2D*>>*   GetTextures() const;
         TransluencyType_t                   GetTransluencyType() const;
 
 	private:
+        map<string, Texture*>               textures_;  /**< Special texture to set for this material */
 		Shader*		                        shader_;	/**< Shader used by the material */
-        vector<vector<Texture2D*>>*         textures_;  /**< Textures used to render a mesh. Those are ordered to go with a specific mesh */
         TransluencyType_t                   transluencyType_;   /**< The transluency type for this material */
 };
 
