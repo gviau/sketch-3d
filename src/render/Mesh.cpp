@@ -105,7 +105,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     // Load if not present in cache and cache it for future loads
     delete importer_;
     importer_ = new Assimp::Importer;
-    const aiScene* scene = importer_->ReadFile(filename, aiProcessPreset_TargetRealtime_Fast);
+    const aiScene* scene = importer_->ReadFile(filename, aiProcessPreset_TargetRealtime_Fast | aiProcess_FixInfacingNormals);
     if (scene == nullptr) {
         Logger::GetInstance()->Error("Couldn't load mesh " + filename);
         delete importer_;
