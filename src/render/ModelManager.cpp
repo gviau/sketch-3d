@@ -1,5 +1,7 @@
 #include "render/ModelManager.h"
 
+#include "system/Logger.h"
+
 namespace Sketch3D {
 
 ModelManager ModelManager::instance_;
@@ -21,6 +23,8 @@ ModelManager::~ModelManager() {
             delete[] model.geometry->indices;
             delete[] model.geometry->textures;
         }
+
+        Logger::GetInstance()->Info("Model \"" + it->first + "\" freed");
     }
 }
 

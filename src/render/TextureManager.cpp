@@ -1,6 +1,7 @@
 #include "render/TextureManager.h"
 
 #include "render/Texture2D.h"
+#include "system/Logger.h"
 
 namespace Sketch3D {
 
@@ -13,6 +14,7 @@ TextureManager::~TextureManager() {
     CacheMap_t::iterator it = cachedTextures_.begin();
     for ( ; it != cachedTextures_.end(); ++it) {
         delete it->second.second;
+        Logger::GetInstance()->Info("Image \"" + it->first + "\" freed");
     }
 }
 
