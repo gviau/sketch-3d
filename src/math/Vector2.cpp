@@ -39,6 +39,10 @@ void Vector2::Normalize() {
     y /= f;
 }
 
+float Vector2::Dot(const Vector2& v) const {
+    return x * v.x + y * v.y;
+}
+
 Vector2 Vector2::Perpendicular() const {
     return Vector2(-y, x);
 }
