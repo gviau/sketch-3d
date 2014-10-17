@@ -26,7 +26,7 @@ void shadeWithShadow() {
 	float shadow = 0.0;
 	vec3 light = vec3(0.0);
 
-	float lambert = max(dot(N, -L), 0.0);
+	float lambert = max(dot(N, L), 0.0);
 
 	if (lambert > 0.0) {
 		light += lambert * light_color.xyz;
@@ -42,8 +42,8 @@ void shadeWithShadow() {
 	shadow += textureProjOffset(shadowMap, shadow_coord, ivec2( 1, -1));
 	shadow *= 0.25;
 
-	vec3 textureColor = pow(texture(texture0, uv).xyz, vec3(1.0/2.2));
-	color = vec4(pow(textureColor * light * shadow + vec3(0.1, 0.1, 0.1), vec3(2.2)), 1.0);
+	vec3 textureColor = texture(texture0, uv).xyz;
+	color = vec4(textureColor * light * shadow + vec3(0.1, 0.1, 0.1), 1.0);
 }
 
 subroutine (RenderPassType)

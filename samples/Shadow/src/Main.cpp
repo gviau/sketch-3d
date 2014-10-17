@@ -30,7 +30,7 @@ using namespace std;
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
-    Window window("Test", 1024, 768, true);
+    Window window("Sample_Shadow", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
@@ -74,7 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // The jeep mesh is not oriented correctly for our needs
     Quaternion orientation;
     orientation.MakeFromAngleAxis(-PI_OVER_2, Vector3::RIGHT);
-    
+
     jeepNode1.SetOrientation(orientation);
     Renderer::GetInstance()->GetSceneTree().AddChildren(&jeepNode1);
 
@@ -102,7 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     surface.textures = new Texture2D* [surface.numTextures];
     
     surface.vertices[0] = Vector3(-100.0f, 0.0f, -100.0f); surface.vertices[1] = Vector3(-100.0f, 0.0f, 100.0f); surface.vertices[2] = Vector3(100.0f, 0.0f, 100.0f); surface.vertices[3] = Vector3(100.0f, 0.0f, -100.0f);
-    surface.normals[0] = surface.normals[1] = surface.normals[2] = surface.normals[3] = -Vector3::UP;
+    surface.normals[0] = surface.normals[1] = surface.normals[2] = surface.normals[3] = Vector3::UP;
     surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
     surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
     surface.textures[0] = Renderer::GetInstance()->CreateTexture2DFromFile("Media/tiled.jpg");
@@ -126,8 +126,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     Vector4 lightColors[4];
     Vector3 newLightPositions[4];
 
-    newLightPositions[0] = lightPositions[0] = Vector3(-40.0f, 15.0f, -30.0f);
-    newLightPositions[1] = lightPositions[1] = Vector3(15.0f, 20.0f, 15.0f);
+    newLightPositions[0] = lightPositions[0] = Vector3(15.0f, 20.0f, 15.0f);
+    newLightPositions[1] = lightPositions[1] = Vector3(-40.0f, 15.0f, -30.0f);
     newLightPositions[2] = lightPositions[2] = Vector3(15.0f, 30.0f, -20.0f);
     newLightPositions[3] = lightPositions[3] = Vector3(-20.0f, 15.0f, 20.0f);
     lightColors[0] = Vector4(1.0f, 1.0f, 1.0f, 100.0f);
@@ -161,7 +161,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         }
 
         // Update the lights' positions
-        // UpdateLights(t, lightPositions, newLightPositions);
+        UpdateLights(t, lightPositions, newLightPositions);
 
         // First, we render from each light's perspective and record the depth in their respective shadow map
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
@@ -169,6 +169,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
         for (size_t i = 0; i < NUM_LIGHTS; i++) {
             shadowMaps[i]->Bind();
+            Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(newLightPositions[i], Vector3::ZERO, Vector3::UP);
             Renderer::GetInstance()->Clear();
             Renderer::GetInstance()->Render();
@@ -217,7 +218,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]) {
     for (size_t i = 0; i < NUM_LIGHTS; i++) {
         float direction = (i % 2 == 0) ? 1.0f : -1.0f;
-        newLightPositions[i].x = direction * 25.0f * float(cos(t));
-        newLightPositions[i].z = direction * 25.0f * float(sin(t));
+        newLightPositions[i].x = direction * 75.0f * float(cos(t / (i + 1)));
+        newLightPositions[i].z = direction * 75.0f * float(sin(t / (i + 1)));
     }
 }

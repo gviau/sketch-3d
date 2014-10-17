@@ -17,8 +17,7 @@ if (MSVC)
 	)
 endif ()
 
-set(HEADER_FILES include/Shadow.h)
-set(SOURCE_FILES src/Shadow.cpp)
+set(SOURCE_FILES src/Main.cpp)
 include_directories(include)
 
 include_directories(../../include)
