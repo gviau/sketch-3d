@@ -12,9 +12,12 @@ TextureManager::TextureManager() {
 
 TextureManager::~TextureManager() {
     CacheMap_t::iterator it = cachedTextures_.begin();
-    for ( ; it != cachedTextures_.end(); ++it) {
-        delete it->second.second;
-        Logger::GetInstance()->Info("Image \"" + it->first + "\" freed");
+    for ( ; it != cachedTextures_.end(); ) {
+        string filename = it->first;
+        Texture2D* texture = it->second.second;
+        cachedTextures_.erase(it++);
+        delete texture;
+        Logger::GetInstance()->Info("Image \"" + filename + "\" freed");
     }
 }
 
@@ -40,6 +43,10 @@ Texture2D* TextureManager::LoadFromCache(const string& filename) {
 }
 
 void TextureManager::RemoveReferenceFromCache(const string& filename) {
+    if (!CheckIfTextureLoaded(filename)) {
+        return;
+    }
+
     cachedTextures_[filename].first -= 1;
     if (cachedTextures_[filename].first == 0) {
         delete cachedTextures_[filename].second;
