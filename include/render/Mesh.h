@@ -75,10 +75,16 @@ class Mesh {
 
 		/**
 		 * Constructor. Read a mesh from a file and load the data in memory
-		 * @param filename The name of the file containing the model data
-         * @param meshType The type of mesh that will be rendered, static or dynamic
+         * @param filename The name of the file from which the mesh will be loaded
+         * @param useNormals If set to true, this will use the normal founds in the mesh file for rendering.
+         * If normals are not present, it will generate them
+         * @param useTextureCoordinates If set to true, this will use the texture coordinates found in the mesh file for rendering.
+         * @param useTangents If set to true, this will use the tangents found in the mesh file for rendering.
+         * If tangents are not present, it will generate them
+         * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
 		 */
-                                Mesh(const string& filename, MeshType_t meshType=MESH_TYPE_STATIC);
+                                Mesh(const string& filename, bool useNormals=false, bool useTextureCoordinates=false,
+                                     bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * Copy constructor
@@ -99,9 +105,16 @@ class Mesh {
 
         /**
          * Load the model from a file
-         * @param filename
+         * @param filename The name of the file from which the mesh will be loaded
+         * @param useNormals If set to true, this will use the normal founds in the mesh file for rendering.
+         * If normals are not present, it will generate them
+         * @param useTextureCoordinates If set to true, this will use the texture coordinates found in the mesh file for rendering.
+         * @param useTangents If set to true, this will use the tangents found in the mesh file for rendering.
+         * If tangents are not present, it will generate them
+         * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-        void                    Load(const string& filename, MeshType_t meshType=MESH_TYPE_STATIC);
+        void                    Load(const string& filename, bool useNormals=false, bool useTextureCoordinates=false,
+                                     bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * Add a model surface to the mesh
@@ -133,6 +146,7 @@ class Mesh {
         string                  filename_;  /**< The name of the file loaded, if we loaded it from a file */
         bool                    fromCache_; /**< Set to true if the model is cached, false otherwise */
         Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
+        char                    loadedProperties_;  /**< This is used for copying mesh */
 
 		// TEMP
 		unsigned int*	        vbo_;		/**< Vertex buffer objects */

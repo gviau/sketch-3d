@@ -20,22 +20,31 @@
 
 namespace Sketch3D {
 
+#define LOADED_MESH_FROM_FILE           0x01
+#define MESH_USES_NORMALS               0x02
+#define MESH_USES_TEXTURE_COORDINATES   0x04
+#define MESH_USES_USES_TANGENTS         0x08
+
 Mesh::Mesh() : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
 {
 }
 
-Mesh::Mesh(const string& filename, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr),
-        vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+Mesh::Mesh(const string& filename, bool useNormals, bool useTextureCoordinates, bool useTangents, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC),
+        filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr), loadedProperties_(0)
 {
-    Load(filename, meshType);
+    Load(filename, useNormals, useTextureCoordinates, useTangents, meshType);
     Initialize(meshType);
 }
 
 Mesh::Mesh(const Mesh& src) : meshType_(src.meshType_), filename_(src.filename_), fromCache_(false), importer_(nullptr),
-        vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+        vbo_(nullptr), ibo_(nullptr), vao_(nullptr), loadedProperties_(src.loadedProperties_)
 {
-    if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-        Load(filename_, meshType_);
+    if (((loadedProperties_ & LOADED_MESH_FROM_FILE) != 0) && ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+        bool useNormals = ((loadedProperties_ & MESH_USES_NORMALS) != 0);
+        bool useTextureCoordinates = ((loadedProperties_ & MESH_USES_TEXTURE_COORDINATES) != 0);
+        bool useTangents = ((loadedProperties_ & MESH_USES_USES_TANGENTS) != 0);
+
+        Load(filename_, useNormals, useTextureCoordinates, useTangents, meshType_);
         Initialize(meshType_);
     }
 }
@@ -55,9 +64,14 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
         vbo_ = nullptr;
         ibo_ = nullptr;
         vao_ = nullptr;
+        loadedProperties_ = rhs.loadedProperties_;
 
-        if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-            Load(filename_, meshType_);
+        if (((loadedProperties_ & LOADED_MESH_FROM_FILE) != 0) && ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+            bool useNormals = ((loadedProperties_ & MESH_USES_NORMALS) != 0);
+            bool useTextureCoordinates = ((loadedProperties_ & MESH_USES_TEXTURE_COORDINATES) != 0);
+            bool useTangents = ((loadedProperties_ & MESH_USES_USES_TANGENTS) != 0);
+
+            Load(filename_, useNormals, useTextureCoordinates, useTangents, meshType_);
             Initialize(meshType_);
         }
     }
@@ -65,7 +79,7 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
     return *this;
 }
 
-void Mesh::Load(const string& filename, MeshType_t meshType) {
+void Mesh::Load(const string& filename, bool useNormals, bool useTextureCoordinates, bool useTangents, MeshType_t meshType) {
     if (filename == filename_) {
         return;
     }
@@ -105,12 +119,25 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     // Load if not present in cache and cache it for future loads
     delete importer_;
     importer_ = new Assimp::Importer;
-    const aiScene* scene = importer_->ReadFile(filename, aiProcessPreset_TargetRealtime_Fast | aiProcess_FixInfacingNormals);
+    unsigned int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_SortByPType;
+    if (useNormals) {
+        flags |= aiProcess_GenNormals | aiProcess_FixInfacingNormals;
+    }
+
+    if (useTextureCoordinates) {
+        flags |= aiProcess_GenUVCoords;
+    }
+
+    const aiScene* scene = importer_->ReadFile(filename, flags);
     if (scene == nullptr) {
         Logger::GetInstance()->Error("Couldn't load mesh " + filename);
         delete importer_;
         importer_ = nullptr;
         return;
+    }
+
+    if (useTangents) {
+        importer_->ApplyPostProcessing(aiProcess_CalcTangentSpace);
     }
 
     // Retrive the path from which the mesh was loaded
@@ -146,7 +173,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
                 }
             }
 
-            if (mesh->HasNormals()) {
+            if (useNormals && mesh->HasNormals()) {
                 surface->numNormals = numVertices;
                 surface->normals = new Vector3[numVertices];
 
@@ -158,7 +185,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
                 }
             }
 
-            if (mesh->HasTextureCoords(0)) {
+            if (useTextureCoordinates && mesh->HasTextureCoords(0)) {
                 surface->numTexCoords = numVertices;
                 surface->texCoords = new Vector2[numVertices];
 
@@ -169,7 +196,7 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
                 }
             }
 
-            if (mesh->HasTangentsAndBitangents()) {
+            if (useTangents && mesh->HasTangentsAndBitangents()) {
                 surface->numTangents = numVertices;
                 surface->tangents = new Vector3[numVertices];
 
@@ -227,6 +254,19 @@ void Mesh::Load(const string& filename, MeshType_t meshType) {
     filename_ = filename;
     Initialize(meshType);
     fromCache_ = true;
+
+    loadedProperties_ = LOADED_MESH_FROM_FILE;
+    if (useNormals) {
+        loadedProperties_ |= MESH_USES_NORMALS;
+    }
+
+    if (useTextureCoordinates) {
+        loadedProperties_ |= MESH_USES_TEXTURE_COORDINATES;
+    }
+
+    if (useTangents) {
+        loadedProperties_ |= MESH_USES_USES_TANGENTS;
+    }
 
     Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
 }
