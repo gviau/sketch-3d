@@ -66,7 +66,7 @@ class Texture {
          * @param format The format to use
 		 */
 						Texture(unsigned int width, unsigned int height,
-								FilterMode_t filterMode=FILTER_MODE_NEAREST,
+								FilterMode_t filterMode=FILTER_MODE_LINEAR,
 								WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 								TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 

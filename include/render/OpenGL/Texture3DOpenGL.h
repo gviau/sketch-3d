@@ -30,7 +30,7 @@ class Texture3DOpenGL : public Texture3D {
 		 * @param format The format to use
 		 */
 								Texture3DOpenGL(unsigned int width, unsigned int height, unsigned int depth,
-										        FilterMode_t filterMode=FILTER_MODE_NEAREST,
+										        FilterMode_t filterMode=FILTER_MODE_LINEAR,
 										        WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										        TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
