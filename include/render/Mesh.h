@@ -83,7 +83,7 @@ class Mesh {
          * If tangents are not present, it will generate them
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
 		 */
-                                Mesh(const string& filename, bool useNormals=false, bool useTextureCoordinates=false,
+                                Mesh(const string& filename, bool useNormals=true, bool useTextureCoordinates=true,
                                      bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
@@ -113,7 +113,7 @@ class Mesh {
          * If tangents are not present, it will generate them
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-        void                    Load(const string& filename, bool useNormals=false, bool useTextureCoordinates=false,
+        void                    Load(const string& filename, bool useNormals=true, bool useTextureCoordinates=true,
                                      bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
