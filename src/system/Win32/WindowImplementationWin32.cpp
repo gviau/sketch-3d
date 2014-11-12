@@ -40,6 +40,11 @@ void WindowImplementationWin32::Close() {
 }
 
 void WindowImplementationWin32::ProcessEvents() {
+    MSG msg;
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 }
 
 void WindowImplementationWin32::SetVisible(bool val) {
