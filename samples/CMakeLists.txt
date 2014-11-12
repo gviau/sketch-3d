@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 
 add_subdirectory(BurningPaper)
+add_subdirectory(DeferredShading)
+add_subdirectory(InteractiveWater)
 add_subdirectory(NormalMapping)
 add_subdirectory(ParallaxMapping)
 add_subdirectory(TessendorfOcean)
