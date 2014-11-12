@@ -11,16 +11,17 @@ uniform float normalizationFactor;
 in vec3 normal;
 in vec2 uv;
 in vec3 light_dir;
-in vec3 view;
+in vec3 eye;
 
 out vec4 color;
 
 void main() {
 	vec3 L = normalize(light_dir);
-	vec3 V = normalize(view);
+	vec3 V = normalize(eye);
 	vec3 N = normalize(normal);
 
-	float numLayers = mix(15, 10, abs(dot(N, V)));
+	// Steep relief mapping
+	float numLayers = mix(35, 10, abs(dot(N, V)));
 	float layerHeight = 1.0 / numLayers;
 	float currentLayerHeight = 0.0;
 	vec2 dtex = 0.1 * V.xy / numLayers;
@@ -41,9 +42,10 @@ void main() {
 
 	vec2 newTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 
+	// Get the new normal from the normal map
 	N = normalize(texture(normalTexture, newTexCoords).xyz);
-	//N = normalize(normal);
 
+	// Compute the diffuse and specular colors
 	vec3 light = vec3(0.0);
 	float lambert = max(dot(N, L), 0.0);
 	if (lambert > 0.0) {
@@ -52,5 +54,7 @@ void main() {
 				 pow(max(dot(H, N), 0.0), 75.0) * vec3(1.0);
 	}
 
-	color = vec4(texture(diffuseTexture, newTexCoords).xyz * light, 1.0);
+	// Gamma correction
+	vec3 texColor = pow( texture(diffuseTexture, newTexCoords).xyz, vec3(2.2) );
+	color = vec4( pow( texColor * light, vec3(1.0 / 2.2) ), 1.0);
 }
