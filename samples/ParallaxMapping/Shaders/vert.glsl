@@ -1,7 +1,8 @@
 #version 330
 
 uniform mat4 modelViewProjection;
-uniform mat3 modelView;
+uniform mat4 modelView;
+uniform mat4 view;
 
 layout (location=0) in vec3 in_vertex;
 layout (location=1) in vec3 in_normal;
@@ -11,24 +12,24 @@ layout (location=3) in vec3 in_tangent;
 out vec3 normal;
 out vec2 uv;
 out vec3 light_dir;
-out vec3 view;
+out vec3 eye;
 
 void main() {
-	vec3 norm = normalize(modelView * in_normal);
-	vec3 tangent = normalize(modelView * in_tangent);
+	// Compute the bitangent from the normal and the tangent
+	vec3 norm = normalize(mat3(modelView) * in_normal);
+	vec3 tangent = normalize(mat3(modelView) * in_tangent);
 	vec3 bitangent = normalize(cross(norm, tangent));
-	mat3 tbn = mat3(
-		tangent.x, tangent.y, tangent.z,
-		bitangent.x, bitangent.y, bitangent.z,
-		norm.x, norm.y, norm.z
-	);
 
-	vec3 pos = modelView * in_vertex;
-	vec3 ld = normalize((vec3(1.0, 2.0, 6.0) - pos));
-	light_dir = tbn * ld;
+	// Construct the TBN matrix which will transform points from the camera space to tangent space
+	mat3 tbn = transpose(mat3(
+		tangent,
+		bitangent,
+		norm
+	));
 
-	vec3 v = normalize(-pos);
-	view = tbn * v;
+	vec3 pos = (modelView * vec4(in_vertex, 1.0)).xyz;
+	light_dir = normalize( tbn * ( (view * vec4(2.0, 2.0, -6.0, 1.0)).xyz - pos) );
+	eye = tbn * normalize(-pos);
 
 	normal = norm;
 	uv = in_uv;
