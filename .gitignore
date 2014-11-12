@@ -4,7 +4,6 @@ doc/html
 doc/latex
 CMakeFiles
 Makefile
-*.cmake
 CMakeCache.txt
 bin/
 lib/
