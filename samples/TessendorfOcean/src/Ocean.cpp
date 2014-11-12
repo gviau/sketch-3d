@@ -25,18 +25,20 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     size_t numVertices = numberOfPoints_ * numberOfPoints_;
     oceanSurface_.numVertices = numVertices;
     oceanSurface_.numNormals = numVertices;
+    //oceanSurface_.numTangents = numVertices;
     oceanSurface_.vertices = new Vector3[oceanSurface_.numVertices];
     oceanSurface_.normals = new Vector3[oceanSurface_.numNormals];
+    //oceanSurface_.tangents = new Vector3[oceanSurface_.numTangents];
     initialPositions_.resize(oceanSurface_.numVertices);
 
     Vector2 v;
     size_t idx = 0;
     for (int i = 0; i < numberOfPoints_; i++) {
-        v.x = ((i - numberOfPoints_) / 2.0f) * length_ / numberOfPoints_;
+        v.y = (i - numberOfPoints_ / 2.0f) * length_ / numberOfPoints_;
 
         for (int j = 0; j < numberOfPoints_; j++) {
             idx = i * numberOfPoints_ + j;
-            v.y = ((j - numberOfPoints_) / 2.0f) * length_ / numberOfPoints_;
+            v.x = (j - numberOfPoints_ / 2.0f) * length_ / numberOfPoints_;
 
             oceanSurface_.vertices[idx] = Vector3(v.x, 0.0f, v.y);
             initialPositions_[idx] = Vector2(oceanSurface_.vertices[idx].x, oceanSurface_.vertices[idx].z);
@@ -57,12 +59,12 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             oceanSurface_.indices[idx++] = i + j * numberOfPoints_;
-            oceanSurface_.indices[idx++] = i + j * numberOfPoints_ + 1;
-            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_ + 1;
-
-            oceanSurface_.indices[idx++] = i + j * numberOfPoints_;
-            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_ + 1;
             oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_;
+            oceanSurface_.indices[idx++] = i + j * numberOfPoints_ + 1;
+
+            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_;
+            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_ + 1;
+            oceanSurface_.indices[idx++] = i + j * numberOfPoints_ + 1;
         }
     }
 
@@ -150,10 +152,10 @@ void Ocean::EvaluateWaves(double t) {
     size_t index;
 
     for (int i = 0; i < numberOfPoints_; i++) {
-        k.x = PI * (2.0f * i - numberOfPoints_) / length_;
+        k.y = PI * (2.0f * i - numberOfPoints_) / length_;
 
         for (int j = 0; j < numberOfPoints_; j++) {
-            k.y = PI * (2.0f * j - numberOfPoints_) / length_;
+            k.x = PI * (2.0f * j - numberOfPoints_) / length_;
             kLength = k.Length();
             index = i * numberOfPoints_ + j;
 
@@ -253,7 +255,7 @@ float Ocean::Phillips(int i, int j) const {
     k.x /= kLength;
     k.y /= kLength;
     float kDotW = k.Dot(wind_);
-    float kDotW2 = kDotW * kDotW;
+    float kDotW2 = kDotW * kDotW * kDotW * kDotW * kDotW * kDotW;
 
     float L = windLength_ * windLength_ / gravity_;
     float L2 = L * L;
