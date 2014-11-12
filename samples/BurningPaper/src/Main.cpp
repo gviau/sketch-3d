@@ -10,6 +10,7 @@
 #include <render/Texture2D.h>
 
 #include <system/Window.h>
+#include <system/WindowEvent.h>
 using namespace Sketch3D;
 
 #include <Windows.h>
@@ -68,13 +69,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     float t = 0.0f;
     clock_t begin, end;
 
-    MSG msg;
     while (window.IsOpen()) {
         begin = clock();
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+        WindowEvent windowEvent;
+        if (window.PollEvents(windowEvent)) {
         }
 
         //threshold = powf(1.05, t / 5000.0f);
@@ -89,5 +88,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         t += float(end - begin) / CLOCKS_PER_SEC;
     }
 
-    return msg.wParam;
+    return 0;
 }
