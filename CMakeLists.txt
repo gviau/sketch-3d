@@ -61,6 +61,15 @@ else ()
 	set (MISSING_MODULES ${MISSING_MODULES} "FreeImage")
 endif ()
 
+find_package (OIS)
+
+message (STATUS "OIS found? ${OIS_FOUND}")
+if (OIS_FOUND)
+	message (STATUS "OIS include: ${OIS_INCLUDE_DIR}")
+	message (STATUS "OIS libs debug: ${OIS_LIBRARY_DEBUG}")
+	message (STATUS "OIS libs release: ${OIS_LIBRARY}")
+endif ()
+
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
 endif (MISSING_MODULES)
