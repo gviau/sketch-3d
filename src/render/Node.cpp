@@ -101,9 +101,10 @@ void Node::ImmediateRender() const {
     model[2][3] = position_.z;
 
     Matrix4x4 modelViewProjection = viewProjection * model;
-    Matrix3x3 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
+    Matrix4x4 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
     shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
-    shader->SetUniformMatrix3x3("modelView", modelView);
+    shader->SetUniformMatrix4x4("modelView", modelView);
+    shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
 
     // Get the rendering data
     unsigned int* bufferObjects;

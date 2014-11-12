@@ -39,7 +39,7 @@ void RenderQueue::AddItem(const Node& node, Layer_t layer) {
 	model[2][3] = position.z;
 
     Matrix4x4 fullModelView = Renderer::GetInstance()->GetViewMatrix() * model;
-    Matrix3x3* modelView = new Matrix3x3(fullModelView);
+    Matrix4x4* modelView = new Matrix4x4(fullModelView);
 
     float distanceFromCamera = fullModelView[2][3];
     items_.push_back(new RenderQueueItem(node.GetMesh(), node.GetMaterial(), distanceFromCamera, layer));
@@ -53,7 +53,7 @@ void RenderQueue::AddItem(const Node& node, Layer_t layer) {
     Matrix4x4* uniformModel = new Matrix4x4(model);
 
     item->uniforms_["modelViewProjection"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX4X4, (void*)modelViewProjection);
-    item->uniforms_["modelView"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX3X3, (void*)modelView);
+    item->uniforms_["modelView"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX4X4, (void*)modelView);
     item->uniforms_["model"] = pair<UniformType_t, void*>(UNIFORM_TYPE_MATRIX4X4, (void*)uniformModel);
 
     // TODO add uniforms from material
@@ -112,6 +112,9 @@ void RenderQueue::Render() {
                     break;
             }
         }
+
+        // Set the view matrix to the shader as well
+        shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
 
         // Prepare draw data
 
