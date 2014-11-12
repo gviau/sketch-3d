@@ -16,6 +16,7 @@
 
 #include <system/Logger.h>
 #include <system/Window.h>
+#include <system/WindowEvent.h>
 using namespace Sketch3D;
 
 #include <vector>
@@ -25,7 +26,7 @@ using namespace std;
 
 #include <Windows.h>
 
-#define NUM_LIGHTS 1
+#define NUM_LIGHTS 2
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
 
@@ -146,13 +147,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     clock_t begin;
     clock_t end;
 
-    MSG msg;
     while (window.IsOpen()) {
         begin = clock();
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+        WindowEvent windowEvent;
+        if (window.PollEvents(windowEvent)) {
         }
 
         if (NUM_LIGHTS > 1) {
@@ -161,7 +160,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         }
 
         // Update the lights' positions
-        UpdateLights(t, lightPositions, newLightPositions);
+        // UpdateLights(t, lightPositions, newLightPositions);
 
         // First, we render from each light's perspective and record the depth in their respective shadow map
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
@@ -187,7 +186,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             // to prevent Z-fighting.
             if (i == 1) {
                 Renderer::GetInstance()->EnableDepthWrite(false);
-                Renderer::GetInstance()->SetDepthComparisonFunc(DEPTH_FUNC_LEQUAL);
+                Renderer::GetInstance()->SetDepthComparisonFunc(DEPTH_FUNC_EQUAL);
                 Renderer::GetInstance()->EnableBlending(true);
             }
 
@@ -212,7 +211,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         t += double(end - begin) / CLOCKS_PER_SEC;
     }
 
-    return msg.wParam;
+    return 0;
 }
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]) {
