@@ -7,13 +7,19 @@
 #include <render/Shader.h>
 #include <render/Texture2D.h>
 #include <system/Window.h>
+#include <system/WindowEvent.h>
 using namespace Sketch3D;
 
 #include <string>
+#include <time.h>
 #include <vector>
 using namespace std;
 
 #include <Windows.h>
+
+#ifdef OIS_AVAILABLE
+#include <OIS.h>
+#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
     Window window("Sample_NormalMapping", 1024, 768, true);
@@ -46,17 +52,62 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.0f), Vector3::ZERO);
 
-    MSG msg;
+    // Create the OIS system if present
+#ifdef OIS_AVAILABLE
+
+    size_t windowHandle = (size_t)window.GetHandle();
+
+    OIS::ParamList paramList;
+    paramList.insert(pair<string, string>("WINDOW", to_string(windowHandle)));
+
+    OIS::InputManager* inputManager = OIS::InputManager::createInputSystem(paramList);
+
+    OIS::Keyboard* keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
+#endif
+
+    float angleY = 0.0f;
+    float angleX = 0.0f;
+    float t = 0.0f;
+    clock_t begin, end;
+
     while (window.IsOpen()) {
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+        begin = clock();
+
+        WindowEvent windowEvent;
+        if (window.PollEvents(windowEvent)) {
         }
+
+        // Rotate the sphere
+#ifdef OIS_AVAILABLE
+        keyboard->capture();
+
+        if (keyboard->isKeyDown(OIS::KC_ESCAPE)) {
+            break;
+        }
+
+        if (keyboard->isKeyDown(OIS::KC_A) || keyboard->isKeyDown(OIS::KC_LEFT)) {
+            angleY += t;
+        } else if (keyboard->isKeyDown(OIS::KC_D) || keyboard->isKeyDown(OIS::KC_RIGHT)) {
+            angleY -= t;
+        }
+
+        if (keyboard->isKeyDown(OIS::KC_W) || keyboard->isKeyDown(OIS::KC_UP)) {
+            angleX += t;
+        } else if (keyboard->isKeyDown(OIS::KC_S) || keyboard->isKeyDown(OIS::KC_DOWN)) {
+            angleX -= t;
+        }
+
+        sphereNode.Yaw(angleY);
+        //sphereNode.Pitch(angleX);
+#endif
 
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        end = clock();
+        t = float(end - begin) / (float)CLOCKS_PER_SEC;
     }
 
-    return msg.wParam;
+    return 0;
 }

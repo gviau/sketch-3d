@@ -7,21 +7,51 @@
 #include <render/Shader.h>
 #include <render/Texture2D.h>
 #include <system/Window.h>
+#include <system/WindowEvent.h>
 using namespace Sketch3D;
 
 #include <string>
+#include <time.h>
 #include <vector>
 using namespace std;
+
+#ifdef OIS_AVAILABLE
+#include <OIS.h>
+#endif
 
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
-    Window window("Sample_NormalMapping", 1024, 768, true);
+    Window window("Sample_ParallaxMapping", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the sphere's mesh and generate the tangents
-    Mesh sphereMesh("Media/sphere.obj", true, true, true);
+    //Mesh sphereMesh("Media/sphere.obj", true, true, true);
+    SurfaceTriangles_t surface;
+    surface.numVertices = 4;
+    surface.numNormals = 4;
+    surface.numTexCoords = 4;
+    surface.numTangents = 4;
+    surface.vertices = new Vector3[surface.numVertices];
+    surface.normals = new Vector3[surface.numNormals];
+    surface.texCoords = new Vector2[surface.numTexCoords];
+    surface.tangents = new Vector3[surface.numTangents];
+    surface.vertices[0] = Vector3(-1.0f, -1.0f, 1.0f); surface.vertices[1] = Vector3(-1.0f, 1.0f, 1.0f); surface.vertices[2] = Vector3(1.0f, 1.0f, 1.0f); surface.vertices[3] = Vector3(1.0f, -1.0f, 1.0f);
+    surface.normals[0] = surface.normals[1] = surface.normals[2] = surface.normals[3] = -Vector3::LOOK;
+    surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
+    surface.tangents[0] = surface.tangents[1] = surface.tangents[2] = surface.tangents[3] = Vector3::RIGHT;
+    
+    surface.numIndices = 6;
+    surface.indices = new unsigned short[surface.numIndices];
+    surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
+
+    ModelSurface_t modelSurface;
+    modelSurface.geometry = &surface;
+
+    Mesh mesh;
+    mesh.AddSurface(modelSurface);
+    mesh.Initialize();
 
     // Create the material for the sphere
     vector<string> vertexInputs;
@@ -43,22 +73,74 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // Create the sphere node
     Node sphereNode;
     sphereNode.SetMaterial(&sphereMaterial);
-    sphereNode.SetMesh(&sphereMesh);
+    sphereNode.SetMesh(&mesh);
     Renderer::GetInstance()->GetSceneTree().AddChildren(&sphereNode);
 
-    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.0f), Vector3::ZERO);
+    float posX = 0.0f;
+    float posY = 0.0f;
+    float posZ = -1.0f;
+    float speedX = 1.0f;
+    float speedY = 1.0f;
+    float speedZ = 1.0f;
 
-    MSG msg;
+    // Create the OIS system if present
+#ifdef OIS_AVAILABLE
+
+    size_t windowHandle = (size_t)window.GetHandle();
+
+    OIS::ParamList paramList;
+    paramList.insert(pair<string, string>("WINDOW", to_string(windowHandle)));
+    OIS::InputManager* inputManager = OIS::InputManager::createInputSystem(paramList);
+
+    OIS::Keyboard* keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
+#endif
+
+    float delta = 0.0f;
+    clock_t begin, end;
+
     while (window.IsOpen()) {
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+        begin = clock();
+
+        WindowEvent windowEvent;
+        if (window.PollEvents(windowEvent)) {
         }
+
+        // Handle input if OIS is present
+#ifdef OIS_AVAILABLE
+        keyboard->capture();
+
+        if (keyboard->isKeyDown(OIS::KC_ESCAPE)) {
+            break;
+        }
+
+        if (keyboard->isKeyDown(OIS::KC_W)) {
+            posZ += delta * speedZ;
+        } else if (keyboard->isKeyDown(OIS::KC_S)) {
+            posZ -= delta * speedZ;
+        }
+
+        if (keyboard->isKeyDown(OIS::KC_A)) {
+            posX -= delta * speedX;
+        } else if (keyboard->isKeyDown(OIS::KC_D)) {
+            posX += delta * speedX;
+        }
+
+        if (keyboard->isKeyDown(OIS::KC_Q)) {
+            posY += delta * speedY;
+        } else if (keyboard->isKeyDown(OIS::KC_E)) {
+            posY -= delta * speedY;
+        }
+#endif
+
+        Renderer::GetInstance()->CameraLookAt(Vector3(posX, posY, posZ), Vector3::LOOK);
 
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        end = clock();
+        delta = float(end - begin) / (float)CLOCKS_PER_SEC;
     }
 
-    return msg.wParam;
+    return 0;
 }

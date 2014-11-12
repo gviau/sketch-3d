@@ -39,12 +39,26 @@ add_executable(
 	${HEADER_FILES}
 )
 
-target_link_libraries(
-	Sample_NormalMapping
+set (LINK_LIBRARIES
 	math
 	render
 	system
 	${OPENGL_LIBRARIES}
 	${ASSIMP_LIBRARY}
 	${FreeImage_LIBRARIES}
+)
+
+if (${OIS_FOUND})
+	include_directories(${OIS_INCLUDE_DIR})
+	add_definitions(-DOIS_AVAILABLE)
+	
+	set (LINK_LIBRARIES
+		${LINK_LIBRARIES}
+		${OIS_LIBRARY_DEBUG}
+	)
+endif ()
+
+target_link_libraries(
+	Sample_NormalMapping
+	${LINK_LIBRARIES}
 )
