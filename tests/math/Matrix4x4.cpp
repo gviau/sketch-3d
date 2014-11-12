@@ -23,6 +23,30 @@ BOOST_AUTO_TEST_CASE(test_4x4_transpose)
     BOOST_REQUIRE(m.Transpose() == t);
 }
 
+BOOST_AUTO_TEST_CASE(test_4x4_inverse)
+{
+    Matrix4x4 m = Matrix4x4::IDENTITY;
+    Matrix4x4 inverse = m.Inverse();
+
+    BOOST_REQUIRE(inverse == m);
+
+    m = Matrix4x4(1.0f, 1.0f, 1.0f, 1.0f,
+                  2.0f, 5.0f, 2.0f, 2.0f,
+                  3.0f, 3.0f, 4.0f, 3.0f,
+                  6.0f, 4.0f, 4.0f, 4.0f);
+
+    Matrix4x4 result(-2.0f, 0.0f, 0.0f, 0.5f,
+                     -2.0f / 3.0f, 1.0f / 3.0f, 0.0f, 0.0f,
+                     -3.0f, 0.0f, 1.0f, 0.0f,
+                     20.0f / 3.0f, -1.0f / 3.0f, -1.0f, -0.5f);
+
+    inverse = m.Inverse();
+
+    BOOST_REQUIRE(inverse == result);
+
+    BOOST_REQUIRE(inverse.Transpose() == m.Transpose().Inverse());
+}
+
 BOOST_AUTO_TEST_CASE(test_4x4_translation)
 {
     Matrix4x4 m;

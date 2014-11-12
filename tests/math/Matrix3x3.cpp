@@ -21,6 +21,28 @@ BOOST_AUTO_TEST_CASE(test_3x3_transpose)
     BOOST_REQUIRE(m.Transpose() == t);
 }
 
+BOOST_AUTO_TEST_CASE(test_3x3_inverse)
+{
+    Matrix3x3 m = Matrix3x3::IDENTITY;
+    Matrix3x3 inverse = m.Inverse();
+
+    BOOST_REQUIRE(inverse == m);
+
+    m = Matrix3x3(1.0f, 1.0f, 1.0f,
+                  2.0f, 3.0f, 2.0f,
+                  4.0f, 3.0f, 3.0f);
+
+    Matrix3x3 result(-3.0f, 0.0f, 1.0f,
+                     -2.0f, 1.0f, 0.0f,
+                      6.0f, -1.0f, -1.0f);
+
+    inverse = m.Inverse();
+
+    BOOST_REQUIRE(inverse == result);
+
+    BOOST_REQUIRE(inverse.Transpose() == m.Transpose().Inverse());
+}
+
 BOOST_AUTO_TEST_CASE(test_3x3_translation)
 {
     Matrix3x3 m;

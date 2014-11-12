@@ -58,6 +58,11 @@ class Matrix4x4
         Matrix4x4               Transpose() const;
 
         /**
+         * Return the inverse of this matrix
+         */
+        Matrix4x4               Inverse() const;
+
+        /**
          * Transform this matrix into a translation matrix
          * @param translation A vector representing the translation
          */

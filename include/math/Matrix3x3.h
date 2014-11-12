@@ -59,6 +59,11 @@ class Matrix3x3
         Matrix3x3               Transpose() const;
 
         /**
+         * Return the inverse of this matrix
+         */
+        Matrix3x3               Inverse() const;
+
+        /**
          * Transform this matrix into a translation matrix
          * @param translation A vector representing the translation
          */

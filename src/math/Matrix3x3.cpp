@@ -87,6 +87,39 @@ Matrix3x3 Matrix3x3::Transpose() const
     return Matrix3x3(data);
 }
 
+Matrix3x3 Matrix3x3::Inverse() const {
+    // From OGRE code
+    Matrix3x3 result;
+
+    result[0][0] = data_[1][1] * data_[2][2] - data_[1][2] * data_[2][1];
+    result[0][1] = data_[0][2] * data_[2][1] - data_[0][1] * data_[2][2];
+    result[0][2] = data_[0][1] * data_[1][2] - data_[0][2] * data_[1][1];
+    result[1][0] = data_[1][2] * data_[2][0] - data_[1][0] * data_[2][2];
+    result[1][1] = data_[0][0] * data_[2][2] - data_[0][2] * data_[2][0];
+    result[1][2] = data_[0][2] * data_[1][0] - data_[0][0] * data_[1][2];
+    result[2][0] = data_[1][0] * data_[2][1] - data_[1][1] * data_[2][0];
+    result[2][1] = data_[0][1] * data_[2][0] - data_[0][0] * data_[2][1];
+    result[2][2] = data_[0][0] * data_[1][1] - data_[0][1] * data_[1][0];
+
+    float det = data_[0][0] * result[0][0] +
+                data_[0][1] * result[1][0] +
+                data_[0][2] * result[2][0];
+
+    if (fabs(det) <= EPSILON) {
+        return Matrix4x4::ZERO;
+    }
+
+    float invDet = 1.0f / det;
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            result[i][j] *= invDet;
+        }
+    }
+
+    return result;
+
+}
+
 void Matrix3x3::Translate(const Vector2& translation) {
     *this = Matrix3x3::IDENTITY;
     data_[0][2] = translation.x;
