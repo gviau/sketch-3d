@@ -24,13 +24,17 @@ using namespace Sketch3D;
 #include <time.h>
 using namespace std;
 
-#include <Windows.h>
-
 #define NUM_LIGHTS 2
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
 
+#if defined(__WIN32__) || defined(_WIN32)
+#include <Windows.h>
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+#else
+int main(int argc, char** argv) {
+#endif
     Window window("Sample_Shadow", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
