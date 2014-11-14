@@ -3,7 +3,6 @@
 #include "render/OpenGL/gl/glew.h"
 #include "render/OpenGL/gl/gl.h"
 
-#include "render/Renderer.h"
 #include "render/OpenGL/RenderTextureOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"

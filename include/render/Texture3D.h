@@ -3,6 +3,8 @@
 
 #include "render/Texture.h"
 
+#include <cstdlib>
+
 namespace Sketch3D {
 
 /**

@@ -206,11 +206,10 @@ bool ShaderOpenGL::SelectSubroutine(const string& subroutine, ShaderType_t type)
 }
 
 char* ShaderOpenGL::ReadShader(const string& filename) {
-    char* content = NULL;
-	FILE* fp;
-    errno_t err = fopen_s(&fp, filename.c_str(), "r");
+    char* content = nullptr;
+	FILE* fp = fopen(filename.c_str(), "r");
 
-	if (err != 0) {
+	if (fp == nullptr) {
 		Logger::GetInstance()->Error("Can't open file : " + filename);
 	} else {
 		fseek( fp, 0, SEEK_END );
@@ -222,9 +221,7 @@ char* ShaderOpenGL::ReadShader(const string& filename) {
 			content[size] = '\0';
 		}
 
-        if (fp != nullptr) {
-		    fclose(fp);
-        }
+	    fclose(fp);
 	}
 
     return content;

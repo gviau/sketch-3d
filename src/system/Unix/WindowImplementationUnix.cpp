@@ -41,8 +41,8 @@ WindowImplementationUnix::WindowImplementationUnix(const string& title, unsigned
                             CWColormap | CWEventMask, &attributes);
 
     XClassHint* classHint = XAllocClassHint();
-    classHint->res_name = "sketh-3d";
-    classHint->res_class = "sketch-3d";
+    classHint->res_name = (char*) "sketh-3d";
+    classHint->res_class = (char*) "sketch-3d";
     XSetClassHint(display_, window_, classHint);
     XFree(classHint);
 

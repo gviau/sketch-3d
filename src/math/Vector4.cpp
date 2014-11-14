@@ -135,7 +135,12 @@ Vector4 Vector4::Normalized() const
 
 		result = *pr;
 #elif PLATFORM == PLATFORM_LINUX
-		f = sqrtf(x*x + y*y + z*z);
+		length = sqrtf(x*x + y*y + z*z);
+        if (length != 0.0f) {
+            result.x = x / length;
+            result.y = y / length;
+            result.z = z / length;
+        }
 #endif
 /*
         __m128 u = {x, y, z, 0.0f};
@@ -205,7 +210,12 @@ void Vector4::Normalize()
 		(*this) = v;
 
 #elif PLATFORM == PLATFORM_LINUX
-		f = sqrtf(x*x + y*y + z*z);
+		length = sqrtf(x*x + y*y + z*z);
+        if (length != 0.0f) {
+            x /= length;
+            y /= length;
+            z /= length;
+        }
 #endif
 /*
         __m128 u = {x, y, z, 0.0f};

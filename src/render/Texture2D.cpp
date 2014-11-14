@@ -5,6 +5,8 @@
 
 #include <FreeImage.h>
 
+#include <cstring>
+
 namespace Sketch3D {
 
 uint32_t Texture2D::nextAvailableId_ = 0;

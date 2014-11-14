@@ -15,11 +15,11 @@ RenderTextureOpenGL::RenderTextureOpenGL(unsigned int width, unsigned int height
 
 RenderTextureOpenGL::~RenderTextureOpenGL() {
     if (renderbuffer_ != 0) {
-        glDeleteRenderbuffers(1, &renderbuffer_);
+        glDeleteRenderbuffers(1, (const GLuint*) &renderbuffer_);
     }
 
     if (framebuffer_ != 0) {
-        glDeleteFramebuffers(1, &framebuffer_);
+        glDeleteFramebuffers(1, (const GLuint*) &framebuffer_);
     }
 }
 
@@ -31,11 +31,11 @@ bool RenderTextureOpenGL::AddDepthBuffer() {
     }
 
     if (framebuffer_ == 0) {
-        glGenFramebuffers(1, &framebuffer_);
+        glGenFramebuffers(1, (GLuint*) &framebuffer_);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
-    glGenRenderbuffers(1, &renderbuffer_);
+    glGenRenderbuffers(1, (GLuint*) &renderbuffer_);
     glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer_);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer_);
@@ -58,7 +58,7 @@ bool RenderTextureOpenGL::AttachTextureToDepthBuffer(Texture2D* texture) {
     }
 
     if (framebuffer_ == 0) {
-        glGenFramebuffers(1, &framebuffer_);
+        glGenFramebuffers(1, (GLuint*) &framebuffer_);
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
@@ -111,7 +111,7 @@ bool RenderTextureOpenGL::AttachTextures(const vector<Texture2D*>& textures) {
     }
 
     if (framebuffer_ == 0) {
-        glGenFramebuffers(1, &framebuffer_);
+        glGenFramebuffers(1, (GLuint*) &framebuffer_);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
@@ -128,7 +128,7 @@ bool RenderTextureOpenGL::AttachTextures(const vector<Texture2D*>& textures) {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &framebuffer_);
+    glDeleteFramebuffers(1, (const GLuint*) &framebuffer_);
     framebuffer_ = 0;
 
     Logger::GetInstance()->Error("Couldn't create render texture, frame buffer is not complete");

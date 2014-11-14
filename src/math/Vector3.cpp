@@ -116,7 +116,12 @@ Vector3 Vector3::Normalized() const
 			movups	[ecx], xmm2
 		}
 #elif PLATFORM == PLATFORM_LINUX
-		f = sqrtf(x*x + y*y + z*z);
+		length = sqrtf(x*x + y*y + z*z);
+        if (length != 0.0f) {
+            result.x = x / length;
+            result.y = y / length;
+            result.z = z / length;
+        }
 #endif
 	/*
         __m128 u = {x, y, z, 0.0f};
@@ -179,7 +184,10 @@ void Vector3::Normalize()
 			movups	[esi], xmm2
 		}
 #elif PLATFORM == PLATFORM_LINUX
-		f = sqrtf(x*x + y*y + z*z);
+		length = sqrtf(x*x + y*y + z*z);
+        x /= length;
+        y /= length;
+        z /= length;
 #endif
 /*
         __m128 u = {x, y, z, 0.0f};

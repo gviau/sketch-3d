@@ -2,6 +2,7 @@
 #include "render/OpenGL/Unix/RenderContextOpenGLUnix.h"
 
 #include "system/Logger.h"
+#include "system/Window.h"
 
 #include <X11/Xutil.h>
 
@@ -9,17 +10,17 @@
 
 namespace Sketch3D {
 
-RenderContextOpenGLUnix::RenderContextOpenGLUnix(const Window& window) : RenderContextOpenGL(window) {
+RenderContextOpenGLUnix::RenderContextOpenGLUnix()  {
     display_ = XOpenDisplay(NULL);
-    xWindow_ = static_cast< ::Window>(window_.GetHandle());
 }
 
 RenderContextOpenGLUnix::~RenderContextOpenGLUnix() {
 }
 
-bool RenderContextOpenGLUnix::Initialize() {
+bool RenderContextOpenGLUnix::Initialize(Window& window) {
     Logger::GetInstance()->Debug("Initializing OpenGL context");
 
+    xWindow_ = static_cast< ::Window>(window.GetHandle());
     XVisualInfo* visual = NULL;
 
     const GLubyte* name = reinterpret_cast<const GLubyte*>("glXCreateContextAttribsARB");

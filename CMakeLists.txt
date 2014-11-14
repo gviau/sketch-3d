@@ -76,8 +76,7 @@ endif (MISSING_MODULES)
 
 if (WIN32)
 else (WIN32)
-    add_definitions(-Wall -W -ansi)
-    add_definitions(-Wno-long-long -Wno-comments)
+    add_definitions(-std=c++11)
 endif (WIN32)
 
 add_subdirectory (src)

@@ -4,6 +4,7 @@
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 #include "render/SceneTree.h"
+#include "render/Texture.h"
 
 #include <string>
 using namespace std;
@@ -17,8 +18,6 @@ class Shader;
 class Texture2D;
 class Texture3D;
 class Window;
-
-enum TextureFormat_t;
 
 /**
  * @enum BlendingEquation_t

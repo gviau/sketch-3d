@@ -3,7 +3,7 @@
 
 #include "render/Texture3D.h"
 
-#include "gl\glew.h"
+#include "render/OpenGL/gl/glew.h"
 
 namespace Sketch3D {
 

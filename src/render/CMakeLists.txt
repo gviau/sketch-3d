@@ -84,16 +84,17 @@ if (WIN32)
 	source_group("Header Files" FILES ${OPENGL_HEADER})
 elseif (UNIX)
     set(OPENGL_SRC
-        ${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
+        ${OPENGL_SRC}
         ${SRC_PATH}/OpenGL/Unix/RenderContextOpenGLUnix.cpp
     )
 
     set(OPENGL_HEADER
-        ${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
-        ${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h
+        ${OPENGL_HEADER}
         ${HEADER_PATH}/OpenGL/Unix/RenderContextOpenGLUnix.h
     )
 
+    source_group("Source Files" FILES ${OPENGL_SRC})
+    source_group("Header Files" FILES ${OPENGL_HEADER})
 endif ()
 
 include_directories (../../include)

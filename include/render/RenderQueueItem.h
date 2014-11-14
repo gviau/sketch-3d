@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_RENDER_QUEUE_ITEM_H
 #define SKETCH_3D_RENDER_QUEUE_ITEM_H
 
+#include "render/Material.h"
+
 #include <map>
 #include <stdint.h>
 #include <string>
@@ -16,8 +18,6 @@ class Vector3;
 class Vector4;
 class Matrix3x3;
 class Matrix4x4;
-
-enum TransluencyType_t;
 
 enum Layer_t {
     LAYER_GAME,

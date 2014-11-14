@@ -1,6 +1,5 @@
 #include "render/RenderQueueItem.h"
 
-#include "render/Material.h"
 #include "render/Mesh.h"
 #include "render/Shader.h"
 #include "render/Texture2D.h"

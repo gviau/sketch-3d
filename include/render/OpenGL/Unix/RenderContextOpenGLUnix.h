@@ -19,16 +19,15 @@ class RenderContextOpenGLUnix : public RenderContextOpenGL {
     public:
         /**
          * Constructor
-         * @param window The window for which the context will be created
          */
-                        RenderContextOpenGLUnix(const Window& window);
+                        RenderContextOpenGLUnix();
 
         /**
          * Destructr. Free the render context
          */
         virtual        ~RenderContextOpenGLUnix();
 
-        virtual bool    Initialize();
+        virtual bool    Initialize(Window& window);
         virtual void    SwapBuffers();
           
     private:

@@ -8,7 +8,7 @@
 #include "system/Utils.h"
 
 #include "render/OpenGL/gl/glew.h"
-#include <gl/GL.h>
+#include "render/OpenGL/gl/gl.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

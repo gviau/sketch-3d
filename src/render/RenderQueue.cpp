@@ -12,7 +12,7 @@ using namespace std;
 
 // TEMP
 #include "render/OpenGL/gl/glew.h"
-#include <gl/GL.h>
+#include "render/OpenGL/gl/gl.h"
 
 namespace Sketch3D {
 

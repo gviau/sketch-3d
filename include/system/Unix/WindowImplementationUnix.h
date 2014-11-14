@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_WINDOW_IMPLEMENTATION_WIN32_H
 #define SKETCH_3D_WINDOW_IMPLEMENTATION_WIN32_H
 
-#include "system/WindowImplementation.h"a
+#include "system/WindowImplementation.h"
 
 #include <X11/Xlib.h>
 

@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_RENDER_SYSTEM_H
 #define SKETCH_3D_RENDER_SYSTEM_H
 
+#include "render/Renderer.h"
 #include "system/Platform.h"
 #include "system/Window.h"
 #include "system/WindowHandle.h"
@@ -16,13 +17,6 @@ class RenderTexture;
 class Shader;
 class Texture2D;
 class Texture3D;
-
-enum BlendingEquation_t;
-enum BlendingFactor_t;
-enum CullingMethod_t;
-enum DepthFunc_t;
-enum RenderMode_t;
-enum TextureFormat_t;
 
 /**
  * @interface RenderSystem
