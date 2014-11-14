@@ -293,6 +293,13 @@ class Renderer {
          */
         void                SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
 
+        /**
+         * Convert a point in screen space into world space. This function uses the current perspective and view matrix
+         * @param screenPoint A vector representing the point in screen space
+         * @return A vector representing the point in world space
+         */
+        Vector3             ScreenToWorldPoint(const Vector2& point) const;
+
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;
 		const Matrix4x4&	GetViewProjectionMatrix() const;

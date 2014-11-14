@@ -184,6 +184,11 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
         shader->SelectSubroutine("shadeWithShadow", SHADER_TYPE_FRAGMENT);
 
+        // Write only the depth
+        Renderer::GetInstance()->EnableDepthWrite(true);
+        
+        Renderer::GetInstance()->EnableDepthWrite(false);
+
         for (size_t i = 0; i < NUM_LIGHTS; i++) {
             // If there's more than one light, we activate additive blending to accumulate each light contribution in
             // the framebuffer. Moreover, we disable depth writing and set the depth comparison function to less or equal

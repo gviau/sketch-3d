@@ -1,9 +1,11 @@
 #include "render/Renderer.h"
 
 #include "math/Constants.h"
+
 #include "render/OpenGL/RenderSystemOpenGL.h"
 #include "render/Texture2D.h"
 #include "render/TextureManager.h"
+
 #include "system/Logger.h"
 #include "system/Window.h"
 
@@ -217,6 +219,10 @@ void Renderer::SetBlendingEquation(BlendingEquation_t equation) const {
 
 void Renderer::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const {
     renderSystem_->SetBlendingFactor(srcFactor, dstFactor);
+}
+
+Vector3 Renderer::ScreenToWorldPoint(const Vector2& point) const {
+    return renderSystem_->ScreenToWorldPoint(viewProjection_.Inverse(), point);
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {

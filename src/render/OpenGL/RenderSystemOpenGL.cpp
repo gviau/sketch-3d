@@ -50,6 +50,7 @@ bool RenderSystemOpenGL::Initialize() {
 	glViewport(0, 0, width_, height_);
 
 	Renderer::GetInstance()->PerspectiveProjection(45.0f, (float)width_ / (float)height_, 1.0f, 1000.0f);
+    Renderer::GetInstance()->CameraLookAt(Vector3::ZERO, Vector3::LOOK);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

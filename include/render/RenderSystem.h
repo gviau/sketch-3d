@@ -2,6 +2,8 @@
 #define SKETCH_3D_RENDER_SYSTEM_H
 
 #include "render/Renderer.h"
+#include "math/Vector3.h"
+
 #include "system/Platform.h"
 #include "system/Window.h"
 #include "system/WindowHandle.h"
@@ -13,10 +15,12 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
+class Matrix4x4;
 class RenderTexture;
 class Shader;
 class Texture2D;
 class Texture3D;
+class Vector2;
 
 /**
  * @interface RenderSystem
@@ -160,6 +164,14 @@ class RenderSystem {
          * @param dstFactor the factor to use for the destination pixel (the pixel already present in the framebuffer)
          */
         virtual void                    SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const = 0;
+
+        /**
+         * Convert a point in screen space into world space. This function uses the current perspective and view matrix
+         * @param inversedViewProjection The inverse of the view-projection matrix
+         * @param screenPoint A vector representing the point in screen space
+         * @return A vector representing the point in world space
+         */
+        Vector3                         ScreenToWorldPoint(Matrix4x4& inversedViewProjection, const Vector2& point) const;
 
         size_t                          GetWidth() const { return width_; }
         size_t                          GetHeight() const { return height_; }

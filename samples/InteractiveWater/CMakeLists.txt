@@ -7,12 +7,12 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/")
 if (MSVC)
 	configure_file(
 		${SKETCH3D_TEMPLATES_PATH}/VisualStudioUserFile.vcxproj.user.in
-		${CMAKE_CURRENT_BINARY_DIR}/Sample_DeferredShading.vcxproj.user
+		${CMAKE_CURRENT_BINARY_DIR}/Sample_InteractiveWater.vcxproj.user
 		@ONLY
 	)
 	configure_file(
 		${SKETCH3D_TEMPLATES_PATH}/VisualStudioUserFile.vcproj.user.in
-		${CMAKE_CURRENT_BINARY_DIR}/Sample_DeferredShading.vcproj.user
+		${CMAKE_CURRENT_BINARY_DIR}/Sample_InteractiveWater.vcproj.user
 		@ONLY
 	)
 endif ()
@@ -33,7 +33,7 @@ else (WIN32)
 endif (WIN32)
 
 add_executable(
-    Sample_InteractiveWater
+	Sample_InteractiveWater
 	${WIN32_EXECUTABLE}
 	${SOURCE_FILES}
 )
