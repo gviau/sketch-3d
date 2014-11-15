@@ -24,6 +24,10 @@ using namespace Sketch3D;
 #include <time.h>
 using namespace std;
 
+#ifdef OIS_AVAILABLE
+#include <OIS.h>
+#endif
+
 #define NUM_LIGHTS 4
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
@@ -106,7 +110,7 @@ int main(int argc, char** argv) {
     surface.indices = new unsigned short[surface.numIndices];
     surface.textures = new Texture2D* [surface.numTextures];
     
-    surface.vertices[0] = Vector3(-100.0f, 0.0f, -100.0f); surface.vertices[1] = Vector3(-100.0f, 0.0f, 100.0f); surface.vertices[2] = Vector3(100.0f, 0.0f, 100.0f); surface.vertices[3] = Vector3(100.0f, 0.0f, -100.0f);
+    surface.vertices[0] = Vector3(-50.0f, 0.0f, -50.0f); surface.vertices[1] = Vector3(-50.0f, 0.0f, 50.0f); surface.vertices[2] = Vector3(50.0f, 0.0f, 50.0f); surface.vertices[3] = Vector3(50.0f, 0.0f, -50.0f);
     surface.normals[0] = surface.normals[1] = surface.normals[2] = surface.normals[3] = Vector3::UP;
     surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
     surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
@@ -136,9 +140,9 @@ int main(int argc, char** argv) {
     newLightPositions[2] = lightPositions[2] = Vector3(15.0f, 30.0f, -20.0f);
     newLightPositions[3] = lightPositions[3] = Vector3(-20.0f, 15.0f, 20.0f);
     lightColors[0] = Vector4(1.0f, 1.0f, 1.0f, 100.0f);
-    lightColors[1] = Vector4(0.8f, 0.0f, 0.0f, 10.0f);
-    lightColors[2] = Vector4(0.0f, 0.8f, 0.0f, 10.0f);
-    lightColors[3] = Vector4(0.0f, 0.0f, 0.8f, 10.0f);
+    lightColors[1] = Vector4(0.8f, 0.0f, 0.0f, 100.0f);
+    lightColors[2] = Vector4(0.0f, 0.8f, 0.0f, 100.0f);
+    lightColors[3] = Vector4(0.0f, 0.0f, 0.8f, 100.0f);
 
     Matrix4x4 biasMatrix(0.5f, 0.0f, 0.0f, 0.5f,
                          0.0f, 0.5f, 0.0f, 0.5f,
@@ -151,6 +155,19 @@ int main(int argc, char** argv) {
     clock_t begin;
     clock_t end;
 
+    // Initialize OIS if available
+#ifdef OIS_AVAILABLE
+    size_t windowHandle = (size_t)window.GetHandle();
+
+    OIS::ParamList paramList;
+    paramList.insert(pair<string, string>("WINDOW", to_string(windowHandle)));
+    OIS::InputManager* inputManager = OIS::InputManager::createInputSystem(paramList);
+
+    OIS::Keyboard* keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
+#endif
+
+    size_t currentLightNumber = 1;
+
     while (window.IsOpen()) {
         begin = clock();
 
@@ -158,10 +175,23 @@ int main(int argc, char** argv) {
         if (window.PollEvents(windowEvent)) {
         }
 
-        if (NUM_LIGHTS > 1) {
-            Renderer::GetInstance()->EnableDepthWrite(true);
-            Renderer::GetInstance()->SetDepthComparisonFunc(DEPTH_FUNC_LESS);
+        // Movement & change the number of lights
+#ifdef OIS_AVAILABLE
+        keyboard->capture();
+
+        if (keyboard->isKeyDown(OIS::KC_1)) {
+            currentLightNumber = 1;
+        } else if (keyboard->isKeyDown(OIS::KC_2)) {
+            currentLightNumber = 2;
+        } else if (keyboard->isKeyDown(OIS::KC_3)) {
+            currentLightNumber = 3;
+        } else if (keyboard->isKeyDown(OIS::KC_4)) {
+            currentLightNumber = 4;
         }
+#endif
+
+        Renderer::GetInstance()->EnableDepthWrite(true);
+        Renderer::GetInstance()->SetDepthComparisonFunc(DEPTH_FUNC_LESS);
 
         // Update the lights' positions
         UpdateLights(t, lightPositions, newLightPositions);
@@ -170,7 +200,7 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
         shader->SelectSubroutine("recordDepth", SHADER_TYPE_FRAGMENT);
 
-        for (size_t i = 0; i < NUM_LIGHTS; i++) {
+        for (size_t i = 0; i < currentLightNumber; i++) {
             shadowMaps[i]->Bind();
             Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(newLightPositions[i], Vector3::ZERO, Vector3::UP);
@@ -184,7 +214,7 @@ int main(int argc, char** argv) {
         shader->SelectSubroutine("shadeWithShadow", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
 
-        for (size_t i = 0; i < NUM_LIGHTS; i++) {
+        for (size_t i = 0; i < currentLightNumber; i++) {
             // If there's more than one light, we activate additive blending to accumulate each light contribution in
             // the framebuffer. Moreover, we disable depth writing and set the depth comparison function to less or equal
             // to prevent Z-fighting.
@@ -207,7 +237,7 @@ int main(int argc, char** argv) {
 
         Renderer::GetInstance()->EndRender();
 
-        if (NUM_LIGHTS > 1) {
+        if (currentLightNumber > 1) {
             Renderer::GetInstance()->EnableBlending(false);
         }
 
@@ -221,7 +251,7 @@ int main(int argc, char** argv) {
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]) {
     for (size_t i = 0; i < NUM_LIGHTS; i++) {
         float direction = (i % 2 == 0) ? 1.0f : -1.0f;
-        newLightPositions[i].x = direction * 75.0f * float(cos(t / (i + 1)));
-        newLightPositions[i].z = direction * 75.0f * float(sin(t / (i + 1)));
+        newLightPositions[i].x = 75.0f * float(cos(direction * t / (i + 1)));
+        newLightPositions[i].z = 75.0f * float(sin(direction * t / (i + 1)));
     }
 }
