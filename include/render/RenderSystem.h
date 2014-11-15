@@ -101,6 +101,12 @@ class RenderSystem {
         virtual void                    EnableDepthWrite(bool val) const = 0;
 
         /**
+         * Enable or disable color writing.
+         * @param val Enabled if true, disabled otherwise
+         */
+        virtual void                    EnableColorWrite(bool val) const = 0;
+
+        /**
          * Sets the depth compare function to use
          * @param comparison The comparison function to use
          */

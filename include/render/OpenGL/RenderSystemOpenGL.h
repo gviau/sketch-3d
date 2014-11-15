@@ -25,6 +25,7 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void SetViewport(size_t x, size_t y, size_t width, size_t height);
         virtual void EnableDepthTest(bool val) const;
         virtual void EnableDepthWrite(bool val) const;
+        virtual void EnableColorWrite(bool val) const;
         virtual void SetDepthComparisonFunc(DepthFunc_t comparison) const;
         virtual void SetCullingMethod(CullingMethod_t cullingMethod) const;
         virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);

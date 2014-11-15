@@ -165,6 +165,10 @@ void Renderer::EnableDepthWrite(bool val) const {
     renderSystem_->EnableDepthWrite(val);
 }
 
+void Renderer::EnableColorWrite(bool val) const {
+    renderSystem_->EnableColorWrite(val);
+}
+
 void Renderer::SetDepthComparisonFunc(DepthFunc_t comparison) const {
     renderSystem_->SetDepthComparisonFunc(comparison);
 }

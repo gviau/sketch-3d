@@ -223,6 +223,12 @@ class Renderer {
         void                EnableDepthWrite(bool val) const;
 
         /**
+         * Enable or disable color writing.
+         * @param val Enabled if true, disabled otherwise
+         */
+        void                EnableColorWrite(bool val) const;
+
+        /**
          * Sets the depth compare function to use
          * @param comparison The comparison function to use
          */
