@@ -43,10 +43,10 @@ void shadeWithShadow() {
 	shadow += textureProjOffset(shadowMap, shadow_coord, ivec2( 1,  1));
 	shadow += textureProjOffset(shadowMap, shadow_coord, ivec2( 1, -1));
 	shadow *= 0.25;
-
-	// Game correction
-	vec3 textureColor = texture(texture0, uv).xyz;
-	color = vec4(textureColor * light * shadow + vec3(0.1, 0.1, 0.1), 1.0);
+	
+	// Gamma correction
+	vec3 textureColor = pow(texture(texture0, uv).xyz, vec3(1.0/2.2));
+	color = vec4( pow( textureColor * light * shadow + vec3(0.1, 0.1, 0.1), vec3(2.2)), 1.0);
 }
 
 subroutine (RenderPassType)
