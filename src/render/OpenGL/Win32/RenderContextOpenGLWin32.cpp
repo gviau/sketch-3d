@@ -55,8 +55,8 @@ bool RenderContextOpenGLWin32::Initialize(Window& window) {
 	
 	// Create a dummy context, because we are going to create a context using
 	// an extension function
-	renderContext_ = wglCreateContext(deviceContext_);
-	wglMakeCurrent(deviceContext_, renderContext_);
+	HGLRC dummyRenderContext = wglCreateContext(deviceContext_);
+	wglMakeCurrent(deviceContext_, dummyRenderContext);
 
 	int attributes[] = {
 		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
@@ -68,9 +68,15 @@ bool RenderContextOpenGLWin32::Initialize(Window& window) {
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = reinterpret_cast<PFNWGLCREATECONTEXTATTRIBSARBPROC>(wglGetProcAddress("wglCreateContextAttribsARB"));
 	renderContext_ = wglCreateContextAttribsARB(deviceContext_, NULL, attributes);
 	if (!renderContext_) {
+        wglDeleteContext(dummyRenderContext);
 		Logger::GetInstance()->Error("Couldn't create render context");
 		return false;
 	}
+
+    if (!wglDeleteContext(dummyRenderContext)) {
+        Logger::GetInstance()->Error("Couldn't delete dummy context");
+        return false;
+    }
 
 	if (!wglMakeCurrent(deviceContext_, renderContext_)) {
 		Logger::GetInstance()->Error("Couldn't set the new rendering context");
