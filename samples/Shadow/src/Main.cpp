@@ -24,7 +24,7 @@ using namespace Sketch3D;
 #include <time.h>
 using namespace std;
 
-#define NUM_LIGHTS 2
+#define NUM_LIGHTS 4
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
 
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
         }
 
         // Update the lights' positions
-        // UpdateLights(t, lightPositions, newLightPositions);
+        UpdateLights(t, lightPositions, newLightPositions);
 
         // First, we render from each light's perspective and record the depth in their respective shadow map
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
@@ -181,13 +181,8 @@ int main(int argc, char** argv) {
         // Then we use the shadow maps to render the scene normally from the camera's perspective
         Renderer::GetInstance()->BindScreenBuffer();
         Renderer::GetInstance()->Clear();
-        Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
         shader->SelectSubroutine("shadeWithShadow", SHADER_TYPE_FRAGMENT);
-
-        // Write only the depth
-        Renderer::GetInstance()->EnableDepthWrite(true);
-        
-        Renderer::GetInstance()->EnableDepthWrite(false);
+        Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
 
         for (size_t i = 0; i < NUM_LIGHTS; i++) {
             // If there's more than one light, we activate additive blending to accumulate each light contribution in
