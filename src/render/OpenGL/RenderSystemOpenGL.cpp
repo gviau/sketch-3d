@@ -119,6 +119,14 @@ void RenderSystemOpenGL::EnableDepthWrite(bool val) const {
     glDepthMask( (val) ? GL_TRUE : GL_FALSE );
 }
 
+void RenderSystemOpenGL::EnableColorWrite(bool val) const {
+    if (val) {
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    } else {
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    }
+}
+
 void RenderSystemOpenGL::SetDepthComparisonFunc(DepthFunc_t comparison) const {
     GLenum depthFunc;
     switch (comparison) {
@@ -188,7 +196,7 @@ void RenderSystemOpenGL::EnableBlending(bool val) const {
     if (val) {
         glEnable(GL_BLEND);
     } else {
-        glEnable(GL_BLEND);
+        glDisable(GL_BLEND);
     }
 }
 
