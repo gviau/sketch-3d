@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     Node sphereNode;
     sphereNode.SetMaterial(&sphereMaterial);
     sphereNode.SetMesh(&sphereMesh);
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&sphereNode);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&sphereNode);
 
     Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.0f), Vector3::ZERO);
 

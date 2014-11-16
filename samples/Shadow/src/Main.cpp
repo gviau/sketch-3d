@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     orientation.MakeFromAngleAxis(-PI_OVER_2, Vector3::RIGHT);
 
     jeepNode1.SetOrientation(orientation);
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&jeepNode1);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&jeepNode1);
 
     // Create a second jeep
     Node jeepNode2;
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     jeepNode2.SetMesh(&jeepMesh);
     jeepNode2.SetOrientation(orientation);
     jeepNode2.SetPosition(Vector3(-15.0f, 0.0f, -12.0f));
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&jeepNode2);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&jeepNode2);
 
     // Create the ground
     Mesh groundMesh;
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
     Node groundNode;
     groundNode.SetMaterial(&material);
     groundNode.SetMesh(&groundMesh);
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&groundNode);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&groundNode);
 
     // Define some useful vectors for this sample
     Vector3 cameraPosition(-20.0f, 15.0f, -55.0f);

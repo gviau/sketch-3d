@@ -86,7 +86,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     oceanNode_.SetMaterial(oceanMaterial_);
     oceanNode_.SetMesh(&oceanMesh_);
     //oceanNode_.SetPosition(Vector3(48.0f, -5.0f, 32.0f));
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&oceanNode_);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&oceanNode_);
 
     // Initialize the FFT specific members
     log_2_N_ = log(numberOfPoints_) / log(2);

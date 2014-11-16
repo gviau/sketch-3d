@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     spiderNode.SetMaterial(&recordMaterial);
     spiderNode.SetMesh(&spiderMesh);
     spiderNode.SetPosition(Vector3(0.0f, 0.0f, 200.0f));
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&spiderNode);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&spiderNode);
 
     Node fullscreenQuad;
     fullscreenQuad.SetMaterial(&material);

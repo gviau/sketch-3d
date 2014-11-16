@@ -5,6 +5,7 @@
 #include "math/Quaternion.h"
 #include "math/Vector3.h"
 
+#include <map>
 #include <string>
 using namespace std;
 
@@ -20,6 +21,8 @@ class RenderQueue;
  * This class provides the base functionnality of a node the SceneTree
  */
 class Node {
+    friend class SceneTree;
+
 	public:
 		/**
 		 * Constructor. The name of the node is generated automatically.
@@ -71,12 +74,41 @@ class Node {
 		 * This function sends the data required for the rendering.
          * @param renderQueue The render queue to use for drawing
 		 */
-		virtual void        Render(RenderQueue& renderQueue) const;
+		void                Render(RenderQueue& renderQueue) const;
 
         /**
          * Immediately draw the node
          */
-        virtual void        ImmediateRender() const;
+        void                ImmediateRender() const;
+
+		/**
+		 * Add a node to this node's childrens. The name of the node must not already
+		 * exist in this node's list
+		 * @param node The node to add to the list
+		 * @return true if the node could be added, false otherwise.
+		 */
+		bool				AddChildren(Node* node);
+
+        /**
+         * Returns the children node with the specified name
+         * @param name The name of the node to get
+         * @return A pointer to the node or nullptr if it couldn't be found
+         */
+        Node*               GetNodeByName(const string& name) const;
+
+        /**
+         * Remove a children node from this node
+         * @param node The node to remove
+         * @return true if the node was found. False otherwise
+         */
+        bool                RemoveChildren(const Node* const node);
+
+		/**
+		 * Remove a children node from this node by its name
+		 * @param name The name of the node to remove
+		 * @return true if the node was found. False otherwise
+		 */
+		bool				RemoveChildrenByName(const string& name);
 
 		/**
 		 * Translate the node by a certain amount. This amount is added to the
@@ -141,6 +173,7 @@ class Node {
 
 		string				name_;		/**< The name of this node */
 		Node*				parent_;	/**< The parent of this node */
+        map<string, Node*>	children_;	/**< The children of this node. The key is the name of the node */
 
 		Vector3				position_;	/**< The position of this node */
 		Vector3				scale_;		/**< The scale factor of this node */

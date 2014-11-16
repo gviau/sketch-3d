@@ -78,6 +78,11 @@ Node::~Node() {
 
 void Node::Render(RenderQueue& renderQueue) const {
     renderQueue.AddItem(*this);
+
+	map<string, Node*>::const_iterator it = children_.begin();
+	for (; it != children_.end(); ++it) {
+		it->second->Render(renderQueue);
+	}
 }
 
 void Node::ImmediateRender() const {
@@ -142,6 +147,55 @@ void Node::ImmediateRender() const {
             glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
     }
+}
+
+bool Node::AddChildren(Node* node) {
+	string name = node->GetName();
+	map<string, Node*>::iterator it = children_.find(name);
+	if (it != children_.end()) {
+		return false;
+	}
+
+	children_[name] = node;
+	return true;
+}
+
+Node* Node::GetNodeByName(const string& name) const {
+    map<string, Node*>::const_iterator it = children_.find(name);
+    if (it != children_.end()) {
+        return it->second;
+    }
+
+    Node* node = nullptr;
+    for (it = children_.begin(); it != children_.end(); ++it) {
+        node = it->second->GetNodeByName(name);
+
+        if (node != nullptr) {
+            return node;
+        }
+    }
+
+    return nullptr;
+}
+
+bool Node::RemoveChildrenByName(const string& name) {
+	map<string, Node*>::iterator it = children_.find(name);
+	if (it != children_.end()) {
+	    children_.erase(it);
+	    return true;
+	}
+
+    for (it = children_.begin(); it != children_.end(); ++it) {
+        if (it->second->RemoveChildrenByName(name)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Node::RemoveChildren(const Node* const node) {
+    return RemoveChildrenByName(node->GetName());
 }
 
 void Node::Translate(const Vector3& translation) {

@@ -1,8 +1,11 @@
 #ifndef SKETCH_3D_SCENE_TREE_H
 #define SKETCH_3D_SCENE_TREE_H
 
-#include "render/CompositeNode.h"
+#include "render/Node.h"
 #include "render/RenderQueue.h"
+
+#include <string>
+using namespace std;
 
 namespace Sketch3D {
 
@@ -15,7 +18,7 @@ namespace Sketch3D {
  *
  * The name of this node is automatically set to "root" and it has no parent.
  */
-class SceneTree : public CompositeNode {
+class SceneTree {
 	public:
 		/**
 		 * Constructor
@@ -35,35 +38,36 @@ class SceneTree : public CompositeNode {
 		void		        Render();
 
         /**
-         * Construct the parts of a node. If the part sent to this function are null, they won't be loaded.
-         *  This function uses default post processing steps upon loading the files. The steps are the following:
-		 *	- aiProcess_Triangulate : Triangulates all faces;
-		 *	- aiProcess_GenNormals : Generates normals if none are present;
-		 *	- aiProcess_GenUVCoords : Generates the UV coordinates if the texture coordinates aren't correct;
-         * @param filename The name of the file from which the model should be loaded
-         * @param mesh A pointer to a mesh to load the geometry. If null, then it won't be loaded
-         * @param material A pointer to a material to load the textures. The material won't have any shader attached to it.
-         * The user will therefore have to attach one to it to be able to render the node. If null, then the textures won't
-         * be loaded.
-         * @return true if the loading was succesful, false otherwise.
+         * Add a node to the scene tree. This will add the node directly to the root node
+         * @param node A pointer to the node to add to the scene tree
+         * @return true if the node could be added, false if the node was already present
          */
-        bool                ConstructNode(const string& filename, Mesh* mesh, Material* material) const;
+        bool                AddNode(Node* node);
 
         /**
-         * Construct the parts of a node. If the part sent to this function are null, they won't be loaded.
-         * @param filename The name of the file from which the model should be loaded
-         * @param mesh A pointer to a mesh to load the geometry. If null, then it won't be loaded
-         * @param prostProcessingFlags A unsigned int containing bits indicating
-		 * which Assimp's post processing flags the loader should use.
-         * @param material A pointer to a material to load the textures. The material won't have any shader attached to it.
-         * The user will therefore have to attach one to it to be able to render the node. If null, then the textures won't
-         * be loaded.
-         * @return true if the loading was succesful, false otherwise.
+         * Get a node from the scene tree by its name.
+         * @param name The name of the node to get
+         * @return A pointer to the node if it is in the scene tree, nullptr otherwise
          */
-        bool                ConstructNode(const string& filename, Mesh* mesh, unsigned int postProcessingFlags, Material* material) const;
+        Node*               GetNodeByName(const string& name) const;
+
+        /**
+         * Remove a node.
+         * @param node A pointer to the node to remove
+         * @return true if the node was succesfully removed, false if it couldn't be found
+         */
+        bool                RemoveNode(const Node* const node);
+
+        /**
+         * Remove a node by its name.
+         * @param name The name of the node to remove
+         * @return true if the node was succesfully removed, false if it couldn't be found
+         */
+        bool                RemoveNodeByName(const string& name);
 
     private:
         RenderQueue         renderQueue_;   /**< The render queue used for drawing */
+        Node                root_;          /**< The root node of the scene tree */
 };
 
 }

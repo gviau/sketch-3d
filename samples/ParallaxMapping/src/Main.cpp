@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
     Node sphereNode;
     sphereNode.SetMaterial(&sphereMaterial);
     sphereNode.SetMesh(&mesh);
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&sphereNode);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&sphereNode);
 
     float posX = 0.0f;
     float posY = 0.0f;

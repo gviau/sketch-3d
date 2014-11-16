@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     Node paperNode;
     paperNode.SetMaterial(&paperMaterial);
     paperNode.SetMesh(&paperMesh);
-    Renderer::GetInstance()->GetSceneTree().AddChildren(&paperNode);
+    Renderer::GetInstance()->GetSceneTree().AddNode(&paperNode);
 
     Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.0f), Vector3::LOOK, Vector3::UP);
 

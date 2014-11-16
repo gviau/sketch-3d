@@ -8,7 +8,6 @@ set(HEADER_PATH "${CMAKE_SOURCE_DIR}/include/render")
 
 set(SRC
 	${SRC_PATH}/BufferObject.cpp
-	${SRC_PATH}/CompositeNode.cpp
 	${SRC_PATH}/Material.cpp
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/ModelManager.cpp
@@ -28,7 +27,6 @@ set(SRC
 
 set(HEADER
 	${HEADER_PATH}/BufferObject.h
-	${HEADER_PATH}/CompositeNode.h
 	${HEADER_PATH}/Material.h
 	${HEADER_PATH}/Mesh.h
 	${HEADER_PATH}/ModelManager.h
