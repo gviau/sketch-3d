@@ -20,32 +20,23 @@
 
 namespace Sketch3D {
 
-#define LOADED_MESH_FROM_FILE           0x01
-#define MESH_USES_NORMALS               0x02
-#define MESH_USES_TEXTURE_COORDINATES   0x04
-#define MESH_USES_USES_TANGENTS         0x08
-
 Mesh::Mesh() : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
 {
 }
 
-Mesh::Mesh(const string& filename, bool useNormals, bool useTextureCoordinates, bool useTangents, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC),
-        filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr), loadedProperties_(0)
+Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC),
+        filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
 {
-    Load(filename, useNormals, useTextureCoordinates, useTangents, meshType);
-    Initialize(meshType);
+    Load(filename, vertexAttributes, meshType);
+    Initialize(vertexAttributes, meshType);
 }
 
 Mesh::Mesh(const Mesh& src) : meshType_(src.meshType_), filename_(src.filename_), fromCache_(false), importer_(nullptr),
-        vbo_(nullptr), ibo_(nullptr), vao_(nullptr), loadedProperties_(src.loadedProperties_)
+        vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
 {
-    if (((loadedProperties_ & LOADED_MESH_FROM_FILE) != 0) && ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-        bool useNormals = ((loadedProperties_ & MESH_USES_NORMALS) != 0);
-        bool useTextureCoordinates = ((loadedProperties_ & MESH_USES_TEXTURE_COORDINATES) != 0);
-        bool useTangents = ((loadedProperties_ & MESH_USES_USES_TANGENTS) != 0);
-
-        Load(filename_, useNormals, useTextureCoordinates, useTangents, meshType_);
-        Initialize(meshType_);
+    if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+        Load(filename_, src.vertexAttributes_, meshType_);
+        Initialize(src.vertexAttributes_, meshType_);
     }
 }
 
@@ -64,22 +55,17 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
         vbo_ = nullptr;
         ibo_ = nullptr;
         vao_ = nullptr;
-        loadedProperties_ = rhs.loadedProperties_;
 
-        if (((loadedProperties_ & LOADED_MESH_FROM_FILE) != 0) && ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-            bool useNormals = ((loadedProperties_ & MESH_USES_NORMALS) != 0);
-            bool useTextureCoordinates = ((loadedProperties_ & MESH_USES_TEXTURE_COORDINATES) != 0);
-            bool useTangents = ((loadedProperties_ & MESH_USES_USES_TANGENTS) != 0);
-
-            Load(filename_, useNormals, useTextureCoordinates, useTangents, meshType_);
-            Initialize(meshType_);
+        if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
+            Load(filename_, rhs.vertexAttributes_, meshType_);
+            Initialize(rhs.vertexAttributes_, meshType_);
         }
     }
 
     return *this;
 }
 
-void Mesh::Load(const string& filename, bool useNormals, bool useTextureCoordinates, bool useTangents, MeshType_t meshType) {
+void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) {
     if (filename == filename_) {
         return;
     }
@@ -111,10 +97,15 @@ void Mesh::Load(const string& filename, bool useNormals, bool useTextureCoordina
     if (ModelManager::GetInstance()->CheckIfModelLoaded(filename)) {
         surfaces_ = ModelManager::GetInstance()->LoadFromCache(filename);
         filename_ = filename;
-        Initialize(meshType);
+        Initialize(vertexAttributes, meshType);
         fromCache_ = true;
         return;
     }
+
+    // Determine what does the mesh uses
+    bool useNormals = vertexAttributes.find(VERTEX_ATTRIBUTES_NORMAL) != vertexAttributes.end();
+    bool useTextureCoordinates = vertexAttributes.find(VERTEX_ATTRIBUTES_TEX_COORDS) != vertexAttributes.end();
+    bool useTangents = vertexAttributes.find(VERTEX_ATTRIBUTES_TANGENT) != vertexAttributes.end();
 
     // Load if not present in cache and cache it for future loads
     delete importer_;
@@ -252,21 +243,8 @@ void Mesh::Load(const string& filename, bool useNormals, bool useTextureCoordina
     // Cache the model for future loads
     ModelManager::GetInstance()->CacheModel(filename, surfaces_);
     filename_ = filename;
-    Initialize(meshType);
+    Initialize(vertexAttributes, meshType);
     fromCache_ = true;
-
-    loadedProperties_ = LOADED_MESH_FROM_FILE;
-    if (useNormals) {
-        loadedProperties_ |= MESH_USES_NORMALS;
-    }
-
-    if (useTextureCoordinates) {
-        loadedProperties_ |= MESH_USES_TEXTURE_COORDINATES;
-    }
-
-    if (useTangents) {
-        loadedProperties_ |= MESH_USES_USES_TANGENTS;
-    }
 
     Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
 }
@@ -275,8 +253,16 @@ void Mesh::AddSurface(const ModelSurface_t& surface) {
     surfaces_.push_back(surface);
 }
 
-void Mesh::Initialize(MeshType_t meshType) {
+void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) {
     meshType_ = meshType;
+    vertexAttributes_ = vertexAttributes;
+
+    // Calculate offset and array index depending on vertex attributes provided by the user
+    map<size_t, VertexAttributes_t> attributesFromIndex;
+    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+    for (; it != vertexAttributes_.end(); ++it) {
+        attributesFromIndex[it->second] = it->first;
+    }
 
 	// TEMP - construct the buffers
     vbo_ = new unsigned int[surfaces_.size()];
@@ -301,24 +287,37 @@ void Mesh::Initialize(MeshType_t meshType) {
         bool hasTangents = surfaces_[i].geometry->numTangents > 0;
 
         for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
-            if (hasVertices) {
-                Vector3 vertex = surfaces_[i].geometry->vertices[j];
-                data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-            }
+            map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+            for (; v_it != attributesFromIndex.end(); ++v_it) {
+                switch (v_it->second) {
+                    case VERTEX_ATTRIBUTES_POSITION:
+                        if (hasVertices) {
+                            Vector3 vertex = surfaces_[i].geometry->vertices[j];
+                            data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
+                        }
+                        break;
 
-            if (hasNormals) {
-                Vector3 normal = surfaces_[i].geometry->normals[j];
-                data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
-            }
+                    case VERTEX_ATTRIBUTES_NORMAL:
+                        if (hasNormals) {
+                            Vector3 normal = surfaces_[i].geometry->normals[j];
+                            data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
+                        }
+                        break;
 
-            if (hasTexCoords) {
-                Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
-                data.push_back(texCoords.x); data.push_back(texCoords.y);
-            }
+                    case VERTEX_ATTRIBUTES_TEX_COORDS:
+                        if (hasTexCoords) {
+                            Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
+                            data.push_back(texCoords.x); data.push_back(texCoords.y);
+                        }
+                        break;
 
-            if (hasTangents) {
-                Vector3 tangents = surfaces_[i].geometry->tangents[j];
-                data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
+                    case VERTEX_ATTRIBUTES_TANGENT:
+                        if (hasTangents) {
+                            Vector3 tangents = surfaces_[i].geometry->tangents[j];
+                            data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
+                        }
+                        break;
+                }
             }
 	    }
 
@@ -326,45 +325,6 @@ void Mesh::Initialize(MeshType_t meshType) {
                         ((hasNormals) ? sizeof(Vector3) : 0) +
                         ((hasTexCoords) ? sizeof(Vector2) : 0) +
                         ((hasTangents) ? sizeof(Vector3) : 0);
-        size_t normalsOffset = (hasNormals) ? sizeof(Vector3) : 0;
-        size_t texCoordsOffset = (hasTexCoords) ? (hasNormals) ? sizeof(Vector3) + sizeof(Vector3) : sizeof(Vector3) : 0;
-
-        size_t tangentsOffset = 0;
-        if (hasTangents) {
-            if (hasTexCoords) {
-                if (hasNormals) {
-                    tangentsOffset = sizeof(Vector3) + sizeof(Vector3) + sizeof(Vector2);
-                } else {
-                    tangentsOffset = sizeof(Vector3) + sizeof(Vector2);
-                }
-            } else {
-                if (hasNormals) {
-                    tangentsOffset = sizeof(Vector3) + sizeof(Vector3);
-                } else {
-                    tangentsOffset = sizeof(Vector3);
-                }
-            }
-        }
-
-        size_t normalsArrayIndex = (hasNormals) ? 1 : 0;
-        size_t texCoordsArrayIndex = (hasTexCoords) ? (hasNormals) ? 2 : 1 : 0;
-
-        size_t tangentsArrayIndex = 0;
-        if (hasTangents) {
-            if (hasTexCoords) {
-                if (hasNormals) {
-                    tangentsArrayIndex = 3;
-                } else {
-                    tangentsArrayIndex = 2;
-                }
-            } else {
-                if (hasNormals) {
-                    tangentsArrayIndex = 2;
-                } else {
-                    tangentsArrayIndex = 1;
-                }
-            }
-        }
 
         // We first create the vertex array object and then bind the vertex and index buffer objects
 	    glBindVertexArray(vao_[i]);
@@ -374,23 +334,49 @@ void Mesh::Initialize(MeshType_t meshType) {
 	    glBindBuffer(GL_ARRAY_BUFFER, vbo_[i]);
 	    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], type);
 
+        size_t cumulativeOffset = 0;
+        map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+        for (; v_it != attributesFromIndex.end(); ++v_it) {
+            size_t size = 0;
+            size_t offset = 0;
 
-        glEnableVertexAttribArray(0);
-	    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, stride, 0);
+            switch (v_it->second) {
+                case VERTEX_ATTRIBUTES_POSITION:
+                    size = 3;
+                    offset = sizeof(Vector3);
+                    break;
 
-        if (hasNormals) {
-            glEnableVertexAttribArray(normalsArrayIndex);
-            glVertexAttribPointer((GLuint)normalsArrayIndex, 3, GL_FLOAT, GL_FALSE, stride, (void*)normalsOffset);
-        }
+                case VERTEX_ATTRIBUTES_NORMAL:
+                    if (!hasNormals) {
+                        continue;
+                    }
 
-        if (hasTexCoords) {
-            glEnableVertexAttribArray(texCoordsArrayIndex);
-            glVertexAttribPointer((GLuint)texCoordsArrayIndex, 2, GL_FLOAT, GL_FALSE, stride, (void*)texCoordsOffset);
-        }
+                    size = 3;
+                    offset = sizeof(Vector3);
+                    break;
 
-        if (hasTangents) {
-            glEnableVertexAttribArray(tangentsArrayIndex);
-            glVertexAttribPointer((GLuint)tangentsArrayIndex, 3, GL_FLOAT, GL_FALSE, stride, (void*)tangentsOffset);
+                case VERTEX_ATTRIBUTES_TEX_COORDS:
+                    if (!hasTexCoords) {
+                        continue;
+                    }
+
+                    size = 2;
+                    offset = sizeof(Vector2);
+                    break;
+
+                case VERTEX_ATTRIBUTES_TANGENT:
+                    if (!hasTangents) {
+                        continue;
+                    }
+
+                    size = 3;
+                    offset = sizeof(Vector3);
+                    break;
+            }
+
+            glEnableVertexAttribArray(v_it->first);
+            glVertexAttribPointer(v_it->first, size, GL_FLOAT, GL_FALSE, stride, (void*)cumulativeOffset);
+            cumulativeOffset += offset;
         }
 
         // Index buffer object
@@ -408,6 +394,12 @@ void Mesh::UpdateMeshData() const {
         return;
     }
 
+    map<size_t, VertexAttributes_t> attributesFromIndex;
+    VertexAttributesMap_t::const_iterator it = vertexAttributes_.begin();
+    for (; it != vertexAttributes_.end(); ++it) {
+        attributesFromIndex[it->second] = it->first;
+    }
+
     for (size_t i = 0; i < surfaces_.size(); i++) {
 	    vector<float> data;
         data.reserve(surfaces_[i].geometry->numVertices * 3 +
@@ -421,24 +413,37 @@ void Mesh::UpdateMeshData() const {
         bool hasTangents = surfaces_[i].geometry->numTangents > 0;
 
         for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
-            if (hasVertices) {
-                Vector3 vertex = surfaces_[i].geometry->vertices[j];
-                data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-            }
+            map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+            for (; v_it != attributesFromIndex.end(); ++v_it) {
+                switch (v_it->second) {
+                    case VERTEX_ATTRIBUTES_POSITION:
+                        if (hasVertices) {
+                            Vector3 vertex = surfaces_[i].geometry->vertices[j];
+                            data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
+                        }
+                        break;
 
-            if (hasNormals) {
-                Vector3 normal = surfaces_[i].geometry->normals[j];
-                data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
-            }
+                    case VERTEX_ATTRIBUTES_NORMAL:
+                        if (hasNormals) {
+                            Vector3 normal = surfaces_[i].geometry->normals[j];
+                            data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
+                        }
+                        break;
 
-            if (hasTexCoords) {
-                Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
-                data.push_back(texCoords.x); data.push_back(texCoords.y);
-            }
+                    case VERTEX_ATTRIBUTES_TEX_COORDS:
+                        if (hasTexCoords) {
+                            Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
+                            data.push_back(texCoords.x); data.push_back(texCoords.y);
+                        }
+                        break;
 
-            if (hasTangents) {
-                Vector3 tangents = surfaces_[i].geometry->tangents[j];
-                data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
+                    case VERTEX_ATTRIBUTES_TANGENT:
+                        if (hasTangents) {
+                            Vector3 tangents = surfaces_[i].geometry->tangents[j];
+                            data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
+                        }
+                        break;
+                }
             }
 	    }
 

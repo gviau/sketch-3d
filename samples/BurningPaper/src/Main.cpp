@@ -46,7 +46,11 @@ int main(int argc, char** argv) {
     model.geometry = &surface;
     Mesh paperMesh;
     paperMesh.AddSurface(model);
-    paperMesh.Initialize();
+
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 1;
+    paperMesh.Initialize(vertexAttributes);
     
     // Create the paper material
     vector<string> vertexInputs;

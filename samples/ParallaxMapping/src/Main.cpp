@@ -55,7 +55,13 @@ int main(int argc, char** argv) {
 
     Mesh mesh;
     mesh.AddSurface(modelSurface);
-    mesh.Initialize();
+
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    vertexAttributes[VERTEX_ATTRIBUTES_TANGENT] = 3;
+    mesh.Initialize(vertexAttributes);
 
     // Create the material for the sphere
     vector<string> vertexInputs;

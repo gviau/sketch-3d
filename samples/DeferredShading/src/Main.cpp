@@ -31,8 +31,12 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the meshes
-    Mesh sphereMesh("Media/sphere.obj", true, true);
-    Mesh spiderMesh("Media/spider.obj", true, true);
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    Mesh sphereMesh("Media/sphere.obj", vertexAttributes);
+    Mesh spiderMesh("Media/spider.obj", vertexAttributes);
 
     // Create a plane mesh
     SurfaceTriangles_t surface;
@@ -49,7 +53,10 @@ int main(int argc, char** argv) {
 
     Mesh planeMesh;
     planeMesh.AddSurface(modelSurface);
-    planeMesh.Initialize();
+
+    VertexAttributesMap_t vertexAttributesPlane;
+    vertexAttributesPlane[VERTEX_ATTRIBUTES_POSITION] = 0;
+    planeMesh.Initialize(vertexAttributesPlane);
 
     // Create the materials
     vector<string> vertexInputs_record;

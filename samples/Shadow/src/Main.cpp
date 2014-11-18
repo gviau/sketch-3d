@@ -75,7 +75,11 @@ int main(int argc, char** argv) {
     Material material(shader);
 
     // Create the jeep
-    Mesh jeepMesh("Media/jeep1.3ds");
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    Mesh jeepMesh("Media/jeep1.3ds", vertexAttributes);
     Node jeepNode1;
     jeepNode1.SetMaterial(&material);
     jeepNode1.SetMesh(&jeepMesh);
@@ -119,7 +123,8 @@ int main(int argc, char** argv) {
     ModelSurface_t groundSurface;
     groundSurface.geometry = &surface;
     groundMesh.AddSurface(groundSurface);
-    groundMesh.Initialize();
+
+    groundMesh.Initialize(vertexAttributes);
 
     // Create the ground
     Node groundNode;

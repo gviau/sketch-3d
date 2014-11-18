@@ -31,7 +31,12 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the sphere's mesh and generate the tangents
-    Mesh sphereMesh("Media/sphere.obj", true, true, true);
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    vertexAttributes[VERTEX_ATTRIBUTES_TANGENT] = 3;
+    Mesh sphereMesh("Media/sphere.obj", vertexAttributes);
 
     // Create the material for the sphere
     vector<string> vertexInputs;

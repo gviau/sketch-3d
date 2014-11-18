@@ -71,7 +71,11 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     ModelSurface_t surface;
     surface.geometry = &oceanSurface_;
     oceanMesh_.AddSurface(surface);
-    oceanMesh_.Initialize(MESH_TYPE_DYNAMIC);
+
+    VertexAttributesMap_t vertexAttributes;
+    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    oceanMesh_.Initialize(vertexAttributes, MESH_TYPE_DYNAMIC);
 
     // Load the shader
     vector<string> vertexInputs;

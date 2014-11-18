@@ -4,6 +4,7 @@
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
+#include <map>
 #include <string>
 #include <vector>
 using namespace std;
@@ -62,6 +63,21 @@ enum MeshType_t {
 };
 
 /**
+ * @enum VertexAttributes_t
+ * The different type of vertex attributes that can be loaded from a mesh and
+ * sent to the vertex shader.
+ */
+enum VertexAttributes_t {
+    VERTEX_ATTRIBUTES_POSITION,
+    VERTEX_ATTRIBUTES_NORMAL,
+    VERTEX_ATTRIBUTES_TEX_COORDS,
+    VERTEX_ATTRIBUTES_TANGENT
+};
+
+// Typdefs
+typedef map<VertexAttributes_t, size_t> VertexAttributesMap_t;
+
+/**
  * @class Mesh
  * This class holds the representation of a 3D model. It is reponsible to send
  * the needed data to the underlying rendering system.
@@ -76,15 +92,12 @@ class Mesh {
 		/**
 		 * Constructor. Read a mesh from a file and load the data in memory
          * @param filename The name of the file from which the mesh will be loaded
-         * @param useNormals If set to true, this will use the normal founds in the mesh file for rendering.
-         * If normals are not present, it will generate them
-         * @param useTextureCoordinates If set to true, this will use the texture coordinates found in the mesh file for rendering.
-         * @param useTangents If set to true, this will use the tangents found in the mesh file for rendering.
-         * If tangents are not present, it will generate them
+         * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
+         * key is the vertex attributes and the value is its attribute location.
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
 		 */
-                                Mesh(const string& filename, bool useNormals=true, bool useTextureCoordinates=true,
-                                     bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
+                                Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
+                                     MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * Copy constructor
@@ -106,15 +119,12 @@ class Mesh {
         /**
          * Load the model from a file
          * @param filename The name of the file from which the mesh will be loaded
-         * @param useNormals If set to true, this will use the normal founds in the mesh file for rendering.
-         * If normals are not present, it will generate them
-         * @param useTextureCoordinates If set to true, this will use the texture coordinates found in the mesh file for rendering.
-         * @param useTangents If set to true, this will use the tangents found in the mesh file for rendering.
-         * If tangents are not present, it will generate them
+         * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
+         * key is the vertex attributes and the value is its attribute location.
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-        void                    Load(const string& filename, bool useNormals=true, bool useTextureCoordinates=true,
-                                     bool useTangents=false, MeshType_t meshType=MESH_TYPE_STATIC);
+        void                    Load(const string& filename, const VertexAttributesMap_t& vertexAttributes,
+                                     MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * Add a model surface to the mesh
@@ -124,9 +134,11 @@ class Mesh {
 
         /**
          * Initialize the mesh with geometry data
+         * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
+         * key is the vertex attributes and the value is its attribute location.
          * @param meshType The type of mesh that will be rendered, static or dynamic
          */
-        void                    Initialize(MeshType_t meshType=MESH_TYPE_STATIC);
+        void                    Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType=MESH_TYPE_STATIC);
 
         /**
          * If the mesh is a dynamic mesh, re-uploads the mesh data
@@ -146,7 +158,7 @@ class Mesh {
         string                  filename_;  /**< The name of the file loaded, if we loaded it from a file */
         bool                    fromCache_; /**< Set to true if the model is cached, false otherwise */
         Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
-        char                    loadedProperties_;  /**< This is used for copying mesh */
+        VertexAttributesMap_t   vertexAttributes_;  /**< Vertex attributes used by the mesh */
 
 		// TEMP
 		unsigned int*	        vbo_;		/**< Vertex buffer objects */
