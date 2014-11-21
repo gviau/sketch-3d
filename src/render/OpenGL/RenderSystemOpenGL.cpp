@@ -44,7 +44,7 @@ bool RenderSystemOpenGL::Initialize() {
 		return false;
 	}
 
-	FillDeviceCapabilities();
+	QueryDeviceCapabilities();
 
 	// Some initial values
 	glViewport(0, 0, width_, height_);
@@ -227,8 +227,14 @@ void RenderSystemOpenGL::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingF
     glBlendFunc(GetBlendingFactor(srcFactor), GetBlendingFactor(dstFactor));
 }
 
-void RenderSystemOpenGL::FillDeviceCapabilities() {
-	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxActiveTextures_);
+void RenderSystemOpenGL::BindTexture(const Texture* texture, size_t unit) const {
+    size_t textureName = dynamic_cast<const Texture2DOpenGL*>(texture)->textureName_;
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, textureName);
+}
+
+void RenderSystemOpenGL::QueryDeviceCapabilities() {
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &deviceCapabilities_.maxActiveTextures_);
 }
 
 unsigned int RenderSystemOpenGL::GetBlendingFactor(BlendingFactor_t factor) const {

@@ -43,6 +43,15 @@ enum TextureFormat_t {
 };
 
 /**
+ * @enum TextureType_t
+ * Type of the texture (2D or 3D)
+ */
+enum TextureType_t {
+    TEXTURE_TYPE_2D,
+    TEXTURE_TYPE_3D
+};
+
+/**
  * @class Texture
  * This class serves as a base class to other classes that act as textures,
  * such as the Texture2D and RenderTexture classes.
@@ -54,7 +63,7 @@ class Texture {
 		 * to FILTER_MODE_POINT and the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
 		 */
-						Texture();
+						        Texture();
 
 		/**
 		 * Constructor. Initializes the filter mode to FILTER_MODE_POINT and
@@ -65,15 +74,15 @@ class Texture {
 		 * @param wrapMode The wrap mode to use
          * @param format The format to use
 		 */
-						Texture(unsigned int width, unsigned int height,
-								FilterMode_t filterMode=FILTER_MODE_LINEAR,
-								WrapMode_t wrapMode=WRAP_MODE_REPEAT,
-								TextureFormat_t format=TEXTURE_FORMAT_RGB24);
+						        Texture(unsigned int width, unsigned int height,
+								        FilterMode_t filterMode=FILTER_MODE_LINEAR,
+								        WrapMode_t wrapMode=WRAP_MODE_REPEAT,
+								        TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
         /**
          * Destructor
          */
-        virtual        ~Texture();
+        virtual                ~Texture();
 
         /**
          * Create the actual texture handle
@@ -83,28 +92,30 @@ class Texture {
 
         /**
          * Activate the texture
-         * @param unit On which texture unit should we bind the texture
+         * @return The texture unit on which the texture was bound
          */
-        virtual void            Bind(unsigned int unit) = 0;
+        size_t                  Bind() const;
 
-		void			SetWidth(unsigned int width);
-		void			SetHeight(unsigned int height);
-		void			SetFilterMode(FilterMode_t mode);
-		void			SetWrapMode(WrapMode_t mode);
-        void		    SetTextureFormat(TextureFormat_t format);
+		void			        SetWidth(unsigned int width);
+		void			        SetHeight(unsigned int height);
+		void			        SetFilterMode(FilterMode_t mode);
+		void			        SetWrapMode(WrapMode_t mode);
+        void		            SetTextureFormat(TextureFormat_t format);
 
-		unsigned int	GetWidth() const;
-		unsigned int	GetHeight() const;
-		FilterMode_t	GetFilterMode() const;
-		WrapMode_t		GetWrapMode() const;
-        TextureFormat_t	GetTextureFormat() const;
+		unsigned int	        GetWidth() const;
+		unsigned int	        GetHeight() const;
+		FilterMode_t	        GetFilterMode() const;
+		WrapMode_t		        GetWrapMode() const;
+        TextureFormat_t	        GetTextureFormat() const;
+
+        virtual TextureType_t   GetType() const = 0;
 
 	protected:
-		unsigned int	width_;	/**< The width of the texture */
-		unsigned int	height_;	/**< The height of the texture */
-		FilterMode_t	filterMode_;	/**< The filter mode of the texture */
-		WrapMode_t		wrapMode_;	/**< The wrap mode of the texture */
-        TextureFormat_t format_;    /**< The texture format */
+		unsigned int	        width_;	/**< The width of the texture */
+		unsigned int	        height_;	/**< The height of the texture */
+		FilterMode_t	        filterMode_;	/**< The filter mode of the texture */
+		WrapMode_t		        wrapMode_;	/**< The wrap mode of the texture */
+        TextureFormat_t         format_;    /**< The texture format */
 };
 
 }

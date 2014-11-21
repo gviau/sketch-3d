@@ -36,14 +36,15 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void EnableBlending(bool val) const;
         virtual void SetBlendingEquation(BlendingEquation_t equation) const;
         virtual void SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
+        virtual void BindTexture(const Texture* texture, size_t unit) const;
 
 	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */
 
 		map<const Texture2D*, pair<size_t, size_t>>	textures_;		/**< Texture mapped to the API representation of the texture */
 
-		virtual void FillDeviceCapabilities();
         unsigned int GetBlendingFactor(BlendingFactor_t factor) const;
+        virtual void QueryDeviceCapabilities();
 };
 
 }

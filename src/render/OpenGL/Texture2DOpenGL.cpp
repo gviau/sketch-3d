@@ -71,11 +71,6 @@ bool Texture2DOpenGL::Create() {
     return true;
 }
 
-void Texture2DOpenGL::Bind(unsigned int unit) {
-    glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, textureName_);
-}
-
 const void* Texture2DOpenGL::GetData() const {
     if (data_ != nullptr) {
         return data_;

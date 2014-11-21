@@ -306,6 +306,14 @@ class Renderer {
          */
         Vector3             ScreenToWorldPoint(const Vector2& point) const;
 
+        /**
+         * Bind a given texture to a texture unit. This function chooses a texture unit by using
+         * a Least Recently Used (LRU) cache.
+         * @param texture The texture to cache
+         * @return The texture unit to which the texture has been bound to
+         */
+        size_t              BindTexture(const Texture* texture);
+
 		const Matrix4x4&	GetProjectionMatrix() const;
 		const Matrix4x4&	GetViewMatrix() const;
 		const Matrix4x4&	GetViewProjectionMatrix() const;
@@ -314,7 +322,20 @@ class Renderer {
 		SceneTree&			GetSceneTree();
 
 	private:
-		static Renderer		instance_;	/**< Singleton instance of this class */
+        /**
+         * @struct TextureUnitNode_t
+         * This texture serves as an element for the texture unit cache. All that it contains is
+         * a pointer to the next element and the texture unit it refers to. It is used as a single
+         * linked list
+         */
+        struct TextureUnitNode_t {
+            size_t              textureUnit;
+            TextureUnitNode_t*  next;
+            TextureUnitNode_t*  prev;
+        };
+        typedef map<const Texture*, TextureUnitNode_t*> TextureCache_t;
+
+		static Renderer		instance_;	        /**< Singleton instance of this class */
 
 		RenderSystem*		renderSystem_;		/**< The render system that is currently being used */
 
@@ -323,6 +344,10 @@ class Renderer {
 		Matrix4x4			viewProjection_;	/**< Pre-computed view-projection matrix */
 
 		SceneTree			sceneTree_;			/**< The scene tree to render */
+
+        TextureUnitNode_t*  head_;              /**< Head of the double linked list */
+        TextureUnitNode_t*  tail_;              /**< Tail of the double linked list */
+        TextureCache_t      textureCache_;      /**< Texture pointers refer directly to a cache element for faster lookup */
 
 		/**
 		 * Constructor
@@ -337,7 +362,7 @@ class Renderer {
 		/**
 		 * Assignment operator - here only to disallow assignment
 		 */
-							Renderer& operator=(const Renderer& rhs);		
+							Renderer& operator=(const Renderer& rhs);
 };
 
 }

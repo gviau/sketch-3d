@@ -64,12 +64,6 @@ class Texture2D : public Texture {
         virtual bool            Create() = 0;
 
         /**
-         * Activate the texture
-         * @param unit On which texture unit should we bind the texture
-         */
-        virtual void            Bind(unsigned int unit) = 0;
-
-        /**
          * Set the data as an array of bytes. Will only work with texture formats that doesn't require floats
          * @param data The new data array
          * @param width The width of the new data. Must be of the same width than this texture
@@ -91,6 +85,8 @@ class Texture2D : public Texture {
 
         virtual const void*     GetData() const = 0;
         uint32_t                GetId() const { return id_; }
+
+        virtual TextureType_t   GetType() const { return TEXTURE_TYPE_2D; }
 
 	protected:
         string                  filename_;  /**< The name of the loaded file */

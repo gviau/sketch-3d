@@ -21,6 +21,14 @@ Renderer::Renderer() : renderSystem_(NULL) {
 }
 
 Renderer::~Renderer() {
+    TextureUnitNode_t* node = head_;
+    TextureUnitNode_t* toDelete = nullptr;
+    while (node != nullptr) {
+        toDelete = node;
+        node = node->next;
+        delete toDelete;
+    }
+
 	delete renderSystem_;
 }
 
@@ -45,7 +53,27 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			break;
 	}
 
-	return renderSystem_->Initialize();
+	if (!renderSystem_->Initialize()) {
+        Logger::GetInstance()->Error("Couldn't initialize render system properly");
+        return false;
+    }
+
+    // Construct the texture cache
+    const DeviceCapabilities_t* deviceCapabilities = renderSystem_->GetDeviceCapabilities();
+    head_ = new TextureUnitNode_t;
+    head_->textureUnit = 0;
+    head_->prev = nullptr;
+    tail_ = head_;
+
+    for (int i = 1; i < deviceCapabilities->maxActiveTextures_ + 1; i++) {
+        tail_->next = new TextureUnitNode_t;
+        tail_->next->prev = tail_;
+        tail_ = tail_->next;
+        tail_->textureUnit = i;
+    }
+    tail_->next = nullptr;
+
+    return true;
 }
 
 void Renderer::SetClearColor(float red, float green, float blue, float alpha) const {
@@ -227,6 +255,47 @@ void Renderer::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t ds
 
 Vector3 Renderer::ScreenToWorldPoint(const Vector2& point) const {
     return renderSystem_->ScreenToWorldPoint(viewProjection_.Inverse(), point);
+}
+
+size_t Renderer::BindTexture(const Texture* texture) {
+    // Verify if the node is already bound
+    size_t textureUnit = 0;
+    TextureUnitNode_t* nodeToUse = head_;
+    TextureCache_t::iterator it = textureCache_.find(texture);
+
+    if (it != textureCache_.end()) {
+        nodeToUse = it->second;
+    } else {
+        // Bind it otherwise
+        renderSystem_->BindTexture(texture, nodeToUse->textureUnit);
+        textureCache_[texture] = nodeToUse;
+    }
+    textureUnit = nodeToUse->textureUnit;
+
+    // Put the node to use at the end of the list if it isn't there yet
+    if (tail_ != nodeToUse) {
+        tail_->next = nodeToUse;
+
+        // Remove that node from the list since its now a duplicate
+        if (nodeToUse->prev) {
+            nodeToUse->prev->next = nodeToUse->next;
+        }
+
+        if (nodeToUse->next) {
+            nodeToUse->next->prev = nodeToUse->prev;
+        }
+
+        // Advance head if needed
+        if (nodeToUse == head_) {
+            head_ = head_->next;
+        }
+
+        tail_->next->prev = tail_;
+        tail_ = tail_->next;
+        tail_->next = nullptr;
+    }
+
+    return textureUnit;
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {

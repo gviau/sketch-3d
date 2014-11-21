@@ -121,13 +121,10 @@ void Node::ImmediateRender() const {
     const map<string, Texture*>& materialTextures = material_->GetTextures();
     map<string, Texture*>::const_iterator it = materialTextures.begin();
 
-    int lastTextureIdx = 0;
     for (; it != materialTextures.end(); ++it) {
         if (it->second != nullptr) {
-            if (shader->SetUniformTexture(it->first, lastTextureIdx)) {
-                it->second->Bind(lastTextureIdx);
-                lastTextureIdx += 1;
-            }
+            size_t textureUnit = it->second->Bind();
+            shader->SetUniformTexture(it->first, textureUnit);
         }
     }
 
@@ -137,9 +134,8 @@ void Node::ImmediateRender() const {
         for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
             Texture2D* texture = surfaces[i].geometry->textures[j];
             if (texture != nullptr) {
-                if (shader->SetUniformTexture("texture" + to_string(j), lastTextureIdx + j)) {
-                    texture->Bind(lastTextureIdx + j);
-                }
+                size_t textureUnit = texture->Bind();
+                shader->SetUniformTexture("texture" + to_string(j), textureUnit);
             }
         }
 
@@ -224,7 +220,7 @@ void Node::RotateAroundAxis(float angle, const Vector3& axis) {
 	Quaternion rot;
 	rot.MakeFromAngleAxis(angle, axis);
 	rot.Normalize();
-	orientation_ = rot;
+	orientation_ *= rot;
 }
 
 void Node::SetParent(Node* parent) {

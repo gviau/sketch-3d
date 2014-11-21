@@ -135,14 +135,12 @@ int main(int argc, char** argv) {
     material.AddTexture("normals", normalsTexture);
     material.AddTexture("albedos", albedosTexture);
 
-    float angle = 0.0f;
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
 
-        spiderNode.Yaw(angle);
-        angle += 0.001f;
+        spiderNode.Yaw(0.001f);
 
         // Render in the GBuffer
         GBuffer->Bind();

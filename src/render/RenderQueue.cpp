@@ -130,13 +130,10 @@ void RenderQueue::Render() {
         const map<string, Texture*>& materialTextures = item->material_->GetTextures();
         map<string, Texture*>::const_iterator t_it = materialTextures.begin();
 
-        int lastTextureIdx = 0;
         for (; t_it != materialTextures.end(); ++t_it) {
             if (t_it->second != nullptr) {
-                if (shader->SetUniformTexture(t_it->first, lastTextureIdx)) {
-                    t_it->second->Bind(lastTextureIdx);
-                    lastTextureIdx += 1;
-                }
+                size_t textureUnit = t_it->second->Bind();
+                shader->SetUniformTexture(t_it->first, textureUnit);
             }
         }
 
@@ -144,9 +141,8 @@ void RenderQueue::Render() {
             for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
                 Texture2D* texture = surfaces[i].geometry->textures[j];
                 if (texture != nullptr) {
-                    if (shader->SetUniformTexture("texture" + to_string(j), lastTextureIdx + j)) {
-                        texture->Bind(lastTextureIdx + j);
-                    }
+                    size_t textureUnit = texture->Bind();
+                    shader->SetUniformTexture("texture" + to_string(j), textureUnit);
                 }
             }
 

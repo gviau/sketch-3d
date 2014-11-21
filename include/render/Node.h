@@ -168,7 +168,7 @@ class Node {
 		Mesh*				GetMesh() const;
 		Material*			GetMaterial() const;
 
-	protected:
+	private:
 		static long long	nextNameIndex_;	/**< The next available number for the automatic name */
 
 		string				name_;		/**< The name of this node */

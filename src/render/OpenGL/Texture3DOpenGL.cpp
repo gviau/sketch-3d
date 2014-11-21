@@ -61,11 +61,6 @@ bool Texture3DOpenGL::Create() {
     return true;
 }
 
-void Texture3DOpenGL::Bind(unsigned int unit) {
-    glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, textureName_);
-}
-
 void Texture3DOpenGL::SetPixelDataBytesImp(unsigned char* data) {
     if (textureName_ != 0) {
         glActiveTexture(GL_TEXTURE0);

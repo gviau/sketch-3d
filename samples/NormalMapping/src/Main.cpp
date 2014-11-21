@@ -74,8 +74,6 @@ int main(int argc, char** argv) {
     OIS::Keyboard* keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
 #endif
 
-    float angleY = 0.0f;
-    float angleX = 0.0f;
     float t = 0.0f;
     clock_t begin, end;
 
@@ -95,19 +93,16 @@ int main(int argc, char** argv) {
         }
 
         if (keyboard->isKeyDown(OIS::KC_A) || keyboard->isKeyDown(OIS::KC_LEFT)) {
-            angleY += t;
+            sphereNode.Yaw(t);
         } else if (keyboard->isKeyDown(OIS::KC_D) || keyboard->isKeyDown(OIS::KC_RIGHT)) {
-            angleY -= t;
+            sphereNode.Yaw(-t);
         }
 
         if (keyboard->isKeyDown(OIS::KC_W) || keyboard->isKeyDown(OIS::KC_UP)) {
-            angleX += t;
+            sphereNode.Pitch(t);
         } else if (keyboard->isKeyDown(OIS::KC_S) || keyboard->isKeyDown(OIS::KC_DOWN)) {
-            angleX -= t;
+            sphereNode.Pitch(-t);
         }
-
-        sphereNode.Yaw(angleY);
-        //sphereNode.Pitch(angleX);
 #endif
 
         Renderer::GetInstance()->Clear();

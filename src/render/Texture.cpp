@@ -1,5 +1,7 @@
 #include "render/Texture.h"
 
+#include "render/Renderer.h"
+
 namespace Sketch3D {
 
 Texture::Texture() : width_(0), height_(0), filterMode_(FILTER_MODE_NEAREST),
@@ -17,6 +19,10 @@ Texture::Texture(unsigned int width, unsigned int height,
 }
 
 Texture::~Texture() {
+}
+
+size_t Texture::Bind() const {
+    return Renderer::GetInstance()->BindTexture(this);
 }
 
 void Texture::SetWidth(unsigned int width) {

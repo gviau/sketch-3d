@@ -45,12 +45,6 @@ class Texture3DOpenGL : public Texture3D {
          */
         virtual bool        Create();
 
-        /**
-         * Bind the texture to a texture unit
-         * @param unit On which texture unit should we bind the texture
-         */
-        virtual void        Bind(unsigned int unit);
-
     private:
         GLuint              textureName_;   /**< OpenGL texture's name */
 

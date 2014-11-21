@@ -13,8 +13,9 @@ namespace Sketch3D {
  */
 class Texture2DOpenGL : public Texture2D {
 
+    friend class RenderSystemOpenGL;
     friend class RenderTextureOpenGL;
-
+    
     public:
 		/**
 		 * Constructor. Initializes the width and height to 0, the filter mode
@@ -46,12 +47,6 @@ class Texture2DOpenGL : public Texture2D {
          * @return true if the texture was created correctly
          */
         virtual bool        Create();
-
-        /**
-         * Bind the texture to a texture unit
-         * @param unit On which texture unit should we bind the texture
-         */
-        virtual void        Bind(unsigned int unit);
 
         /**
          * Get the data from the texture. If the pointer is null, try to get it from the opengl texture
