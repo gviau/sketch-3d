@@ -12,6 +12,9 @@ namespace Sketch3D {
  * 3D texture implementation with OpenGL API
  */
 class Texture3DOpenGL : public Texture3D {
+
+    friend class RenderSystemOpenGL;
+
     public:
 		/**
 		 * Constructor. Initializes the width, height and depth to 0, the filter mode

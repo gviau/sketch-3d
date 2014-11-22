@@ -20,7 +20,7 @@ bool Texture2DOpenGL::Create() {
 	    glGenTextures(1, &textureName_);
     }
 
-	glBindTexture(GL_TEXTURE_2D, textureName_);
+    Bind();
 
 	GLuint filter, wrap, format, components, type, bpp;
 	switch (filterMode_) {
@@ -66,8 +66,6 @@ bool Texture2DOpenGL::Create() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
     return true;
 }
 
@@ -76,7 +74,7 @@ const void* Texture2DOpenGL::GetData() const {
         return data_;
     }
 
-    glBindTexture(GL_TEXTURE_2D, textureName_);
+    Bind();
 
     GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
@@ -85,34 +83,28 @@ const void* Texture2DOpenGL::GetData() const {
     float* data = new float[width_ * height_ * bpp];
     glGetTexImage(GL_TEXTURE_2D, 0, components, type, data);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
     return data;
 }
 
 void Texture2DOpenGL::SetPixelDataBytesImp(unsigned char* data) {
     if (textureName_ != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureName_);
+        Bind();
 
         GLuint format, components, type, bpp;
         GetOpenglTextureFormat(format_, format, components, type, bpp);
 
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_, components, GL_UNSIGNED_BYTE, data);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 
 void Texture2DOpenGL::SetPixelDataFloatsImp(float* data) {
     if (textureName_ != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureName_);
+        Bind();
 
         GLuint format, components, type, bpp;
         GetOpenglTextureFormat(format_, format, components, type, bpp);
 
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_, components, GL_FLOAT, data);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 

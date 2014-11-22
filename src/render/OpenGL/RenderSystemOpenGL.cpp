@@ -228,9 +228,20 @@ void RenderSystemOpenGL::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingF
 }
 
 void RenderSystemOpenGL::BindTexture(const Texture* texture, size_t unit) const {
-    size_t textureName = dynamic_cast<const Texture2DOpenGL*>(texture)->textureName_;
+    TextureType_t textureType = texture->GetType();
+    size_t textureName = 0;
+
     glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, textureName);
+    if (textureType == TEXTURE_TYPE_2D) {
+        textureName = dynamic_cast<const Texture2DOpenGL*>(texture)->textureName_;
+        glBindTexture(GL_TEXTURE_2D, textureName);
+    } else if (textureType == TEXTURE_TYPE_3D) {
+        textureName = dynamic_cast<const Texture3DOpenGL*>(texture)->textureName_;
+        glBindTexture(GL_TEXTURE_2D, textureName);
+    } else {
+        Logger::GetInstance()->Error("Invalid texture type for binding!");
+        return;
+    }
 }
 
 void RenderSystemOpenGL::QueryDeviceCapabilities() {
