@@ -112,7 +112,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
     importer_ = new Assimp::Importer;
     unsigned int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_SortByPType;
     if (useNormals) {
-        flags |= aiProcess_GenNormals | aiProcess_FixInfacingNormals;
+        flags |= aiProcess_GenSmoothNormals | aiProcess_FixInfacingNormals;
     }
 
     if (useTextureCoordinates) {
