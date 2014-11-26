@@ -14,4 +14,7 @@ Shader::Shader(const string& vertexFilename, const string& fragmentFilename) : a
     }
 }
 
+Shader::~Shader() {
+}
+
 }

@@ -18,6 +18,7 @@ namespace Sketch3D {
 class ShaderOpenGL : public Shader {
 	public:
 		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);
+        virtual ~ShaderOpenGL();
 
 		virtual void SetActive(bool val);
 		virtual bool SetUniformInt(const string& uniform, int value);
@@ -31,9 +32,10 @@ class ShaderOpenGL : public Shader {
         virtual bool SelectSubroutine(const string& subroutine, ShaderType_t type);
 
 	private:
+        GLuint              vertex_;    /**< Represents the vertex shader */
+        GLuint              fragment_;  /**< Represents the fragment shader */
 		GLuint				program_;	/**< Represents the shader program */
 		map<GLint, GLuint>	textures_;	/**< Allows the shader to map textures to its different texture units */
-		unsigned int		currentTextureUnit_;	/**< The current texture unit to use to set the texture */
 
 		/**
 		 * Read the shader file and output a string to pass to the GLSL

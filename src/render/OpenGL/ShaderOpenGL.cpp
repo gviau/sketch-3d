@@ -19,20 +19,21 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 						   const string& fragmentFilename,
                            const vector<string>& vertexInputs) : Shader(vertexFilename,
 																	    fragmentFilename),
-															     currentTextureUnit_(0)
+															     vertex_(0),
+                                                                 fragment_(0)
 {
 	Logger::GetInstance()->Debug("Shader creation");
 
 	program_ = glCreateProgram();
 
-	GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-	if (!vertex) {
+	vertex_ = glCreateShader(GL_VERTEX_SHADER);
+	if (!vertex_) {
 		Logger::GetInstance()->Error("Couldn't create vertex shader");
 		return;
 	}
 
-	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	if (!fragment) {
+	fragment_ = glCreateShader(GL_FRAGMENT_SHADER);
+	if (!fragment_) {
 		Logger::GetInstance()->Error("Couldn't create fragment shader");
 		return;
 	}
@@ -45,10 +46,10 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
         return;
     }
 
-	glShaderSource(vertex, 1, &vertexFile, NULL);
-	glCompileShader(vertex);
-	glAttachShader(program_, vertex);
-	LogShaderErrors(vertex, vertexFilename);
+	glShaderSource(vertex_, 1, &vertexFile, NULL);
+	glCompileShader(vertex_);
+	glAttachShader(program_, vertex_);
+	LogShaderErrors(vertex_, vertexFilename);
 
 	// Create the fragment shader
 	Logger::GetInstance()->Debug("Fragment shader creation");
@@ -58,12 +59,12 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
         return;
     }
 
-	glShaderSource(fragment, 1, &fragmentFile, NULL);
-	glCompileShader(fragment);
-	glAttachShader(program_, fragment);
-	LogShaderErrors(fragment, fragmentFilename);
+	glShaderSource(fragment_, 1, &fragmentFile, NULL);
+	glCompileShader(fragment_);
+	glAttachShader(program_, fragment_);
+	LogShaderErrors(fragment_, fragmentFilename);
 	
-	// TEMP
+    // Sets the attrib location according the array of vertex inputs
     for (size_t i = 0; i < vertexInputs.size(); i++) {
         glBindAttribLocation(program_, i, vertexInputs[i].c_str());
     }
@@ -71,6 +72,12 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename,
 	Logger::GetInstance()->Debug("Shader program linking");
 	glLinkProgram(program_);
 	LogProgramErrors();
+}
+
+ShaderOpenGL::~ShaderOpenGL() {
+    glDeleteProgram(program_);
+    glDeleteShader(vertex_);
+    glDeleteShader(fragment_);
 }
 
 void ShaderOpenGL::SetActive(bool val) {

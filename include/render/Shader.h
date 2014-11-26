@@ -38,8 +38,12 @@ class Shader {
 		 * @param vertexFilename The filename of the vertex shader
 		 * @param fragmentFilename The filename of the fragment shader
 		 */
-		Shader(const string& vertexFilename, const string& fragmentFilename);
+		                Shader(const string& vertexFilename, const string& fragmentFilename);
 
+        /**
+         * Destructor
+         */
+        virtual        ~Shader();
 		/**
 		 * Activate or deactivate the shader
 		 * @param val If set to true, this shader will be set as the current
