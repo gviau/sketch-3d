@@ -318,4 +318,8 @@ SceneTree& Renderer::GetSceneTree() {
 	return sceneTree_;
 }
 
+BufferObjectManager* Renderer::GetBufferObjectManager() const {
+    return renderSystem_->GetBufferObjectManager();
+}
+
 }

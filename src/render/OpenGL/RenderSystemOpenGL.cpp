@@ -3,6 +3,7 @@
 #include "render/OpenGL/gl/glew.h"
 #include "render/OpenGL/gl/gl.h"
 
+#include "render/OpenGL/BufferObjectManagerOpenGL.h"
 #include "render/OpenGL/RenderTextureOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
@@ -58,6 +59,8 @@ bool RenderSystemOpenGL::Initialize() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
     SetRenderFillMode(RenderMode_t::RENDER_MODE_FILL);
+
+    bufferObjectManager_ = new BufferObjectManagerOpenGL;
 
 	return true;
 }

@@ -12,6 +12,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward class declaration
+class BufferObjectManager;
 class RenderSystem;
 class RenderTexture;
 class Shader;
@@ -113,9 +114,9 @@ class Renderer {
 		/**
 		 * Destructor
 		 */
-						   ~Renderer();
+						       ~Renderer();
 
-		static Renderer*	GetInstance();
+		static Renderer*	    GetInstance();
 
 		/**
 		 * Initialize the renderer
@@ -123,8 +124,8 @@ class Renderer {
 		 * @param window The window for which to create a rendering context
 		 * @return true if the initialization went correctly
 		 */
-		bool				Initialize(RenderSystem_t renderSystem,
-									   Window& window);
+		bool				    Initialize(RenderSystem_t renderSystem,
+									       Window& window);
 
 		/**
 		 * Change the clear color
@@ -133,23 +134,23 @@ class Renderer {
 		 * @param blue The blue component of the color
 		 * @param alpha The alpha component of the color
 		 */
-		void				SetClearColor(float red, float green, float blue, float alpha=0.0f) const;
+		void				    SetClearColor(float red, float green, float blue, float alpha=0.0f) const;
 
 		/**
 		 * Clears the current framebuffer
          * @param buffer Which buffers to clear
 		 */
-		void				Clear(int buffer=(CLEAR_BUFFER_COLOR|CLEAR_BUFFER_DEPTH)) const;
+		void				    Clear(int buffer=(CLEAR_BUFFER_COLOR|CLEAR_BUFFER_DEPTH)) const;
 
 		/**
 		 * End the rendering process
 		 */
-		void				EndRender();
+		void				    EndRender();
 
 		/**
 		 * The actual rendering
 		 */
-		void				Render();
+		void				    Render();
 
 		/**
 		 * Set an orthogonal projection. This replace the current projection matrix
@@ -160,8 +161,8 @@ class Renderer {
 		 * @param near The near position of the viewing volume
 		 * @param far The far position of the viewing volume
 		 */
-		void				OrthoProjection(float left, float right, float bottom,
-											float top, float near, float far);
+		void				    OrthoProjection(float left, float right, float bottom,
+											    float top, float near, float far);
 
 		/**
 		 * Set a perspective projection. This replace the current projection matrix
@@ -172,8 +173,8 @@ class Renderer {
 		 * @param near The near position of the viewing volume
 		 * @param far The far position of the viewing volume
 		 */
-		void				PerspectiveProjection(float left, float right, float bottom,
-												  float top, float near, float far);
+		void				    PerspectiveProjection(float left, float right, float bottom,
+												      float top, float near, float far);
 
 		/**
 		 * Set a perspective projection. This replace the current projection matrix
@@ -182,8 +183,8 @@ class Renderer {
 		 * @param near The near position of the viewing volume
 		 * @param far The far position of the viewing volume
 		 */
-		void				PerspectiveProjection(float fov, float aspect,
-												  float near, float far);
+		void				    PerspectiveProjection(float fov, float aspect,
+												      float near, float far);
 
 		/**
 		 * Set a new camera position, looking direction and up vector
@@ -191,15 +192,15 @@ class Renderer {
 		 * @param point The point to look at
 		 * @param up The up vector to use for the camera. UP by default
 		 */
-		void				CameraLookAt(const Vector3& position,
-										 const Vector3& point,
-										 const Vector3& up=Vector3::UP);
+		void				    CameraLookAt(const Vector3& position,
+										     const Vector3& point,
+										     const Vector3& up=Vector3::UP);
 
 		/**
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		void				SetRenderFillMode(RenderMode_t mode) const;
+		void				    SetRenderFillMode(RenderMode_t mode) const;
 
         /**
          * Sets the camera viewport dimension
@@ -208,37 +209,37 @@ class Renderer {
          * @param width The width of the viewport
          * @param height The height of the viewport
          */
-        void                SetViewport(size_t x, size_t y, size_t width, size_t height);
+        void                    SetViewport(size_t x, size_t y, size_t width, size_t height);
 
         /**
          * Enable or disable depth testing
          * @param val Enabled if true, disabled otherwise
          */
-        void                EnableDepthTest(bool val) const;
+        void                    EnableDepthTest(bool val) const;
 
         /**
          * Enable or disable depth writing. This will only work if depth testing is enabled
          * @param val Enabled if true, disabled otherwise
          */
-        void                EnableDepthWrite(bool val) const;
+        void                    EnableDepthWrite(bool val) const;
 
         /**
          * Enable or disable color writing.
          * @param val Enabled if true, disabled otherwise
          */
-        void                EnableColorWrite(bool val) const;
+        void                    EnableColorWrite(bool val) const;
 
         /**
          * Sets the depth compare function to use
          * @param comparison The comparison function to use
          */
-        void                SetDepthComparisonFunc(DepthFunc_t comparison) const;
+        void                    SetDepthComparisonFunc(DepthFunc_t comparison) const;
 
         /**
          * Select the culling method
          * @param cullingMethod The culling method to use
          */
-        void                SetCullingMethod(CullingMethod_t cullingMethod) const;
+        void                    SetCullingMethod(CullingMethod_t cullingMethod) const;
 
         /**
          * Create a shader object
@@ -247,25 +248,25 @@ class Renderer {
          * @param vertexInputs The vertex inputs in order
          * @return A pointer to a shader
          */
-        Shader*             CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const;
+        Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const;
 
         /**
          * Create a 2D texture object
          * @return A pointer to a 2D texture
          */
-        Texture2D*          CreateTexture2D() const;
+        Texture2D*              CreateTexture2D() const;
 
         /**
          * Create a 2D texture object from a file
          * @return A pointer to a 2D texture
          */
-        Texture2D*          CreateTexture2DFromFile(const string& filename) const;
+        Texture2D*              CreateTexture2DFromFile(const string& filename) const;
 
         /**
          * Create a 3D texture object
          * @return A pointer to a 3D texture
          */
-        Texture3D*          CreateTexture3D() const;
+        Texture3D*              CreateTexture3D() const;
 
         /**
          * Create a render texture
@@ -274,37 +275,37 @@ class Renderer {
          * @param format The format of the render texture
          * @return A pointer to a render texture
          */
-        RenderTexture*      CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
+        RenderTexture*          CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
 
         /**
          * Binds the render system frame buffer that is used to draw on the screen
          */
-        void                BindScreenBuffer() const;
+        void                    BindScreenBuffer() const;
 
         /**
          * Enable blending
          * @param val if true, enables blending, deactivate it otherwise
          */
-        void                EnableBlending(bool val) const;
+        void                    EnableBlending(bool val) const;
 
         /**
          * Specifies the blending equation to use
          */
-        void                SetBlendingEquation(BlendingEquation_t equation) const;
+        void                    SetBlendingEquation(BlendingEquation_t equation) const;
 
         /**
          * Specifies the blending factor to use
          * @param srcFactor The factor to use for the source pixel (the pixel being processed)
          * @param dstFactor the factor to use for the destination pixel (the pixel already present in the framebuffer)
          */
-        void                SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
+        void                    SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
 
         /**
          * Convert a point in screen space into world space. This function uses the current perspective and view matrix
          * @param screenPoint A vector representing the point in screen space
          * @return A vector representing the point in world space
          */
-        Vector3             ScreenToWorldPoint(const Vector2& point) const;
+        Vector3                 ScreenToWorldPoint(const Vector2& point) const;
 
         /**
          * Bind a given texture to a texture unit. This function chooses a texture unit by using
@@ -312,14 +313,16 @@ class Renderer {
          * @param texture The texture to cache
          * @return The texture unit to which the texture has been bound to
          */
-        size_t              BindTexture(const Texture* texture);
+        size_t                  BindTexture(const Texture* texture);
 
-		const Matrix4x4&	GetProjectionMatrix() const;
-		const Matrix4x4&	GetViewMatrix() const;
-		const Matrix4x4&	GetViewProjectionMatrix() const;
+		const Matrix4x4&	    GetProjectionMatrix() const;
+		const Matrix4x4&	    GetViewMatrix() const;
+		const Matrix4x4&	    GetViewProjectionMatrix() const;
 
-		const SceneTree&	GetSceneTree() const;
-		SceneTree&			GetSceneTree();
+		const SceneTree&	    GetSceneTree() const;
+		SceneTree&			    GetSceneTree();
+
+        BufferObjectManager*    GetBufferObjectManager() const;
 
 	private:
         /**
@@ -335,34 +338,36 @@ class Renderer {
         };
         typedef map<const Texture*, TextureUnitNode_t*> TextureCache_t;
 
-		static Renderer		instance_;	        /**< Singleton instance of this class */
+		static Renderer		    instance_;	            /**< Singleton instance of this class */
 
-		RenderSystem*		renderSystem_;		/**< The render system that is currently being used */
+		RenderSystem*		    renderSystem_;		    /**< The render system that is currently being used */
 
-		Matrix4x4			projection_;		/**< The projection matrix */
-		Matrix4x4			view_;				/**< The view matrix */
-		Matrix4x4			viewProjection_;	/**< Pre-computed view-projection matrix */
+		Matrix4x4			    projection_;		    /**< The projection matrix */
+		Matrix4x4			    view_;				    /**< The view matrix */
+		Matrix4x4			    viewProjection_;	    /**< Pre-computed view-projection matrix */
 
-		SceneTree			sceneTree_;			/**< The scene tree to render */
+		SceneTree			    sceneTree_;			    /**< The scene tree to render */
 
-        TextureUnitNode_t*  head_;              /**< Head of the double linked list */
-        TextureUnitNode_t*  tail_;              /**< Tail of the double linked list */
-        TextureCache_t      textureCache_;      /**< Texture pointers refer directly to a cache element for faster lookup */
+        BufferObjectManager*    bufferObjectManager_;   /**< Buffer object manager used to create the buffer objects */
+
+        TextureUnitNode_t*      head_;                  /**< Head of the double linked list */
+        TextureUnitNode_t*      tail_;                  /**< Tail of the double linked list */
+        TextureCache_t          textureCache_;          /**< Texture pointers refer directly to a cache element for faster lookup */
 
 		/**
 		 * Constructor
 		 */
-							Renderer();
+							    Renderer();
 
 		/**
 		 * Copy-constructor - here only to disallow copy
 		 */
-							Renderer(const Renderer& src);
+							    Renderer(const Renderer& src);
 
 		/**
 		 * Assignment operator - here only to disallow assignment
 		 */
-							Renderer& operator=(const Renderer& rhs);
+							    Renderer& operator=(const Renderer& rhs);
 };
 
 }

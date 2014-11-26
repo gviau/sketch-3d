@@ -4,6 +4,8 @@
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
+#include "render/BufferObject.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -61,21 +63,6 @@ enum MeshType_t {
     MESH_TYPE_STATIC,
     MESH_TYPE_DYNAMIC,
 };
-
-/**
- * @enum VertexAttributes_t
- * The different type of vertex attributes that can be loaded from a mesh and
- * sent to the vertex shader.
- */
-enum VertexAttributes_t {
-    VERTEX_ATTRIBUTES_POSITION,
-    VERTEX_ATTRIBUTES_NORMAL,
-    VERTEX_ATTRIBUTES_TEX_COORDS,
-    VERTEX_ATTRIBUTES_TANGENT
-};
-
-// Typdefs
-typedef map<VertexAttributes_t, size_t> VertexAttributesMap_t;
 
 /**
  * @class Mesh
@@ -147,10 +134,10 @@ class Mesh {
 
 		/**
 		 * Get the rendering information about the mesh for rendering
-         * @param bufferObjects A pointer to buffer object names
+         * @param bufferObjects A pointer to the buffer objects
          * @param surfaces The list of surfaces
 		 */
-        void					GetRenderInfo(unsigned int*& bufferObjects, vector<ModelSurface_t>& surfaces) const;
+        void					GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const;
 
 	protected:
         MeshType_t              meshType_;  /**< The type of the mesh */
@@ -160,10 +147,7 @@ class Mesh {
         Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
         VertexAttributesMap_t   vertexAttributes_;  /**< Vertex attributes used by the mesh */
 
-		// TEMP
-		unsigned int*	        vbo_;		/**< Vertex buffer objects */
-		unsigned int*	        ibo_;		/**< Index buffer objects */
-		unsigned int*   	    vao_;		/**< Vertex array objects */
+        BufferObject**          bufferObjects_; /**< Buffer objects for all the sub mesh */
 
         /**
          * Free the mesh memory

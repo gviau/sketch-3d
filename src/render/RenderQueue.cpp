@@ -1,5 +1,6 @@
 #include "render/RenderQueue.h"
 
+#include "render/BufferObject.h"
 #include "render/Material.h"
 #include "render/Mesh.h"
 #include "render/Node.h"
@@ -9,10 +10,6 @@
 
 #include <algorithm>
 using namespace std;
-
-// TEMP
-#include "render/OpenGL/gl/glew.h"
-#include "render/OpenGL/gl/gl.h"
 
 namespace Sketch3D {
 
@@ -120,7 +117,7 @@ void RenderQueue::Render() {
 
         // Render
 	    // Get the rendering data
-        unsigned int* bufferObjects;
+        BufferObject** bufferObjects;
         vector<ModelSurface_t> surfaces;
         item->mesh_->GetRenderInfo(bufferObjects, surfaces);
 
@@ -146,9 +143,7 @@ void RenderQueue::Render() {
                 }
             }
 
-            glBindVertexArray(bufferObjects[i]);
-                glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
-            glBindVertexArray(0);
+            bufferObjects[i]->Render();
         }
     }
 

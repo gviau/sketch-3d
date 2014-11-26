@@ -1,5 +1,7 @@
 #include "render/Mesh.h"
 
+#include "render/BufferObject.h"
+#include "render/BufferObjectManager.h"
 #include "render/ModelManager.h"
 #include "render/Renderer.h"
 #include "render/Texture2D.h"
@@ -20,19 +22,19 @@
 
 namespace Sketch3D {
 
-Mesh::Mesh() : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+Mesh::Mesh() : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
 {
 }
 
 Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC),
-        filename_(""), fromCache_(false), importer_(nullptr), vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+        filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
 {
     Load(filename, vertexAttributes, meshType);
     Initialize(vertexAttributes, meshType);
 }
 
 Mesh::Mesh(const Mesh& src) : meshType_(src.meshType_), filename_(src.filename_), fromCache_(false), importer_(nullptr),
-        vbo_(nullptr), ibo_(nullptr), vao_(nullptr)
+        bufferObjects_(nullptr)
 {
     if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
         Load(filename_, src.vertexAttributes_, meshType_);
@@ -52,9 +54,7 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
         filename_ = rhs.filename_;
         fromCache_ = false;
         importer_ = nullptr;
-        vbo_ = nullptr;
-        ibo_ = nullptr;
-        vao_ = nullptr;
+        bufferObjects_ = nullptr;
 
         if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
             Load(filename_, rhs.vertexAttributes_, meshType_);
@@ -264,16 +264,13 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t 
         attributesFromIndex[it->second] = it->first;
     }
 
-	// TEMP - construct the buffers
-    vbo_ = new unsigned int[surfaces_.size()];
-    ibo_ = new unsigned int[surfaces_.size()];
-    vao_ = new unsigned int[surfaces_.size()];
-
-    glGenBuffers(surfaces_.size(), vbo_);
-    glGenBuffers(surfaces_.size(), ibo_);
-    glGenVertexArrays(surfaces_.size(), vao_);
+    bufferObjects_ = new BufferObject* [surfaces_.size()];
+    BufferUsage_t bufferUsage = (meshType == MESH_TYPE_STATIC) ? BUFFER_USAGE_STATIC : BUFFER_USAGE_DYNAMIC;
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
+        bufferObjects_[i] = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes_, bufferUsage);
+        BufferObject* bufferObject = bufferObjects_[i];
+
 	    // Interleave the data
 	    vector<float> data;
         data.reserve(surfaces_[i].geometry->numVertices * 3 +
@@ -281,20 +278,19 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t 
                      surfaces_[i].geometry->numTexCoords * 2 +
                      surfaces_[i].geometry->numTangents * 3);
 
-        bool hasVertices = surfaces_[i].geometry->numVertices > 0;
         bool hasNormals = surfaces_[i].geometry->numNormals > 0;
         bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
         bool hasTangents = surfaces_[i].geometry->numTangents > 0;
 
+        Vector3 vertex;
         for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
             map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+
             for (; v_it != attributesFromIndex.end(); ++v_it) {
                 switch (v_it->second) {
                     case VERTEX_ATTRIBUTES_POSITION:
-                        if (hasVertices) {
-                            Vector3 vertex = surfaces_[i].geometry->vertices[j];
-                            data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-                        }
+                        vertex = surfaces_[i].geometry->vertices[j];
+                        data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
                         break;
 
                     case VERTEX_ATTRIBUTES_NORMAL:
@@ -321,71 +317,26 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t 
             }
 	    }
 
-        size_t stride = ((hasVertices) ? sizeof(Vector3) : 0) +
-                        ((hasNormals) ? sizeof(Vector3) : 0) +
-                        ((hasTexCoords) ? sizeof(Vector2) : 0) +
-                        ((hasTangents) ? sizeof(Vector3) : 0);
-
-        // We first create the vertex array object and then bind the vertex and index buffer objects
-	    glBindVertexArray(vao_[i]);
-
-        // Vertex buffer object
-        int type = (meshType_ == MESH_TYPE_STATIC) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-	    glBindBuffer(GL_ARRAY_BUFFER, vbo_[i]);
-	    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], type);
-
-        size_t cumulativeOffset = 0;
-        map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
-        for (; v_it != attributesFromIndex.end(); ++v_it) {
-            size_t size = 0;
-            size_t offset = 0;
-
-            switch (v_it->second) {
-                case VERTEX_ATTRIBUTES_POSITION:
-                    size = 3;
-                    offset = sizeof(Vector3);
-                    break;
-
-                case VERTEX_ATTRIBUTES_NORMAL:
-                    if (!hasNormals) {
-                        continue;
-                    }
-
-                    size = 3;
-                    offset = sizeof(Vector3);
-                    break;
-
-                case VERTEX_ATTRIBUTES_TEX_COORDS:
-                    if (!hasTexCoords) {
-                        continue;
-                    }
-
-                    size = 2;
-                    offset = sizeof(Vector2);
-                    break;
-
-                case VERTEX_ATTRIBUTES_TANGENT:
-                    if (!hasTangents) {
-                        continue;
-                    }
-
-                    size = 3;
-                    offset = sizeof(Vector3);
-                    break;
-            }
-
-            glEnableVertexAttribArray(v_it->first);
-            glVertexAttribPointer(v_it->first, size, GL_FLOAT, GL_FALSE, stride, (void*)cumulativeOffset);
-            cumulativeOffset += offset;
+        int presentVertexAttributes = 0;
+        if (hasNormals) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_NORMAL;
         }
 
-        // Index buffer object
-	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_[i]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, surfaces_[i].geometry->numIndices * sizeof(unsigned short), surfaces_[i].geometry->indices, GL_STATIC_DRAW);
+        if (hasTexCoords) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TEX_COORDS;
+        }
 
-        glBindVertexArray(0);
-	    glBindBuffer(GL_ARRAY_BUFFER, 0);
-	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        if (hasTangents) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TANGENT;
+        }
+
+        if (!bufferObject->SetVertexData(data, presentVertexAttributes)) {
+            Logger::GetInstance()->Error("The vertex attributes are not all present");
+            FreeMeshMemory();
+            break;
+        }
+
+        bufferObject->SetIndexData(surfaces_[i].geometry->indices, surfaces_[i].geometry->numIndices);
     }
 }
 
@@ -407,20 +358,20 @@ void Mesh::UpdateMeshData() const {
                      surfaces_[i].geometry->numTexCoords * 2 +
                      surfaces_[i].geometry->numTangents * 3);
 
-        bool hasVertices = surfaces_[i].geometry->numVertices > 0;
         bool hasNormals = surfaces_[i].geometry->numNormals > 0;
         bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
         bool hasTangents = surfaces_[i].geometry->numTangents > 0;
 
+        // Interleave the data
+        Vector3 vertex;
         for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
             map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+
             for (; v_it != attributesFromIndex.end(); ++v_it) {
                 switch (v_it->second) {
                     case VERTEX_ATTRIBUTES_POSITION:
-                        if (hasVertices) {
-                            Vector3 vertex = surfaces_[i].geometry->vertices[j];
-                            data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-                        }
+                        vertex = surfaces_[i].geometry->vertices[j];
+                        data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
                         break;
 
                     case VERTEX_ATTRIBUTES_NORMAL:
@@ -447,15 +398,25 @@ void Mesh::UpdateMeshData() const {
             }
 	    }
 
-        int type = (meshType_ == MESH_TYPE_STATIC) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-	    glBindBuffer(GL_ARRAY_BUFFER, vbo_[i]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(float), &data[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        int presentVertexAttributes = 0;
+        if (hasNormals) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_NORMAL;
+        }
+
+        if (hasTexCoords) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TEX_COORDS;
+        }
+
+        if (hasTangents) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TANGENT;
+        }
+
+        bufferObjects_[i]->SetVertexData(data, presentVertexAttributes);
     }
 }
 
-void Mesh::GetRenderInfo(unsigned int*& bufferObjects, vector<ModelSurface_t>& surfaces) const {
-    bufferObjects = vao_;
+void Mesh::GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const {
+    bufferObjects = bufferObjects_;
     surfaces = surfaces_;
 }
 
@@ -487,13 +448,12 @@ void Mesh::FreeMeshMemory() {
             ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
         }
 
-        glDeleteBuffers(surfaces_.size(), vbo_);
-        glDeleteBuffers(surfaces_.size(), ibo_);
-        glDeleteVertexArrays(surfaces_.size(), vao_);
+        for (size_t i = 0; i < surfaces_.size(); i++) {
+            Renderer::GetInstance()->GetBufferObjectManager()->DeleteBufferObject(bufferObjects_[i]);
+        }
+        delete[] bufferObjects_;
 
-        delete[] vbo_;
-        delete[] ibo_;
-        delete[] vao_;
+        surfaces_.clear();
     }
 }
 

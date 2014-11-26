@@ -15,6 +15,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
+class BufferObjectManager;
 class Matrix4x4;
 class RenderTexture;
 class Shader;
@@ -197,6 +198,7 @@ class RenderSystem {
         size_t                              GetWidth() const { return width_; }
         size_t                              GetHeight() const { return height_; }
         const DeviceCapabilities_t* const   GetDeviceCapabilities() const { return &deviceCapabilities_; }
+        BufferObjectManager*                GetBufferObjectManager() const;
 
 	protected:
         Window&							    window_;        /**< The window */
@@ -208,6 +210,7 @@ class RenderSystem {
         vector<Shader*>                     shaders_;       /**< List of all shaders created */
 
         DeviceCapabilities_t                deviceCapabilities_;
+        BufferObjectManager*                bufferObjectManager_;
 
 		/**
 		 * Query the device capabilities

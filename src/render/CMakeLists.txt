@@ -8,6 +8,7 @@ set(HEADER_PATH "${CMAKE_SOURCE_DIR}/include/render")
 
 set(SRC
 	${SRC_PATH}/BufferObject.cpp
+	${SRC_PATH}/BufferObjectManager.cpp
 	${SRC_PATH}/Material.cpp
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/ModelManager.cpp
@@ -19,6 +20,7 @@ set(SRC
 	${SRC_PATH}/RenderTexture.cpp
 	${SRC_PATH}/SceneTree.cpp
 	${SRC_PATH}/Shader.cpp
+	${SRC_PATH}/SkinnedMesh.cpp
 	${SRC_PATH}/Texture.cpp
 	${SRC_PATH}/Texture2D.cpp
 	${SRC_PATH}/Texture3D.cpp
@@ -27,6 +29,7 @@ set(SRC
 
 set(HEADER
 	${HEADER_PATH}/BufferObject.h
+	${HEADER_PATH}/BufferObjectManager.h
 	${HEADER_PATH}/Material.h
 	${HEADER_PATH}/Mesh.h
 	${HEADER_PATH}/ModelManager.h
@@ -39,6 +42,7 @@ set(HEADER
 	${HEADER_PATH}/RenderTexture.h
 	${HEADER_PATH}/SceneTree.h
 	${HEADER_PATH}/Shader.h
+	${HEADER_PATH}/SkinnedMesh.h
 	${HEADER_PATH}/Texture.h
 	${HEADER_PATH}/Texture2D.h
 	${HEADER_PATH}/Texture3D.h
@@ -48,6 +52,8 @@ source_group("Source Files" FILES ${SRC})
 source_group("Header Files" FILES ${HEADER})
 
 set(OPENGL_SRC
+	${SRC_PATH}/OpenGL/BufferObjectManagerOpenGL.cpp
+	${SRC_PATH}/OpenGL/BufferObjectOpenGL.cpp
 	${SRC_PATH}/OpenGL/RenderQueueOpenGL.cpp
 	${SRC_PATH}/OpenGL/RenderSystemOpenGL.cpp
 	${SRC_PATH}/OpenGL/RenderTextureOpenGL.cpp
@@ -58,6 +64,8 @@ set(OPENGL_SRC
 )
 
 set(OPENGL_HEADER
+	${HEADER_PATH}/OpenGL/BufferObjectManagerOpenGL.h
+	${HEADER_PATH}/OpenGL/BufferObjectOpenGL.h
 	${HEADER_PATH}/OpenGL/RenderQueueOpenGL.h
 	${HEADER_PATH}/OpenGL/RenderContextOpenGL.h
 	${HEADER_PATH}/OpenGL/RenderSystemOpenGL.h

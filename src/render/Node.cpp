@@ -1,5 +1,6 @@
 #include "render/Node.h"
 
+#include "render/BufferObject.h"
 #include "render/Material.h"
 #include "render/Mesh.h"
 #include "render/ModelManager.h"
@@ -9,10 +10,6 @@
 #include "render/Texture2D.h"
 
 #include <sstream>
-
-// TEMP
-#include "render/OpenGL/gl/glew.h"
-#include "render/OpenGL/gl/gl.h"
 
 namespace Sketch3D {
 
@@ -112,7 +109,7 @@ void Node::ImmediateRender() const {
     shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
 
     // Get the rendering data
-    unsigned int* bufferObjects;
+    BufferObject** bufferObjects;
     vector<ModelSurface_t> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
@@ -139,9 +136,7 @@ void Node::ImmediateRender() const {
             }
         }
 
-        glBindVertexArray(bufferObjects[i]);
-            glDrawElements(GL_TRIANGLES, surfaces[i].geometry->numIndices, GL_UNSIGNED_SHORT, 0);
-        glBindVertexArray(0);
+        bufferObjects[i]->Render();
     }
 }
 
