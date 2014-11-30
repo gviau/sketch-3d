@@ -72,14 +72,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     ModelSurface_t modelSurface;
     modelSurface.geometry = &surface;
 
-    Mesh waterMesh;
+    Mesh waterMesh(MESH_TYPE_DYNAMIC);
     waterMesh.AddSurface(modelSurface);
 
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
     vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
-    waterMesh.Initialize(vertexAttributes, MESH_TYPE_DYNAMIC);
+    waterMesh.Initialize(vertexAttributes);
 
     // Material surface
     vector<string> vertexInputs;
