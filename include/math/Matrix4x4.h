@@ -22,7 +22,7 @@ class Matrix4x4
         static const Matrix4x4  IDENTITY;   /**< Only the main diagonal is set to 1 */
         static const Matrix4x4  ZERO;       /**< Everything to zero */
         /**
-         * Default constructor. Initializes everything to 0.
+         * Default constructor. Initializes the matrix to the identity matrix
          */
                                 Matrix4x4();
 
@@ -123,10 +123,17 @@ class Matrix4x4
         INLINE Matrix4x4        operator-() const;
 
         // BINARY OPERATORS
+        INLINE Matrix4x4        operator+(const Matrix4x4& m) const;
+        INLINE Matrix4x4        operator-(const Matrix4x4& m) const;
         INLINE Matrix4x4        operator*(const Matrix4x4& m) const;
+        INLINE Matrix4x4        operator*(float f) const;
         Vector4                 operator*(const Vector3& v) const;
         Vector4					operator*(const Vector4& v) const;
+
+        INLINE void             operator+=(const Matrix4x4& m);
+        INLINE void             operator-=(const Matrix4x4& m);
         INLINE void             operator*=(const Matrix4x4& m);
+        INLINE void             operator*=(float f);
 
         INLINE bool             operator==(const Matrix4x4& m) const;
         INLINE bool             operator!=(const Matrix4x4& m) const;
@@ -167,6 +174,30 @@ INLINE Matrix4x4 Matrix4x4::operator-() const
     return Matrix4x4(data);
 }
 
+INLINE Matrix4x4 Matrix4x4::operator+(const Matrix4x4& m) const {
+    Matrix4x4 mat;
+
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            mat.data_[i][j] += m.data_[i][j];
+        }
+    }
+
+    return mat;
+}
+
+INLINE Matrix4x4 Matrix4x4::operator-(const Matrix4x4& m) const {
+    Matrix4x4 mat;
+
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            mat.data_[i][j] -= m.data_[i][j];
+        }
+    }
+
+    return mat;
+}
+
 INLINE Matrix4x4 Matrix4x4::operator*(const Matrix4x4& m) const
 {
     Matrix4x4 mat;
@@ -193,6 +224,34 @@ INLINE Matrix4x4 Matrix4x4::operator*(const Matrix4x4& m) const
     return mat;
 }
 
+INLINE Matrix4x4 Matrix4x4::operator*(float f) const {
+    Matrix4x4 mat;
+
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            mat.data_[i][j] = data_[i][j] * f;
+        }
+    }
+
+    return mat;
+}
+
+INLINE void Matrix4x4::operator+=(const Matrix4x4& m) {
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            data_[i][j] += m.data_[i][j];
+        }
+    }
+}
+
+INLINE void Matrix4x4::operator-=(const Matrix4x4& m) {
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            data_[i][j] -= m.data_[i][j];
+        }
+    }
+}
+
 INLINE void Matrix4x4::operator*=(const Matrix4x4& m)
 {
 	Matrix4x4 mat = ZERO;
@@ -217,6 +276,14 @@ INLINE void Matrix4x4::operator*=(const Matrix4x4& m)
     mat.data_[3][3] = data_[3][0] * m.data_[0][3] + data_[3][1] * m.data_[1][3] + data_[3][2] * m.data_[2][3] + data_[3][3] * m.data_[3][3];
 
     (*this) = mat;
+}
+
+INLINE void Matrix4x4::operator*=(float f) {
+    for (size_t i = 0; i < 4; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            data_[i][j] *= f;
+        }
+    }
 }
 
 INLINE bool Matrix4x4::operator==(const Matrix4x4& m) const

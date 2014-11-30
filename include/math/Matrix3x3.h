@@ -24,7 +24,7 @@ class Matrix3x3
         static const Matrix3x3  IDENTITY;   /**< Only the main diagonal is set to 1 */
         static const Matrix3x3  ZERO;       /**< Everything to zero */
         /**
-         * Default constructor. Initializes everything to 0.
+         * Default constructor. Initializes the matrix to the identity matrix
          */
                                 Matrix3x3();
 
@@ -124,10 +124,17 @@ class Matrix3x3
         INLINE Matrix3x3        operator-() const;
 
         // BINARY OPERATORS
+        INLINE Matrix3x3        operator+(const Matrix3x3& m) const;
+        INLINE Matrix3x3        operator-(const Matrix3x3& m) const;
         INLINE Matrix3x3        operator*(const Matrix3x3& m) const;
+        INLINE Matrix3x3        operator*(float f) const;
         Vector3                 operator*(const Vector2& v) const;
         Vector3					operator*(const Vector3& v) const;
+
+        INLINE void             operator+=(const Matrix3x3& m);
+        INLINE void             operator-=(const Matrix3x3& m);
         INLINE void             operator*=(const Matrix3x3& m);
+        INLINE void             operator*=(float f);
 
         INLINE bool             operator==(const Matrix3x3& m) const;
         INLINE bool             operator!=(const Matrix3x3& m) const;
@@ -169,6 +176,30 @@ INLINE Matrix3x3 Matrix3x3::operator-() const
     return Matrix3x3(data);
 }
 
+INLINE Matrix3x3 Matrix3x3::operator+(const Matrix3x3& m) const {
+    Matrix3x3 mat;
+
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            mat.data_[i][j] += m.data_[i][j];
+        }
+    }
+
+    return mat;
+}
+
+INLINE Matrix3x3 Matrix3x3::operator-(const Matrix3x3& m) const {
+    Matrix3x3 mat;
+
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            mat.data_[i][j] -= m.data_[i][j];
+        }
+    }
+
+    return mat;
+}
+
 INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
 {
     Matrix3x3 mat = ZERO;
@@ -187,6 +218,34 @@ INLINE Matrix3x3 Matrix3x3::operator*(const Matrix3x3& m) const
     return mat;
 }
 
+INLINE Matrix3x3 Matrix3x3::operator*(float f) const {
+    Matrix3x3 mat;
+
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            mat.data_[i][j] = data_[i][j] * f;
+        }
+    }
+
+    return mat;
+}
+
+INLINE void Matrix3x3::operator+=(const Matrix3x3& m) {
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            data_[i][j] += m.data_[i][j];
+        }
+    }
+}
+
+INLINE void Matrix3x3::operator-=(const Matrix3x3& m) {
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            data_[i][j] -= m.data_[i][j];
+        }
+    }
+}
+
 INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
 {
     Matrix3x3 mat = ZERO;
@@ -203,6 +262,14 @@ INLINE void Matrix3x3::operator*=(const Matrix3x3& m)
     mat.data_[2][2] = data_[2][0] * m.data_[0][2] + data_[2][1] * m.data_[1][2] + data_[2][2] * m.data_[2][2];
 
     (*this) = mat;
+}
+
+INLINE void Matrix3x3::operator*=(float f) {
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            data_[i][j] *= f;
+        }
+    }
 }
 
 INLINE bool Matrix3x3::operator==(const Matrix3x3& m) const
