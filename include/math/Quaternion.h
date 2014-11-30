@@ -59,6 +59,12 @@ class Quaternion
         void                    Normalize();
 
         /**
+         * Computes the dot product between two quaternions
+         * @param q The quaternion with which to compute the dot product
+         */
+        float                   Dot(const Quaternion& q) const;
+
+        /**
          * Sets the Quaternion parts from a rotation matrix.
          * @param mat The rotation matrix to use to set the quaternion
          */
@@ -119,6 +125,16 @@ class Quaternion
                                        Vector3& zAxis) const;
 
         /**
+         * Linearly interpolate between this quaternion and another specified quaternion that represents
+         * the end value
+         * @param endQuat The end quaternion value for the interpolation
+         * @param t The interpolation factor
+         * @param shortestPath Use the shortest path between the two quaternions
+         * @return The new interpolated quaternion
+         */
+        Quaternion              Slerp(const Quaternion& endQuat, float t, bool shortestPath=false) const;
+
+        /**
          * Returns the x axis from this quaternion
          */
         Vector3                 GetXAxis() const;
@@ -133,13 +149,27 @@ class Quaternion
          */
         Vector3                 GetZAxis() const;
 
+        // UNARY OPERATORS
+        Quaternion              operator-() const;
+
         // BINARY OPERATORS
+        INLINE Quaternion       operator+(const Quaternion& q) const;
         Quaternion              operator*(const Quaternion& q) const;
+        INLINE Quaternion       operator*(float f) const;
+
         void                    operator*=(const Quaternion& q);
 
         bool                    operator==(const Quaternion& q) const;
         bool                    operator!=(const Quaternion& q) const;
 };
+
+INLINE Quaternion Quaternion::operator+(const Quaternion& q) const {
+    return Quaternion(w+q.w, x+q.x, y+q.y, z+q.z);
+}
+
+INLINE Quaternion Quaternion::operator*(float f) const {
+    return Quaternion(w*f, x*f, y*f, z*f);
+}
 
 }
 

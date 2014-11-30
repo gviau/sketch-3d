@@ -43,6 +43,10 @@ void Quaternion::Normalize()
     z /= f;
 }
 
+float Quaternion::Dot(const Quaternion& q) const {
+    return w*q.w + x*q.x + y*q.y + z*q.z;
+}
+
 void Quaternion::MakeFromRotationMatrix(const Matrix3x3& mat)
 {
     Matrix4x4 m;
@@ -244,6 +248,30 @@ void Quaternion::ToAxes(Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const
     zAxis.z = mat[2][2];
 }
 
+Quaternion Quaternion::Slerp(const Quaternion& endQuat, float t, bool shortestPath) const {
+    float cos_ = Dot(endQuat);
+    Quaternion end = endQuat;
+
+    if (cos_ < 0.0f && shortestPath) {
+        cos_ = -cos_;
+        end = -endQuat;
+    }
+
+    if (abs(cos_) < 1.0f - EPSILON) {
+        float sin_ = sqrtf(1.0f - cos_ * cos_);
+        float angle = atan2(sin_, cos_);
+        float invSin = 1.0f / sin_;
+        float coeff0 = sin((1.0f - t) * angle) * invSin;
+        float coeff1 = sin(t * angle) * invSin;
+        
+        return (*this) * coeff0 + end * coeff1;
+    }
+
+    Quaternion interpolated = (*this) * (1.0f - t) + end * t;
+    interpolated.Normalize();
+    return interpolated;
+}
+
 Vector3 Quaternion::GetXAxis() const
 {
     return Vector3(1.0f - 2.0f * (y*y + z*z),
@@ -271,6 +299,10 @@ Quaternion Quaternion::operator*(const Quaternion& q) const
                       w*q.x + x*q.w + y*q.z - z*q.y,
                       w*q.y + y*q.w + z*q.x - x*q.z,
                       w*q.z + z*q.w + x*q.y - y*q.x);
+}
+
+Quaternion Quaternion::operator-() const {
+    return Quaternion(-w, -x, -y, -z);
 }
 
 void Quaternion::operator*=(const Quaternion& q)
