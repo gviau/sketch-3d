@@ -33,7 +33,7 @@ class Vector4 {
                                 Vector4();
 
         /**
-         * Constructor.
+         * Constructor. The w component is set to 1
          * @param x The x component
          * @param y The y component
          * @param z The z component
