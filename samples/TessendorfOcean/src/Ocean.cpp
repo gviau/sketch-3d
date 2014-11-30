@@ -16,7 +16,8 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
         length_(length),
         gravity_(9.81f),
         oceanMaterial_(nullptr),
-        oceanShader_(nullptr)
+        oceanShader_(nullptr),
+        oceanMesh_(MESH_TYPE_DYNAMIC)
 {
     windLength_ = wind_.Length();
     wind_.Normalize();
@@ -75,7 +76,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    oceanMesh_.Initialize(vertexAttributes, MESH_TYPE_DYNAMIC);
+    oceanMesh_.Initialize(vertexAttributes);
 
     // Load the shader
     vector<string> vertexInputs;

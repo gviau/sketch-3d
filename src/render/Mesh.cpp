@@ -22,23 +22,23 @@
 
 namespace Sketch3D {
 
-Mesh::Mesh() : meshType_(MESH_TYPE_STATIC), filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
+Mesh::Mesh(MeshType_t meshType) : meshType_(meshType), filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
 {
 }
 
-Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) : meshType_(MESH_TYPE_STATIC),
+Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) : meshType_(meshType),
         filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
 {
-    Load(filename, vertexAttributes, meshType);
-    Initialize(vertexAttributes, meshType);
+    Load(filename, vertexAttributes);
+    Initialize(vertexAttributes);
 }
 
 Mesh::Mesh(const Mesh& src) : meshType_(src.meshType_), filename_(src.filename_), fromCache_(false), importer_(nullptr),
         bufferObjects_(nullptr)
 {
     if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-        Load(filename_, src.vertexAttributes_, meshType_);
-        Initialize(src.vertexAttributes_, meshType_);
+        Load(filename_, src.vertexAttributes_);
+        Initialize(src.vertexAttributes_);
     }
 }
 
@@ -57,15 +57,15 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
         bufferObjects_ = nullptr;
 
         if (ModelManager::GetInstance()->CheckIfModelLoaded(filename_)) {
-            Load(filename_, rhs.vertexAttributes_, meshType_);
-            Initialize(rhs.vertexAttributes_, meshType_);
+            Load(filename_, rhs.vertexAttributes_);
+            Initialize(rhs.vertexAttributes_);
         }
     }
 
     return *this;
 }
 
-void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) {
+void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes) {
     if (filename == filename_) {
         return;
     }
@@ -73,7 +73,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
     // Delete last model if present
     if (surfaces_.size() != 0) {
         if (fromCache_) {
-            ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
+            ModelManager::GetInstance()->RemoveModelReferenceFromCache(filename_);
         } else {
             for (size_t i = 0; i < surfaces_.size(); i++) {
                 ModelSurface_t& model = surfaces_[i];
@@ -95,9 +95,9 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
 
     // Check cache first
     if (ModelManager::GetInstance()->CheckIfModelLoaded(filename)) {
-        surfaces_ = ModelManager::GetInstance()->LoadFromCache(filename);
+        surfaces_ = ModelManager::GetInstance()->LoadModelFromCache(filename);
         filename_ = filename;
-        Initialize(vertexAttributes, meshType);
+        Initialize(vertexAttributes);
         fromCache_ = true;
         return;
     }
@@ -243,7 +243,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
     // Cache the model for future loads
     ModelManager::GetInstance()->CacheModel(filename, surfaces_);
     filename_ = filename;
-    Initialize(vertexAttributes, meshType);
+    Initialize(vertexAttributes);
     fromCache_ = true;
 
     Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
@@ -253,8 +253,7 @@ void Mesh::AddSurface(const ModelSurface_t& surface) {
     surfaces_.push_back(surface);
 }
 
-void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) {
-    meshType_ = meshType;
+void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
     vertexAttributes_ = vertexAttributes;
 
     // Calculate offset and array index depending on vertex attributes provided by the user
@@ -265,7 +264,7 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t 
     }
 
     bufferObjects_ = new BufferObject* [surfaces_.size()];
-    BufferUsage_t bufferUsage = (meshType == MESH_TYPE_STATIC) ? BUFFER_USAGE_STATIC : BUFFER_USAGE_DYNAMIC;
+    BufferUsage_t bufferUsage = (meshType_ == MESH_TYPE_STATIC) ? BUFFER_USAGE_STATIC : BUFFER_USAGE_DYNAMIC;
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
         bufferObjects_[i] = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes_, bufferUsage);
@@ -445,7 +444,7 @@ void Mesh::FreeMeshMemory() {
                 delete[] model.geometry->textures;
             }
         } else {
-            ModelManager::GetInstance()->RemoveReferenceFromCache(filename_);
+            ModelManager::GetInstance()->RemoveModelReferenceFromCache(filename_);
         }
 
         for (size_t i = 0; i < surfaces_.size(); i++) {

@@ -73,8 +73,9 @@ class Mesh {
 	public:
         /**
          * Constructor. Initialize everything to 0
+         * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-                                Mesh();
+                                Mesh(MeshType_t meshType=MESH_TYPE_STATIC);
 
 		/**
 		 * Constructor. Read a mesh from a file and load the data in memory
@@ -95,7 +96,7 @@ class Mesh {
         /**
          * Destructor - release the buffer objects
          */
-                               ~Mesh();
+        virtual                ~Mesh();
 
         /**
          * Assignment operator
@@ -108,10 +109,8 @@ class Mesh {
          * @param filename The name of the file from which the mesh will be loaded
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
-         * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-        void                    Load(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                                     MeshType_t meshType=MESH_TYPE_STATIC);
+        virtual void            Load(const string& filename, const VertexAttributesMap_t& vertexAttributes);
 
         /**
          * Add a model surface to the mesh
@@ -123,14 +122,13 @@ class Mesh {
          * Initialize the mesh with geometry data
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
-         * @param meshType The type of mesh that will be rendered, static or dynamic
          */
-        void                    Initialize(const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType=MESH_TYPE_STATIC);
+        virtual void            Initialize(const VertexAttributesMap_t& vertexAttributes);
 
         /**
          * If the mesh is a dynamic mesh, re-uploads the mesh data
          */
-        void                    UpdateMeshData() const;
+        virtual void            UpdateMeshData() const;
 
 		/**
 		 * Get the rendering information about the mesh for rendering
@@ -152,7 +150,7 @@ class Mesh {
         /**
          * Free the mesh memory
          */
-        void                    FreeMeshMemory();
+        virtual void            FreeMeshMemory();
 };
 
 }

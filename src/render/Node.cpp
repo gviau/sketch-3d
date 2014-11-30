@@ -7,6 +7,7 @@
 #include "render/Renderer.h"
 #include "render/RenderQueue.h"
 #include "render/Shader.h"
+#include "render/SkinnedMesh.h"
 #include "render/Texture2D.h"
 
 #include <sstream>

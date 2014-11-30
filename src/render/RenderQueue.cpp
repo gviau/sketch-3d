@@ -6,6 +6,7 @@
 #include "render/Node.h"
 #include "render/Renderer.h"
 #include "render/Shader.h"
+#include "render/SkinnedMesh.h"
 #include "render/Texture2D.h"
 
 #include <algorithm>

@@ -10,9 +10,9 @@ ModelManager::ModelManager() {
 }
 
 ModelManager::~ModelManager() {
-    CacheMap_t::iterator it = cachedModels_.begin();
-    for (; it != cachedModels_.end(); ++it) {
-        vector<ModelSurface_t>& models = it->second.second;
+    ModelCacheMap_t::iterator m_it = cachedModels_.begin();
+    for (; m_it != cachedModels_.end(); ++m_it) {
+        vector<ModelSurface_t>& models = m_it->second.second;
 
         for (size_t i = 0; i < models.size(); i++) {
             ModelSurface_t model = models[i];
@@ -24,7 +24,15 @@ ModelManager::~ModelManager() {
             delete[] model.geometry->textures;
         }
 
-        Logger::GetInstance()->Info("Model \"" + it->first + "\" freed");
+        Logger::GetInstance()->Info("Model \"" + m_it->first + "\" freed");
+    }
+
+    SkeletonCacheMap_t::iterator s_it = cachedSkeletons_.begin();
+    for (; s_it != cachedSkeletons_.end(); ++s_it) {
+        Skeleton* skeleton = s_it->second.second;
+        delete skeleton;
+
+        Logger::GetInstance()->Info("Skeleton of model \"" + s_it->first + "\" freed");
     }
 }
 
@@ -33,8 +41,13 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 bool ModelManager::CheckIfModelLoaded(const string& filename) const {
-    CacheMap_t::const_iterator it = cachedModels_.find(filename);
+    ModelCacheMap_t::const_iterator it = cachedModels_.find(filename);
     return (it != cachedModels_.end());
+}
+
+bool ModelManager::CheckIfSkeletonLoaded(const string& filename) const {
+    SkeletonCacheMap_t::const_iterator it = cachedSkeletons_.find(filename);
+    return (it != cachedSkeletons_.end());
 }
 
 void ModelManager::CacheModel(const string& filename, const vector<ModelSurface_t>& model) {
@@ -43,13 +56,25 @@ void ModelManager::CacheModel(const string& filename, const vector<ModelSurface_
     }
 }
 
-vector<ModelSurface_t> ModelManager::LoadFromCache(const string& filename) {
+void ModelManager::CacheSkeleton(const string& filename, Skeleton* skeleton) {
+    if (!CheckIfSkeletonLoaded(filename)) {
+        cachedSkeletons_[filename] = pair<int, Skeleton*>(1, skeleton);
+    }
+}
+
+vector<ModelSurface_t> ModelManager::LoadModelFromCache(const string& filename) {
     vector<ModelSurface_t> model = cachedModels_[filename].second;
     cachedModels_[filename].first += 1;
     return model;
 }
 
-void ModelManager::RemoveReferenceFromCache(const string& filename) {
+Skeleton* ModelManager::LoadSkeletonFromCache(const string& filename) {
+    Skeleton* skeleton = cachedSkeletons_[filename].second;
+    cachedSkeletons_[filename].first += 1;
+    return skeleton;
+}
+
+void ModelManager::RemoveModelReferenceFromCache(const string& filename) {
     cachedModels_[filename].first -= 1;
     if (cachedModels_[filename].first == 0) {
         vector<ModelSurface_t>& models = cachedModels_[filename].second;
@@ -65,6 +90,16 @@ void ModelManager::RemoveReferenceFromCache(const string& filename) {
         }
 
         cachedModels_.erase(filename);
+    }
+}
+
+void ModelManager::RemoveSkeletonReferenceFromCache(const string& filename) {
+    cachedSkeletons_[filename].first -= 1;
+    if (cachedSkeletons_[filename].first == 0) {
+        Skeleton* skeleton = cachedSkeletons_[filename].second;
+        delete skeleton;
+
+        cachedSkeletons_.erase(filename);
     }
 }
 
