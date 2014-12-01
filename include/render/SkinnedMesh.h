@@ -90,9 +90,6 @@ class SkinnedMesh : public Mesh {
         const AnimationState*       currentAnimationState_; /**< The animation state to use while animating the skeleton */
         bool                        isLooping_;             /**< Is the animation looping? */
 
-        vector<vector<Vector3>>     originalVertices_;  /**< Original vertices if skinning on CPU */
-        vector<vector<Vector3>>     originalNormals_;   /**< Original normals if skinning on CPU */
-
         /**
          * Free the mesh memory
          */

@@ -51,34 +51,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
         return;
     }
 
-    // Determine what does the mesh uses
-    bool useNormals = vertexAttributes.find(VERTEX_ATTRIBUTES_NORMAL) != vertexAttributes.end();
-    bool useTextureCoordinates = vertexAttributes.find(VERTEX_ATTRIBUTES_TEX_COORDS) != vertexAttributes.end();
-    bool useTangents = vertexAttributes.find(VERTEX_ATTRIBUTES_TANGENT) != vertexAttributes.end();
-
-    // If skinning on the CPU, then we need to save the original vectors and normals
-    if (meshType_ == MESH_TYPE_DYNAMIC) {
-        for (size_t i = 0; i < surfaces_.size(); i++) {
-            SurfaceTriangles_t* surface = surfaces_[i].geometry;
-            bool hasNormals = (surface->numNormals > 0);
-            vector<Vector3> originalVertices, originalNormals;
-
-            for (size_t j = 0; j < surface->numVertices; j++) {
-                originalVertices.push_back(surface->vertices[j]);
-
-                if (useNormals && hasNormals) {
-                    originalNormals.push_back(surface->normals[j]);
-                }
-            }
-
-            originalVertices_.push_back(originalVertices);
-
-            if (useNormals && hasNormals) {
-                originalNormals_.push_back(originalNormals);
-            }
-        }
-    }
-
+    // Reload the scene - we need it to query information about the bones
     const aiScene* scene = nullptr;
     if (importer_ == nullptr) {
         importer_ = new Assimp::Importer;
@@ -243,6 +216,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
             vector<pair<double, Vector3>> positionKeys, scaleKeys;
             vector<pair<double, Quaternion>> rotationKeys;
 
+            // Get all the key frames
             for (size_t k = 0; k < nodeAnim->mNumPositionKeys; k++) {
                 const aiVectorKey& positionKey = nodeAnim->mPositionKeys[k];
                 const aiVector3D& position = positionKey.mValue;
@@ -269,7 +243,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
         skeleton_->AddAnimationState(animation->mName.data, animationState);
     }
 
-    // Cache the model for future loads
+    // Cache the skeleton for future loads
     ModelManager::GetInstance()->CacheSkeleton(filename, skeleton_);
 
     Logger::GetInstance()->Info("Successfully loaded animations from file " + filename);
@@ -294,12 +268,19 @@ void SkinnedMesh::Animate(double deltaTime) {
         map<const Bone_t*, Matrix4x4>::iterator it, end_it = transformationMatrices.end();
         size_t baseIndex = 0;
 
+        vector<vector<Vector3>> originalVertices, originalNormals;
+
         for (size_t i = 0; i < surfaces_.size(); i++) {
             ModelSurface_t& surface = surfaces_[i];
             bool hasNormals = (surface.geometry->numNormals > 0);
 
             Vector3* vertices = surface.geometry->vertices;
             Vector3* normals = surface.geometry->normals;
+            originalVertices.push_back(vector<Vector3>());
+            if (useNormals && hasNormals) {
+                originalNormals.push_back(vector<Vector3>());
+            }
+
             for (size_t j = 0; j < surface.geometry->numVertices; j++) {
                 Matrix4x4 boneTransform;
                 it = transformationMatrices.begin();
@@ -327,16 +308,18 @@ void SkinnedMesh::Animate(double deltaTime) {
                     }
                 }
 
-                Vector3 vertex = originalVertices_[i][j];
+                Vector3 vertex = vertices[j];
                 Vector4 transformedVertex(vertex.x, vertex.y, vertex.z);
                 transformedVertex = boneTransform * transformedVertex;
                 vertices[j] = Vector3(transformedVertex.x, transformedVertex.y, transformedVertex.z);
+                originalVertices[i].push_back(vertex);
 
                 if (useNormals && hasNormals) {
-                    Vector3 normal = originalNormals_[i][j];
+                    Vector3 normal = normals[j];
                     Vector4 transformedNormal(normal.x, normal.y, normal.z, 0.0f);
                     transformedNormal = boneTransform * transformedNormal;
                     normals[j] = Vector3(normal.x, normal.y, normal.z);
+                    originalNormals[i].push_back(normal);
                 }
             }
 
@@ -344,6 +327,22 @@ void SkinnedMesh::Animate(double deltaTime) {
         }
 
         Mesh::UpdateMeshData();
+
+        for (size_t i = 0; i < surfaces_.size(); i++) {
+            ModelSurface_t& surface = surfaces_[i];
+            bool hasNormals = (surface.geometry->numNormals > 0);
+
+            Vector3* vertices = surface.geometry->vertices;
+            Vector3* normals = surface.geometry->normals;
+
+            for (size_t j = 0; j < surface.geometry->numVertices; j++) {
+                vertices[j] = originalVertices[i][j];
+
+                if (useNormals && hasNormals) {
+                    normals[j] = originalNormals[i][j];
+                }
+            }
+        }
     } else {
         // TODO
     }
