@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
     vector<string> vertexInputs;
     vertexInputs.push_back("in_vertex");
     vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert.glsl", "Shaders/BurningPaper/frag.glsl", vertexInputs);
     Material paperMaterial(shader);
 
     Texture2D* paperTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/paper.jpg");

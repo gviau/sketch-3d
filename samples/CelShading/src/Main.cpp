@@ -42,8 +42,8 @@ int main(int argc, char** argv) {
     vector<string> vertexInputs;
     vertexInputs.push_back("in_vertex");
     vertexInputs.push_back("in_normal");
-    Shader* normalRenderShader = Renderer::GetInstance()->CreateShader("Shaders/normalRender.vert", "Shaders/normalRender.frag", vertexInputs);
-    Shader* contourRenderShader = Renderer::GetInstance()->CreateShader("Shaders/contourRender.vert", "Shaders/contourRender.frag", vertexInputs);
+    Shader* normalRenderShader = Renderer::GetInstance()->CreateShader("Shaders/CelShading/normalRender.vert", "Shaders/CelShading/normalRender.frag", vertexInputs);
+    Shader* contourRenderShader = Renderer::GetInstance()->CreateShader("Shaders/CelShading/contourRender.vert", "Shaders/CelShading/contourRender.frag", vertexInputs);
 
     Material normalRenderMaterial(normalRenderShader);
     Material contourRenderMaterial(contourRenderShader);

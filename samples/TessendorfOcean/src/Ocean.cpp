@@ -82,7 +82,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     vector<string> vertexInputs;
     vertexInputs.push_back("in_vertex");
     vertexInputs.push_back("in_normal");
-    oceanShader_ = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl", vertexInputs);
+    oceanShader_ = Renderer::GetInstance()->CreateShader("Shaders/TessendorfOcean/vert.glsl", "Shaders/TessendorfOcean/frag.glsl", vertexInputs);
 
     // Create the material
     oceanMaterial_ = new Material(oceanShader_);

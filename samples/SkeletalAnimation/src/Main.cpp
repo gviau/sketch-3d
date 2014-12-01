@@ -34,7 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     vertexInputs.push_back("in_vertex");
     vertexInputs.push_back("in_normal");
     vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SkeletalAnimation/vert.glsl", "Shaders/SkeletalAnimation/frag.glsl", vertexInputs);
 
     Material material(shader);
 

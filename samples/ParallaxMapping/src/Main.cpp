@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     vertexInputs.push_back("in_normal");
     vertexInputs.push_back("in_uv");
     vertexInputs.push_back("in_tangent");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/ParallaxMapping/vert.glsl", "Shaders/ParallaxMapping/frag.glsl", vertexInputs);
     Material sphereMaterial(shader);
 
     // Add the diffuse and normal texture

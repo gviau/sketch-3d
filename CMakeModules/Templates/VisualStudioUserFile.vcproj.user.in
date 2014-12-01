@@ -10,7 +10,7 @@
 			>
 			<DebugSettings
 				Command="@CMAKE_SOURCE_DIR@/bin/$(ConfigurationName)/$(TargetFileName)"
-				WorkingDirectory="@PROJECT_SOURCE_DIR@"
+				WorkingDirectory="@PROJECT_SOURCE_DIR@/.."
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
