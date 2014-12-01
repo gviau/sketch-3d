@@ -15,9 +15,14 @@ using namespace Sketch3D;
 #include <vector>
 using namespace std;
 
+#if defined(__WIN32__) || defined(_WIN32)
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+#else
+int main(int argc, char** argv) {
+#endif
+
     Window window("Sample_SkeletalAnimation", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
