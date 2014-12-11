@@ -142,7 +142,8 @@ class Matrix4x4
         INLINE Matrix4x4&       operator=(const Matrix4x4& m);
 
 		/**
-		 * Return the matrix as a column-major linear array.
+		 * Return the matrix as a column-major linear array. This creates a copy of the internal data, so
+         * a valid buffer is required, not just a pointer
 		 * @param The returned array
 		 */
 		INLINE void				GetData(float* data) const;
