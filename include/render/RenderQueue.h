@@ -29,7 +29,7 @@ class RenderQueue {
          * @param node The node to render
          * @param layer On which layer are we drawing everything. This option might change render state, such as depth testing
          */
-        void                        AddItem(const Node& node, Layer_t layer=LAYER_GAME);
+        void                        AddItem(const Node* node, Layer_t layer=LAYER_GAME);
 
         /**
          * Renders the content of the queue. This invalidates the queue by removing all items in the queue.

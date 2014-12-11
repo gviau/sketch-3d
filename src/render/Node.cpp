@@ -74,20 +74,11 @@ Node::Node(const Node& src) : parent_(src.parent_),
 Node::~Node() {
 }
 
-void Node::Render(RenderQueue& renderQueue) const {
-    renderQueue.AddItem(*this);
-
-	map<string, Node*>::const_iterator it = children_.begin();
-	for (; it != children_.end(); ++it) {
-		it->second->Render(renderQueue);
-	}
-}
-
-void Node::ImmediateRender() const {
+void Node::Render() const {
 	Shader* shader = material_->GetShader();
-    shader->SetActive(true);
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
+    const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
     Matrix4x4 model;
 
     // Setup the transformation matrix for this node
@@ -103,10 +94,14 @@ void Node::ImmediateRender() const {
     model[1][3] = position_.y;
     model[2][3] = position_.z;
 
-    Matrix4x4 modelViewProjection = viewProjection * model;
-    Matrix4x4 modelView = Renderer::GetInstance()->GetViewMatrix() * model;
+    // Set the uniform matrices
+    Matrix4x4 modelViewProjection(viewProjection * model);
+    Matrix4x4 modelView(view * model);
+
+    Renderer::GetInstance()->BindShader(shader);
     shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
     shader->SetUniformMatrix4x4("modelView", modelView);
+    shader->SetUniformMatrix4x4("model", model);
     shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
 
     // Get the rendering data
@@ -114,15 +109,13 @@ void Node::ImmediateRender() const {
     vector<ModelSurface_t> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
-    // TEMP
     // Material's textures
     const map<string, Texture*>& materialTextures = material_->GetTextures();
     map<string, Texture*>::const_iterator it = materialTextures.begin();
 
     for (; it != materialTextures.end(); ++it) {
         if (it->second != nullptr) {
-            size_t textureUnit = it->second->Bind();
-            shader->SetUniformTexture(it->first, textureUnit);
+            shader->SetUniformTexture(it->first, it->second);
         }
     }
 
@@ -132,8 +125,7 @@ void Node::ImmediateRender() const {
         for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
             Texture2D* texture = surfaces[i].geometry->textures[j];
             if (texture != nullptr) {
-                size_t textureUnit = texture->Bind();
-                shader->SetUniformTexture("texture" + to_string(j), textureUnit);
+                shader->SetUniformTexture("texture" + to_string(j), texture);
             }
         }
 
@@ -269,6 +261,15 @@ Mesh* Node::GetMesh() const {
 
 Material* Node::GetMaterial() const {
 	return material_;
+}
+
+void Node::Render(RenderQueue& renderQueue) const {
+    renderQueue.AddItem(this);
+
+	map<string, Node*>::const_iterator it = children_.begin();
+	for (; it != children_.end(); ++it) {
+		it->second->Render(renderQueue);
+	}
 }
 
 }

@@ -12,8 +12,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward declaration
-class Material;
-class Mesh;
+class Node;
 class Vector3;
 class Vector4;
 class Matrix3x3;
@@ -23,17 +22,6 @@ enum Layer_t {
     LAYER_GAME,
     LAYER_FULLSCREEN,
     LAYER_HUD
-};
-
-enum UniformType_t {
-    UNIFORM_TYPE_INT,
-    UNIFORM_TYPE_FLOAT,
-    UNIFORM_TYPE_VECTOR2,
-    UNIFORM_TYPE_VECTOR3,
-    UNIFORM_TYPE_VECTOR4,
-    UNIFORM_TYPE_MATRIX3X3,
-    UNIFORM_TYPE_MATRIX4X4,
-    UNIFORM_TYPE_TEXTURE,
 };
 
 /**
@@ -62,18 +50,15 @@ class RenderQueueItem {
     friend class RenderQueue;
     friend class RenderQueueItemKeyComparator;
 
-    typedef map<string, pair<UniformType_t, void*>> UniformMap_t;
-
     public:
         /**
          * Constructor.
-         * Creates the render queue from a material and a mesh
-         * @param mesh The mesh to use for drawing
-         * @param material The material to use for drawing
+         * Creates the render queue from a node
+         * @param node The node that contains the mesh and material to draw
          * @param distanceFromCamera The distance that the mesh is from the camera
          * @param layer On which layer are we drawing everything. This option might change render state, such as depth testing
          */
-                            RenderQueueItem(const Mesh* mesh, const Material* material, float distanceFromCamera, Layer_t layer=LAYER_GAME);
+                            RenderQueueItem(const Node* node, float distanceFromCamera, Layer_t layer=LAYER_GAME);
 
         /**
          * Destructor. Frees the uniform map
@@ -86,11 +71,8 @@ class RenderQueueItem {
         TransluencyType_t   transluencyType_;
         float               distanceFromCamera_;
         int                 materialId_;
-        
-        UniformMap_t        uniforms_;  /**< Map of uniforms to use to render the geometry */
 
-        const Mesh*         mesh_;      /**< The mesh to render */
-        const Material*     material_;  /**< The material to use for rendering */
+        const Node*         node_;  /**< The node to draw */
 
         /**
          * Construct the 30 bits material id from the material properties

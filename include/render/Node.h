@@ -70,16 +70,10 @@ class Node {
 		 */
 		virtual			   ~Node();
 
-		/**
-		 * This function sends the data required for the rendering.
-         * @param renderQueue The render queue to use for drawing
-		 */
-		void                Render(RenderQueue& renderQueue) const;
-
         /**
-         * Immediately draw the node
+         * Renders the node on the screen
          */
-        void                ImmediateRender() const;
+        void                Render() const;
 
 		/**
 		 * Add a node to this node's childrens. The name of the node must not already
@@ -183,6 +177,12 @@ class Node {
 
 		Mesh*				mesh_; /**< Geometric represention of the node */
 		Material*			material_; /**< The material of the node. It will be applied to the mesh, if any */
+
+		/**
+		 * This function sends the data required for the rendering.
+         * @param renderQueue The render queue to use for drawing
+		 */
+		void                Render(RenderQueue& renderQueue) const;
 };
 
 }
