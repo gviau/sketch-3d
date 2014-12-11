@@ -6,7 +6,7 @@ namespace Sketch3D {
 
 uint16_t Shader::nextAvailableId_ = 0;
 
-Shader::Shader(const string& vertexFilename, const string& fragmentFilename) : active_(false), id_(MAX_SHADER_ID) {
+Shader::Shader(const string& vertexFilename, const string& fragmentFilename) : id_(MAX_SHADER_ID) {
     if (nextAvailableId_ == MAX_SHADER_ID) {
         Logger::GetInstance()->Error("Maximum number of shaders created (" + to_string(MAX_SHADER_ID) + ")");
     } else {
@@ -15,6 +15,10 @@ Shader::Shader(const string& vertexFilename, const string& fragmentFilename) : a
 }
 
 Shader::~Shader() {
+}
+
+bool Shader::SelectSubroutine(const string& subroutine, ShaderType_t type) {
+    return false;
 }
 
 }

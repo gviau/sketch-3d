@@ -15,7 +15,7 @@ BufferObjectOpenGL::~BufferObjectOpenGL() {
     glDeleteBuffers(1, &ibo_);
 }
 
-void BufferObjectOpenGL::Render() const {
+void BufferObjectOpenGL::Render() {
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, indexCount_, GL_UNSIGNED_SHORT, 0);
 }

@@ -1,6 +1,7 @@
 #include "render/RenderQueueItem.h"
 
-#include "render/Mesh.h"
+#include "render/Material.h"
+#include "render/Node.h"
 #include "render/Shader.h"
 #include "render/Texture2D.h"
 
@@ -19,33 +20,18 @@ const int MATERIAL_SHIFT = 0;
 
 const uint32_t DISTANCE_TRUNCATION = 0xFFFFFFFC;
 
-RenderQueueItem::RenderQueueItem(const Mesh* mesh, const Material* material, float distanceFromCamera, Layer_t layer) : layer_(layer), transluencyType_(TRANSLUENCY_TYPE_OPAQUE),
-        distanceFromCamera_(-distanceFromCamera), materialId_(0), mesh_(mesh), material_(material) 
+RenderQueueItem::RenderQueueItem(const Node* node, float distanceFromCamera, Layer_t layer) : layer_(layer), transluencyType_(TRANSLUENCY_TYPE_OPAQUE),
+        distanceFromCamera_(-distanceFromCamera), materialId_(0), node_(node)
 {
-    transluencyType_ = material_->GetTransluencyType();
+    transluencyType_ = node_->GetMaterial()->GetTransluencyType();
     materialId_ = ConstructMaterialId();
 }
 
 RenderQueueItem::~RenderQueueItem() {
-    UniformMap_t::iterator it = uniforms_.begin();
-    for (; it != uniforms_.end(); ++it) {
-        pair<UniformType_t, void*> uniform = it->second;
-
-        switch (uniform.first) {
-            case UNIFORM_TYPE_INT:          delete reinterpret_cast<int*>(uniform.second); break;
-            case UNIFORM_TYPE_FLOAT:        delete reinterpret_cast<float*>(uniform.second); break;
-            case UNIFORM_TYPE_VECTOR2:      delete reinterpret_cast<float*>(uniform.second); break;
-            case UNIFORM_TYPE_VECTOR3:      delete reinterpret_cast<Vector3*>(uniform.second); break;
-            case UNIFORM_TYPE_VECTOR4:      delete reinterpret_cast<Vector4*>(uniform.second); break;
-            case UNIFORM_TYPE_MATRIX3X3:    delete reinterpret_cast<Matrix3x3*>(uniform.second); break;
-            case UNIFORM_TYPE_MATRIX4X4:    delete reinterpret_cast<Matrix4x4*>(uniform.second); break;
-            case UNIFORM_TYPE_TEXTURE:      delete reinterpret_cast<int*>(uniform.second); break;
-        }
-    }
 }
 
 uint32_t RenderQueueItem::ConstructMaterialId() const {
-    uint16_t shaderId = material_->GetShader()->GetId();
+    uint16_t shaderId = node_->GetMaterial()->GetShader()->GetId();
     return shaderId;
 }
 

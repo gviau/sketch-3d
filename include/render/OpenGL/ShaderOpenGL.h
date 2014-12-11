@@ -16,11 +16,12 @@ namespace Sketch3D {
  * Implement an OpenGL shader object
  */
 class ShaderOpenGL : public Shader {
+    friend class RenderSystemOpenGL;
+
 	public:
 		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);
         virtual ~ShaderOpenGL();
 
-		virtual void SetActive(bool val);
 		virtual bool SetUniformInt(const string& uniform, int value);
 		virtual bool SetUniformFloat(const string& uniform, float value);
 		virtual bool SetUniformVector2(const string& uniform, float value1, float value2);
@@ -28,7 +29,7 @@ class ShaderOpenGL : public Shader {
 		virtual bool SetUniformVector4(const string& uniform, const Vector4& value);
 		virtual bool SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
 		virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
-		virtual bool SetUniformTexture(const string& uniform, int activeTexture);
+		virtual bool SetUniformTexture(const string& uniform, const Texture* texture);
         virtual bool SelectSubroutine(const string& subroutine, ShaderType_t type);
 
 	private:

@@ -55,7 +55,7 @@ class BufferObject {
         /**
          * Actually render the buffer object contents
          */
-        virtual void            Render() const = 0;
+        virtual void            Render() = 0;
 
         /**
          * Set the vertices for the vertex buffer

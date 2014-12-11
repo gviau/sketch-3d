@@ -142,6 +142,11 @@ class Renderer {
 		 */
 		void				    Clear(int buffer=(CLEAR_BUFFER_COLOR|CLEAR_BUFFER_DEPTH)) const;
 
+        /**
+         * Starts the rendering process
+         */
+        void                    StartRender();
+
 		/**
 		 * End the rendering process
 		 */
@@ -158,11 +163,11 @@ class Renderer {
 		 * @param right The right position of the viewing volume
 		 * @param bottom The bottom position of the viewing volume
 		 * @param top The top position of the viewing volume
-		 * @param near The near position of the viewing volume
-		 * @param far The far position of the viewing volume
+		 * @param nearPlane The near position of the viewing volume
+		 * @param farPlane The far position of the viewing volume
 		 */
 		void				    OrthoProjection(float left, float right, float bottom,
-											    float top, float near, float far);
+											    float top, float nearPlane, float farPlane);
 
 		/**
 		 * Set a perspective projection. This replace the current projection matrix
@@ -170,21 +175,21 @@ class Renderer {
 		 * @param right The right position of the viewing volume
 		 * @param bottom The bottom position of the viewing volume
 		 * @param top The top position of the viewing volume
-		 * @param near The near position of the viewing volume
-		 * @param far The far position of the viewing volume
+		 * @param nearPlane The near position of the viewing volume
+		 * @param farPlane The far position of the viewing volume
 		 */
 		void				    PerspectiveProjection(float left, float right, float bottom,
-												      float top, float near, float far);
+												      float top, float nearPlane, float farPlane);
 
 		/**
 		 * Set a perspective projection. This replace the current projection matrix
 		 * @param fov The field of view in degrees in the y direction
 		 * @param aspect The aspect ration
-		 * @param near The near position of the viewing volume
-		 * @param far The far position of the viewing volume
+		 * @param nearPlane The near position of the viewing volume
+		 * @param farPlane The far position of the viewing volume
 		 */
 		void				    PerspectiveProjection(float fov, float aspect,
-												      float near, float far);
+												      float nearPlane, float farPlane);
 
 		/**
 		 * Set a new camera position, looking direction and up vector
@@ -315,6 +320,12 @@ class Renderer {
          */
         size_t                  BindTexture(const Texture* texture);
 
+        /**
+         * Bind the specified shader to be the active one.
+         * @param shader The shader to activate. If set to nullptr, then it will unbind the current shader
+         */
+        void                    BindShader(const Shader* shader);
+
 		const Matrix4x4&	    GetProjectionMatrix() const;
 		const Matrix4x4&	    GetViewMatrix() const;
 		const Matrix4x4&	    GetViewProjectionMatrix() const;
@@ -348,6 +359,7 @@ class Renderer {
 
 		SceneTree			    sceneTree_;			    /**< The scene tree to render */
 
+        const Shader*           boundShader_;           /**< The currently bound shader */
         BufferObjectManager*    bufferObjectManager_;   /**< Buffer object manager used to create the buffer objects */
 
         TextureUnitNode_t*      head_;                  /**< Head of the double linked list */

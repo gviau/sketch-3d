@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_SHADER_H
 #define SKETCH_3D_SHADER_H
 
+#include <map>
 #include <stdint.h>
 #include <string>
 using namespace std;
@@ -14,7 +15,7 @@ class Matrix3x3;
 class Matrix4x4;
 class Vector3;
 class Vector4;
-class Texture2D;
+class Texture;
 
 /**
  * @enum ShaderType_t
@@ -34,44 +35,35 @@ enum ShaderType_t {
 class Shader {
 	public:
 		/**
-		 * Constructor. Load the vertex and fragment shader
-		 * @param vertexFilename The filename of the vertex shader
-		 * @param fragmentFilename The filename of the fragment shader
+		 * Constructor. Load the shaders
+         * @param vertexFilename The name of the vertex shader file
+         * @param fragmentFilename The name of the fragment shader file
 		 */
-		                Shader(const string& vertexFilename, const string& fragmentFilename);
+		                    Shader(const string& vertexFilename, const string& fragmentFilename);
 
         /**
          * Destructor
          */
-        virtual        ~Shader();
-		/**
-		 * Activate or deactivate the shader
-		 * @param val If set to true, this shader will be set as the current
-		 * one and will be deactivated otherwise.
-		 */
-		virtual void	SetActive(bool val) = 0;
+        virtual            ~Shader();
 
 		// UNIFORM SETTERS
-		virtual bool	SetUniformInt(const string& uniform, int value) = 0;
-		virtual bool	SetUniformFloat(const string& uniform, float value) = 0;
-		virtual bool	SetUniformVector2(const string& uniform, float value1, float value2) = 0;
-		virtual bool	SetUniformVector3(const string& uniform, const Vector3& value) = 0;
-		virtual bool	SetUniformVector4(const string& uniform, const Vector4& value) = 0;
-		virtual bool	SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
-		virtual bool	SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
-		virtual bool	SetUniformTexture(const string& uniform, int activeTexture) = 0;
+		virtual bool	    SetUniformInt(const string& uniform, int value) = 0;
+		virtual bool	    SetUniformFloat(const string& uniform, float value) = 0;
+		virtual bool	    SetUniformVector2(const string& uniform, float value1, float value2) = 0;
+		virtual bool	    SetUniformVector3(const string& uniform, const Vector3& value) = 0;
+		virtual bool	    SetUniformVector4(const string& uniform, const Vector4& value) = 0;
+		virtual bool	    SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
+		virtual bool	    SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
+		virtual bool	    SetUniformTexture(const string& uniform, const Texture* texture) = 0;
 
-        virtual bool    SelectSubroutine(const string& subroutine, ShaderType_t type) = 0;
+        virtual bool        SelectSubroutine(const string& subroutine, ShaderType_t type);
 
-		bool			IsActive() const { return active_; }
-
-        uint16_t        GetId() const { return id_; }
+        uint16_t            GetId() const { return id_; }
 
 	protected:
-		bool			active_;	/**< Is the shader active? */
-        uint16_t        id_;        /**< Id of the shader */
+        uint16_t            id_;                /**< Id of the shader */
 
-        static uint16_t nextAvailableId_;
+        static uint16_t     nextAvailableId_;
 };
 
 }

@@ -47,25 +47,15 @@ bool RenderSystemOpenGL::Initialize() {
 
 	QueryDeviceCapabilities();
 
-	// Some initial values
-	glViewport(0, 0, width_, height_);
-
-	Renderer::GetInstance()->PerspectiveProjection(45.0f, (float)width_ / (float)height_, 1.0f, 1000.0f);
-    Renderer::GetInstance()->CameraLookAt(Vector3::ZERO, Vector3::LOOK);
-
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
     glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-    SetRenderFillMode(RenderMode_t::RENDER_MODE_FILL);
 
     bufferObjectManager_ = new BufferObjectManagerOpenGL;
 
 	return true;
 }
 
-void RenderSystemOpenGL::SetClearColor(float red, float green, float blue, float alpha) const {
+void RenderSystemOpenGL::SetClearColor(float red, float green, float blue, float alpha) {
 	glClearColor(red, green, blue, alpha);
 }
 
@@ -80,6 +70,9 @@ void RenderSystemOpenGL::Clear(int buffer) const {
     }
 
 	glClear(clearBuffer);
+}
+
+void RenderSystemOpenGL::StartRender() {
 }
 
 void RenderSystemOpenGL::EndRender() {
@@ -244,6 +237,15 @@ void RenderSystemOpenGL::BindTexture(const Texture* texture, size_t unit) const 
     } else {
         Logger::GetInstance()->Error("Invalid texture type for binding!");
         return;
+    }
+}
+
+void RenderSystemOpenGL::BindShader(const Shader* shader) {
+    if (shader == nullptr) {
+        glUseProgram(0);
+    } else {
+        const ShaderOpenGL* shaderOpengl = static_cast<const ShaderOpenGL*>(shader);
+        glUseProgram(shaderOpengl->program_);
     }
 }
 

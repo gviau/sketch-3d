@@ -10,13 +10,13 @@ namespace Sketch3D {
 
 /**
  * @class BufferObjectOpenGL
- * 
+ * OpenGL implementation of vertex paired with an index buffer
  */
 class BufferObjectOpenGL : public BufferObject {
     public:
                         BufferObjectOpenGL(const VertexAttributesMap_t& vertexAttributes, BufferUsage_t usage=BUFFER_USAGE_STATIC);
         virtual        ~BufferObjectOpenGL();
-        virtual void    Render() const;
+        virtual void    Render();
         virtual bool    SetVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual bool    AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual void    SetIndexData(unsigned short* indexData, size_t numIndex);

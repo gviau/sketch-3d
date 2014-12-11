@@ -22,8 +22,6 @@ class RenderSystemOpenGL;
  */
 class Texture2D : public Texture {
 
-	friend class RenderSystemOpenGL;
-
 	public:
 		/**
 		 * Constructor. Initializes the width and height to 0, the filter mode

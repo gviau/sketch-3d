@@ -88,8 +88,30 @@ if (WIN32)
 		${HEADER_PATH}/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
-	source_group("Source Files" FILES ${OPENGL_SRC})
-	source_group("Header Files" FILES ${OPENGL_HEADER})
+	set(DIRECT3D9_SRC
+		${SRC_PATH}/Direct3D9/BufferObjectDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/BufferObjectManagerDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/RenderContextDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/RenderSystemDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/RenderTextureDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/ShaderDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/Texture2DDirect3D9.cpp
+		${SRC_PATH}/Direct3D9/Texture3DDirect3D9.cpp
+	)
+	
+	set(DIRECT3D9_HEADER
+		${HEADER_PATH}/Direct3D9/BufferObjectDirect3D9.h
+		${HEADER_PATH}/Direct3D9/BufferObjectManagerDirect3D9.h
+		${HEADER_PATH}/Direct3D9/RenderContextDirect3D9.h
+		${HEADER_PATH}/Direct3D9/RenderSystemDirect3D9.h
+		${HEADER_PATH}/Direct3D9/RenderTextureDirect3D9.h
+		${HEADER_PATH}/Direct3D9/ShaderDirect3D9.h
+		${HEADER_PATH}/Direct3D9/Texture2DDirect3D9.h
+		${HEADER_PATH}/Direct3D9/Texture3DDirect3D9.h
+	)
+	
+	source_group("Source Files\\Direct3D9" FILES ${DIRECT3D9_SRC})
+	source_group("Header Files\\Direct3D9" FILES ${DIRECT3D9_HEADER})
 elseif (UNIX)
     set(OPENGL_SRC
         ${OPENGL_SRC}
@@ -100,22 +122,26 @@ elseif (UNIX)
         ${OPENGL_HEADER}
         ${HEADER_PATH}/OpenGL/Unix/RenderContextOpenGLUnix.h
     )
-
-    source_group("Source Files" FILES ${OPENGL_SRC})
-    source_group("Header Files" FILES ${OPENGL_HEADER})
 endif ()
+
+source_group("Source Files\\OpenGL" FILES ${OPENGL_SRC})
+source_group("Header Files\\OpenGL" FILES ${OPENGL_HEADER})
 
 include_directories (../../include)
 include_directories (${ASSIMP_INCLUDE_DIR})
 include_directories (${FreeImage_INCLUDE_DIRS})
+
+if (WIN32)
+	include_directories (${DirectX_INCLUDE_DIR})
+endif ()
 
 add_definitions(-DGLEW_BUILD)
 
 add_library(
     render
     STATIC
-    ${SRC} ${OPENGL_SRC}
-    ${HEADER} ${OPENGL_HEADER}
+    ${SRC} ${OPENGL_SRC} ${DIRECT3D9_SRC}
+    ${HEADER} ${OPENGL_HEADER} ${DIRECT3D9_HEADER}
 )
 
 target_link_libraries(

@@ -17,8 +17,9 @@ class RenderSystemOpenGL : public RenderSystem {
         RenderSystemOpenGL(Window& window);
 		~RenderSystemOpenGL();
 		virtual bool Initialize();
-		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f) const;
+		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);
 		virtual void Clear(int buffer) const;
+        virtual void StartRender();
 		virtual void EndRender();
 		virtual void Render();
 		virtual void SetRenderFillMode(RenderMode_t mode) const;
@@ -37,6 +38,7 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void SetBlendingEquation(BlendingEquation_t equation) const;
         virtual void SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
         virtual void BindTexture(const Texture* texture, size_t unit) const;
+        virtual void BindShader(const Shader* shader);
 
 	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */

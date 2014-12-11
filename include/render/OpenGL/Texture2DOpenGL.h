@@ -22,7 +22,7 @@ class Texture2DOpenGL : public Texture2D {
 		 * to FILTER_MODE_POINT, the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
 		 */
-					    Texture2DOpenGL();
+					        Texture2DOpenGL();
 
 		/**
 		 * Constructor

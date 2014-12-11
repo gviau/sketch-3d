@@ -3,6 +3,12 @@
 #include "math/Constants.h"
 
 #include "render/OpenGL/RenderSystemOpenGL.h"
+
+// Windows is the only OS where it makes sense to have DirectX
+#if defined(__WIN32__) || defined(_WIN32)
+#include "render/Direct3D9/RenderSystemDirect3D9.h"
+#endif
+
 #include "render/Texture2D.h"
 #include "render/TextureManager.h"
 
@@ -17,7 +23,7 @@ namespace Sketch3D {
 
 Renderer Renderer::instance_;
 
-Renderer::Renderer() : renderSystem_(NULL) {
+Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr) {
 }
 
 Renderer::~Renderer() {
@@ -45,7 +51,7 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			break;
 
 		case RENDER_SYSTEM_DIRECT3D9:
-			Logger::GetInstance()->Error("Direct3D9 still not supported");
+            renderSystem_ = new RenderSystemDirect3D9(window);			
 			break;
 
 		default:
@@ -57,6 +63,15 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
         Logger::GetInstance()->Error("Couldn't initialize render system properly");
         return false;
     }
+
+    // Some initial values
+    PerspectiveProjection(45.0f, (float)window.GetWidth() / (float)window.GetHeight(), 1.0f, 1000.0f);
+    CameraLookAt(Vector3::ZERO, Vector3::LOOK);
+
+    SetCullingMethod(CULLING_METHOD_BACK_FACE);
+    EnableDepthTest(true);
+    SetDepthComparisonFunc(DEPTH_FUNC_LESS);
+    SetRenderFillMode(RENDER_MODE_FILL);
 
     // Construct the texture cache
     const DeviceCapabilities_t* deviceCapabilities = renderSystem_->GetDeviceCapabilities();
@@ -84,6 +99,10 @@ void Renderer::Clear(int buffer) const {
 	renderSystem_->Clear(buffer);
 }
 
+void Renderer::StartRender() {
+    renderSystem_->StartRender();
+}
+
 void Renderer::EndRender() {
 	renderSystem_->EndRender();
 }
@@ -99,11 +118,11 @@ void Renderer::Render() {
 
 void Renderer::OrthoProjection(float left, float right,
 							   float bottom, float top,
-							   float near, float far)
+							   float nearPlane, float farPlane)
 {
 	float dx = right - left;
 	float dy = top - bottom;
-	float dz = near - far;
+	float dz = nearPlane - farPlane;
 
 	projection_ = Matrix4x4::IDENTITY;
 	projection_[0][0] = 2.0f / dx;
@@ -111,39 +130,39 @@ void Renderer::OrthoProjection(float left, float right,
 	projection_[2][2] = 2.0f / dz;
 	projection_[0][3] = (left - right) / dx;
 	projection_[1][3] = (bottom - top) / dy;
-	projection_[2][3] = dz / (far - near);
+	projection_[2][3] = dz / (farPlane - nearPlane);
 
 	viewProjection_ = projection_ * view_;
 }
 
 void Renderer::PerspectiveProjection(float left, float right,
 									 float bottom, float top,
-									 float near, float far)
+									 float nearPlane, float farPlane)
 {
 	float dx = right - left;
 	float dy = top - bottom;
-	float dz = near - far;
-	float z2 = 2.0f * near;
+	float dz = nearPlane - farPlane;
+	float z2 = 2.0f * nearPlane;
 
 	projection_ = Matrix4x4::IDENTITY;
-	projection_[0][0] = 2.0f * near / dx;
-	projection_[1][1] = 2.0f * near / dy;
+	projection_[0][0] = 2.0f * nearPlane / dx;
+	projection_[1][1] = 2.0f * nearPlane / dy;
 	projection_[0][2] = (right + left) / dx;
 	projection_[1][2] = (top + bottom) / dy;
-	projection_[2][2] = (far + near) / dz;
+	projection_[2][2] = (farPlane + nearPlane) / dz;
 	projection_[3][2] = -1.0f;
-	projection_[2][3] = 2.0f * near * far / dz;
+	projection_[2][3] = 2.0f * nearPlane * farPlane / dz;
 	projection_[3][3] = 0.0f;
 
 	viewProjection_ = projection_ * view_;
 }
 
-void Renderer::PerspectiveProjection(float fov, float aspect, float near,
-									 float far)
+void Renderer::PerspectiveProjection(float fov, float aspect, float nearPlane,
+									 float farPlane)
 {
-	float h = tan(fov * DEG_2_RAD_OVER_2) * near;
+	float h = tan(fov * DEG_2_RAD_OVER_2) * nearPlane;
 	float w = h * aspect;
-	PerspectiveProjection(-w, w, -h, h, near, far);
+	PerspectiveProjection(-w, w, -h, h, nearPlane, farPlane);
 }
 
 void Renderer::CameraLookAt(const Vector3& position, const Vector3& point,
@@ -296,6 +315,13 @@ size_t Renderer::BindTexture(const Texture* texture) {
     }
 
     return textureUnit;
+}
+
+void Renderer::BindShader(const Shader* shader) {
+    if (shader != boundShader_) {
+        renderSystem_->BindShader(shader);
+        boundShader_ = shader;
+    }
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {

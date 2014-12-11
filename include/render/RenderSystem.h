@@ -64,13 +64,18 @@ class RenderSystem {
 		 * @param blue The blue component
 		 * @param alpha The alpha component
 		 */
-		virtual void					    SetClearColor(float red, float green, float blue, float alpha=1.0f) const = 0;
+		virtual void					    SetClearColor(float red, float green, float blue, float alpha=1.0f) = 0;
 
 		/**
 		 * Clears the current framebuffer
          * @param buffer Which buffers to clear
 		 */
 		virtual void				        Clear(int buffer) const = 0;
+
+        /**
+         * Starts the rendering process
+         */
+        virtual void                        StartRender() = 0;
 
 		/**
 		 * Ends the rendering process
@@ -194,6 +199,12 @@ class RenderSystem {
          * @param unit The texture unit to bind it to
          */
         virtual void                        BindTexture(const Texture* texture, size_t unit) const = 0;
+
+        /**
+         * Bind the specified shader to the GPU
+         * @param shader The shader to bind. If set to nullptr, then it will unbind the current shader
+         */
+        virtual void                        BindShader(const Shader* shader) = 0;
 
         size_t                              GetWidth() const { return width_; }
         size_t                              GetHeight() const { return height_; }
