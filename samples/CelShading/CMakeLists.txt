@@ -26,8 +26,18 @@ include_directories(../../include)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
+set(LIBRARIES
+	${OPENGL_LIBRARIES}
+	${ASSIMP_LIBRARY}
+	${FreeImage_LIBRARIES}
+)
+
 if (WIN32)
 	set (WIN32_EXECUTABLE "WIN32")
+	set (LIBRARIES
+		 ${LIBRARIES}
+		 ${DirectX_LIBRARIES}
+	)
 else (WIN32)
 	set (WIN32_EXEUTABLE "")
 endif (WIN32)
@@ -42,9 +52,7 @@ set (LINK_LIBRARIES
 	math
 	render
 	system
-	${OPENGL_LIBRARIES}
-	${ASSIMP_LIBRARY}
-	${FreeImage_LIBRARIES}
+	${LIBRARIES}
 )
 
 if (${OIS_FOUND})
