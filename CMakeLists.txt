@@ -70,6 +70,22 @@ if (OIS_FOUND)
 	message (STATUS "OIS libs release: ${OIS_LIBRARY}")
 endif ()
 
+if (WIN32)
+	find_package (DirectX)
+	
+	message(STATUS "DirectX found? ${DirectX_FOUND}")
+	if (DirectX_FOUND)
+		message (STATUS "DirectX include: ${DirectX_INCLUDE_DIR}")
+		message (STATUS "DirectX libs: ${DirectX_LIBRARY} ${DirectX_D3DX9_LIBRARY}")
+		
+		# We only want d3d9 and d3dx9
+		set(DirectX_LIBRARIES
+			${DirectX_LIBRARY}
+			${DirectX_D3DX9_LIBRARY}
+		)
+	endif ()
+endif ()
+
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
 endif (MISSING_MODULES)
