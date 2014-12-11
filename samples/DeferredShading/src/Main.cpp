@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
         // Draw the fullscreen quad using the GBuffer
         Renderer::GetInstance()->BindScreenBuffer();
         Renderer::GetInstance()->Clear();
-        fullscreenQuad.ImmediateRender();
+        fullscreenQuad.Render();
 
         Renderer::GetInstance()->EndRender();
     }

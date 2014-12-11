@@ -93,7 +93,6 @@ int main(int argc, char** argv) {
         
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
         teapotNode.SetMaterial(&contourRenderMaterial);
-        contourRenderShader->SetActive(true);
         contourRenderShader->SetUniformFloat("offset", 0.025f);
         Renderer::GetInstance()->Render();
         
