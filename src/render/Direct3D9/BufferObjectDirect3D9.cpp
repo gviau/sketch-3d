@@ -30,9 +30,9 @@ BufferObjectDirect3D9::~BufferObjectDirect3D9() {
 }
 
 void BufferObjectDirect3D9::Render() {
-    device_->GetStreamSource(0, &vertexBuffer_, nullptr, &stride_);
-    device_->SetIndices(indexBuffer_);
     device_->SetVertexDeclaration(vertexDeclaration_);
+    device_->SetStreamSource(0, vertexBuffer_, 0, stride_);
+    device_->SetIndices(indexBuffer_);
     device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, vertexCount_, 0, primitivesCount_);
 }
 
@@ -50,10 +50,6 @@ bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int p
     if (count != vertexAttributes_.size()) {
         return false;
     }
-
-    vertexCount_ = vertexData.size();
-
-    GenerateBuffers();
 
     if (vertexDeclaration_ != nullptr) {
         vertexDeclaration_->Release();
@@ -118,11 +114,23 @@ bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int p
 
     device_->CreateVertexDeclaration(&vertexElements[0], &vertexDeclaration_);
 
-    void* data;
-    DWORD lockFlags = (usage_ == BUFFER_USAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0;
-    vertexBuffer_->Lock(0, vertexCount_ * sizeof(float), &data, lockFlags);
+    vertexCount_ = vertexData.size() / (stride_ / sizeof(float));
 
-    memcpy(data, (void*)&vertexData[0], vertexCount_);
+    if (vertexBuffer_ != nullptr) {
+        vertexBuffer_->Release();
+        vertexBuffer_ = nullptr;
+    }
+
+    DWORD usage = (usage_ == BUFFER_USAGE_STATIC) ? D3DUSAGE_WRITEONLY : D3DUSAGE_DYNAMIC;
+    device_->CreateVertexBuffer(vertexCount_ * stride_, usage, 0, D3DPOOL_MANAGED, &vertexBuffer_, nullptr);
+
+    void* data;
+    size_t bufferSize = vertexData.size() * sizeof(float);
+
+    DWORD lockFlags = (usage_ == BUFFER_USAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0;
+    vertexBuffer_->Lock(0, bufferSize, &data, lockFlags);
+
+    memcpy(data, (void*)&vertexData[0], bufferSize);
 
     vertexBuffer_->Unlock();
 
@@ -134,7 +142,11 @@ bool BufferObjectDirect3D9::AppendVertexData(const vector<float>& vertexData, in
 }
 
 void BufferObjectDirect3D9::SetIndexData(unsigned short* indexData, size_t numIndex) {
-    GenerateBuffers();
+    if (indexBuffer_ != nullptr) {
+        indexBuffer_->Release();
+        indexBuffer_ = nullptr;
+    }
+    device_->CreateIndexBuffer(numIndex * sizeof(unsigned short), D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_MANAGED, &indexBuffer_, nullptr);
 
     indexCount_ = numIndex;
 
@@ -142,7 +154,7 @@ void BufferObjectDirect3D9::SetIndexData(unsigned short* indexData, size_t numIn
     DWORD lockFlags = 0;
     indexBuffer_->Lock(0, indexCount_ * sizeof(unsigned short), &data, lockFlags);
 
-    memcpy(data, (void*)indexData, indexCount_);
+    memcpy(data, (void*)indexData, indexCount_ * sizeof(unsigned short));
 
     indexBuffer_->Unlock();
 
