@@ -2,6 +2,8 @@
 #define SKETCH_3D_RENDER_SYSTEM_H
 
 #include "render/Renderer.h"
+
+#include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 
 #include "system/Platform.h"
@@ -16,7 +18,6 @@ namespace Sketch3D {
 
 // Forward declaration
 class BufferObjectManager;
-class Matrix4x4;
 class RenderTexture;
 class Shader;
 class Texture2D;
@@ -86,6 +87,30 @@ class RenderSystem {
 		 * The actual rendering process
 		 */
 		virtual void					    Render() = 0;
+
+		/**
+		 * Set an orthogonal projection. This replace the current projection matrix
+		 * @param left The left position of the viewing volume
+		 * @param right The right position of the viewing volume
+		 * @param bottom The bottom position of the viewing volume
+		 * @param top The top position of the viewing volume
+		 * @param nearPlane The near position of the viewing volume
+		 * @param farPlane The far position of the viewing volume
+		 */
+		virtual Matrix4x4       OrthoProjection(float left, float right, float bottom,
+											    float top, float nearPlane, float farPlane) const = 0;
+
+		/**
+		 * Set a perspective projection. This replace the current projection matrix
+		 * @param left The left position of the viewing volume
+		 * @param right The right position of the viewing volume
+		 * @param bottom The bottom position of the viewing volume
+		 * @param top The top position of the viewing volume
+		 * @param nearPlane The near position of the viewing volume
+		 * @param farPlane The far position of the viewing volume
+		 */
+		virtual Matrix4x4       PerspectiveProjection(float left, float right, float bottom,
+												      float top, float nearPlane, float farPlane) const = 0;
 
 		/**
 		 * Set the renderer's fill mode
