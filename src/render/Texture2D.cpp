@@ -79,14 +79,26 @@ bool Texture2D::Load(const string& filename) {
 
     filterMode_ = FILTER_MODE_NEAREST;
     wrapMode_ = WRAP_MODE_REPEAT;
-    format_ = (bpp == 24) ? TEXTURE_FORMAT_BGR24 : TEXTURE_FORMAT_BGRA32;
+    format_ = (bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32;
 
-    size_t bytesPerPixel = (format_ == TEXTURE_FORMAT_BGR24) ? 3 : 4;
+    size_t bytesPerPixel = (format_ == TEXTURE_FORMAT_RGB24) ? 3 : 4;
     size_t size = width_ * height_ * bytesPerPixel;
-    data_ = malloc(size);
+    unsigned char* data = (unsigned char*)malloc(size);
+    BYTE* imageData = FreeImage_GetBits(dib);
 
-    memcpy(data_, (void*)FreeImage_GetBits(dib), size);
+    // We store the texture data in rgba, where r is LSB and a is MSB
+    for (size_t i = 0; i < size; i += bytesPerPixel) {
+        data[i    ] = imageData[i + 2];
+        data[i + 1] = imageData[i + 1];
+        data[i + 2] = imageData[i    ];
+
+        if (bytesPerPixel == 4) {
+            data[i + 3] = imageData[i + 3];
+        }
+    }
+
     FreeImage_Unload(dib);
+    data_ = (void*)data;
 
     if (!Create()) {
         Logger::GetInstance()->Error("Couldn't create texture handle for image " + filename);

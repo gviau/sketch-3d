@@ -124,21 +124,6 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             bpp = 4;
 			break;
 
-        // FreeImage loads pixels in reverse
-        case TEXTURE_FORMAT_BGR24:
-            internalFormat = 3;
-            format = GL_BGR;
-            type = GL_UNSIGNED_BYTE;
-            bpp = 3;
-            break;
-
-        case TEXTURE_FORMAT_BGRA32:
-            internalFormat = 4;
-            format = GL_BGRA;
-            type = GL_UNSIGNED_BYTE;
-            bpp = 4;
-            break;
-
         case TEXTURE_FORMAT_R32F:
             internalFormat = GL_R32F;
             format = GL_RED;
