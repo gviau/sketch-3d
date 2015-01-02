@@ -37,8 +37,9 @@ bool RenderContextDirect3D9::Initialize(Window& window) {
     presentParameters.hDeviceWindow = hWnd;
     presentParameters.Flags = 0;
     presentParameters.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-    presentParameters.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-    presentParameters.EnableAutoDepthStencil = FALSE;
+    presentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+    presentParameters.EnableAutoDepthStencil = TRUE;
+    presentParameters.AutoDepthStencilFormat = D3DFMT_D16;
 
     if (window.IsWindowed()) {
         presentParameters.Windowed = TRUE;
