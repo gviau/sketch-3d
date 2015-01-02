@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 
     surface.vertices[0] = Vector3(-1.2f, -1.5f, 1.0f); surface.vertices[1] = Vector3(-1.2f, 1.5f, 1.0f); surface.vertices[2] = Vector3(1.2f, 1.5f, 1.0f); surface.vertices[3] = Vector3(1.2f, -1.5f, 1.0f);
     surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
-    surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
+    surface.indices[0] = 0; surface.indices[1] = 2; surface.indices[2] = 1; surface.indices[3] = 0; surface.indices[4] = 3; surface.indices[5] = 2;
 
     ModelSurface_t model;
     model.geometry = &surface;
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     paperNode.SetMesh(&paperMesh);
     Renderer::GetInstance()->GetSceneTree().AddNode(&paperNode);
 
-    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.0f), Vector3::LOOK, Vector3::UP);
+    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, 5.0f), -Vector3::LOOK, Vector3::UP);
 
     float threshold = 0.0f;
     float range = 0.075f;
@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
         shader->SetUniformVector2("thresholds", threshold, range);
 
         Renderer::GetInstance()->Clear();
+        Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
 
