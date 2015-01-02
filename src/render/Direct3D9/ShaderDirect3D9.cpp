@@ -5,6 +5,8 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
+#include "render/Direct3D9/Texture2DDirect3D9.h"
+
 #include "system/Logger.h"
 
 #include <d3d9.h>
@@ -69,7 +71,7 @@ ShaderDirect3D9::ShaderDirect3D9(const string& vertexFilename, const string& fra
     hr = D3DXCompileShaderFromFile(fragmentFilename.c_str(), nullptr, nullptr, "main", "ps_3_0", flags,
                                    &shader, &errorBuffer, &fragmentConstants_);
     if (errorBuffer != nullptr) {
-        Logger::GetInstance()->Error("Shader error for file : " + vertexFilename);
+        Logger::GetInstance()->Error("Shader error for file : " + fragmentFilename);
         Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
         errorBuffer->Release();
         errorBuffer = nullptr;
@@ -225,11 +227,11 @@ bool ShaderDirect3D9::SetUniformMatrix3x3(const string& uniformName, const Matri
 	    }
 
         float mat[9];
-        value.GetData(mat);
+        value.Transpose().GetData(mat);
         fragmentConstants_->SetFloatArray(device_, uniformHandle, mat, 9);
     } else {
         float mat[9];
-        value.GetData(mat);
+        value.Transpose().GetData(mat);
         vertexConstants_->SetFloatArray(device_, uniformHandle, mat, 9);
     }
 
@@ -247,11 +249,11 @@ bool ShaderDirect3D9::SetUniformMatrix4x4(const string& uniformName, const Matri
 	    }
 
         float mat[16];
-        value.GetData(mat);
+        value.Transpose().GetData(mat);
         fragmentConstants_->SetFloatArray(device_, uniformHandle, mat, 16);
     } else {
         float mat[16];
-        value.GetData(mat);
+        value.Transpose().GetData(mat);
         vertexConstants_->SetFloatArray(device_, uniformHandle, mat, 16);
     }
 
@@ -283,10 +285,28 @@ bool ShaderDirect3D9::SetUniformTexture(const string& uniform, const Texture* te
     }
 
     if (samplerIndex != 10000) {
-        // device_->SetTexture(samplerIndex, 
+        const Texture2DDirect3D9* textureDirect3D9 = static_cast<const Texture2DDirect3D9*>(texture);
+        device_->SetTexture(samplerIndex, textureDirect3D9->texture_);
+        device_->SetSamplerState( samplerIndex, D3DSAMP_MINFILTER, GetFilter(texture->GetFilterMode()) );
+        device_->SetSamplerState( samplerIndex, D3DSAMP_MAGFILTER, GetFilter(texture->GetFilterMode()) );
     }
 
     return true;
+}
+
+unsigned long ShaderDirect3D9::GetFilter(FilterMode_t filter) const {
+    DWORD mode = 0;
+    switch (filter) {
+        case FILTER_MODE_NEAREST:
+            mode = D3DTEXF_POINT;
+            break;
+
+        case FILTER_MODE_LINEAR:
+            mode = D3DTEXF_LINEAR;
+            break;
+    }
+
+    return mode;
 }
 
 }

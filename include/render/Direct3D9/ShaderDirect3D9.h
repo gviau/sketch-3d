@@ -12,6 +12,8 @@ struct ID3DXConstantTable;
 
 namespace Sketch3D {
 
+enum FilterMode_t;
+
 /**
  * @class ShaderDirect3D9
  * Direct3D9 implementation of a shader object
@@ -38,6 +40,11 @@ class ShaderDirect3D9 : public Shader {
         IDirect3DPixelShader9*  fragmentShader_;
         ID3DXConstantTable*     vertexConstants_;
         ID3DXConstantTable*     fragmentConstants_;
+
+        /**
+         * Gets the Direct3D9 filter value for the specified filter
+         */
+        unsigned long           GetFilter(FilterMode_t filter) const;
 };
 
 }
