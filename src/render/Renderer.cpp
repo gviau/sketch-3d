@@ -120,18 +120,7 @@ void Renderer::OrthoProjection(float left, float right,
 							   float bottom, float top,
 							   float nearPlane, float farPlane)
 {
-	float dx = right - left;
-	float dy = top - bottom;
-	float dz = nearPlane - farPlane;
-
-	projection_ = Matrix4x4::IDENTITY;
-	projection_[0][0] = 2.0f / dx;
-	projection_[1][1] = 2.0f / dy;
-	projection_[2][2] = 2.0f / dz;
-	projection_[0][3] = (left - right) / dx;
-	projection_[1][3] = (bottom - top) / dy;
-	projection_[2][3] = dz / (farPlane - nearPlane);
-
+    projection_ = renderSystem_->OrthoProjection(left, right, bottom, top, nearPlane, farPlane);
 	viewProjection_ = projection_ * view_;
 }
 
@@ -139,21 +128,7 @@ void Renderer::PerspectiveProjection(float left, float right,
 									 float bottom, float top,
 									 float nearPlane, float farPlane)
 {
-	float dx = right - left;
-	float dy = top - bottom;
-	float dz = nearPlane - farPlane;
-	float z2 = 2.0f * nearPlane;
-
-	projection_ = Matrix4x4::IDENTITY;
-	projection_[0][0] = 2.0f * nearPlane / dx;
-	projection_[1][1] = 2.0f * nearPlane / dy;
-	projection_[0][2] = (right + left) / dx;
-	projection_[1][2] = (top + bottom) / dy;
-	projection_[2][2] = (farPlane + nearPlane) / dz;
-	projection_[3][2] = -1.0f;
-	projection_[2][3] = 2.0f * nearPlane * farPlane / dz;
-	projection_[3][3] = 0.0f;
-
+    projection_ = renderSystem_->PerspectiveProjection(left, right, bottom, top, nearPlane, farPlane);
 	viewProjection_ = projection_ * view_;
 }
 
@@ -191,7 +166,7 @@ void Renderer::CameraLookAt(const Vector3& position, const Vector3& point,
 
 	view_[0][3] = -position.Dot(right);
 	view_[1][3] = -position.Dot(u);
-	view_[2][3] = position.Dot(direction);
+	view_[2][3] =  position.Dot(direction);
 
 	viewProjection_ = projection_ * view_;
 }

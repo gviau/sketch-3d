@@ -73,6 +73,40 @@ void RenderSystemDirect3D9::Render() {
 
 }
 
+Matrix4x4 RenderSystemDirect3D9::OrthoProjection(float left, float right, float bottom, float top,
+                                                 float nearPlane, float farPlane) const
+{
+    float w = right - left;
+    float h = top - bottom;
+    float dz = nearPlane - farPlane;
+
+    Matrix4x4 projection;
+    projection[0][0] = 2.0f / w;
+    projection[1][1] = 2.0f / h;
+    projection[2][2] = 1.0f / dz;
+    projection[2][3] = nearPlane / dz;
+    return projection;
+}
+
+Matrix4x4 RenderSystemDirect3D9::PerspectiveProjection(float left, float right, float bottom, float top,
+                                                       float nearPlane, float farPlane) const
+{
+    float w = right - left;
+    float h = top - bottom;
+    float dz = nearPlane - farPlane;
+    float z2 = 2.0f * nearPlane;
+
+    Matrix4x4 projection;
+    projection[0][0] = z2 / w;
+    projection[1][1] = z2 / h;
+    projection[2][2] = farPlane / dz;
+    projection[3][2] = -1.0f;
+    projection[2][3] = nearPlane * farPlane / dz;
+    projection[3][3] = 0.0f;
+
+    return projection;
+}
+
 void RenderSystemDirect3D9::SetRenderFillMode(RenderMode_t mode) const {
     DWORD renderMode;
     switch (mode) {
@@ -104,7 +138,7 @@ void RenderSystemDirect3D9::SetViewport(size_t x, size_t y, size_t width, size_t
 }
 
 void RenderSystemDirect3D9::EnableDepthTest(bool val) const {
-    device_->SetRenderState(D3DRS_ZENABLE, (val) ? TRUE : FALSE);
+    device_->SetRenderState(D3DRS_ZENABLE, (val) ? D3DZB_TRUE : D3DZB_FALSE);
 }
 
 void RenderSystemDirect3D9::EnableDepthWrite(bool val) const {
@@ -157,16 +191,17 @@ void RenderSystemDirect3D9::SetDepthComparisonFunc(DepthFunc_t comparison) const
 void RenderSystemDirect3D9::SetCullingMethod(CullingMethod_t cullingMethod) const {
     DWORD cullMode;
     if (cullingMethod == CULLING_METHOD_BACK_FACE) {
-        cullMode = D3DCULL_CCW;
-    } else if (cullingMethod == CULLING_METHOD_FRONT_FACE) {
         cullMode = D3DCULL_CW;
+    } else if (cullingMethod == CULLING_METHOD_FRONT_FACE) {
+        cullMode = D3DCULL_CCW;
     }
 
     device_->SetRenderState(D3DRS_CULLMODE, cullMode);
 }
 
 Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename, const vector<string>& vertexInputs) {
-    return new ShaderDirect3D9(vertexFilename, fragmentFilename, device_);
+    shaders_.push_back(new ShaderDirect3D9(vertexFilename, fragmentFilename, device_));
+    return shaders_[shaders_.size() - 1];
 }
 
 Texture2D* RenderSystemDirect3D9::CreateTexture2D() const {

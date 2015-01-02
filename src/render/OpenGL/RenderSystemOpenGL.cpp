@@ -80,9 +80,44 @@ void RenderSystemOpenGL::EndRender() {
 }
 
 void RenderSystemOpenGL::Render() {
-	static float angle = 0.0f;
-	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-	angle += 0.02f;
+}
+
+Matrix4x4 RenderSystemOpenGL::OrthoProjection(float left, float right, float bottom, float top,
+                                              float nearPlane, float farPlane) const
+{
+	float dx = right - left;
+	float dy = top - bottom;
+	float dz = farPlane - nearPlane;
+
+	Matrix4x4 projection;
+	projection[0][0] = 2.0f / dx;
+	projection[1][1] = 2.0f / dy;
+	projection[2][2] = -2.0f / dz;
+	projection[0][3] = -(right + left) / dx;
+	projection[1][3] = -(top + bottom) / dy;
+	projection[2][3] = -(farPlane + nearPlane) / dz;
+
+    return projection;
+}
+
+Matrix4x4 RenderSystemOpenGL::PerspectiveProjection(float left, float right, float bottom, float top,
+                                                    float nearPlane, float farPlane) const
+{
+	float dx = right - left;
+	float dy = top - bottom;
+	float dz = nearPlane - farPlane;
+
+	Matrix4x4 projection;
+	projection[0][0] = 2.0f * nearPlane / dx;
+	projection[1][1] = 2.0f * nearPlane / dy;
+	projection[0][2] = (right + left) / dx;
+	projection[1][2] = (top + bottom) / dy;
+	projection[2][2] = (farPlane + nearPlane) / dz;
+	projection[3][2] = -1.0f;
+	projection[2][3] = 2.0f * nearPlane * farPlane / dz;
+	projection[3][3] = 0.0f;
+
+    return projection;
 }
 
 void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) const {

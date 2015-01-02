@@ -15,13 +15,15 @@ class RenderContextOpenGL;
 class RenderSystemOpenGL : public RenderSystem {
 	public:
         RenderSystemOpenGL(Window& window);
-		~RenderSystemOpenGL();
+		virtual ~RenderSystemOpenGL();
 		virtual bool Initialize();
 		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);
 		virtual void Clear(int buffer) const;
         virtual void StartRender();
 		virtual void EndRender();
 		virtual void Render();
+        virtual Matrix4x4 OrthoProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
+        virtual Matrix4x4 PerspectiveProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
 		virtual void SetRenderFillMode(RenderMode_t mode) const;
         virtual void SetViewport(size_t x, size_t y, size_t width, size_t height);
         virtual void EnableDepthTest(bool val) const;

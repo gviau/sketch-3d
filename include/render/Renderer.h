@@ -134,7 +134,7 @@ class Renderer {
 		 * @param blue The blue component of the color
 		 * @param alpha The alpha component of the color
 		 */
-		void				    SetClearColor(float red, float green, float blue, float alpha=0.0f) const;
+		void				    SetClearColor(float red, float green, float blue, float alpha=1.0f) const;
 
 		/**
 		 * Clears the current framebuffer

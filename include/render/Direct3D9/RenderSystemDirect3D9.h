@@ -23,6 +23,8 @@ class RenderSystemDirect3D9 : public RenderSystem {
         virtual void StartRender();
         virtual void EndRender();
         virtual void Render();
+        virtual Matrix4x4 OrthoProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
+        virtual Matrix4x4 PerspectiveProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
         virtual void SetRenderFillMode(RenderMode_t mode) const;
         virtual void SetViewport(size_t x, size_t y, size_t width, size_t height);
         virtual void EnableDepthTest(bool val) const;
