@@ -152,23 +152,27 @@ void Renderer::CameraLookAt(const Vector3& position, const Vector3& point,
 	Vector3 u = right.Cross(direction);
 	u.Normalize();
 
-	view_[0][0] = right.x;
-	view_[0][1] = right.y;
-	view_[0][2] = right.z;
-	
-	view_[1][0] = u.x;
-	view_[1][1] = u.y;
-	view_[1][2] = u.z;
-		
-	view_[2][0] = -direction.x;
-	view_[2][1] = -direction.y;
-	view_[2][2] = -direction.z;
+    SetViewMatrix(right, u, direction, position);
+}
 
-	view_[0][3] = -position.Dot(right);
-	view_[1][3] = -position.Dot(u);
-	view_[2][3] =  position.Dot(direction);
+void Renderer::SetViewMatrix(const Vector3& right, const Vector3& up, const Vector3& look, const Vector3& position) {
+    view_[0][0] = right.x;
+    view_[0][1] = right.y;
+    view_[0][2] = right.z;
 
-	viewProjection_ = projection_ * view_;
+    view_[1][0] = up.x;
+    view_[1][1] = up.y;
+    view_[1][2] = up.z;
+
+    view_[2][0] = -look.x;
+    view_[2][1] = -look.y;
+    view_[2][2] = -look.z;
+
+    view_[0][3] = -position.Dot(right);
+    view_[1][3] = -position.Dot(up);
+    view_[2][3] =  position.Dot(look);
+
+    viewProjection_ = projection_ * view_;
 }
 
 void Renderer::SetRenderFillMode(RenderMode_t mode) const {

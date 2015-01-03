@@ -201,6 +201,17 @@ class Renderer {
 										     const Vector3& point,
 										     const Vector3& up=Vector3::UP);
 
+        /**
+         * Set the view matrix with a right, up, look vector and position. The right, up and look vector are
+         * assumed to be orthonormalized.
+         * @param right The right vector of the view matrix
+         * @param up The up vector of the view matrix
+         * @param look The look vector of the view matrix
+         * @param position Position in view matrix
+         */
+        void                    SetViewMatrix(const Vector3& right, const Vector3& up, const Vector3& look,
+                                              const Vector3& position);
+
 		/**
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
