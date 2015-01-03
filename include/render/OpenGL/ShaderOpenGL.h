@@ -26,6 +26,7 @@ class ShaderOpenGL : public Shader {
 		virtual bool SetUniformFloat(const string& uniform, float value);
 		virtual bool SetUniformVector2(const string& uniform, float value1, float value2);
 		virtual bool SetUniformVector3(const string& uniform, const Vector3& value);
+        virtual bool SetUniformVector3Array(const string& uniform, Vector3* values, int arraySize);
 		virtual bool SetUniformVector4(const string& uniform, const Vector4& value);
 		virtual bool SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
 		virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);

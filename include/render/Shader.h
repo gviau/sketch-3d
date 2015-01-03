@@ -51,6 +51,7 @@ class Shader {
 		virtual bool	    SetUniformFloat(const string& uniform, float value) = 0;
 		virtual bool	    SetUniformVector2(const string& uniform, float value1, float value2) = 0;
 		virtual bool	    SetUniformVector3(const string& uniform, const Vector3& value) = 0;
+        virtual bool        SetUniformVector3Array(const string& uniform, Vector3* values, int arraySize) = 0;
 		virtual bool	    SetUniformVector4(const string& uniform, const Vector4& value) = 0;
 		virtual bool	    SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
 		virtual bool	    SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;

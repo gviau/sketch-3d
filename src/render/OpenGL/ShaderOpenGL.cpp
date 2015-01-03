@@ -123,6 +123,17 @@ bool ShaderOpenGL::SetUniformVector3(const string& uniformName, const Vector3& v
     return true;
 }
 
+bool ShaderOpenGL::SetUniformVector3Array(const string& uniform, Vector3* values, int arraySize) {
+    GLint location = glGetUniformLocation(program_, uniform.c_str());
+	if (location == -1) {
+        Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(id_));
+        return false;
+	}
+
+    glUniform3fv(location, arraySize, (const GLfloat*) values);
+    return true;
+}
+
 bool ShaderOpenGL::SetUniformVector4(const string& uniformName, const Vector4& value) {
     GLint location = glGetUniformLocation(program_, uniformName.c_str());
 	if (location == -1) {
