@@ -144,14 +144,11 @@ void RenderTextureOpenGL::Bind() const {
     if (framebuffer_ != 0) {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 
-        size_t numBuffers = textures_.size() + depthBufferBound_;
+        size_t numBuffers = textures_.size();
         GLenum* buffers = new GLenum[numBuffers];
-        if (depthBufferBound_) {
-            buffers[0] = GL_NONE;
-        }
 
-        for (size_t i = depthBufferBound_; i < numBuffers; i++) {
-            buffers[i] = GL_COLOR_ATTACHMENT0 + (i - depthBufferBound_);
+        for (size_t i = 0; i < numBuffers; i++) {
+            buffers[i] = GL_COLOR_ATTACHMENT0 + i;
         }
         glDrawBuffers(numBuffers, buffers);
         delete[] buffers;
