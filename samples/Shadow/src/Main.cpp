@@ -229,6 +229,7 @@ int main(int argc, char** argv) {
                 Renderer::GetInstance()->EnableBlending(true);
             }
 
+            Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(newLightPositions[i], Vector3::ZERO, Vector3::UP);
             Matrix4x4 shadowMatrix = biasMatrix * Renderer::GetInstance()->GetViewProjectionMatrix();
             shader->SetUniformMatrix4x4("shadowMatrix", shadowMatrix);
@@ -236,6 +237,7 @@ int main(int argc, char** argv) {
             shader->SetUniformVector4("light_color", lightColors[i]);
             material.AddTexture("shadowMap", shadowMapTextures[i]);
 
+            Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(cameraPosition, Vector3::ZERO, Vector3::UP);
             Renderer::GetInstance()->Render();
         }
