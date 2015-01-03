@@ -52,13 +52,12 @@ bool Texture2DOpenGL::Create() {
     if (data_ != nullptr) {
 	    glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0,
 				     components, type, data_);
+    } else if (format == GL_DEPTH_COMPONENT16) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, components, type, nullptr);
     } else {
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width_, height_);
-
-        if (format == GL_DEPTH_COMPONENT16) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-        }
     }
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
