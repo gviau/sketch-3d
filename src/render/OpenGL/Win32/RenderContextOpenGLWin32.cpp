@@ -38,7 +38,7 @@ bool RenderContextOpenGLWin32::Initialize(Window& window) {
 						  PFD_DOUBLEBUFFER;
 	pixelFormat.iPixelType = PFD_TYPE_RGBA;
 	pixelFormat.cColorBits = 24;
-	pixelFormat.cDepthBits = 16;
+	pixelFormat.cDepthBits = 24;
 	pixelFormat.iLayerType = PFD_MAIN_PLANE;
 
 	int format = ChoosePixelFormat(deviceContext_, &pixelFormat);

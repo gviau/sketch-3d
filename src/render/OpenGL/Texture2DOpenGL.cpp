@@ -152,7 +152,7 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             break;
 
         case TEXTURE_FORMAT_DEPTH:
-            internalFormat = GL_DEPTH_COMPONENT16;
+            internalFormat = GL_DEPTH_COMPONENT24;
             format = GL_DEPTH_COMPONENT;
             type = GL_UNSIGNED_INT;
 
