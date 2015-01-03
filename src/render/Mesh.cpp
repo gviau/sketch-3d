@@ -26,10 +26,10 @@ Mesh::Mesh(MeshType_t meshType) : meshType_(meshType), filename_(""), fromCache_
 {
 }
 
-Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType) : meshType_(meshType),
+Mesh::Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes, MeshType_t meshType, bool counterClockWise) : meshType_(meshType),
         filename_(""), fromCache_(false), importer_(nullptr), bufferObjects_(nullptr)
 {
-    Load(filename, vertexAttributes);
+    Load(filename, vertexAttributes, counterClockWise);
     Initialize(vertexAttributes);
 }
 
@@ -65,7 +65,7 @@ Mesh& Mesh::operator= (const Mesh& rhs) {
     return *this;
 }
 
-void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes) {
+void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise) {
     if (filename == filename_) {
         return;
     }
@@ -117,6 +117,10 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
 
     if (useTextureCoordinates) {
         flags |= aiProcess_GenUVCoords;
+    }
+
+    if (!counterClockWise) {
+        flags |= aiProcess_FlipWindingOrder;
     }
 
     const aiScene* scene = importer_->ReadFile(filename, flags);

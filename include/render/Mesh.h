@@ -83,9 +83,10 @@ class Mesh {
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
+         * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
 		 */
                                 Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                                     MeshType_t meshType=MESH_TYPE_STATIC);
+                                     MeshType_t meshType=MESH_TYPE_STATIC, bool counterClockWise=true);
 
         /**
          * Copy constructor
@@ -109,8 +110,9 @@ class Mesh {
          * @param filename The name of the file from which the mesh will be loaded
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
+         * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
          */
-        virtual void            Load(const string& filename, const VertexAttributesMap_t& vertexAttributes);
+        virtual void            Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise=true);
 
         /**
          * Add a model surface to the mesh
