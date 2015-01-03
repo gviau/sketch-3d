@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
     Window window("Sample_SponzaDemo", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.1f, 0.1f, 0.1f);
+    Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
     ////////////////////////////////////////////////////////////////////////////
     // Create the GBuffer render texture
@@ -287,6 +288,19 @@ int main(int argc, char** argv) {
 
         static bool debouncer = false;
         static bool lockMouse = false;
+        static RenderMode_t renderMode = RENDER_MODE_FILL;
+        if (!debouncer && keyboard->isKeyDown(OIS::KC_G)) {
+            if (renderMode == RENDER_MODE_FILL) {
+                renderMode = RENDER_MODE_WIREFRAME;
+            } else {
+                renderMode = RENDER_MODE_FILL;
+            }
+            Renderer::GetInstance()->SetRenderFillMode(renderMode);
+            debouncer = true;
+        } else if (debouncer && !keyboard->isKeyDown(OIS::KC_G)) {
+            debouncer = false;
+        }
+
         if (!debouncer && keyboard->isKeyDown(OIS::KC_P)) {
             Logger::GetInstance()->Warning("Position => x: " + to_string(cameraPosition.x) + " y: " + to_string(cameraPosition.y) + " z: " + to_string(cameraPosition.z));
             Logger::GetInstance()->Warning("Look => x: " + to_string(look.x) + " y: " + to_string(look.y) + " z: " + to_string(look.z));
@@ -342,7 +356,7 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->BindShader(sponzaShader);
         sponzaShader->SelectSubroutine("record_depth", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
-        Renderer::GetInstance()->PerspectiveProjection(90.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
+        Renderer::GetInstance()->PerspectiveProjection(90.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
         // Render from the light's perspective
         Renderer::GetInstance()->CameraLookAt(lightPosition0, lightPosition0 + lightLook0);
@@ -357,7 +371,7 @@ int main(int argc, char** argv) {
         GBuffer->Bind();
         sponzaShader->SelectSubroutine("record_geometry", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
-        Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
+        Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
         // Set the camera view matrix
         look.Normalize();
