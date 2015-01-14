@@ -2,6 +2,7 @@
 
 #include "math/Vector2.h"
 #include "math/Vector3.h"
+#include "math/Vector4.h"
 
 namespace Sketch3D {
 
@@ -60,11 +61,15 @@ bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int pres
         bool hasNormals = ((presentVertexAttributes & VERTEX_ATTRIBUTES_NORMAL) > 0);
         bool hasTexCoords = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TEX_COORDS) > 0);
         bool hasTangents = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TANGENT) > 0);
+        bool hasBones = ((presentVertexAttributes & VERTEX_ATTRIBUTES_BONES) > 0);
+        bool hasWeights = ((presentVertexAttributes & VERTEX_ATTRIBUTES_WEIGHTS) > 0);
 
         size_t stride = sizeof(Vector3) +
                         ((hasNormals) ? sizeof(Vector3) : 0) +
                         ((hasTexCoords) ? sizeof(Vector2) : 0) +
-                        ((hasTangents) ? sizeof(Vector3) : 0);
+                        ((hasTangents) ? sizeof(Vector3) : 0) +
+                        ((hasBones) ? sizeof(Vector4) : 0) +
+                        ((hasWeights) ? sizeof(Vector4) : 0);
 
         size_t cumulativeOffset = 0;
         map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
@@ -103,6 +108,24 @@ bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int pres
 
                     size = 3;
                     offset = sizeof(Vector3);
+                    break;
+
+                case VERTEX_ATTRIBUTES_BONES:
+                    if (!hasBones) {
+                        continue;
+                    }
+                    
+                    size = 4;
+                    offset = sizeof(Vector4);
+                    break;
+
+                case VERTEX_ATTRIBUTES_WEIGHTS:
+                    if (!hasWeights) {
+                        continue;
+                    }
+
+                    size = 4;
+                    offset = sizeof(Vector4);
                     break;
             }
 

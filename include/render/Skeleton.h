@@ -5,6 +5,8 @@
 
 #include "render/AnimationState.h"
 
+#include "system/Common.h"
+
 #include <hash_map>
 #include <map>
 #include <string>
@@ -90,6 +92,8 @@ class Skeleton {
          * @param globalInverseTransform The matrix representing the global inverse transform of the skeleton
          */
         void                        SetGlobalInverseTransform(const Matrix4x4& globalInverseTransform);
+
+        INLINE size_t               GetNumberOfBones() const { return bones_.size(); }
 
     private:
         map<string, AnimationState> animationStates_;   /**< The animation that this skeleton can perform */

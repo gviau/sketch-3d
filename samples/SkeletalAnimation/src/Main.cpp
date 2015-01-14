@@ -23,6 +23,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 int main(int argc, char** argv) {
 #endif
 
+    // CHANGE THIS VALUE TO ANIMATE ON CPU OR GPU
+    bool isSkinnedOnGpu = true;
+
     Window window("Sample_SkeletalAnimation", 1024, 768, true);
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
@@ -32,14 +35,28 @@ int main(int argc, char** argv) {
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
     vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
-    SkinnedMesh mesh("Media/Bob.md5mesh", vertexAttributes);
+
+    if (isSkinnedOnGpu) {
+        vertexAttributes[VERTEX_ATTRIBUTES_BONES] = 3;
+        vertexAttributes[VERTEX_ATTRIBUTES_WEIGHTS] = 4;
+    }
+    SkinnedMesh mesh("Media/Bob.md5mesh", vertexAttributes, isSkinnedOnGpu);
 
     // Create the material
     vector<string> vertexInputs;
     vertexInputs.push_back("in_vertex");
     vertexInputs.push_back("in_normal");
     vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SkeletalAnimation/vert.glsl", "Shaders/SkeletalAnimation/frag.glsl", vertexInputs);
+
+    string vertexFilename = "";
+    if (isSkinnedOnGpu) {
+        vertexInputs.push_back("in_bones");
+        vertexInputs.push_back("in_weights");
+        vertexFilename = "Shaders/SkeletalAnimation/vertSkinned.glsl";
+    } else {
+        vertexFilename = "Shaders/SkeletalAnimation/vert.glsl";
+    }
+    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag.glsl", vertexInputs);
 
     Material material(shader);
 
@@ -71,8 +88,19 @@ int main(int argc, char** argv) {
         rotationX.MakeFromAngleAxis(PI_OVER_2, Vector3::RIGHT);
         node.SetOrientation(rotationZ * rotationX);
 
-        if (numberOfFrames % 12 == 0) {
-            mesh.Animate(deltaTime.count());
+        // CPU skinning
+        if (!isSkinnedOnGpu) {
+            if (numberOfFrames % 12 == 0) {
+                mesh.Animate(deltaTime.count());
+                deltaTime = chrono::duration<double>::zero();
+            }
+        } else {
+            vector<Matrix4x4> boneTransformationMatrices;
+            if (mesh.Animate(deltaTime.count(), boneTransformationMatrices)) {
+                // Send the matrices to the GPU
+                shader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
+            }
+
             deltaTime = chrono::duration<double>::zero();
         }
 

@@ -123,7 +123,7 @@ bool ShaderOpenGL::SetUniformVector3(const string& uniformName, const Vector3& v
     return true;
 }
 
-bool ShaderOpenGL::SetUniformVector3Array(const string& uniform, Vector3* values, int arraySize) {
+bool ShaderOpenGL::SetUniformVector3Array(const string& uniform, const Vector3* values, int arraySize) {
     GLint location = glGetUniformLocation(program_, uniform.c_str());
 	if (location == -1) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniform + " in shader #" + to_string(id_));
@@ -168,6 +168,30 @@ bool ShaderOpenGL::SetUniformMatrix4x4(const string& uniformName, const Matrix4x
     float mat[16];
     value.GetData(mat);
     glUniformMatrix4fv(location, 1, false, mat);
+    return true;
+}
+
+bool ShaderOpenGL::SetUniformMatrix4x4Array(const string& uniformName, const Matrix4x4* values, int arraySize) {
+    GLint location = glGetUniformLocation(program_, uniformName.c_str());
+	if (location == -1) {
+        Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
+        return false;
+	}
+
+    // Convert the matrices to an array of floats
+    vector<float> matrices;
+    matrices.reserve(arraySize * 16);
+    for (int i = 0; i < arraySize; i++) {
+        float mat[16];
+        values[i].GetData(mat);
+        
+        for (size_t j = 0; j < 16; j++) {
+            matrices.push_back(mat[j]);
+        }
+    }
+
+    glUniformMatrix4fv(location, arraySize, false, &matrices[0]);
+
     return true;
 }
 

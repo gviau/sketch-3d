@@ -3,6 +3,7 @@
 
 #include "math/Vector2.h"
 #include "math/Vector3.h"
+#include "math/Vector4.h"
 
 #include "render/BufferObject.h"
 
@@ -27,20 +28,25 @@ class Texture2D;
  * Structure containing the information about a surface to draw regarding the vertices
  */
 struct SurfaceTriangles_t {
-                    SurfaceTriangles_t() : vertices(nullptr), normals(nullptr), texCoords(nullptr), tangents(nullptr),
+                    SurfaceTriangles_t() : vertices(nullptr), normals(nullptr), texCoords(nullptr), tangents(nullptr), bones(nullptr), weights(nullptr),
                                            indices(nullptr), textures(nullptr), numVertices(0), numNormals(0), numTexCoords(0), numTangents(0),
-                                           numIndices(0), numTextures(0) {}
+                                           numBones(0), numWeights(0), numIndices(0), numTextures(0) {}
 
     Vector3*        vertices;   /**< List of vertices */
     Vector3*        normals;    /**< List of normals */
     Vector2*        texCoords;  /**< List texture coordinates */
     Vector3*        tangents;   /**< List of tangents */
+    Vector4*        bones;      /**< List of indices of attached bones. Maximum of 4 bones */
+    Vector4*        weights;    /**< List of weights for their corresponding bones */
     unsigned short* indices;    /**< List of indices */
     Texture2D**     textures;   /**< List of textures to apply to the surface */
+
     size_t          numVertices;
     size_t          numNormals;
     size_t          numTexCoords;
     size_t          numTangents;
+    size_t          numBones;
+    size_t          numWeights;
     size_t          numIndices;
     size_t          numTextures;
 };

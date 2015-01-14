@@ -21,13 +21,16 @@ enum BufferUsage_t {
 /**
  * @enum VertexAttributes_t
  * The different type of vertex attributes that can be loaded from a mesh and
- * sent to the vertex shader.
+ * sent to the vertex shader. This must be a power of two because we use them in a
+ * bitfield to determine what vertex attributes are really present in the mesh data
  */
 enum VertexAttributes_t {
     VERTEX_ATTRIBUTES_POSITION = 0,
     VERTEX_ATTRIBUTES_NORMAL = 1,
     VERTEX_ATTRIBUTES_TEX_COORDS = 2,
-    VERTEX_ATTRIBUTES_TANGENT = 4
+    VERTEX_ATTRIBUTES_TANGENT = 4,
+    VERTEX_ATTRIBUTES_BONES = 8,
+    VERTEX_ATTRIBUTES_WEIGHTS = 16
 };
 
 // Typdefs

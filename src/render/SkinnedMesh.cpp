@@ -23,16 +23,17 @@ using namespace std;
 
 namespace Sketch3D {
 
-SkinnedMesh::SkinnedMesh(MeshType_t meshType) : Mesh(meshType), skeleton_(nullptr), time_(0.0),
+SkinnedMesh::SkinnedMesh(bool isSkinnedOnGpu) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC), skeleton_(nullptr), time_(0.0),
                                                 currentAnimationState_(nullptr), isLooping_(false)
 {
 }
 
 SkinnedMesh::SkinnedMesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                         MeshType_t meshType) : Mesh(filename, vertexAttributes, meshType), skeleton_(nullptr), time_(0.0),
+                         bool isSkinnedOnGpu) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC), skeleton_(nullptr), time_(0.0),
                                                 currentAnimationState_(nullptr), isLooping_(false)
 {
     Load(filename, vertexAttributes);
+    Initialize(vertexAttributes);
 }
 
 SkinnedMesh::~SkinnedMesh() {
@@ -40,6 +41,8 @@ SkinnedMesh::~SkinnedMesh() {
 }
 
 void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes) {
+    Mesh::Load(filename, vertexAttributes);
+
     // Delete last model's skeleton if present
     if (skeleton_ != nullptr) {
         ModelManager::GetInstance()->RemoveSkeletonReferenceFromCache(filename_);
@@ -76,11 +79,13 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
     // Because there are several sub meshes, we want to remember the bone is from which mesh
     set<string> necessaryBones;
     map<string, vector<pair<const aiBone*, size_t>>> bones;
+    map<string, size_t> boneNameToIndex;
     size_t cumulativeNumVertices = 0; 
     queue<const aiNode*> nodes;
     nodes.push(scene->mRootNode);
 
-    // Load the bones
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Load the bones from the mesh
     while (!nodes.empty()) {
         const aiNode* node = nodes.front();
         nodes.pop();
@@ -89,10 +94,63 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
             const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             size_t numVertices = mesh->mNumVertices;
 
+            // Get the surface to set the bones and weights for GPU skinned meshes
+            ModelSurface_t& modelSurface = surfaces_[node->mMeshes[i]];
+            SurfaceTriangles_t* surface = modelSurface.geometry;
+
             // Retrieve for each bones the offset matrix and the vertex with their weight that are attached to it
             if (mesh->HasBones()) {
+                if (meshType_ == MESH_TYPE_STATIC) {
+                    surface->numBones = surface->numVertices;
+                    surface->numWeights = surface->numVertices;
+
+                    surface->bones = new Vector4[surface->numBones];
+                    surface->weights = new Vector4[surface->numWeights];
+
+                    // We intialize all weights to 0
+                    for (size_t j = 0; j < surface->numBones; j++) {
+                        Vector4& contribuingWeight = surface->weights[j];
+                        contribuingWeight.w = 0.0f;
+                    }
+                }
+
                 for (size_t j = 0; j < mesh->mNumBones; j++) {
                     const aiBone* bone = mesh->mBones[j];
+
+                    // Only do this for a static mesh, because it will be skinned on the GPU
+                    if (meshType_ == MESH_TYPE_STATIC) {
+                        // Map the bone index that we'll give to the vertex to its name
+                        size_t boneIndex = 0;
+                        map<string, size_t>::iterator it = boneNameToIndex.find(bone->mName.data);
+                        if (it != boneNameToIndex.end()) {
+                            boneIndex = it->second;
+                        } else {
+                            boneIndex = boneNameToIndex.size();
+                            boneNameToIndex[bone->mName.data] = boneIndex;
+
+                        }
+
+                        for (size_t k = 0; k < bone->mNumWeights; k++) {
+                            const aiVertexWeight& weight = bone->mWeights[k];
+                            Vector4& contribuingBone = surface->bones[weight.mVertexId];
+                            Vector4& contribuingWeights = surface->weights[weight.mVertexId];
+
+                            if (contribuingWeights.x == 0.0f) {
+                                contribuingBone.x = (float)boneIndex;
+                                contribuingWeights.x = weight.mWeight;
+                            } else if (contribuingWeights.y == 0.0f) {
+                                contribuingBone.y = (float)boneIndex;
+                                contribuingWeights.y = weight.mWeight;
+                            } else if (contribuingWeights.z == 0.0f) {
+                                contribuingBone.z = (float)boneIndex;
+                                contribuingWeights.z = weight.mWeight;
+                            } else {
+                                contribuingBone.w = (float)boneIndex;
+                                contribuingWeights.w = weight.mWeight;
+                            }
+                        }
+                    }
+
                     if (bones.find(bone->mName.data) == bones.end()) {
                         bones[bone->mName.data] = vector<pair<const aiBone*, size_t>>();
                     }
@@ -138,6 +196,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////
     // Build the skeleton
     skeleton_ = new Skeleton;
     aiMatrix4x4 globalTransform = scene->mRootNode->mTransformation;
@@ -187,13 +246,19 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
                     Bone_t* bone = skeleton_->CreateBone(it->first, offsetMatrix);
                     parentBone->linkedBones.push_back(bone);
 
-                    for (size_t i = 0; i < it->second.size(); i++) {
-                        const aiVertexWeight* weights = it->second[i].first->mWeights;
-                        size_t baseIndex = it->second[i].second;
+                    // Only do this for a dynamic mesh, because it will be skinned on the GPU
+                    if (meshType_ == MESH_TYPE_DYNAMIC) {
+                        for (size_t i = 0; i < it->second.size(); i++) {
+                            const aiVertexWeight* weights = it->second[i].first->mWeights;
+                            size_t baseIndex = it->second[i].second;
 
-                        for (size_t j = 0; j < it->second[i].first->mNumWeights; j++) {
-                            bone->vertexWeight[baseIndex + weights[j].mVertexId] = weights[j].mWeight;
+                            for (size_t j = 0; j < it->second[i].first->mNumWeights; j++) {
+                                bone->vertexWeight[baseIndex + weights[j].mVertexId] = weights[j].mWeight;
+                            }
                         }
+                    } else {
+                        // Map the bone to the index given to the vertices
+                        boneToIndex_[bone] = boneNameToIndex[node->mName.data];
                     }
                 }
             }
@@ -204,6 +269,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////
     // Load the animations
     for (size_t i = 0; i < scene->mNumAnimations; i++) {
         aiAnimation* animation = scene->mAnimations[i];
@@ -249,9 +315,127 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
     Logger::GetInstance()->Info("Successfully loaded animations from file " + filename);
 }
 
-void SkinnedMesh::Animate(double deltaTime) {
+void SkinnedMesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
+    vertexAttributes_ = vertexAttributes;
+
+    // Calculate offset and array index depending on vertex attributes provided by the user
+    map<size_t, VertexAttributes_t> attributesFromIndex;
+    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+    for (; it != vertexAttributes_.end(); ++it) {
+        attributesFromIndex[it->second] = it->first;
+    }
+
+    bufferObjects_ = new BufferObject* [surfaces_.size()];
+    BufferUsage_t bufferUsage = (meshType_ == MESH_TYPE_STATIC) ? BUFFER_USAGE_STATIC : BUFFER_USAGE_DYNAMIC;
+
+    for (size_t i = 0; i < surfaces_.size(); i++) {
+        bufferObjects_[i] = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes_, bufferUsage);
+        BufferObject* bufferObject = bufferObjects_[i];
+
+	    // Interleave the data
+	    vector<float> data;
+        size_t sizeToReserve = surfaces_[i].geometry->numVertices * 3 +
+                               surfaces_[i].geometry->numNormals * 3 +
+                               surfaces_[i].geometry->numTexCoords * 2 +
+                               surfaces_[i].geometry->numTangents * 3;
+
+        // Add the data for the bones since it will be skinned on the GPU
+        if (meshType_ == MESH_TYPE_STATIC) {
+            sizeToReserve += surfaces_[i].geometry->numBones * 4 +
+                             surfaces_[i].geometry->numWeights * 4;
+        }
+
+        data.reserve(sizeToReserve);
+
+        bool hasNormals = surfaces_[i].geometry->numNormals > 0;
+        bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
+        bool hasTangents = surfaces_[i].geometry->numTangents > 0;
+        bool hasBones = surfaces_[i].geometry->numBones > 0;
+        bool hasWeights = surfaces_[i].geometry->numWeights > 0;
+
+        Vector3 vertex;
+        for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
+            map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+
+            for (; v_it != attributesFromIndex.end(); ++v_it) {
+                switch (v_it->second) {
+                    case VERTEX_ATTRIBUTES_POSITION:
+                        vertex = surfaces_[i].geometry->vertices[j];
+                        data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
+                        break;
+
+                    case VERTEX_ATTRIBUTES_NORMAL:
+                        if (hasNormals) {
+                            Vector3& normal = surfaces_[i].geometry->normals[j];
+                            data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
+                        }
+                        break;
+
+                    case VERTEX_ATTRIBUTES_TEX_COORDS:
+                        if (hasTexCoords) {
+                            Vector2& texCoords = surfaces_[i].geometry->texCoords[j];
+                            data.push_back(texCoords.x); data.push_back(texCoords.y);
+                        }
+                        break;
+
+                    case VERTEX_ATTRIBUTES_TANGENT:
+                        if (hasTangents) {
+                            Vector3& tangents = surfaces_[i].geometry->tangents[j];
+                            data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
+                        }
+                        break;
+
+                    case VERTEX_ATTRIBUTES_BONES:
+                        if (hasBones) {
+                            Vector4& bones = surfaces_[i].geometry->bones[j];
+                            data.push_back(bones.x); data.push_back(bones.y); data.push_back(bones.z); data.push_back(bones.w);
+                        }
+                        break;
+
+                    case VERTEX_ATTRIBUTES_WEIGHTS:
+                        if (hasWeights) {
+                            Vector4& weights = surfaces_[i].geometry->weights[j];
+                            data.push_back(weights.x); data.push_back(weights.y); data.push_back(weights.z); data.push_back(weights.w);
+                        }
+                        break;
+                }
+            }
+	    }
+
+        int presentVertexAttributes = 0;
+        if (hasNormals) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_NORMAL;
+        }
+
+        if (hasTexCoords) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TEX_COORDS;
+        }
+
+        if (hasTangents) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_TANGENT;
+        }
+
+        if (hasBones) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_BONES;
+        }
+
+        if (hasWeights) {
+            presentVertexAttributes |= VERTEX_ATTRIBUTES_WEIGHTS;
+        }
+
+        if (!bufferObject->SetVertexData(data, presentVertexAttributes)) {
+            Logger::GetInstance()->Error("The vertex attributes are not all present");
+            FreeMeshMemory();
+            break;
+        }
+
+        bufferObject->SetIndexData(surfaces_[i].geometry->indices, surfaces_[i].geometry->numIndices);
+    }
+}
+
+bool SkinnedMesh::Animate(double deltaTime, vector<Matrix4x4>& boneTransformationMatrices) {
     if (currentAnimationState_ == nullptr) {
-        return;
+        return false;
     }
 
     time_ += deltaTime;
@@ -259,7 +443,7 @@ void SkinnedMesh::Animate(double deltaTime) {
     if (!skeleton_->GetTransformationMatrices(time_, currentAnimationState_, isLooping_,
                                               transformationMatrices))
     {
-        return;
+        return false;
     }
 
     if (meshType_ == MESH_TYPE_DYNAMIC) {
@@ -344,8 +528,15 @@ void SkinnedMesh::Animate(double deltaTime) {
             }
         }
     } else {
-        // TODO
+        // Populate the vector of transformation matrices so that it can be used by the GPU
+        map<const Bone_t*, size_t>::iterator it = boneToIndex_.begin();
+        boneTransformationMatrices.resize(skeleton_->GetNumberOfBones());
+        for (; it != boneToIndex_.end(); ++it) {
+            boneTransformationMatrices[it->second] = transformationMatrices[it->first];
+        }
     }
+
+    return true;
 }
 
 void SkinnedMesh::SetAnimationState(const string& name) {

@@ -81,6 +81,8 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                 delete[] model.geometry->normals;
                 delete[] model.geometry->texCoords;
                 delete[] model.geometry->tangents;
+                delete[] model.geometry->bones;
+                delete[] model.geometry->weights;
                 delete[] model.geometry->indices;
 
                 for (size_t j = 0; j < model.geometry->numTextures; j++) {
@@ -247,7 +249,6 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
     // Cache the model for future loads
     ModelManager::GetInstance()->CacheModel(filename, surfaces_);
     filename_ = filename;
-    Initialize(vertexAttributes);
     fromCache_ = true;
 
     Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
@@ -284,6 +285,8 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
         bool hasNormals = surfaces_[i].geometry->numNormals > 0;
         bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
         bool hasTangents = surfaces_[i].geometry->numTangents > 0;
+        bool hasBones = surfaces_[i].geometry->numBones > 0;
+        bool hasWeights = surfaces_[i].geometry->numWeights > 0;
 
         Vector3 vertex;
         for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
@@ -434,6 +437,8 @@ void Mesh::FreeMeshMemory() {
                 delete[] model.geometry->normals;
                 delete[] model.geometry->texCoords;
                 delete[] model.geometry->tangents;
+                delete[] model.geometry->bones;
+                delete[] model.geometry->weights;
                 delete[] model.geometry->indices;
 
                 for (size_t j = 0; j < model.geometry->numTextures; j++) {

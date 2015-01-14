@@ -20,6 +20,8 @@ ModelManager::~ModelManager() {
             delete[] model.geometry->normals;
             delete[] model.geometry->texCoords;
             delete[] model.geometry->tangents;
+            delete[] model.geometry->bones;
+            delete[] model.geometry->weights;
             delete[] model.geometry->indices;
             delete[] model.geometry->textures;
         }
