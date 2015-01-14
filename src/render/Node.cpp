@@ -208,7 +208,7 @@ void Node::RotateAroundAxis(float angle, const Vector3& axis) {
 	Quaternion rot;
 	rot.MakeFromAngleAxis(angle, axis);
 	rot.Normalize();
-	orientation_ *= rot;
+	orientation_ = rot * orientation_;
 }
 
 void Node::SetParent(Node* parent) {
