@@ -223,15 +223,34 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                 const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
                 
                 // Get all the textures referenced by the material
-                surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE);
+                surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE) +
+                                       material->GetTextureCount(aiTextureType_NORMALS) +
+                                       material->GetTextureCount(aiTextureType_SPECULAR);
                 surface->textures = new Texture2D* [surface->numTextures];
 
-                for (size_t j = 0; j < surface->numTextures; j++) {
+                size_t textureIdx = 0;
+                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
                     aiString textureName;
                     material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
 
                     Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
-                    surface->textures[j] = texture;
+                    surface->textures[textureIdx++] = texture;
+                }
+
+                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
+                    aiString textureName;
+                    material->GetTexture(aiTextureType_NORMALS, j, &textureName);
+
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
+                    surface->textures[textureIdx++] = texture;
+                }
+
+                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
+                    aiString textureName;
+                    material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
+
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
+                    surface->textures[textureIdx++] = texture;
                 }
             }
 
