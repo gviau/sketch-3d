@@ -136,8 +136,7 @@ int main(int argc, char** argv) {
     hellknight.SetMaterial(&hellknightMaterial);
     hellknight.SetMesh(&hellknightMesh);
 
-    hellknight.Pitch(-PI_OVER_2);
-    hellknight.Yaw(-PI_OVER_2);
+    hellknight.Yaw(2.75f);
     hellknight.SetPosition(Vector3(0.0f, 0.05f, 0.0f));
     hellknight.Scale(Vector3(0.025f, 0.025f, 0.025f));
     Renderer::GetInstance()->GetSceneTree().AddNode(&hellknight);
@@ -208,10 +207,10 @@ int main(int argc, char** argv) {
     ////////////////////////////////////////////////////////////////////////////
     // Shadow maps creation
     ////////////////////////////////////////////////////////////////////////////
-    RenderTexture* shadowMap0 = Renderer::GetInstance()->CreateRenderTexture(1024, 1024, TEXTURE_FORMAT_DEPTH);
+    RenderTexture* shadowMap0 = Renderer::GetInstance()->CreateRenderTexture(2048, 2048, TEXTURE_FORMAT_DEPTH);
     Texture2D* shadowMapTexture0 = Renderer::GetInstance()->CreateTexture2D();
-    shadowMapTexture0->SetWidth(1024);
-    shadowMapTexture0->SetHeight(1024);
+    shadowMapTexture0->SetWidth(2048);
+    shadowMapTexture0->SetHeight(2048);
     shadowMapTexture0->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
     shadowMapTexture0->SetFilterMode(FILTER_MODE_LINEAR);
     if (!shadowMapTexture0->Create()) {
