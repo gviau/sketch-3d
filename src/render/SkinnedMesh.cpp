@@ -23,16 +23,16 @@ using namespace std;
 
 namespace Sketch3D {
 
-SkinnedMesh::SkinnedMesh(bool isSkinnedOnGpu) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC), skeleton_(nullptr), time_(0.0),
-                                                currentAnimationState_(nullptr), isLooping_(false)
+SkinnedMesh::SkinnedMesh(bool isSkinnedOnGpu, bool counterClockWise) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC),
+                                                                       skeleton_(nullptr), time_(0.0), currentAnimationState_(nullptr), isLooping_(false)
 {
 }
 
 SkinnedMesh::SkinnedMesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                         bool isSkinnedOnGpu) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC), skeleton_(nullptr), time_(0.0),
-                                                currentAnimationState_(nullptr), isLooping_(false)
+                         bool isSkinnedOnGpu, bool counterClockWise) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC), skeleton_(nullptr), time_(0.0),
+                                                                       currentAnimationState_(nullptr), isLooping_(false)
 {
-    Load(filename, vertexAttributes);
+    Load(filename, vertexAttributes, counterClockWise);
     Initialize(vertexAttributes);
 }
 
@@ -40,8 +40,8 @@ SkinnedMesh::~SkinnedMesh() {
     FreeMeshMemory();
 }
 
-void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes) {
-    Mesh::Load(filename, vertexAttributes);
+void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise) {
+    Mesh::Load(filename, vertexAttributes, counterClockWise);
 
     // Delete last model's skeleton if present
     if (skeleton_ != nullptr) {

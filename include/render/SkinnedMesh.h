@@ -29,8 +29,9 @@ class SkinnedMesh : public Mesh {
          * @param isSkinnedOnGpu Is the mesh to be skinned on the GPU. If it is false, then the vertices will be updated
          * and sent to the video card each frame, with the transformations done on the CPU. If set to true, then it
          * is the responsability of the class user to implement the transformations on the GPU via a shader.
+         * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
          */
-                                    SkinnedMesh(bool isSkinnedOnGpu=false);
+                                    SkinnedMesh(bool isSkinnedOnGpu=false, bool counterClockWise=true);
 
         /**
          * Constructor
@@ -40,9 +41,10 @@ class SkinnedMesh : public Mesh {
          * @param isSkinnedOnGpu Is the mesh to be skinned on the GPU. If it is false, then the vertices will be updated
          * and sent to the video card each frame, with the transformations done on the CPU. If set to true, then it
          * is the responsability of the class user to implement the transformations on the GPU via a shader.
+         * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
          */
                                     SkinnedMesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                                                bool isSkinnedOnGpu=false);
+                                                bool isSkinnedOnGpu=false, bool counterClockWise=true);
 
         /**
          * Destructor
@@ -54,8 +56,9 @@ class SkinnedMesh : public Mesh {
          * @param filename The name of the file to load
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
+         * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
          */
-        virtual void                Load(const string& filename, const VertexAttributesMap_t& vertexAttributes);
+        virtual void                Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise=true);
 
         /**
          * Initialize the mesh with geometry data - also construct the required data for the bones if is to be skinned on the gpu
