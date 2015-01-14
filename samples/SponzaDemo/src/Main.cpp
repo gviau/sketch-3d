@@ -8,6 +8,7 @@
 #include <render/RenderTexture.h>
 #include <render/SceneTree.h>
 #include <render/Shader.h>
+#include <render/SkinnedMesh.h>
 #include <render/Texture2D.h>
 
 #include <system/Logger.h>
@@ -107,6 +108,44 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->GetSceneTree().AddNode(&sponza);
 
     ////////////////////////////////////////////////////////////////////////////
+    // Load the hellknight model
+    ////////////////////////////////////////////////////////////////////////////
+    VertexAttributesMap_t hellknightVertexAttributes;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_TANGENT] = 3;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_BONES] = 4;
+    hellknightVertexAttributes[VERTEX_ATTRIBUTES_WEIGHTS] = 5;
+    SkinnedMesh hellknightMesh("Media/models/md5/monsters/hellknight/hellknight.md5mesh", hellknightVertexAttributes, true, false);
+
+    // Create the material for the hellknight
+    vector<string> hellknightVertexInputs;
+    hellknightVertexInputs.push_back("in_vertex");
+    hellknightVertexInputs.push_back("in_normal");
+    hellknightVertexInputs.push_back("in_uv");
+    hellknightVertexInputs.push_back("in_tangent");
+    hellknightVertexInputs.push_back("in_bones");
+    hellknightVertexInputs.push_back("in_weights");
+    Shader* hellknightShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_vert.glsl", "Shaders/SponzaDemo/hellknight_frag.glsl",
+                                                                     hellknightVertexInputs);
+    Material hellknightMaterial(hellknightShader);
+
+    // Create the node for the hellknight
+    Node hellknight;
+    hellknight.SetMaterial(&hellknightMaterial);
+    hellknight.SetMesh(&hellknightMesh);
+
+    hellknight.Pitch(-PI_OVER_2);
+    hellknight.Yaw(-PI_OVER_2);
+    hellknight.SetPosition(Vector3(0.0f, 0.05f, 0.0f));
+    hellknight.Scale(Vector3(0.025f, 0.025f, 0.025f));
+    Renderer::GetInstance()->GetSceneTree().AddNode(&hellknight);
+
+    hellknightMesh.SetAnimationState("Default");
+    hellknightMesh.SetAnimationLoop(true);
+
+    ////////////////////////////////////////////////////////////////////////////
     // Create the fullscreen quad mesh
     ////////////////////////////////////////////////////////////////////////////
     SurfaceTriangles_t surface;
@@ -186,6 +225,8 @@ int main(int argc, char** argv) {
     }
 
     fullscreenQuadMaterial.AddTexture("shadowMap0", shadowMapTexture0);
+
+    float shadowBias = 0.0f;
 
     ////////////////////////////////////////////////////////////////////////////
     // Information regarding camera
@@ -288,18 +329,6 @@ int main(int argc, char** argv) {
 
         static bool debouncer = false;
         static bool lockMouse = false;
-        static RenderMode_t renderMode = RENDER_MODE_FILL;
-        if (!debouncer && keyboard->isKeyDown(OIS::KC_G)) {
-            if (renderMode == RENDER_MODE_FILL) {
-                renderMode = RENDER_MODE_WIREFRAME;
-            } else {
-                renderMode = RENDER_MODE_FILL;
-            }
-            Renderer::GetInstance()->SetRenderFillMode(renderMode);
-            debouncer = true;
-        } else if (debouncer && !keyboard->isKeyDown(OIS::KC_G)) {
-            debouncer = false;
-        }
 
         if (!debouncer && keyboard->isKeyDown(OIS::KC_P)) {
             Logger::GetInstance()->Warning("Position => x: " + to_string(cameraPosition.x) + " y: " + to_string(cameraPosition.y) + " z: " + to_string(cameraPosition.z));
@@ -355,6 +384,9 @@ int main(int argc, char** argv) {
         shadowMap0->Bind();
         Renderer::GetInstance()->BindShader(sponzaShader);
         sponzaShader->SelectSubroutine("record_depth", SHADER_TYPE_FRAGMENT);
+
+        Renderer::GetInstance()->BindShader(hellknightShader);
+        hellknightShader->SelectSubroutine("record_depth", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
         Renderer::GetInstance()->PerspectiveProjection(90.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
@@ -369,9 +401,20 @@ int main(int argc, char** argv) {
 
         // Draw into the GBuffer
         GBuffer->Bind();
+
+        Renderer::GetInstance()->BindShader(sponzaShader);
         sponzaShader->SelectSubroutine("record_geometry", SHADER_TYPE_FRAGMENT);
+
+        Renderer::GetInstance()->BindShader(hellknightShader);
+        hellknightShader->SelectSubroutine("record_geometry", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
         Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 500.0f);
+
+        // Animate the hellknight
+        vector<Matrix4x4> boneTransformationMatrices;
+        if (hellknightMesh.Animate(dt, boneTransformationMatrices)) {
+            hellknightShader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
+        }
 
         // Set the camera view matrix
         look.Normalize();

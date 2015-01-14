@@ -6,8 +6,9 @@ Demo features:
 
 - Deferred rendering;
 - Shadow mapping with PCF;
+- GPU skeletal animation;
+- Normal mapping;
 
 More techniques will be added, including:
 - Cascaded shadow mapping;
-- GPU skeletal animation;
 - SSAO.
