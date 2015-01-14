@@ -97,7 +97,7 @@ void Skeleton::CalculateBoneTransformation(double time, const AnimationState* an
     }
 
     Matrix4x4 globalTransformation = parentTransformation * boneTransformation;
-    transformationMatrices[bone] = globalTransformation * bone->offsetMatrix;
+    transformationMatrices[bone] = globalInverseTransform_ * globalTransformation * bone->offsetMatrix;
 
     for (size_t i = 0; i < bone->linkedBones.size(); i++) {
         CalculateBoneTransformation(time, animationState, bone->linkedBones[i], globalTransformation,
@@ -141,7 +141,7 @@ Quaternion Skeleton::CalculateInterpolatedRotation(double time, const AnimationS
         factor = (time - rotation.first) / deltaTime;
     }
 
-    Quaternion interpolatedRotation = rotation.second.Slerp(nextRotation.second, (float)factor);
+    Quaternion interpolatedRotation = rotation.second.Slerp(nextRotation.second, (float)factor, true);
     interpolatedRotation.Normalize();
     return interpolatedRotation;
 }
