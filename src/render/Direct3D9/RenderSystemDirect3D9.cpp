@@ -199,7 +199,7 @@ void RenderSystemDirect3D9::SetCullingMethod(CullingMethod_t cullingMethod) cons
     device_->SetRenderState(D3DRS_CULLMODE, cullMode);
 }
 
-Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename, const vector<string>& vertexInputs) {
+Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename) {
     shaders_.push_back(new ShaderDirect3D9(vertexFilename, fragmentFilename, device_));
     return shaders_[shaders_.size() - 1];
 }

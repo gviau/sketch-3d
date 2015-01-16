@@ -203,8 +203,8 @@ void Renderer::SetCullingMethod(CullingMethod_t cullingMethod) const {
     renderSystem_->SetCullingMethod(cullingMethod);
 }
 
-Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const {
-    return renderSystem_->CreateShader(vertexFilename, fragmentFilename, vertexInputs);
+Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename) const {
+    return renderSystem_->CreateShader(vertexFilename, fragmentFilename);
 }
 
 Texture2D* Renderer::CreateTexture2D() const {

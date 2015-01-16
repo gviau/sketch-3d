@@ -19,7 +19,7 @@ class ShaderOpenGL : public Shader {
     friend class RenderSystemOpenGL;
 
 	public:
-		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);
+		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename);
         virtual ~ShaderOpenGL();
 
 		virtual bool SetUniformInt(const string& uniform, int value);

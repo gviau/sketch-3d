@@ -2,7 +2,9 @@
 #define SKETCH_3D_RENDERER_H
 
 #include "math/Matrix4x4.h"
+#include "math/Plane.h"
 #include "math/Vector3.h"
+
 #include "render/SceneTree.h"
 #include "render/Texture.h"
 
@@ -261,10 +263,9 @@ class Renderer {
          * Create a shader object
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
-         * @param vertexInputs The vertex inputs in order
          * @return A pointer to a shader
          */
-        Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) const;
+        Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename) const;
 
         /**
          * Create a 2D texture object

@@ -16,10 +16,8 @@ using namespace std;
 
 namespace Sketch3D {
 
-ShaderOpenGL::ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename,
-                           const vector<string>& vertexInputs) : Shader(vertexFilename, fragmentFilename),
-															     vertex_(0),
-                                                                 fragment_(0)
+ShaderOpenGL::ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename) :
+            Shader(vertexFilename, fragmentFilename), vertex_(0), fragment_(0)
 {
 	Logger::GetInstance()->Debug("OpenGL shader creation");
 
@@ -62,11 +60,6 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename, const string& fragmentF
 	glCompileShader(fragment_);
 	glAttachShader(program_, fragment_);
 	LogShaderErrors(fragment_, fragmentFilename);
-	
-    // Sets the attrib location according the array of vertex inputs
-    for (size_t i = 0; i < vertexInputs.size(); i++) {
-        glBindAttribLocation(program_, i, vertexInputs[i].c_str());
-    }
 
 	Logger::GetInstance()->Debug("Shader program linking");
 	glLinkProgram(program_);

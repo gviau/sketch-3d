@@ -59,11 +59,7 @@ int main(int argc, char** argv) {
     fullscreenQuadVertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 1;
     fullscreenQuadMesh.Initialize(fullscreenQuadVertexAttributes);
 
-    vector<string> fullscreenQuadVertexInputs;
-    fullscreenQuadVertexInputs.push_back("in_vertex");
-    fullscreenQuadVertexInputs.push_back("in_uv");
-    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/frag.glsl", fullscreenQuadVertexInputs);
-
+    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/frag.glsl");
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
     Node fullscreenQuad;
@@ -76,11 +72,7 @@ int main(int argc, char** argv) {
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
     Mesh mesh("Media/pyramob.3ds", vertexAttributes);
 
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_normal");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/record_vert.glsl", "Shaders/SSAO/record_frag.glsl", vertexInputs);
-
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/record_vert.glsl", "Shaders/SSAO/record_frag.glsl");
     Material material(shader);
 
     Node node;
@@ -135,7 +127,7 @@ int main(int argc, char** argv) {
     }
 
     // Create the material for the ssao
-    Shader* ssaoShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/ssao.glsl", fullscreenQuadVertexInputs);
+    Shader* ssaoShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/ssao.glsl");
     Material ssaoMaterial(ssaoShader);
     ssaoMaterial.AddTexture("positions", positionsTexture);
     ssaoMaterial.AddTexture("normals", normalsTexture);

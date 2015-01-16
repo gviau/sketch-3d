@@ -97,8 +97,8 @@ class RenderSystem {
 		 * @param nearPlane The near position of the viewing volume
 		 * @param farPlane The far position of the viewing volume
 		 */
-		virtual Matrix4x4       OrthoProjection(float left, float right, float bottom,
-											    float top, float nearPlane, float farPlane) const = 0;
+		virtual Matrix4x4                   OrthoProjection(float left, float right, float bottom,
+											                float top, float nearPlane, float farPlane) const = 0;
 
 		/**
 		 * Set a perspective projection. This replace the current projection matrix
@@ -109,8 +109,8 @@ class RenderSystem {
 		 * @param nearPlane The near position of the viewing volume
 		 * @param farPlane The far position of the viewing volume
 		 */
-		virtual Matrix4x4       PerspectiveProjection(float left, float right, float bottom,
-												      float top, float nearPlane, float farPlane) const = 0;
+		virtual Matrix4x4                   PerspectiveProjection(float left, float right, float bottom,
+												                  float top, float nearPlane, float farPlane) const = 0;
 
 		/**
 		 * Set the renderer's fill mode
@@ -161,10 +161,9 @@ class RenderSystem {
          * Create an empty shader
          * @param vertexFilename The vertex shader filename
          * @param fragmentFilename The fragment shader filename
-         * @param vertexInputs List of vertex inputs in order
          * @return A pointer to a shader
          */
-        virtual Shader*                     CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) = 0;
+        virtual Shader*                     CreateShader(const string& vertexFilename, const string& fragmentFilename) = 0;
 
         /**
          * Create an empty texture

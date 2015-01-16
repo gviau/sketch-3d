@@ -43,20 +43,13 @@ int main(int argc, char** argv) {
     SkinnedMesh mesh("Media/Bob.md5mesh", vertexAttributes, isSkinnedOnGpu);
 
     // Create the material
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_normal");
-    vertexInputs.push_back("in_uv");
-
     string vertexFilename = "";
     if (isSkinnedOnGpu) {
-        vertexInputs.push_back("in_bones");
-        vertexInputs.push_back("in_weights");
         vertexFilename = "Shaders/SkeletalAnimation/vertSkinned.glsl";
     } else {
         vertexFilename = "Shaders/SkeletalAnimation/vert.glsl";
     }
-    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag.glsl");
 
     Material material(shader);
 

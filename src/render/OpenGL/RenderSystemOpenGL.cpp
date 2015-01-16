@@ -201,8 +201,8 @@ void RenderSystemOpenGL::SetCullingMethod(CullingMethod_t cullingMethod) const {
     }
 }
 
-Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs) {
-    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename, vertexInputs));
+Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
+    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename));
     return shaders_[shaders_.size() - 1];
 }
 

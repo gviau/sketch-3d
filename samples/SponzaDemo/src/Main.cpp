@@ -94,11 +94,7 @@ int main(int argc, char** argv) {
     Mesh sponzaMesh("Media/sponza.obj", sponzaVertexAttributes, MESH_TYPE_STATIC, false);
 
     // Create the material for the sponza
-    vector<string> sponzaVertexInputs;
-    sponzaVertexInputs.push_back("in_vertex");
-    sponzaVertexInputs.push_back("in_normal");
-    sponzaVertexInputs.push_back("in_uv");
-    Shader* sponzaShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_vert.glsl", "Shaders/SponzaDemo/sponza_frag.glsl", sponzaVertexInputs);
+    Shader* sponzaShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_vert.glsl", "Shaders/SponzaDemo/sponza_frag.glsl");
     Material sponzaMaterial(sponzaShader);
 
     // Create the node for the ponza
@@ -120,15 +116,7 @@ int main(int argc, char** argv) {
     SkinnedMesh hellknightMesh("Media/models/md5/monsters/hellknight/hellknight.md5mesh", hellknightVertexAttributes, true, false);
 
     // Create the material for the hellknight
-    vector<string> hellknightVertexInputs;
-    hellknightVertexInputs.push_back("in_vertex");
-    hellknightVertexInputs.push_back("in_normal");
-    hellknightVertexInputs.push_back("in_uv");
-    hellknightVertexInputs.push_back("in_tangent");
-    hellknightVertexInputs.push_back("in_bones");
-    hellknightVertexInputs.push_back("in_weights");
-    Shader* hellknightShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_vert.glsl", "Shaders/SponzaDemo/hellknight_frag.glsl",
-                                                                     hellknightVertexInputs);
+    Shader* hellknightShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_vert.glsl", "Shaders/SponzaDemo/hellknight_frag.glsl");
     Material hellknightMaterial(hellknightShader);
 
     // Create the node for the hellknight
@@ -189,11 +177,7 @@ int main(int argc, char** argv) {
     fullscreenQuadMesh.Initialize(fullscreenQuadVertexAttributes);
 
     // Create the fullscreen quad material
-    vector<string> fullscreenQuadVertexInputs;
-    fullscreenQuadVertexInputs.push_back("in_vertex");
-    fullscreenQuadVertexInputs.push_back("in_ray");
-    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/fullscreen_vert.glsl", "Shaders/SponzaDemo/fullscreen_frag.glsl",
-                                                                         fullscreenQuadVertexInputs);
+    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/fullscreen_vert.glsl", "Shaders/SponzaDemo/fullscreen_frag.glsl");
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
     fullscreenQuadMaterial.AddTexture("normals", normalsTexture);
@@ -227,16 +211,12 @@ int main(int argc, char** argv) {
     fullscreenQuadMaterial.AddTexture("shadowMap0", shadowMapTexture0);
 
     // Create the shader used to record the shadows
-    vector<string> sponzaRecordShadowVertexInputs;
-    sponzaRecordShadowVertexInputs.push_back("in_vertex");
     Shader* sponzaRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_record_shadow_vert.glsl",
-                                                                             "Shaders/SponzaDemo/record_shadow_frag.glsl",
-                                                                             sponzaRecordShadowVertexInputs);
+                                                                             "Shaders/SponzaDemo/record_shadow_frag.glsl");
     Material sponzaRecordShadowMaterial(sponzaRecordShadowShader);
 
     Shader* hellknightRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_record_shadow_vert.glsl",
-                                                                                 "Shaders/SponzaDemo/record_shadow_frag.glsl",
-                                                                                 hellknightVertexInputs);
+                                                                                 "Shaders/SponzaDemo/record_shadow_frag.glsl");
     Material hellknightRecordShadowMaterial(hellknightRecordShadowShader);
 
     ////////////////////////////////////////////////////////////////////////////

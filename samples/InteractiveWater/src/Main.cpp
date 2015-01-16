@@ -82,11 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     waterMesh.Initialize(vertexAttributes);
 
     // Material surface
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_normal");
-    vertexInputs.push_back("in_uv");
-    Shader* waterShader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl", vertexInputs);
+    Shader* waterShader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl");
 
     Material waterMaterial(waterShader);
     Texture2D* waterTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/water.jpg");

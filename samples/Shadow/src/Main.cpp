@@ -67,11 +67,7 @@ int main(int argc, char** argv) {
     }
 
     // Create the shader
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_normal");
-    vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/vert.glsl", "Shaders/Shadow/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/vert.glsl", "Shaders/Shadow/frag.glsl");
     Material material(shader);
 
     // Create the jeep

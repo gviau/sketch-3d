@@ -31,7 +31,7 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void EnableColorWrite(bool val) const;
         virtual void SetDepthComparisonFunc(DepthFunc_t comparison) const;
         virtual void SetCullingMethod(CullingMethod_t cullingMethod) const;
-        virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename, const vector<string>& vertexInputs);
+        virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename);
         virtual Texture2D* CreateTexture2D() const;
         virtual Texture3D* CreateTexture3D() const;
         virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;

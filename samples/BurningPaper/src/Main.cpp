@@ -53,10 +53,7 @@ int main(int argc, char** argv) {
     paperMesh.Initialize(vertexAttributes);
     
     // Create the paper material
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert.glsl", "Shaders/BurningPaper/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert.glsl", "Shaders/BurningPaper/frag.glsl");
     Material paperMaterial(shader);
 
     Texture2D* paperTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/paper.jpg");

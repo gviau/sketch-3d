@@ -59,17 +59,10 @@ int main(int argc, char** argv) {
     planeMesh.Initialize(vertexAttributesPlane);
 
     // Create the materials
-    vector<string> vertexInputs_record;
-    vertexInputs_record.push_back("in_vertex");
-    vertexInputs_record.push_back("in_normal");
-    vertexInputs_record.push_back("in_uv");
-    Shader* recordShader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/record_vert.glsl", "Shaders/DeferredShading/record_frag.glsl", vertexInputs_record);
+    Shader* recordShader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/record_vert.glsl", "Shaders/DeferredShading/record_frag.glsl");
     Material recordMaterial(recordShader);
 
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_uv");
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/vert.glsl", "Shaders/DeferredShading/frag.glsl", vertexInputs);
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/vert.glsl", "Shaders/DeferredShading/frag.glsl");
     Material material(shader);
 
     // Create the nodes
