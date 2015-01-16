@@ -6,7 +6,7 @@ uniform mat4 view;
 uniform sampler2D normals;
 uniform sampler2D albedos;
 uniform sampler2D depth;
-uniform sampler2DShadow shadowMap0;
+uniform sampler2D shadowMap0;
 
 uniform vec2 positionReconstructionParams;
 
@@ -48,11 +48,17 @@ void main() {
 	///////////////////////////////////////////////////////////////////////////
 	// Light #0
 	vec4 shadowCoord0 = shadowMatrix0 * vec4(worldPos, 1.0);
+	shadowCoord0.xyz /= shadowCoord0.w;
+
+	// Add a small bias
+	shadowCoord0.z -= 0.001;
+
 	float shadow = 0.0;
-	shadow += textureProjOffset(shadowMap0, shadowCoord0, ivec2(-1, -1));
-	shadow += textureProjOffset(shadowMap0, shadowCoord0, ivec2(-1,  1));
-	shadow += textureProjOffset(shadowMap0, shadowCoord0, ivec2( 1,  1));
-	shadow += textureProjOffset(shadowMap0, shadowCoord0, ivec2( 1, -1));
+
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
 	shadow *= 0.25;
 
 	vec3 L0 = normalize( (modelView * vec4(lightPosition0, 1.0)).xyz - pos);

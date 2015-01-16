@@ -87,18 +87,18 @@ int main(int argc, char** argv) {
     ////////////////////////////////////////////////////////////////////////////
     // Load the sponza model
     ////////////////////////////////////////////////////////////////////////////
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
-    Mesh sponzaMesh("Media/sponza.obj", vertexAttributes, MESH_TYPE_STATIC, false);
+    VertexAttributesMap_t sponzaVertexAttributes;
+    sponzaVertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
+    sponzaVertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
+    sponzaVertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+    Mesh sponzaMesh("Media/sponza.obj", sponzaVertexAttributes, MESH_TYPE_STATIC, false);
 
     // Create the material for the sponza
-    vector<string> vertexInputs;
-    vertexInputs.push_back("in_vertex");
-    vertexInputs.push_back("in_normal");
-    vertexInputs.push_back("in_uv");
-    Shader* sponzaShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/vert.glsl", "Shaders/SponzaDemo/record_frag.glsl", vertexInputs);
+    vector<string> sponzaVertexInputs;
+    sponzaVertexInputs.push_back("in_vertex");
+    sponzaVertexInputs.push_back("in_normal");
+    sponzaVertexInputs.push_back("in_uv");
+    Shader* sponzaShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_vert.glsl", "Shaders/SponzaDemo/sponza_frag.glsl", sponzaVertexInputs);
     Material sponzaMaterial(sponzaShader);
 
     // Create the node for the ponza
@@ -192,7 +192,8 @@ int main(int argc, char** argv) {
     vector<string> fullscreenQuadVertexInputs;
     fullscreenQuadVertexInputs.push_back("in_vertex");
     fullscreenQuadVertexInputs.push_back("in_ray");
-    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/fullscreen_vert.glsl", "Shaders/SponzaDemo/frag.glsl", fullscreenQuadVertexInputs);
+    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/fullscreen_vert.glsl", "Shaders/SponzaDemo/fullscreen_frag.glsl",
+                                                                         fullscreenQuadVertexInputs);
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
     fullscreenQuadMaterial.AddTexture("normals", normalsTexture);
@@ -225,7 +226,18 @@ int main(int argc, char** argv) {
 
     fullscreenQuadMaterial.AddTexture("shadowMap0", shadowMapTexture0);
 
-    float shadowBias = 0.0f;
+    // Create the shader used to record the shadows
+    vector<string> sponzaRecordShadowVertexInputs;
+    sponzaRecordShadowVertexInputs.push_back("in_vertex");
+    Shader* sponzaRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_record_shadow_vert.glsl",
+                                                                             "Shaders/SponzaDemo/record_shadow_frag.glsl",
+                                                                             sponzaRecordShadowVertexInputs);
+    Material sponzaRecordShadowMaterial(sponzaRecordShadowShader);
+
+    Shader* hellknightRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_record_shadow_vert.glsl",
+                                                                                 "Shaders/SponzaDemo/record_shadow_frag.glsl",
+                                                                                 hellknightVertexInputs);
+    Material hellknightRecordShadowMaterial(hellknightRecordShadowShader);
 
     ////////////////////////////////////////////////////////////////////////////
     // Information regarding camera
@@ -381,11 +393,16 @@ int main(int argc, char** argv) {
 #endif
         // Draw into the shadow maps
         shadowMap0->Bind();
-        Renderer::GetInstance()->BindShader(sponzaShader);
-        sponzaShader->SelectSubroutine("record_depth", SHADER_TYPE_FRAGMENT);
 
-        Renderer::GetInstance()->BindShader(hellknightShader);
-        hellknightShader->SelectSubroutine("record_depth", SHADER_TYPE_FRAGMENT);
+        vector<Matrix4x4> boneTransformationMatrices;
+        hellknightMesh.Animate(dt, boneTransformationMatrices);
+
+        sponza.SetMaterial(&sponzaRecordShadowMaterial);
+        hellknight.SetMaterial(&hellknightRecordShadowMaterial);
+
+        Renderer::GetInstance()->BindShader(hellknightRecordShadowShader);
+        hellknightRecordShadowShader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
+
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
         Renderer::GetInstance()->PerspectiveProjection(90.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
@@ -401,19 +418,15 @@ int main(int argc, char** argv) {
         // Draw into the GBuffer
         GBuffer->Bind();
 
-        Renderer::GetInstance()->BindShader(sponzaShader);
-        sponzaShader->SelectSubroutine("record_geometry", SHADER_TYPE_FRAGMENT);
-
+        sponza.SetMaterial(&sponzaMaterial);
+        hellknight.SetMaterial(&hellknightMaterial);
         Renderer::GetInstance()->BindShader(hellknightShader);
-        hellknightShader->SelectSubroutine("record_geometry", SHADER_TYPE_FRAGMENT);
+
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
         Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 500.0f);
 
         // Animate the hellknight
-        vector<Matrix4x4> boneTransformationMatrices;
-        if (hellknightMesh.Animate(dt, boneTransformationMatrices)) {
-            hellknightShader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
-        }
+        hellknightShader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
 
         // Set the camera view matrix
         look.Normalize();
