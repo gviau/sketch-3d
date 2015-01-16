@@ -1,8 +1,6 @@
 #version 330
 
 uniform mat4 modelViewProjection;
-uniform mat4 modelView;
-uniform mat4 view;
 
 uniform float offset;
 

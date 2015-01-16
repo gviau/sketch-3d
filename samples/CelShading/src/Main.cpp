@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 #endif
 
     Window window("Sample_CelShading", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_DIRECT3D9, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the mesh
@@ -87,10 +87,13 @@ int main(int argc, char** argv) {
         teapotAngle += 0.0005f;
 
         Renderer::GetInstance()->Clear();
+
+        Renderer::GetInstance()->StartRender();
         
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
         teapotNode.SetMaterial(&contourRenderMaterial);
-        contourRenderShader->SetUniformFloat("offset", 0.025f);
+        Renderer::GetInstance()->BindShader(contourRenderShader);
+        contourRenderShader->SetUniformFloat("offset", 0.015f);
         Renderer::GetInstance()->Render();
         
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
