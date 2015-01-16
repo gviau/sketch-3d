@@ -159,6 +159,11 @@ class Renderer {
 		 */
 		void				    Render();
 
+        /**
+         * Presents the drawn frame to the front buffer
+         */
+        void                    PresentFrame();
+
 		/**
 		 * Set an orthogonal projection. This replace the current projection matrix
 		 * @param left The left position of the viewing volume

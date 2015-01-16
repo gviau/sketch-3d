@@ -59,10 +59,10 @@ int main(int argc, char** argv) {
     planeMesh.Initialize(vertexAttributesPlane);
 
     // Create the materials
-    Shader* recordShader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/record_vert.glsl", "Shaders/DeferredShading/record_frag.glsl");
+    Shader* recordShader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/record_vert", "Shaders/DeferredShading/record_frag");
     Material recordMaterial(recordShader);
 
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/vert.glsl", "Shaders/DeferredShading/frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/vert", "Shaders/DeferredShading/frag");
     Material material(shader);
 
     // Create the nodes
@@ -146,6 +146,8 @@ int main(int argc, char** argv) {
         fullscreenQuad.Render();
 
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
     }
 
     return 0;

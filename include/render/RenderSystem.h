@@ -88,6 +88,11 @@ class RenderSystem {
 		 */
 		virtual void					    Render() = 0;
 
+        /**
+         * Presents the drawn frame to the front buffer
+         */
+        virtual void                        PresentFrame() = 0;
+
 		/**
 		 * Set an orthogonal projection. This replace the current projection matrix
 		 * @param left The left position of the viewing volume

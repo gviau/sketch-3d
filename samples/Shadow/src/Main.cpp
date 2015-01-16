@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     }
 
     // Create the shader
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/vert.glsl", "Shaders/Shadow/frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/vert", "Shaders/Shadow/frag");
     Material material(shader);
 
     // Create the jeep
@@ -239,6 +239,8 @@ int main(int argc, char** argv) {
         }
 
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
 
         if (currentLightNumber > 1) {
             Renderer::GetInstance()->EnableBlending(false);

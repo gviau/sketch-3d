@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
     // Create the material
     string vertexFilename = "";
     if (isSkinnedOnGpu) {
-        vertexFilename = "Shaders/SkeletalAnimation/vertSkinned.glsl";
+        vertexFilename = "Shaders/SkeletalAnimation/vertSkinned";
     } else {
-        vertexFilename = "Shaders/SkeletalAnimation/vert.glsl";
+        vertexFilename = "Shaders/SkeletalAnimation/vert";
     }
-    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag");
 
     Material material(shader);
 
@@ -100,6 +100,8 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
 
         end = Clock::now();
         deltaTime += chrono::duration_cast<chrono::duration<double>>(end - begin);

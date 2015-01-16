@@ -66,11 +66,14 @@ void RenderSystemDirect3D9::StartRender() {
 
 void RenderSystemDirect3D9::EndRender() {
     device_->EndScene();
-    renderContext_->SwapBuffers();
 }
 
 void RenderSystemDirect3D9::Render() {
 
+}
+
+void RenderSystemDirect3D9::PresentFrame() {
+    renderContext_->SwapBuffers();
 }
 
 Matrix4x4 RenderSystemDirect3D9::OrthoProjection(float left, float right, float bottom, float top,
@@ -200,7 +203,7 @@ void RenderSystemDirect3D9::SetCullingMethod(CullingMethod_t cullingMethod) cons
 }
 
 Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename) {
-    shaders_.push_back(new ShaderDirect3D9(vertexFilename, fragmentFilename, device_));
+    shaders_.push_back(new ShaderDirect3D9(vertexFilename + ".hlsl", fragmentFilename + ".hlsl", device_));
     return shaders_[shaders_.size() - 1];
 }
 

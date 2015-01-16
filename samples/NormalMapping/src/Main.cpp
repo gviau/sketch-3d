@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     Mesh sphereMesh("Media/sphere.obj", vertexAttributes);
 
     // Create the material for the sphere
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/NormalMapping/vert.glsl", "Shaders/NormalMapping/frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/NormalMapping/vert", "Shaders/NormalMapping/frag");
     Material sphereMaterial(shader);
 
     // Add the diffuse and normal texture
@@ -103,6 +103,8 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
 
         end = clock();
         t = float(end - begin) / (float)CLOCKS_PER_SEC;

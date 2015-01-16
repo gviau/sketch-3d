@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     paperMesh.Initialize(vertexAttributes);
     
     // Create the paper material
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert.glsl", "Shaders/BurningPaper/frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert", "Shaders/BurningPaper/frag");
     Material paperMaterial(shader);
 
     Texture2D* paperTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/paper.jpg");
@@ -89,6 +89,8 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
 
         end = clock();
         t += float(end - begin) / CLOCKS_PER_SEC;

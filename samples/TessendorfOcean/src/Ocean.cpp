@@ -79,7 +79,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     oceanMesh_.Initialize(vertexAttributes);
 
     // Load the shader
-    oceanShader_ = Renderer::GetInstance()->CreateShader("Shaders/TessendorfOcean/vert.glsl", "Shaders/TessendorfOcean/frag.glsl");
+    oceanShader_ = Renderer::GetInstance()->CreateShader("Shaders/TessendorfOcean/vert", "Shaders/TessendorfOcean/frag");
 
     // Create the material
     oceanMaterial_ = new Material(oceanShader_);

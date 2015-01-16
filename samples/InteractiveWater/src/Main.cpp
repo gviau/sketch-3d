@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     waterMesh.Initialize(vertexAttributes);
 
     // Material surface
-    Shader* waterShader = Renderer::GetInstance()->CreateShader("Shaders/vert.glsl", "Shaders/frag.glsl");
+    Shader* waterShader = Renderer::GetInstance()->CreateShader("Shaders/vert", "Shaders/frag");
 
     Material waterMaterial(waterShader);
     Texture2D* waterTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/water.jpg");
@@ -202,6 +202,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
     }
 
     delete[] buffer;

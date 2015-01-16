@@ -116,6 +116,10 @@ void Renderer::Render() {
 	renderSystem_->Render();
 }
 
+void Renderer::PresentFrame() {
+    renderSystem_->PresentFrame();
+}
+
 void Renderer::OrthoProjection(float left, float right,
 							   float bottom, float top,
 							   float nearPlane, float farPlane)

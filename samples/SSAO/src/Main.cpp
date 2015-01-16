@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     fullscreenQuadVertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 1;
     fullscreenQuadMesh.Initialize(fullscreenQuadVertexAttributes);
 
-    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/frag.glsl");
+    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert", "Shaders/SSAO/frag");
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
     Node fullscreenQuad;

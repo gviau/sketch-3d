@@ -76,10 +76,13 @@ void RenderSystemOpenGL::StartRender() {
 }
 
 void RenderSystemOpenGL::EndRender() {
-	renderContext_->SwapBuffers();
 }
 
 void RenderSystemOpenGL::Render() {
+}
+
+void RenderSystemOpenGL::PresentFrame() {
+    renderContext_->SwapBuffers();
 }
 
 Matrix4x4 RenderSystemOpenGL::OrthoProjection(float left, float right, float bottom, float top,
@@ -202,7 +205,7 @@ void RenderSystemOpenGL::SetCullingMethod(CullingMethod_t cullingMethod) const {
 }
 
 Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
-    shaders_.push_back(new ShaderOpenGL(vertexFilename, fragmentFilename));
+    shaders_.push_back(new ShaderOpenGL(vertexFilename + ".glsl", fragmentFilename + ".glsl"));
     return shaders_[shaders_.size() - 1];
 }
 
