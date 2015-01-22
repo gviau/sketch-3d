@@ -3,6 +3,8 @@ sketch-3d
 
 A simple cross-platform 3D renderer. This is a learning experience project.
 
+You can find the compiled demos (as of January 2015 the 22th) at this link: https://www.dropbox.com/sh/qhfo9fjf0jfxvjq/AADApvgPJ404oKv4PP980AQ7a?dl=0
+
 To build the library, the samples and the test, you need the following CMake to create the appropriate files for compilation.
 
 You need the following libraries:
@@ -25,5 +27,7 @@ Currently the following samples are provided to showcase different 3d programmin
 * Normal mapping
 * Parallax mapping
 * Shadow mapping using PCF
+* Sponza Demo: A demo featuring Deferred rendering, normal mapping, GPU skinned meshes and shadows in the Sponza scene.
 * Skeletal animation
+* SSAO
 * An ocean simulation based on Tessendorf paper
