@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
     Mesh mesh("Media/pyramob.3ds", vertexAttributes);
 
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/record_vert.glsl", "Shaders/SSAO/record_frag.glsl");
+    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/record_vert", "Shaders/SSAO/record_frag");
     Material material(shader);
 
     Node node;
@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
     }
 
     // Create the material for the ssao
-    Shader* ssaoShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert.glsl", "Shaders/SSAO/ssao.glsl");
+    Shader* ssaoShader = Renderer::GetInstance()->CreateShader("Shaders/SSAO/vert", "Shaders/SSAO/ssao");
     Material ssaoMaterial(ssaoShader);
     ssaoMaterial.AddTexture("positions", positionsTexture);
     ssaoMaterial.AddTexture("normals", normalsTexture);
@@ -268,6 +268,8 @@ int main(int argc, char** argv) {
         fullscreenQuad.Render();
 
         Renderer::GetInstance()->EndRender();
+
+        Renderer::GetInstance()->PresentFrame();
     }
 
     return 0;

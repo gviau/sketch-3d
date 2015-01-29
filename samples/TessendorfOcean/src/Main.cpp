@@ -43,6 +43,8 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
 
+        Renderer::GetInstance()->PresentFrame();
+
         end = clock();
         t += double(end - begin) / CLOCKS_PER_SEC;
     }

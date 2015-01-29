@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
         Quaternion rotationZ, rotationX;
         rotationZ.MakeFromAngleAxis(PI, Vector3::LOOK);
-        rotationX.MakeFromAngleAxis(PI_OVER_2, Vector3::RIGHT);
+        rotationX.MakeFromAngleAxis(PI, Vector3::RIGHT);
         node.SetOrientation(rotationZ * rotationX);
 
         // CPU skinning

@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 #endif
 
     Window window("Sample_CelShading", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_DIRECT3D9, window);
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the mesh
