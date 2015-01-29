@@ -9,7 +9,7 @@
 namespace Sketch3D {
 
 RenderTextureOpenGL::RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format) :
-        RenderTexture(width, height, format), framebuffer_(0), renderbuffer_(0), depthBufferBound_(false), texturesAttached_(false)
+        RenderTexture(width, height, format), framebuffer_(0), renderbuffer_(0)
 {
 }
 

@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->GetSceneTree().AddNode(&node);
 
     // Create the render texture
-    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGB32F);
+    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGBA32F);
 
     // Create the textures for the render texture
     Texture2D* positionsTexture = GBuffer->CreateTexture2D();

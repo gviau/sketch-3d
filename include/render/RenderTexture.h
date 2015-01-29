@@ -69,6 +69,8 @@ class RenderTexture {
         size_t              width_; /**< The width of the render texture */
         size_t              height_;    /**< The height of the render texture */
         TextureFormat_t     format_;    /**< The format of the render texture */
+        bool                depthBufferBound_;  /**< Used to determine if there is a texture attached to the depth buffer */
+        bool                texturesAttached_;  /**< Used to determine if the textures were correctly attached to the frame buffer */
 };
 
 }

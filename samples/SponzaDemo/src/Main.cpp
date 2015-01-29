@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     ////////////////////////////////////////////////////////////////////////////
     // Create the GBuffer render texture
     ////////////////////////////////////////////////////////////////////////////
-    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(window.GetWidth(), window.GetHeight(), TEXTURE_FORMAT_RGB32F);
+    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(window.GetWidth(), window.GetHeight(), TEXTURE_FORMAT_RGBA32F);
     Texture2D* normalsTexture = GBuffer->CreateTexture2D();
     Texture2D* albedosTexture = GBuffer->CreateTexture2D();
     Texture2D* depthTexture = GBuffer->CreateDepthBufferTexture();

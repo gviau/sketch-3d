@@ -14,6 +14,7 @@ namespace Sketch3D {
  * Direct3D9 implementation of a 2d texture
  */
 class Texture2DDirect3D9 : public Texture2D {
+    friend class RenderTextureDirect3D9;
     friend class ShaderDirect3D9;
 
     public:

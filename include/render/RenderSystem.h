@@ -30,6 +30,7 @@ class Vector2;
  */
 struct DeviceCapabilities_t {
     int     maxActiveTextures_; /**< Maximum number of active textures supported by the GPU */
+    int     maxNumberRenderTargets_; /**< Maximum number of render targets that can be used at the same time */
 };
 
 /**

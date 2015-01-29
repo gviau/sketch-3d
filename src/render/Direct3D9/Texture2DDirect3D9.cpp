@@ -54,11 +54,11 @@ bool Texture2DDirect3D9::Create() {
 
         case TEXTURE_FORMAT_RGBA32F:
             format = D3DFMT_A32B32G32R32F;
-            bpp = 3;
+            bpp = 4;
             break;
 
         case TEXTURE_FORMAT_DEPTH:
-            format = D3DFMT_D16;
+            format = D3DFMT_D32;
             bpp = 0;
             break;
 
@@ -67,7 +67,7 @@ bool Texture2DDirect3D9::Create() {
             return false;
     }
 
-    D3DXCreateTexture(device_, width_, height_, 1, 0, format, D3DPOOL_MANAGED, &texture_);
+    D3DXCreateTexture(device_, width_, height_, (generateMipmaps_) ? 0 : 1, 0, format, D3DPOOL_MANAGED, &texture_);
 
     if (texture_ == nullptr) {
         Logger::GetInstance()->Error("Couldn't create texture");

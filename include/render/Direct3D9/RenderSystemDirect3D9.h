@@ -47,6 +47,8 @@ class RenderSystemDirect3D9 : public RenderSystem {
     private:
         RenderContextDirect3D9* renderContext_; /**< The render context to create for Direct3D9 */
         IDirect3DDevice9*       device_;    /**< Rendering device */
+        IDirect3DSurface9*      depthBuffer_;   /**< The normal depth buffer used for rendering */
+        IDirect3DSurface9*      renderTarget_;  /**< The normal render target used for rendering */
 
         D3DCOLORVALUE           clearColor_;    /**< Clear color of the buffer */
 

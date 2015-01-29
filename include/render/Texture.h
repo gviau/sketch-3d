@@ -35,7 +35,6 @@ enum TextureFormat_t {
     // There should be a separation between byte texture format and floating point texture format
     TEXTURE_FORMAT_R32F,
     TEXTURE_FORMAT_RG32F,
-    TEXTURE_FORMAT_RGB32F,
     TEXTURE_FORMAT_RGBA32F,
 
     // Special texture formats

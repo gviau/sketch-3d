@@ -140,13 +140,6 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             bpp = 2;
             break;
 
-        case TEXTURE_FORMAT_RGB32F:
-            internalFormat = GL_RGB32F;
-            format = GL_RGB;
-            type = GL_FLOAT;
-            bpp = 3;
-            break;
-
         case TEXTURE_FORMAT_RGBA32F:
             internalFormat = GL_RGBA32F;
             format = GL_RGBA;

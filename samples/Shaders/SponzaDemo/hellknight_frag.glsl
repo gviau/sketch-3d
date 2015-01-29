@@ -8,8 +8,8 @@ in vec3 normal;
 in vec2 uv;
 in vec3 tangent;
 
-out vec3 norm;
-out vec3 albedo;
+out vec4 norm;
+out vec4 albedo;
 
 void main() {
 	vec3 N = normalize(normal);

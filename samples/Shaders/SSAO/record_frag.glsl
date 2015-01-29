@@ -3,8 +3,8 @@
 in vec3 position;
 in vec3 normal;
 
-out vec3 pos;
-out vec3 norm;
+out vec4 pos;
+out vec4 norm;
 
 void main() {
 	pos = position;

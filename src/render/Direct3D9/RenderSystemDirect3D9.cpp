@@ -1,6 +1,7 @@
 #include "render/Direct3D9/RenderSystemDirect3D9.h"
 
 #include "render/Direct3D9/BufferObjectManagerDirect3D9.h"
+#include "render/Direct3D9/RenderTextureDirect3D9.h"
 #include "render/Direct3D9/ShaderDirect3D9.h"
 #include "render/Direct3D9/Texture2DDirect3D9.h"
 
@@ -36,6 +37,10 @@ bool RenderSystemDirect3D9::Initialize() {
     QueryDeviceCapabilities();
 
     bufferObjectManager_ = new BufferObjectManagerDirect3D9(device_);
+
+    // Retrieve the current depth buffer and render target
+    device_->GetDepthStencilSurface(&depthBuffer_);
+    device_->GetRenderTarget(0, &renderTarget_);
 
     return true;
 }
@@ -216,10 +221,17 @@ Texture3D* RenderSystemDirect3D9::CreateTexture3D() const {
 }
 
 RenderTexture* RenderSystemDirect3D9::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
-    return nullptr;
+    return new RenderTextureDirect3D9(device_, width, height, format);
 }
 
 void RenderSystemDirect3D9::BindScreenBuffer() const {
+    // Set the depth buffer and render target back to what they were, invalidating the other render targets that may have been set earlier
+    device_->SetDepthStencilSurface(depthBuffer_);
+    device_->SetRenderTarget(0, renderTarget_);
+
+    for (int i = 1; i < deviceCapabilities_.maxNumberRenderTargets_; i++) {
+        device_->SetRenderTarget(i, nullptr);
+    }
 }
 
 void RenderSystemDirect3D9::EnableBlending(bool val) const {
@@ -330,6 +342,7 @@ void RenderSystemDirect3D9::QueryDeviceCapabilities() {
     D3DCAPS9 caps;
     device_->GetDeviceCaps(&caps);
     deviceCapabilities_.maxActiveTextures_ = caps.MaxTextureBlendStages;
+    deviceCapabilities_.maxNumberRenderTargets_ = caps.NumSimultaneousRTs;
 }
 
 }

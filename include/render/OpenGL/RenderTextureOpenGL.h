@@ -70,8 +70,6 @@ class RenderTextureOpenGL : public RenderTexture {
         size_t              framebuffer_; /**< OpenGL's name of the framebuffer */
         size_t              renderbuffer_;    /**< OpenGL's name of the renderbuffer */
         vector<Texture2D*>  textures_;   /**< The textures used to receive the output of the rendering */
-        bool                depthBufferBound_;  /**< Used to determine if there is a texture attached to the depth buffer */
-        bool                texturesAttached_;  /**< Used to determine if the textures were correctly attached to the frame buffer */
 };
 
 }

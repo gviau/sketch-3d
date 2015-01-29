@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 int main(int argc, char** argv) {
 #endif
     Window window("Sample_DeferredShading", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_DIRECT3D9, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the meshes
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
     fullscreenQuad.SetMesh(&planeMesh);
 
     // Create the render buffer
-    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGB32F);
+    RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGBA32F);
 
     // Create the textures for the render buffer
     Texture2D* positionsTexture = GBuffer->CreateTexture2D();
@@ -113,13 +113,14 @@ int main(int argc, char** argv) {
         // Render in the GBuffer
         GBuffer->Bind();
         Renderer::GetInstance()->Clear();
+        Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
 
         // Draw the fullscreen quad using the GBuffer
         Renderer::GetInstance()->BindScreenBuffer();
         Renderer::GetInstance()->Clear();
-        fullscreenQuad.Render();
 
+        fullscreenQuad.Render();
         Renderer::GetInstance()->EndRender();
 
         Renderer::GetInstance()->PresentFrame();
