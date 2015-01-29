@@ -20,16 +20,16 @@ bool Texture2DOpenGL::Create(bool generateMipmaps) {
 	    glGenTextures(1, &textureName_);
     }
 
-    size_t textureUnit = Bind();
+    Bind();
 
 	GLuint filter, wrap, format, components, type, bpp;
 	switch (filterMode_) {
 		case FILTER_MODE_NEAREST:
-			filter = GL_NEAREST;
+			filter = (generateMipmaps) ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST;
 			break;
 
 		case FILTER_MODE_LINEAR:
-			filter = GL_LINEAR;
+			filter = (generateMipmaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
 			break;
 	}
 
@@ -54,7 +54,7 @@ bool Texture2DOpenGL::Create(bool generateMipmaps) {
 				     components, type, data_);
 
         if (generateMipmaps) {
-            glGenerateMipmap(textureUnit);
+            glGenerateMipmap(GL_TEXTURE_2D);
         }
 
     } else if (format == GL_DEPTH_COMPONENT16) {
