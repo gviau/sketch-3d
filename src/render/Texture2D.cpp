@@ -76,25 +76,31 @@ bool Texture2D::Load(const string& filename) {
     width_ = FreeImage_GetWidth(dib);
     height_ = FreeImage_GetHeight(dib);
     size_t bpp = FreeImage_GetBPP(dib);
+    size_t pitch = FreeImage_GetPitch(dib);
 
     filterMode_ = FILTER_MODE_NEAREST;
     wrapMode_ = WRAP_MODE_REPEAT;
     format_ = (bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32;
 
     size_t bytesPerPixel = (format_ == TEXTURE_FORMAT_RGB24) ? 3 : 4;
-    size_t size = width_ * height_ * bytesPerPixel;
+    size_t size = height_ * pitch;
     unsigned char* data = (unsigned char*)malloc(size);
-    BYTE* imageData = FreeImage_GetBits(dib);
+    FreeImage_ConvertToRawBits(data, dib, pitch, bpp, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, FALSE);
 
     // We store the texture data in rgba, where r is LSB and a is MSB
-    for (size_t i = 0; i < size; i += bytesPerPixel) {
-        data[i    ] = imageData[i + 2];
-        data[i + 1] = imageData[i + 1];
-        data[i + 2] = imageData[i    ];
-
-        if (bytesPerPixel == 4) {
-            data[i + 3] = imageData[i + 3];
+    size_t idx = 0;
+    size_t pad = pitch - (width_ * bytesPerPixel);
+    for (size_t y = 0; y < height_; y++) {
+        for (size_t x = 0; x < width_; x++) {
+            unsigned char tmp = data[idx];
+            data[idx    ] = data[idx + 2];
+            data[idx + 2] = tmp;
+            idx += bytesPerPixel;
         }
+
+        // Needed so that the world doesn't destroy itself (real reason is that we need to jump above some bytes because
+        // free image will add some bytes to round up to a number of bytes divisible by 4)
+        idx += pad;
     }
 
     FreeImage_Unload(dib);
