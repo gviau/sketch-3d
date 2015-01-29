@@ -30,6 +30,9 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
+    Mesh dummy;
+    dummy.ConstructBoundingSphere();
+
     // Load the sphere's mesh and generate the tangents
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
@@ -101,6 +104,7 @@ int main(int argc, char** argv) {
 #endif
 
         Renderer::GetInstance()->Clear();
+        Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
 
