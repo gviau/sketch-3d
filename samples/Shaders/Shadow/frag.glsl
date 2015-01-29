@@ -14,12 +14,7 @@ in vec4 shadow_coord;
 
 layout (location=0) out vec4 color;
 
-subroutine void RenderPassType();
-subroutine uniform RenderPassType RenderPass;
-
-// Render normally with shadows
-subroutine (RenderPassType)
-void shadeWithShadow() {
+void main() {
 	vec3 L = normalize(light_dir);
 	vec3 V = normalize(eye);
 	vec3 N = normalize(normal);
@@ -47,13 +42,4 @@ void shadeWithShadow() {
 	// Gamma correction
 	vec3 textureColor = pow(texture(texture0, uv).xyz, vec3(1.0/2.2));
 	color = vec4( pow( textureColor * light * shadow + vec3(0.1, 0.1, 0.1), vec3(2.2)), 1.0);
-}
-
-subroutine (RenderPassType)
-void recordDepth() {
-	// Do nothing, depth will be written automatically
-}
-
-void main() {
-	RenderPass();
 }

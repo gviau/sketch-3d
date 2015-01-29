@@ -95,6 +95,10 @@ int main(int argc, char** argv) {
     jeepNode2.SetPosition(Vector3(-15.0f, 0.0f, -12.0f));
     Renderer::GetInstance()->GetSceneTree().AddNode(&jeepNode2);
 
+    // Create the record shadow material
+    Shader* recordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/recordShadow_vert", "Shaders/Shadow/recordShadow_frag");
+    Material recordShadowMaterial(recordShadowShader);
+
     // Create the ground
     Mesh groundMesh;
 
@@ -199,7 +203,8 @@ int main(int argc, char** argv) {
 
         // First, we render from each light's perspective and record the depth in their respective shadow map
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
-        shader->SelectSubroutine("recordDepth", SHADER_TYPE_FRAGMENT);
+        jeepNode1.SetMaterial(&recordShadowMaterial);
+        jeepNode2.SetMaterial(&recordShadowMaterial);
 
         for (size_t i = 0; i < currentLightNumber; i++) {
             shadowMaps[i]->Bind();
@@ -212,8 +217,10 @@ int main(int argc, char** argv) {
         // Then we use the shadow maps to render the scene normally from the camera's perspective
         Renderer::GetInstance()->BindScreenBuffer();
         Renderer::GetInstance()->Clear();
-        shader->SelectSubroutine("shadeWithShadow", SHADER_TYPE_FRAGMENT);
         Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
+        jeepNode1.SetMaterial(&material);
+        jeepNode2.SetMaterial(&material);
+        Renderer::GetInstance()->BindShader(shader);
 
         for (size_t i = 0; i < currentLightNumber; i++) {
             // If there's more than one light, we activate additive blending to accumulate each light contribution in

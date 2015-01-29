@@ -32,7 +32,6 @@ class ShaderOpenGL : public Shader {
 		virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
         virtual bool SetUniformMatrix4x4Array(const string& uniform, const Matrix4x4* values, int arraySize);
 		virtual bool SetUniformTexture(const string& uniform, const Texture* texture);
-        virtual bool SelectSubroutine(const string& subroutine, ShaderType_t type);
 
 	private:
         GLuint              vertex_;    /**< Represents the vertex shader */

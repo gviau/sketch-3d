@@ -17,8 +17,4 @@ Shader::Shader(const string& vertexFilename, const string& fragmentFilename) : i
 Shader::~Shader() {
 }
 
-bool Shader::SelectSubroutine(const string& subroutine, ShaderType_t type) {
-    return false;
-}
-
 }

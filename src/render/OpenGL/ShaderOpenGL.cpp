@@ -202,30 +202,6 @@ bool ShaderOpenGL::SetUniformTexture(const string& uniform, const Texture* textu
     return true;
 }
 
-bool ShaderOpenGL::SelectSubroutine(const string& subroutine, ShaderType_t type) {
-    Renderer::GetInstance()->BindShader(this);
-
-    GLint shader;
-    switch (type) {
-        case SHADER_TYPE_VERTEX:
-            shader = GL_VERTEX_SHADER;
-            break;
-
-        case SHADER_TYPE_FRAGMENT:
-            shader = GL_FRAGMENT_SHADER;
-            break;
-    }
-
-    GLuint index = glGetSubroutineIndex(program_, shader, subroutine.c_str());
-    if (index == GL_INVALID_INDEX) {
-        Logger::GetInstance()->Debug("Couldn't find subroutine of name " + subroutine + " in shader #" + to_string(program_));
-        return false;
-    }
-
-    glUniformSubroutinesuiv(shader, 1, &index);
-    return true;
-}
-
 char* ShaderOpenGL::ReadShader(const string& filename) {
     char* content = nullptr;
 	FILE* fp = fopen(filename.c_str(), "r");

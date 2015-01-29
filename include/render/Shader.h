@@ -58,8 +58,6 @@ class Shader {
         virtual bool        SetUniformMatrix4x4Array(const string& uniform, const Matrix4x4* values, int arraySize) = 0;
 		virtual bool	    SetUniformTexture(const string& uniform, const Texture* texture) = 0;
 
-        virtual bool        SelectSubroutine(const string& subroutine, ShaderType_t type);
-
         uint16_t            GetId() const { return id_; }
 
 	protected:
