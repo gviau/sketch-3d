@@ -86,9 +86,10 @@ class Texture {
 
         /**
          * Create the actual texture handle
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool            Create() = 0;
+        virtual bool            Create(bool generateMipmaps=false) = 0;
 
         /**
          * Activate the texture

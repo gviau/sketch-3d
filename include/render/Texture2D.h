@@ -51,15 +51,17 @@ class Texture2D : public Texture {
         /**
          * Load the texture from a file
          * @param filename The name of file from which the texture will be loaded
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was loaded, false otherwise
          */
-        bool                    Load(const string& filename);
+        bool                    Load(const string& filename, bool generateMipmaps=false);
 
         /**
          * Create the actual texture handle
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool            Create() = 0;
+        virtual bool            Create(bool generateMipmaps=false) = 0;
 
         /**
          * Set the data as an array of bytes. Will only work with texture formats that doesn't require floats

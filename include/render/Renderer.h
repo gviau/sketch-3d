@@ -280,9 +280,10 @@ class Renderer {
 
         /**
          * Create a 2D texture object from a file
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return A pointer to a 2D texture
          */
-        Texture2D*              CreateTexture2DFromFile(const string& filename) const;
+        Texture2D*              CreateTexture2DFromFile(const string& filename, bool generateMipmaps=false) const;
 
         /**
          * Create a 3D texture object

@@ -215,14 +215,14 @@ Texture2D* Renderer::CreateTexture2D() const {
     return renderSystem_->CreateTexture2D();
 }
 
-Texture2D* Renderer::CreateTexture2DFromFile(const string& filename) const {
+Texture2D* Renderer::CreateTexture2DFromFile(const string& filename, bool generateMipmaps) const {
     // Check cache first
     if (TextureManager::GetInstance()->CheckIfTextureLoaded(filename)) {
         return TextureManager::GetInstance()->LoadFromCache(filename);
     }
 
     Texture2D* texture = renderSystem_->CreateTexture2D();
-    if (!texture->Load(filename)) {
+    if (!texture->Load(filename, generateMipmaps)) {
         Logger::GetInstance()->Error("Couldn't create texture from file " + filename);
         delete texture;
         return nullptr;

@@ -15,12 +15,12 @@ Texture2DOpenGL::~Texture2DOpenGL() {
     }
 }
 
-bool Texture2DOpenGL::Create() {
+bool Texture2DOpenGL::Create(bool generateMipmaps) {
     if (textureName_ == 0) {
 	    glGenTextures(1, &textureName_);
     }
 
-    Bind();
+    size_t textureUnit = Bind();
 
 	GLuint filter, wrap, format, components, type, bpp;
 	switch (filterMode_) {
@@ -52,6 +52,11 @@ bool Texture2DOpenGL::Create() {
     if (data_ != nullptr) {
 	    glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0,
 				     components, type, data_);
+
+        if (generateMipmaps) {
+            glGenerateMipmap(textureUnit);
+        }
+
     } else if (format == GL_DEPTH_COMPONENT16) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);

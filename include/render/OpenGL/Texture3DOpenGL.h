@@ -44,9 +44,10 @@ class Texture3DOpenGL : public Texture3D {
 
         /**
          * Create the actual texture handle
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool        Create();
+        virtual bool        Create(bool generateMipmaps=false);
 
     private:
         GLuint              textureName_;   /**< OpenGL texture's name */

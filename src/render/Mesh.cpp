@@ -1,11 +1,14 @@
 #include "render/Mesh.h"
 
+#include "math/Sphere.h"
+
 #include "render/BufferObject.h"
 #include "render/BufferObjectManager.h"
 #include "render/ModelManager.h"
 #include "render/Renderer.h"
 #include "render/Texture2D.h"
 #include "render/TextureManager.h"
+
 #include "system/Logger.h"
 #include "system/Utils.h"
 
@@ -233,7 +236,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                     aiString textureName;
                     material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
                     surface->textures[textureIdx++] = texture;
                 }
 
@@ -241,7 +244,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                     aiString textureName;
                     material->GetTexture(aiTextureType_NORMALS, j, &textureName);
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
                     surface->textures[textureIdx++] = texture;
                 }
 
@@ -249,7 +252,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                     aiString textureName;
                     material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str());
+                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
                     surface->textures[textureIdx++] = texture;
                 }
             }

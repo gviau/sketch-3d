@@ -16,7 +16,7 @@ Texture3DOpenGL::~Texture3DOpenGL() {
     }
 }
 
-bool Texture3DOpenGL::Create() {
+bool Texture3DOpenGL::Create(bool generateMipmaps) {
     if (textureName_ == 0) {
         glGenTextures(1, &textureName_);
     }

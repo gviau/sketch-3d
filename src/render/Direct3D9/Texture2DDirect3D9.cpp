@@ -22,7 +22,7 @@ Texture2DDirect3D9::~Texture2DDirect3D9() {
     }
 }
 
-bool Texture2DDirect3D9::Create() {
+bool Texture2DDirect3D9::Create(bool generateMipmaps) {
     if (texture_ != nullptr) {
         texture_->Release();
         texture_ = nullptr;

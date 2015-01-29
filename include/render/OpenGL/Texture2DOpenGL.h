@@ -44,9 +44,10 @@ class Texture2DOpenGL : public Texture2D {
 
         /**
          * Create the actual texture handle
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool        Create();
+        virtual bool        Create(bool generateMipmaps=false);
 
         /**
          * Get the data from the texture. If the pointer is null, try to get it from the opengl texture

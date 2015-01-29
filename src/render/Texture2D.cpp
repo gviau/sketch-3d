@@ -39,7 +39,7 @@ Texture2D::~Texture2D() {
     }
 }
 
-bool Texture2D::Load(const string& filename) {
+bool Texture2D::Load(const string& filename, bool generateMipmaps) {
     if (filename_ == filename) {
         return true;
     }
@@ -106,7 +106,7 @@ bool Texture2D::Load(const string& filename) {
     FreeImage_Unload(dib);
     data_ = (void*)data;
 
-    if (!Create()) {
+    if (!Create(generateMipmaps)) {
         Logger::GetInstance()->Error("Couldn't create texture handle for image " + filename);
         return false;
     }
