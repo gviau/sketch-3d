@@ -68,89 +68,45 @@ bool Texture2DDirect3D9::Create() {
     }
 
     D3DXCreateTexture(device_, width_, height_, 1, 0, format, D3DPOOL_MANAGED, &texture_);
+
     if (texture_ == nullptr) {
         Logger::GetInstance()->Error("Couldn't create texture");
         return false;
     }
-
+    
     if (data_ != nullptr) {
         D3DLOCKED_RECT lockedRect;
+
         if (SUCCEEDED(texture_->LockRect(0, &lockedRect, nullptr, 0))) {
             unsigned char* rect = static_cast<unsigned char*>(lockedRect.pBits);
             unsigned char* data = static_cast<unsigned char*>(data_);
-            
-            // Must copy pixels row by row in rect
-            size_t rect_idx = 0, rect_offset = 0;
+
+            size_t rect_idx = 0;
             size_t data_idx = 0;
-            size_t size = width_ * height_ * bpp;
+            size_t pitch = ((((bpp * 8 * width_) + 31) / 32) * 4);
+            size_t pad = pitch - (width_ * bpp);
 
-            for (size_t j = 0; j < height_; j++) {
-                rect_offset = (height_ - j - 1) * lockedRect.Pitch;
-
-                for (size_t i = 0; i < width_; i++) {
-                    rect_idx = rect_offset + i * 4;
-                    //rect_idx = i * lockedRect.Pitch + rect_offset;
-                    //data_idx = (i * width_ + (width_ - j - 1)) * bpp;
-                    //data_idx = ((height_ - i - 1) * width_ + j) * bpp;
-                    //data_idx = (j * width_ + i) * bpp;
-
-                    rect[rect_idx    ] = data[data_idx    ];
+            for (size_t y = 0; y < height_; y++) {
+                for (size_t x = 0; x < width_; x++) {
+                    rect[rect_idx    ] = data[data_idx + 2];
                     rect[rect_idx + 1] = data[data_idx + 1];
-                    rect[rect_idx + 2] = data[data_idx + 2];
+                    rect[rect_idx + 2] = data[data_idx    ];
+
+                    if (bpp == 4) {
+                        rect[rect_idx + 3] = data[data_idx + 3];
+                    }
+
+                    rect_idx += 4;
                     data_idx += bpp;
-                    //rect_idx += lockedRect.Pitch;
                 }
+
+                data_idx += pad;
             }
 
-            /*
-            for (size_t i = width_ / 2 - 32; i < width_ / 2 + 32; i++) {
-                for (size_t j = height_ / 2 - 32; j < height_ / 2 + 32; j++) {
-                    rect_idx = (i * height_ + j) * 4;
-                    rect[rect_idx] = 0;
-                    rect[rect_idx+1] = 0;
-                    rect[rect_idx+2] = 255;
-                }
-            }
-            */
-            /*
-            for (size_t i = 0; i < width_; i++) {
-                for (size_t j = 0; j < height_; j++) {
-                    //rect_idx = j * lockedRect.Pitch + i * 4;
-                    rect_idx = j * lockedRect.Pitch + i * 4;
-                    data_idx = (i * height_ + j) * bpp;
-
-                    rect[rect_idx    ] = data[data_idx + 2];
-                    rect[rect_idx + 1] = data[data_idx + 1];
-                    rect[rect_idx + 2] = data[data_idx    ];
-
-                    if (bpp == 4) {
-                        rect[rect_idx + 3] = data[data_idx + 3];
-                    }
-                }
-            }*/
-            
-            /*
-            for (size_t i = 0; i < height_; i++) {
-                for (size_t j = 0; j < width_; j++) {
-                    rect_idx = j + lockedRect.Pitch * i;
-                    data_idx = (i * width_ + j) * bpp;
-
-                    rect[rect_idx    ] = data[data_idx + 2];
-                    rect[rect_idx + 1] = data[data_idx + 1];
-                    rect[rect_idx + 2] = data[data_idx    ];
-
-                    if (bpp == 4) {
-                        rect[rect_idx + 3] = data[data_idx + 3];
-                    } else {
-                        rect[rect_idx + 3] = 255;
-                    }
-                }
-            }
-            */
             texture_->UnlockRect(0);
         }
     }
-
+    
     return true;
 }
 
