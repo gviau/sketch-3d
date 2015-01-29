@@ -41,36 +41,10 @@ int main(int argc, char** argv) {
     // Create the GBuffer render texture
     ////////////////////////////////////////////////////////////////////////////
     RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(window.GetWidth(), window.GetHeight(), TEXTURE_FORMAT_RGB32F);
-    Texture2D* normalsTexture = Renderer::GetInstance()->CreateTexture2D();
-    normalsTexture->SetWidth(window.GetWidth());
-    normalsTexture->SetHeight(window.GetHeight());
-    normalsTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    normalsTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!normalsTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create normal texture for GBuffer");
-        return 1;
-    }
-
-    Texture2D* albedosTexture = Renderer::GetInstance()->CreateTexture2D();
-    albedosTexture->SetWidth(window.GetWidth());
-    albedosTexture->SetHeight(window.GetHeight());
-    albedosTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    albedosTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!albedosTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create albedo texture for GBuffer");
-        return 1;
-    }
-
-    Texture2D* depthTexture = Renderer::GetInstance()->CreateTexture2D();
-    depthTexture->SetWidth(window.GetWidth());
-    depthTexture->SetHeight(window.GetHeight());
-    depthTexture->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
-    depthTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!depthTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create depth texture for GBuffer");
-        return 1;
-    }
-
+    Texture2D* normalsTexture = GBuffer->CreateTexture2D();
+    Texture2D* albedosTexture = GBuffer->CreateTexture2D();
+    Texture2D* depthTexture = GBuffer->CreateDepthBufferTexture();
+   
     vector<Texture2D*> gbufferTextures;
     gbufferTextures.push_back(normalsTexture);
     gbufferTextures.push_back(albedosTexture);
@@ -193,15 +167,7 @@ int main(int argc, char** argv) {
     // Shadow maps creation
     ////////////////////////////////////////////////////////////////////////////
     RenderTexture* shadowMap0 = Renderer::GetInstance()->CreateRenderTexture(2048, 2048, TEXTURE_FORMAT_DEPTH);
-    Texture2D* shadowMapTexture0 = Renderer::GetInstance()->CreateTexture2D();
-    shadowMapTexture0->SetWidth(2048);
-    shadowMapTexture0->SetHeight(2048);
-    shadowMapTexture0->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
-    shadowMapTexture0->SetFilterMode(FILTER_MODE_LINEAR);
-    if (!shadowMapTexture0->Create()) {
-        Logger::GetInstance()->Error("Couldn't create shadow map #0");
-        return 1;
-    }
+    Texture2D* shadowMapTexture0 = shadowMap0->CreateDepthBufferTexture();
 
     if (!shadowMap0->AttachTextureToDepthBuffer(shadowMapTexture0)) {
         Logger::GetInstance()->Error("Couldn't attach shadow map texture to depth buffer for shadow map #0");

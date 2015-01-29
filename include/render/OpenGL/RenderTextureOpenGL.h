@@ -34,6 +34,18 @@ class RenderTextureOpenGL : public RenderTexture {
         virtual bool        AddDepthBuffer();
 
         /**
+         * Create a texture to be used with this RenderTexture
+         * @return A pointer to a valid texture that can be used with this RenderTexture
+         */
+        virtual Texture2D*  CreateTexture2D() const;
+
+        /**
+         * Create a texture to be used as a depth buffer with this RenderTexture
+         * @return A pointer to a valid texture that can be used as a depth buffer with this RenderTexture
+         */
+        virtual Texture2D*  CreateDepthBufferTexture() const;
+
+        /**
          * Attach a texture to the depth buffer.
          * @param texture The texture to attach
          * @return false if there is already a depth buffer attached or if there was an error, true otherwise

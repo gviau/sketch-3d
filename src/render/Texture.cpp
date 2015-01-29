@@ -4,14 +4,15 @@
 
 namespace Sketch3D {
 
-Texture::Texture() : width_(0), height_(0), filterMode_(FILTER_MODE_NEAREST),
+Texture::Texture(bool generateMipmaps) : width_(0), height_(0), generateMipmaps_(generateMipmaps), filterMode_(FILTER_MODE_NEAREST),
 					 wrapMode_(WRAP_MODE_CLAMP), format_(TEXTURE_FORMAT_RGB24)
 {
 }
 
-Texture::Texture(unsigned int width, unsigned int height,
+Texture::Texture(unsigned int width, unsigned int height, bool generateMipmaps,
                  FilterMode_t filterMode, WrapMode_t wrapMode, TextureFormat_t format) : width_(width),
 																                         height_(height),
+                                                                                         generateMipmaps_(generateMipmaps),
 																                         filterMode_(filterMode),
 																                         wrapMode_(wrapMode),
                                                                                          format_(format)
@@ -33,12 +34,18 @@ void Texture::SetHeight(unsigned int height) {
 	height_ = height;
 }
 
+void Texture::SetGenerateMipmaps(bool generateMipmaps) {
+    generateMipmaps_ = generateMipmaps;
+}
+
 void Texture::SetFilterMode(FilterMode_t mode) {
 	filterMode_ = mode;
+    SetFilterModeImpl();
 }
 
 void Texture::SetWrapMode(WrapMode_t mode) {
 	wrapMode_ = mode;
+    SetWrapModeImpl();
 }
 
 void Texture::SetTextureFormat(TextureFormat_t format) {
@@ -51,6 +58,10 @@ unsigned int Texture::GetWidth() const {
 
 unsigned int Texture::GetHeight() const {
 	return height_;
+}
+
+bool Texture::GetGenerateMipmaps() const {
+    return generateMipmaps_;
 }
 
 FilterMode_t Texture::GetFilterMode() const {

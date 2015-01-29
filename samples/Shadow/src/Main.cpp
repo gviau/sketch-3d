@@ -49,14 +49,9 @@ int main(int argc, char** argv) {
 
     for (size_t i = 0; i < NUM_LIGHTS; i++) {
         shadowMaps[i] = Renderer::GetInstance()->CreateRenderTexture(1024, 1024, TEXTURE_FORMAT_DEPTH);
-        shadowMapTextures[i] = Renderer::GetInstance()->CreateTexture2D();
-
-        shadowMapTextures[i]->SetWidth(1024);
-        shadowMapTextures[i]->SetHeight(1024);
-        shadowMapTextures[i]->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
+        shadowMapTextures[i] = shadowMaps[i]->CreateDepthBufferTexture();
         shadowMapTextures[i]->SetFilterMode(FILTER_MODE_LINEAR);
-        shadowMapTextures[i]->SetWrapMode(WRAP_MODE_CLAMP);
-    
+
         if (!shadowMapTextures[i]->Create()) {
             Logger::GetInstance()->Error("Couldn't create shadow map texture");
         }

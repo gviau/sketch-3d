@@ -22,20 +22,22 @@ class Texture2DDirect3D9 : public Texture2D {
 		 * to FILTER_MODE_POINT, the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
          * @param device A pointer to the Direct3D9 device
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 */
-					        Texture2DDirect3D9(IDirect3DDevice9* device);
+					        Texture2DDirect3D9(IDirect3DDevice9* device, bool generateMipmaps=false);
 
 		/**
 		 * Constructor
          * @param device A pointer to the Direct3D9 device
 		 * @param width The width of the texture
 		 * @param height The height of the texture
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 * @param filterMode The filter mode to use
 		 * @param wrapMode The wrap mode to use
 		 * @param format The format to use
 		 */
 				            Texture2DDirect3D9(IDirect3DDevice9* device, unsigned int width, unsigned int height,
-										       FilterMode_t filterMode=FILTER_MODE_LINEAR,
+										       bool generateMipmaps=false, FilterMode_t filterMode=FILTER_MODE_LINEAR,
 										       WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										       TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
@@ -46,10 +48,9 @@ class Texture2DDirect3D9 : public Texture2D {
 
         /**
          * Create the actual texture handle
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool        Create(bool generateMipmaps=false);
+        virtual bool        Create();
 
         /**
          * Get the data from the texture. If the pointer is null, try to get it from the opengl texture
@@ -59,6 +60,9 @@ class Texture2DDirect3D9 : public Texture2D {
     private:
         IDirect3DDevice9*   device_;
         IDirect3DTexture9*  texture_;   /**< Direct3D9's texture handle */
+
+        virtual void        SetFilterModeImpl() const;
+        virtual void        SetWrapModeImpl() const;
 
         /**
          * Sends the pixel data to the texture object

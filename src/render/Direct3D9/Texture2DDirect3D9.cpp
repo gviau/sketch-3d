@@ -7,12 +7,12 @@
 
 namespace Sketch3D {
 
-Texture2DDirect3D9::Texture2DDirect3D9(IDirect3DDevice9* device) : device_(device), texture_(nullptr) {
+Texture2DDirect3D9::Texture2DDirect3D9(IDirect3DDevice9* device, bool generateMipmaps) : Texture2D(generateMipmaps), device_(device), texture_(nullptr) {
 }
 
-Texture2DDirect3D9::Texture2DDirect3D9(IDirect3DDevice9* device, unsigned int width, unsigned int height,
+Texture2DDirect3D9::Texture2DDirect3D9(IDirect3DDevice9* device, unsigned int width, unsigned int height, bool generateMipmaps,
                                        FilterMode_t filter, WrapMode_t wrapMode, TextureFormat_t format) :
-            Texture2D(width, height, filter, wrapMode, format), device_(device), texture_(nullptr)
+            Texture2D(width, height, generateMipmaps, filter, wrapMode, format), device_(device), texture_(nullptr)
 {
 }
 
@@ -22,7 +22,7 @@ Texture2DDirect3D9::~Texture2DDirect3D9() {
     }
 }
 
-bool Texture2DDirect3D9::Create(bool generateMipmaps) {
+bool Texture2DDirect3D9::Create() {
     if (texture_ != nullptr) {
         texture_->Release();
         texture_ = nullptr;
@@ -112,6 +112,12 @@ bool Texture2DDirect3D9::Create(bool generateMipmaps) {
 
 const void* Texture2DDirect3D9::GetData() const {
     return nullptr;
+}
+
+void Texture2DDirect3D9::SetFilterModeImpl() const {
+}
+
+void Texture2DDirect3D9::SetWrapModeImpl() const {
 }
 
 void Texture2DDirect3D9::SetPixelDataBytesImp(unsigned char* data) {

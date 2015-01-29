@@ -1,12 +1,12 @@
 #include "render/OpenGL/Texture3DOpenGL.h"
 
 namespace Sketch3D {
-Texture3DOpenGL::Texture3DOpenGL() : Texture3D(), textureName_(0) {
+Texture3DOpenGL::Texture3DOpenGL(bool generateMipmaps) : Texture3D(generateMipmaps), textureName_(0) {
 }
 
-Texture3DOpenGL::Texture3DOpenGL(unsigned int width, unsigned int height, unsigned int depth, FilterMode_t filterMode,
-                                 WrapMode_t wrapMode, TextureFormat_t format) :
-        Texture3D(width, height, depth, filterMode, wrapMode, format), textureName_(0)
+Texture3DOpenGL::Texture3DOpenGL(unsigned int width, unsigned int height, unsigned int depth, bool generateMipmaps,
+                                 FilterMode_t filterMode, WrapMode_t wrapMode, TextureFormat_t format) :
+        Texture3D(width, height, depth, generateMipmaps, filterMode, wrapMode, format), textureName_(0)
 {
 }
 
@@ -16,38 +16,17 @@ Texture3DOpenGL::~Texture3DOpenGL() {
     }
 }
 
-bool Texture3DOpenGL::Create(bool generateMipmaps) {
+bool Texture3DOpenGL::Create() {
     if (textureName_ == 0) {
         glGenTextures(1, &textureName_);
     }
 
     Bind();
 
-    GLuint filter, wrap, format, components, type, bpp;
-	switch (filterMode_) {
-		case FILTER_MODE_NEAREST:
-			filter = GL_NEAREST;
-			break;
-
-		case FILTER_MODE_LINEAR:
-			filter = GL_LINEAR;
-			break;
-	}
-
-	switch (wrapMode_) {
-		case WRAP_MODE_CLAMP:
-			wrap = GL_CLAMP;
-			break;
-
-		case WRAP_MODE_REPEAT:
-			wrap = GL_REPEAT;
-			break;
-
-        case WRAP_MODE_CLAMP_TO_BORDER:
-            wrap = GL_CLAMP_TO_BORDER;
-            break;
-	}
-
+    GLuint filter = GetOpenglFilterMode();
+    GLuint wrap = GetOpenglWrapMode();
+    
+    GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
     glTexImage3D(GL_TEXTURE_3D, 0, format, width_, height_, depth_, 0, components, type, data_);
@@ -55,8 +34,28 @@ bool Texture3DOpenGL::Create(bool generateMipmaps) {
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrap);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, wrap);
 
     return true;
+}
+
+void Texture3DOpenGL::SetFilterModeImpl() const {
+    Bind();
+
+    GLuint filter = GetOpenglFilterMode();
+
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, filter);
+}
+
+void Texture3DOpenGL::SetWrapModeImpl() const {
+    Bind();
+
+    GLuint wrap = GetOpenglWrapMode();
+
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrap);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, wrap);
 }
 
 void Texture3DOpenGL::SetPixelDataBytesImp(unsigned char* data) {
@@ -149,6 +148,33 @@ void Texture3DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             bpp = 0;
             break;
 	}
+}
+
+GLuint Texture3DOpenGL::GetOpenglFilterMode() const {
+	switch (filterMode_) {
+		case FILTER_MODE_NEAREST:
+			return GL_NEAREST;
+
+		case FILTER_MODE_LINEAR:
+			return GL_LINEAR;
+	}
+
+    return 0;
+}
+
+GLuint Texture3DOpenGL::GetOpenglWrapMode() const {
+	switch (wrapMode_) {
+		case WRAP_MODE_CLAMP:
+			return GL_CLAMP;
+
+		case WRAP_MODE_REPEAT:
+			return GL_REPEAT;
+
+        case WRAP_MODE_CLAMP_TO_BORDER:
+            return GL_CLAMP_TO_BORDER;
+	}
+
+    return 0;
 }
 
 }

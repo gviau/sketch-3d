@@ -1,11 +1,12 @@
 #include "render/OpenGL/Texture2DOpenGL.h"
 
 namespace Sketch3D {
-Texture2DOpenGL::Texture2DOpenGL() : Texture2D(), textureName_(0) {
+Texture2DOpenGL::Texture2DOpenGL(bool generateMipmaps) : Texture2D(generateMipmaps), textureName_(0) {
 }
 
-Texture2DOpenGL::Texture2DOpenGL(unsigned int width, unsigned int height, FilterMode_t filterMode,
-                                 WrapMode_t wrapMode, TextureFormat_t format) : Texture2D(width, height, filterMode, wrapMode, format), textureName_(0)
+Texture2DOpenGL::Texture2DOpenGL(unsigned int width, unsigned int height, bool generateMipmaps, FilterMode_t filterMode,
+                                 WrapMode_t wrapMode, TextureFormat_t format) : Texture2D(width, height, generateMipmaps,
+                                                                                          filterMode, wrapMode, format), textureName_(0)
 {
 }
 
@@ -15,45 +16,24 @@ Texture2DOpenGL::~Texture2DOpenGL() {
     }
 }
 
-bool Texture2DOpenGL::Create(bool generateMipmaps) {
+bool Texture2DOpenGL::Create() {
     if (textureName_ == 0) {
 	    glGenTextures(1, &textureName_);
     }
 
     Bind();
 
-	GLuint filter, wrap, format, components, type, bpp;
-	switch (filterMode_) {
-		case FILTER_MODE_NEAREST:
-			filter = (generateMipmaps) ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST;
-			break;
+    GLuint filter = GetOpenglFilterMode();
+    GLuint wrap = GetOpenglWrapMode();
 
-		case FILTER_MODE_LINEAR:
-			filter = (generateMipmaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
-			break;
-	}
-
-	switch (wrapMode_) {
-		case WRAP_MODE_CLAMP:
-			wrap = GL_CLAMP;
-			break;
-
-		case WRAP_MODE_REPEAT:
-			wrap = GL_REPEAT;
-			break;
-
-        case WRAP_MODE_CLAMP_TO_BORDER:
-            wrap = GL_CLAMP_TO_BORDER;
-            break;
-	}
-
+    GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
     if (data_ != nullptr) {
 	    glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0,
 				     components, type, data_);
 
-        if (generateMipmaps) {
+        if (generateMipmaps_) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
@@ -88,6 +68,24 @@ const void* Texture2DOpenGL::GetData() const {
     glGetTexImage(GL_TEXTURE_2D, 0, components, type, data);
 
     return data;
+}
+
+void Texture2DOpenGL::SetFilterModeImpl() const {
+    Bind();
+
+    GLuint filter = GetOpenglFilterMode();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+}
+
+void Texture2DOpenGL::SetWrapModeImpl() const {
+    Bind();
+
+    GLuint wrap = GetOpenglWrapMode();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 }
 
 void Texture2DOpenGL::SetPixelDataBytesImp(unsigned char* data) {
@@ -165,6 +163,33 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             bpp = 0;
             break;
 	}
+}
+
+GLuint Texture2DOpenGL::GetOpenglFilterMode() const {
+	switch (filterMode_) {
+		case FILTER_MODE_NEAREST:
+			return (generateMipmaps_) ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST;
+
+		case FILTER_MODE_LINEAR:
+			return (generateMipmaps_) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+	}
+
+    return 0;
+}
+
+GLuint Texture2DOpenGL::GetOpenglWrapMode() const {
+	switch (wrapMode_) {
+		case WRAP_MODE_CLAMP:
+			return GL_CLAMP;
+
+		case WRAP_MODE_REPEAT:
+			return GL_REPEAT;
+
+        case WRAP_MODE_CLAMP_TO_BORDER:
+            return GL_CLAMP_TO_BORDER;
+	}
+
+    return 0;
 }
 
 }

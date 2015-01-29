@@ -62,19 +62,21 @@ class Texture {
 		 * Constructor. Initializes the width and height to 0, the filter mode
 		 * to FILTER_MODE_POINT and the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 */
-						        Texture();
+                                Texture(bool generateMipmaps=false);
 
 		/**
 		 * Constructor. Initializes the filter mode to FILTER_MODE_POINT and
 		 * the wrap mode to WRAP_MODE_CLAMP by default.
 		 * @param width The width of the texture
 		 * @param height The height of the texture
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 * @param filterMode The filter mode to use
 		 * @param wrapMode The wrap mode to use
          * @param format The format to use
 		 */
-						        Texture(unsigned int width, unsigned int height,
+						        Texture(unsigned int width, unsigned int height, bool generateMipmaps=false,
 								        FilterMode_t filterMode=FILTER_MODE_LINEAR,
 								        WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 								        TextureFormat_t format=TEXTURE_FORMAT_RGB24);
@@ -86,10 +88,9 @@ class Texture {
 
         /**
          * Create the actual texture handle
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool            Create(bool generateMipmaps=false) = 0;
+        virtual bool            Create() = 0;
 
         /**
          * Activate the texture
@@ -99,12 +100,14 @@ class Texture {
 
 		void			        SetWidth(unsigned int width);
 		void			        SetHeight(unsigned int height);
+        void                    SetGenerateMipmaps(bool generateMipmaps);
 		void			        SetFilterMode(FilterMode_t mode);
 		void			        SetWrapMode(WrapMode_t mode);
         void		            SetTextureFormat(TextureFormat_t format);
 
 		unsigned int	        GetWidth() const;
 		unsigned int	        GetHeight() const;
+        bool                    GetGenerateMipmaps() const;
 		FilterMode_t	        GetFilterMode() const;
 		WrapMode_t		        GetWrapMode() const;
         TextureFormat_t	        GetTextureFormat() const;
@@ -114,9 +117,13 @@ class Texture {
 	protected:
 		unsigned int	        width_;	/**< The width of the texture */
 		unsigned int	        height_;	/**< The height of the texture */
+        bool                    generateMipmaps_;   /**< Should we generate mipmaps for this texture */
 		FilterMode_t	        filterMode_;	/**< The filter mode of the texture */
 		WrapMode_t		        wrapMode_;	/**< The wrap mode of the texture */
         TextureFormat_t         format_;    /**< The texture format */
+
+        virtual void            SetFilterModeImpl() const = 0;
+        virtual void            SetWrapModeImpl() const = 0;
 };
 
 }

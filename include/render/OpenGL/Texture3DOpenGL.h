@@ -20,20 +20,22 @@ class Texture3DOpenGL : public Texture3D {
 		 * Constructor. Initializes the width, height and depth to 0, the filter mode
 		 * to FILTER_MODE_POINT, the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 */
-								Texture3DOpenGL();
+								Texture3DOpenGL(bool generateMipmaps=false);
 
 		/**
 		 * Constructor
 		 * @param width The width of the texture
 		 * @param height The height of the texture
          * @param depth The depth of the texture
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 * @param filterMode The filter mode to use
 		 * @param wrapMode The wrap mode to use
 		 * @param format The format to use
 		 */
-								Texture3DOpenGL(unsigned int width, unsigned int height, unsigned int depth,
-										        FilterMode_t filterMode=FILTER_MODE_LINEAR,
+                                Texture3DOpenGL(unsigned int width, unsigned int height, unsigned int depth,
+										        bool generateMipmaps=false, FilterMode_t filterMode=FILTER_MODE_LINEAR,
 										        WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										        TextureFormat_t format=TEXTURE_FORMAT_RGB24);
 
@@ -44,13 +46,15 @@ class Texture3DOpenGL : public Texture3D {
 
         /**
          * Create the actual texture handle
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool        Create(bool generateMipmaps=false);
+        virtual bool        Create();
 
     private:
         GLuint              textureName_;   /**< OpenGL texture's name */
+
+        virtual void        SetFilterModeImpl() const;
+        virtual void        SetWrapModeImpl() const;
 
         /**
          * Sends the pixel data to the texture object
@@ -59,6 +63,8 @@ class Texture3DOpenGL : public Texture3D {
         virtual void        SetPixelDataFloatsImp(float* data);
 
         void                GetOpenglTextureFormat(TextureFormat_t textureFormat, GLuint& internalFormat, GLuint& format, GLuint& type, GLuint& bpp) const;
+        GLuint              GetOpenglFilterMode() const;
+        GLuint              GetOpenglWrapMode() const;
 };
 
 }

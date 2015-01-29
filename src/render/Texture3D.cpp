@@ -4,12 +4,12 @@
 
 namespace Sketch3D {
 
-Texture3D::Texture3D() : Texture(), depth_(0), data_(nullptr) {
+Texture3D::Texture3D(bool generateMipmaps) : Texture(generateMipmaps), depth_(0), data_(nullptr) {
 }
 
-Texture3D::Texture3D(unsigned int width, unsigned int height, unsigned int depth,
+Texture3D::Texture3D(unsigned int width, unsigned int height, unsigned int depth, bool generateMipmaps,
                      FilterMode_t filterMode, WrapMode_t wrapMode, TextureFormat_t format) :
-        Texture(width, height, filterMode, wrapMode, format), depth_(depth), data_(nullptr)
+        Texture(width, height, generateMipmaps, filterMode, wrapMode, format), depth_(depth), data_(nullptr)
 {
 }
 

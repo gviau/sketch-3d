@@ -222,7 +222,8 @@ Texture2D* Renderer::CreateTexture2DFromFile(const string& filename, bool genera
     }
 
     Texture2D* texture = renderSystem_->CreateTexture2D();
-    if (!texture->Load(filename, generateMipmaps)) {
+    texture->SetGenerateMipmaps(generateMipmaps);
+    if (!texture->Load(filename)) {
         Logger::GetInstance()->Error("Couldn't create texture from file " + filename);
         delete texture;
         return nullptr;

@@ -76,39 +76,14 @@ int main(int argc, char** argv) {
     fullscreenQuad.SetMaterial(&material);
     fullscreenQuad.SetMesh(&planeMesh);
 
-    // Create the textures for the render buffer
-    Texture2D* positionsTexture = Renderer::GetInstance()->CreateTexture2D();
-    positionsTexture->SetWidth(1024);
-    positionsTexture->SetHeight(768);
-    positionsTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    positionsTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!positionsTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create positions texture");
-        return 1;
-    }
-
-    Texture2D* normalsTexture = Renderer::GetInstance()->CreateTexture2D();
-    normalsTexture->SetWidth(1024);
-    normalsTexture->SetHeight(768);
-    normalsTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    normalsTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!normalsTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create normals texture");
-        return 1;
-    }
-
-    Texture2D* albedosTexture = Renderer::GetInstance()->CreateTexture2D();
-    albedosTexture->SetWidth(1024);
-    albedosTexture->SetHeight(768);
-    albedosTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    albedosTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!albedosTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create albedos texture");
-        return 1;
-    }
-
     // Create the render buffer
     RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGB32F);
+
+    // Create the textures for the render buffer
+    Texture2D* positionsTexture = GBuffer->CreateTexture2D();
+    Texture2D* normalsTexture = GBuffer->CreateTexture2D();
+    Texture2D* albedosTexture = GBuffer->CreateTexture2D();
+
     vector<Texture2D*> gbufferTextures;
     gbufferTextures.push_back(positionsTexture);
     gbufferTextures.push_back(normalsTexture);

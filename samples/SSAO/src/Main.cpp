@@ -80,39 +80,14 @@ int main(int argc, char** argv) {
     node.SetMesh(&mesh);
     Renderer::GetInstance()->GetSceneTree().AddNode(&node);
 
-    // Create the textures for the render texture
-    Texture2D* positionsTexture = Renderer::GetInstance()->CreateTexture2D();
-    positionsTexture->SetWidth(1024);
-    positionsTexture->SetHeight(768);
-    positionsTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    positionsTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!positionsTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create position texture for render texture");
-        return 1;
-    }
-
-    Texture2D* normalsTexture = Renderer::GetInstance()->CreateTexture2D();
-    normalsTexture->SetWidth(1024);
-    normalsTexture->SetHeight(768);
-    normalsTexture->SetTextureFormat(TEXTURE_FORMAT_RGB32F);
-    normalsTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!normalsTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create normal texture for render texture");
-        return 1;
-    }
-
-    Texture2D* depthTexture = Renderer::GetInstance()->CreateTexture2D();
-    depthTexture->SetWidth(1024);
-    depthTexture->SetHeight(768);
-    depthTexture->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
-    depthTexture->SetFilterMode(FILTER_MODE_NEAREST);
-    if (!depthTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create depth texture for render texture");
-        return 1;
-    }
-
     // Create the render texture
     RenderTexture* GBuffer = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGB32F);
+
+    // Create the textures for the render texture
+    Texture2D* positionsTexture = GBuffer->CreateTexture2D();
+    Texture2D* normalsTexture = GBuffer->CreateTexture2D();
+    Texture2D* depthTexture = GBuffer->CreateDepthBufferTexture();
+    
     vector<Texture2D*> gbufferTextures;
     gbufferTextures.push_back(positionsTexture);
     gbufferTextures.push_back(normalsTexture);
@@ -176,15 +151,8 @@ int main(int argc, char** argv) {
 
     // Now we need 1 more render texture for the ssao occlusion factor
     RenderTexture* ssaoOcclusionFactor = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGBA32F);
-    Texture2D* ssaoTexture = Renderer::GetInstance()->CreateTexture2D();
-    ssaoTexture->SetWidth(1024);
-    ssaoTexture->SetHeight(768);
-    ssaoTexture->SetTextureFormat(TEXTURE_FORMAT_RGBA32F);
+    Texture2D* ssaoTexture = ssaoOcclusionFactor->CreateTexture2D();
     ssaoTexture->SetFilterMode(FILTER_MODE_LINEAR);
-    if (!ssaoTexture->Create()) {
-        Logger::GetInstance()->Error("Couldn't create ssao texture");
-        return 1;
-    }
 
     vector<Texture2D*> ssaoTextures;
     ssaoTextures.push_back(ssaoTexture);

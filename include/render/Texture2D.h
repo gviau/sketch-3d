@@ -27,18 +27,20 @@ class Texture2D : public Texture {
 		 * Constructor. Initializes the width and height to 0, the filter mode
 		 * to FILTER_MODE_POINT, the wrap mode to WRAP_MODE_CLAMP and the texture
 		 * format is set to TEXTURE_FORMAT_RGB24
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 */
-								Texture2D();
+								Texture2D(bool generateMipmaps=false);
 
 		/**
 		 * Constructor
 		 * @param width The width of the texture
 		 * @param height The height of the texture
+         * @param generateMipmaps If set to true, generate mipmaps for this texture
 		 * @param filterMode The filter mode to use
 		 * @param wrapMode The wrap mode to use
 		 * @param format The format to use
 		 */
-								Texture2D(unsigned int width, unsigned int height,
+                                Texture2D(unsigned int width, unsigned int height, bool generateMipmaps=false,
 										  FilterMode_t filterMode=FILTER_MODE_LINEAR,
 										  WrapMode_t wrapMode=WRAP_MODE_REPEAT,
 										  TextureFormat_t format=TEXTURE_FORMAT_RGB24);
@@ -51,17 +53,15 @@ class Texture2D : public Texture {
         /**
          * Load the texture from a file
          * @param filename The name of file from which the texture will be loaded
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was loaded, false otherwise
          */
-        bool                    Load(const string& filename, bool generateMipmaps=false);
+        bool                    Load(const string& filename);
 
         /**
          * Create the actual texture handle
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return true if the texture was created correctly
          */
-        virtual bool            Create(bool generateMipmaps=false) = 0;
+        virtual bool            Create() = 0;
 
         /**
          * Set the data as an array of bytes. Will only work with texture formats that doesn't require floats
@@ -95,6 +95,9 @@ class Texture2D : public Texture {
         bool                    fromCache_; /**< Set to true if the texture is cached, false otherwise */
 
         static uint32_t         nextAvailableId_;
+
+        virtual void            SetFilterModeImpl() const = 0;
+        virtual void            SetWrapModeImpl() const = 0;
 
         /**
          * Sends the data to the texture object

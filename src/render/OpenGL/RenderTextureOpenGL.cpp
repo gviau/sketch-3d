@@ -1,10 +1,10 @@
 #include "render/OpenGL/RenderTextureOpenGL.h"
 
+#include "render/Renderer.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
 #include "system/Logger.h"
 
 #include "render/OpenGL/gl/glew.h"
-
 
 namespace Sketch3D {
 
@@ -43,6 +43,26 @@ bool RenderTextureOpenGL::AddDepthBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return true;
+}
+
+Texture2D* RenderTextureOpenGL::CreateTexture2D() const {
+    Texture2D* texture = Renderer::GetInstance()->CreateTexture2D();
+    texture->SetWidth(width_);
+    texture->SetHeight(height_);
+    texture->SetTextureFormat(format_);
+    texture->Create();
+
+    return texture;
+}
+
+Texture2D* RenderTextureOpenGL::CreateDepthBufferTexture() const {
+    Texture2D* texture = Renderer::GetInstance()->CreateTexture2D();
+    texture->SetWidth(width_);
+    texture->SetHeight(height_);
+    texture->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
+    texture->Create();
+
+    return texture;
 }
 
 bool RenderTextureOpenGL::AttachTextureToDepthBuffer(Texture2D* texture) {
