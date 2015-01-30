@@ -90,13 +90,17 @@ Texture2D* RenderTextureDirect3D9::CreateDepthBufferTexture() const {
     // We need to manually create the texture to set the usage flag to D3DUSAGE_RENDERTARGET
     Texture2DDirect3D9* texture = new Texture2DDirect3D9(device_);
 
-    D3DXCreateTexture(device_, width_, height_, 1, D3DUSAGE_RENDERTARGET, D3DFMT_D24X8, D3DPOOL_MANAGED, &texture->texture_);
+    D3DXCreateTexture(device_, width_, height_, 1, D3DUSAGE_DEPTHSTENCIL, D3DFMT_D24X8, D3DPOOL_DEFAULT, &texture->texture_);
 
     if (texture->texture_ == nullptr) {
         Logger::GetInstance()->Error("Couldn't create texture");
         delete texture;
         return nullptr;
     }
+
+    texture->width_ = width_;
+    texture->height_ = height_;
+    texture->format_ = TEXTURE_FORMAT_DEPTH;
 
     return texture;
 }

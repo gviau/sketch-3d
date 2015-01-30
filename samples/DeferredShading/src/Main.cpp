@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 int main(int argc, char** argv) {
 #endif
     Window window("Sample_DeferredShading", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_DIRECT3D9, window);
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the meshes

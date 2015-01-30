@@ -9,10 +9,12 @@ struct PS_INPUT {
 };
 
 float4 main(PS_INPUT input) : COLOR {
+    // The new normal is from the normal map. Since it's stored in tangent space, we can directly use it
     float3 N = normalize(tex2D(normalTexture, input.uv).xyz);
     float3 L = normalize(input.light_dir);
     float3 V = normalize(input.eye);
 
+    // Compute diffuse and specular lighting
     float3 light = float3(0.0, 0.0, 0.0);
     float lambert = max(dot(N, L), 0.0);
     if (lambert > 0.0) {
@@ -21,6 +23,7 @@ float4 main(PS_INPUT input) : COLOR {
                  pow(max(dot(H, N), 0.0), 75.0) * float3(1.0, 1.0, 1.0);
     }
 
+    // Gamma correction
     float3 texColor = pow( tex2D(diffuseTexture, input.uv).xyz, float3(2.2, 2.2, 2.2));
     return float4( pow( texColor * light, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)), 1.0);
 }

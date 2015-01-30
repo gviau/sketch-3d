@@ -14,7 +14,7 @@ out vec4 norm;
 out vec4 albedo; 
 
 void main() {
-	position = pos;
-	norm = normal;
-	albedo = texture2D(texture0, uv).xyz;
+	position.xyz = pos;
+	norm.xyz = normal;
+	albedo.xyz = texture2D(texture0, uv).xyz;
 }

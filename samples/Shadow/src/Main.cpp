@@ -52,10 +52,6 @@ int main(int argc, char** argv) {
         shadowMapTextures[i] = shadowMaps[i]->CreateDepthBufferTexture();
         shadowMapTextures[i]->SetFilterMode(FILTER_MODE_LINEAR);
 
-        if (!shadowMapTextures[i]->Create()) {
-            Logger::GetInstance()->Error("Couldn't create shadow map texture");
-        }
-
         if (!shadowMaps[i]->AttachTextureToDepthBuffer(shadowMapTextures[i])) {
             Logger::GetInstance()->Error("Couldn't create shadow map");
         }
@@ -201,6 +197,8 @@ int main(int argc, char** argv) {
         jeepNode1.SetMaterial(&recordShadowMaterial);
         jeepNode2.SetMaterial(&recordShadowMaterial);
 
+        Renderer::GetInstance()->StartRender();
+
         for (size_t i = 0; i < currentLightNumber; i++) {
             shadowMaps[i]->Bind();
             Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
@@ -233,6 +231,7 @@ int main(int argc, char** argv) {
             shader->SetUniformMatrix4x4("shadowMatrix", shadowMatrix);
             shader->SetUniformVector3("light_position", newLightPositions[i]);
             shader->SetUniformVector4("light_color", lightColors[i]);
+            shader->SetUniformVector2("shadowMapTexelStep", 1.0f / shadowMapTextures[i]->GetWidth(), 1.0f / shadowMapTextures[i]->GetHeight());
             material.AddTexture("shadowMap", shadowMapTextures[i]);
 
             Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
