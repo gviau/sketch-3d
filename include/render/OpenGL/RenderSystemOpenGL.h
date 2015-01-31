@@ -16,7 +16,7 @@ class RenderSystemOpenGL : public RenderSystem {
 	public:
         RenderSystemOpenGL(Window& window);
 		virtual ~RenderSystemOpenGL();
-		virtual bool Initialize();
+		virtual bool Initialize(const RenderParameters_t& renderParameters);
 		virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);
 		virtual void Clear(int buffer) const;
         virtual void StartRender();

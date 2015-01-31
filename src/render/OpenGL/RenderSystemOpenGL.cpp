@@ -31,7 +31,7 @@ RenderSystemOpenGL::~RenderSystemOpenGL() {
 	delete renderContext_;
 }
 
-bool RenderSystemOpenGL::Initialize() {
+bool RenderSystemOpenGL::Initialize(const RenderParameters_t& renderParameters) {
 	Logger::GetInstance()->Info("Initializing OpenGL...");
 
 #if PLATFORM == PLATFORM_WIN32
@@ -40,7 +40,7 @@ bool RenderSystemOpenGL::Initialize() {
     renderContext_ = new RenderContextOpenGLUnix();
 #endif
 
-	if (!renderContext_->Initialize(window_)) {
+    if (!renderContext_->Initialize(window_, renderParameters)) {
 		Logger::GetInstance()->Error("Couldn't create OpenGL context");
 		return false;
 	}

@@ -19,10 +19,104 @@ RenderContextOpenGLWin32::~RenderContextOpenGLWin32() {
 
 		wglDeleteContext(renderContext_);
 	}
+
+    ChangeDisplaySettings(NULL, 0);
 }
 
-bool RenderContextOpenGLWin32::Initialize(Window& window) {
+bool RenderContextOpenGLWin32::Initialize(Window& window, const RenderParameters_t& renderParameters) {
 	Logger::GetInstance()->Debug("Initializing OpenGL context");
+
+    size_t colorBits, redBits, greenBits, blueBits, depthBits;
+    size_t alphaBits = 0;
+    size_t stencilBits = 0;
+    switch (renderParameters.displayFormat) {
+        case DISPLAY_FORMAT_A1R5G5B5:
+            colorBits = 16;
+            alphaBits = 1;
+            redBits = blueBits = 5;
+            greenBits = 6;
+            break;
+
+        case DISPLAY_FORMAT_A2R10G10B10:
+            colorBits = 24;
+            alphaBits = 2;
+            redBits = greenBits = blueBits = 10;
+            break;
+
+        case DISPLAY_FORMAT_A8R8G8B8:
+            colorBits = 24;
+            alphaBits = 8;
+            redBits = greenBits = blueBits = 8;
+            break;
+
+        case DISPLAY_FORMAT_R5G6B5:
+            colorBits = 16;
+            redBits = blueBits = 5;
+            greenBits = 6;
+            break;
+
+        case DISPLAY_FORMAT_X1R5G5B5:
+            colorBits = 16;
+            redBits = greenBits = blueBits = 5;
+            break;
+
+        case DISPLAY_FORMAT_X8R8G8B8:
+            colorBits = 24;
+            redBits = greenBits = blueBits = 8;
+            break;
+    }
+
+    switch (renderParameters.depthStencilBits) {
+        case DEPTH_STENCIL_BITS_D15S1:
+            depthBits = 15;
+            stencilBits = 1;
+            break;
+
+        case DEPTH_STENCIL_BITS_D16:
+            depthBits = 16;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24S8:
+            depthBits = 24;
+            stencilBits = 8;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24X4S4:
+            depthBits = 24;
+            stencilBits = 4;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24X8:
+            depthBits = 24;
+            break;
+
+        case DEPTH_STENCIL_BITS_D32:
+            depthBits = 32;
+            break;
+    }
+
+    if (!window.IsWindowed()) {
+        // From http://www.falloutsoftware.com/tutorials/gl/gl2.htm
+        DEVMODE dmode;
+ 
+        memset(&dmode, 0, sizeof(DEVMODE));
+        dmode.dmSize=sizeof(DEVMODE);
+        dmode.dmPelsWidth = renderParameters.width;
+        dmode.dmPelsHeight = renderParameters.height;
+        dmode.dmBitsPerPel = (colorBits == 24) ? 32 : colorBits;
+        dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+ 
+        // Change resolution, if possible
+        if (ChangeDisplaySettings(&dmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
+            Logger::GetInstance()->Warning("Couldn't set window to fullscreen mode");
+        }
+
+        // Make the window flags compatible with fullscreen mode
+        SetWindowLongW(window.GetHandle(), GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+        SetWindowLongW(window.GetHandle(), GWL_EXSTYLE, WS_EX_APPWINDOW);
+        SetWindowPos(window.GetHandle(), NULL, 0, 0, renderParameters.width, renderParameters.height, SWP_FRAMECHANGED);
+        ShowWindow(window.GetHandle(), SW_SHOW);
+    }
 
     deviceContext_ = GetDC(reinterpret_cast<HWND>(window.GetHandle()));
     if (!deviceContext_) {
@@ -37,8 +131,13 @@ bool RenderContextOpenGLWin32::Initialize(Window& window) {
 	pixelFormat.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL |
 						  PFD_DOUBLEBUFFER;
 	pixelFormat.iPixelType = PFD_TYPE_RGBA;
-	pixelFormat.cColorBits = 24;
-	pixelFormat.cDepthBits = 32;
+    pixelFormat.cColorBits = colorBits;
+    pixelFormat.cDepthBits = depthBits;
+    pixelFormat.cAlphaBits = alphaBits;
+    pixelFormat.cRedBits = redBits;
+    pixelFormat.cGreenBits = greenBits;
+    pixelFormat.cBlueBits = blueBits;
+    pixelFormat.cStencilBits = stencilBits;
 	pixelFormat.iLayerType = PFD_MAIN_PLANE;
 
 	int format = ChoosePixelFormat(deviceContext_, &pixelFormat);
@@ -94,6 +193,10 @@ bool RenderContextOpenGLWin32::Initialize(Window& window) {
 
 void RenderContextOpenGLWin32::SwapBuffers() {
 	::SwapBuffers(deviceContext_);
+}
+
+void RenderContextOpenGLWin32::QueryAdapterSupportedDisplayFormats() {
+
 }
 
 }

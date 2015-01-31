@@ -23,12 +23,14 @@ class RenderContextOpenGLWin32 : public RenderContextOpenGL {
 		 */
 		virtual		   ~RenderContextOpenGLWin32();
 
-		virtual bool	Initialize(Window& window);
+		virtual bool	Initialize(Window& window, const RenderParameters_t& renderParameters);
 		virtual void	SwapBuffers();
 
 	private:
 		HDC				deviceContext_;		/**< Window's device context */
 		HGLRC			renderContext_;		/**< The render context to initialize */
+
+        virtual void    QueryAdapterSupportedDisplayFormats();
 };
 
 }

@@ -23,11 +23,11 @@ RenderSystemDirect3D9::~RenderSystemDirect3D9() {
     delete renderContext_;
 }
 
-bool RenderSystemDirect3D9::Initialize() {
+bool RenderSystemDirect3D9::Initialize(const RenderParameters_t& renderParameters) {
     Logger::GetInstance()->Info("Initializing Direct3D9");
 
     renderContext_ = new RenderContextDirect3D9;
-    if (!renderContext_->Initialize(window_)) {
+    if (!renderContext_->Initialize(window_, renderParameters)) {
         Logger::GetInstance()->Error("Couldn't create Direct3D9 context");
         return false;
     }

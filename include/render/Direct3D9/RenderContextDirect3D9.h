@@ -27,7 +27,7 @@ class RenderContextDirect3D9 : public RenderContext {
          */
         virtual            ~RenderContextDirect3D9();
 
-        virtual bool        Initialize(Window& window);
+        virtual bool        Initialize(Window& window, const RenderParameters_t& renderParameters);
         virtual void        SwapBuffers();
 
         /**
@@ -38,6 +38,8 @@ class RenderContextDirect3D9 : public RenderContext {
     private:
         IDirect3D9*         direct3D9Context_;
         IDirect3DDevice9*   direct3D9Device_;
+
+        virtual void        QueryAdapterSupportedDisplayFormats();
 };
 
 }

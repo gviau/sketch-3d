@@ -29,7 +29,14 @@ int main(int argc, char** argv) {
 #endif
 
     Window window("Sample_CelShading", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
+    RenderParameters_t renderParameters;
+    renderParameters.width = 1024;
+    renderParameters.height = 768;
+    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
+    renderParameters.refreshRate = 0;
+    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the mesh

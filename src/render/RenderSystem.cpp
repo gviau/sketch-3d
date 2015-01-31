@@ -6,6 +6,7 @@
 #include "math/Vector4.h"
 
 #include "render/BufferObjectManager.h"
+#include "render/RenderTexture.h"
 #include "render/Shader.h"
 
 #include "system/Window.h"

@@ -1,6 +1,11 @@
 #ifndef SKETCH_3D_RENDER_CONTEXT_H
 #define SKETCH_3D_RENDER_CONTEXT_H
 
+#include "render/Renderer_Common.h"
+
+#include <vector>
+using namespace std;
+
 namespace Sketch3D {
 
 // Forward declaration
@@ -16,14 +21,31 @@ class RenderContext {
 		/**
 		 * Initialize the context.
 		 * @param window The window for which the context will be created
+         * @param renderParameters The rendering parameters to use when creating the render context
 		 * @return true if the intiailizing was correctly done, false otherwise
 		 */
-		virtual bool	Initialize(Window& window) = 0;
+        virtual bool	        Initialize(Window& window, const RenderParameters_t& renderParameters) = 0;
 
 		/**
 		 * Swap the buffers from the internal device context
 		 */
-		virtual void	SwapBuffers() = 0;
+		virtual void	        SwapBuffers() = 0;
+
+    protected:
+        vector<DisplayMode_t>   supportedDisplayModes_;   /**< List of supported display modes by the display adapter */
+
+        /**
+         * Queries the display adapter about its supported formats. This will populate the
+         * supportedDisplayFormats_ list
+         */
+        virtual void            QueryAdapterSupportedDisplayFormats() = 0;
+
+        /**
+         * Check if the provided render parameters are supported by the display adapter
+         * @param renderParameters The render parameters to check
+         * @return true if they are supported, false otherwise
+         */
+        bool                    AreRenderParametersSupported(const RenderParameters_t& renderParameters) const;
 };
 
 }

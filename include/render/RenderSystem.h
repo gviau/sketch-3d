@@ -56,9 +56,10 @@ class RenderSystem {
 
 		/**
 		 * Initialize the rendering system
+         * @param renderParameters The rendering parameters to use when creating the render context
 		 * @return true if the system was correctly initialized, false otherwise
 		 */
-		virtual bool					    Initialize()=0;
+		virtual bool					    Initialize(const RenderParameters_t& renderParameters)=0;
 
 		/**
 		 * Change the clear color

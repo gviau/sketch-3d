@@ -17,7 +17,7 @@ class RenderSystemDirect3D9 : public RenderSystem {
     public:
         RenderSystemDirect3D9(Window& window);
         ~RenderSystemDirect3D9();
-        virtual bool Initialize();
+        virtual bool Initialize(const RenderParameters_t& renderParameters);
         virtual void SetClearColor(float red, float green, float blue, float alpha=1.0f);
         virtual void Clear(int buffer) const;
         virtual void StartRender();

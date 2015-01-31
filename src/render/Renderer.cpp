@@ -44,7 +44,7 @@ Renderer* Renderer::GetInstance() {
 }
 
 bool Renderer::Initialize(RenderSystem_t renderSystem,
-						  Window& window)
+						  Window& window, const RenderParameters_t& renderParameters)
 {
 	switch (renderSystem) {
 		case RENDER_SYSTEM_OPENGL:
@@ -60,13 +60,13 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			break;
 	}
 
-	if (!renderSystem_->Initialize()) {
+	if (!renderSystem_->Initialize(renderParameters)) {
         Logger::GetInstance()->Error("Couldn't initialize render system properly");
         return false;
     }
 
     // Some initial values
-    PerspectiveProjection(45.0f, (float)window.GetWidth() / (float)window.GetHeight(), 1.0f, 1000.0f);
+    PerspectiveProjection(45.0f, (float)renderParameters.width / (float)renderParameters.height, 1.0f, 1000.0f);
     CameraLookAt(Vector3::ZERO, Vector3::LOOK);
 
     SetCullingMethod(CULLING_METHOD_BACK_FACE);

@@ -14,6 +14,7 @@ set(SRC
 	${SRC_PATH}/Mesh.cpp
 	${SRC_PATH}/ModelManager.cpp
 	${SRC_PATH}/Node.cpp
+	${SRC_PATH}/RenderContext.cpp
 	${SRC_PATH}/Renderer.cpp
 	${SRC_PATH}/RenderQueue.cpp
 	${SRC_PATH}/RenderQueueItem.cpp
@@ -39,6 +40,7 @@ set(HEADER
 	${HEADER_PATH}/Node.h
 	${HEADER_PATH}/RenderContext.h
 	${HEADER_PATH}/Renderer.h
+	${HEADER_PATH}/Renderer_Common.h
 	${HEADER_PATH}/RenderQueue.h
 	${HEADER_PATH}/RenderQueueItem.h
 	${HEADER_PATH}/RenderSystem.h

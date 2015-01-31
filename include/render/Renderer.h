@@ -5,6 +5,7 @@
 #include "math/Plane.h"
 #include "math/Vector3.h"
 
+#include "render/Renderer_Common.h"
 #include "render/RenderQueue.h"
 #include "render/SceneTree.h"
 #include "render/Texture.h"
@@ -23,106 +24,6 @@ class Sphere;
 class Texture2D;
 class Texture3D;
 class Window;
-
-/**
- * @enum BlendingEquation_t
- * Specifies the equation to use in the blending process
- */
-enum BlendingEquation_t {
-    BLENDING_EQUATION_ADD,
-    BLENDING_EQUATION_SUBTRACT,
-    BLENDING_EQUATION_REVERSE_SUBTRACT,
-    BLENDING_EQUATION_MIN,
-    BLENDING_EQUATION_MAX
-};
-
-/**
- * @enum BlendingFactors_t
- * Enumeration of all the possible blending factors for the blending equation
- */
-enum BlendingFactor_t {
-    BLENDING_FACTOR_ZERO,
-    BLENDING_FACTOR_ONE,
-    BLENDING_FACTOR_SRC_COLOR,
-    BLENDING_FACTOR_ONE_MINUS_SRC_COLOR,
-    BLENDING_FACTOR_DST_COLOR,
-    BLENDING_FACTOR_ONE_MINUS_DST_COLOR,
-    BLENDING_FACTOR_SRC_ALPHA,
-    BLENDING_FACTOR_ONE_MINUS_SRC_ALPHA,
-    BLENDING_FACTOR_DST_ALPHA,
-    BLENDING_FACTOR_ONE_MINUS_DST_ALPHA,
-    BLENDING_FACTOR_SRC_ALPHA_SATURATE
-};
-
-/**
- * @enum ClearBuffer_t
- * Determines which buffer to clear. Those enum should be combined with OR operations
- */
-enum ClearBuffer_t {
-    CLEAR_BUFFER_COLOR      = 0x01,
-    CLEAR_BUFFER_DEPTH      = 0X02
-};
-
-/**
- * @enum CullingMethod_t
- * Determines if the culling should be for front face or back face
- */
-enum CullingMethod_t {
-    CULLING_METHOD_FRONT_FACE,
-    CULLING_METHOD_BACK_FACE
-};
-
-/**
- * @enum DepthFunc_t
- * Sets the possible depth comparison functions
- */
-enum DepthFunc_t {
-    DEPTH_FUNC_NEVER,
-    DEPTH_FUNC_ALWAYS,
-    DEPTH_FUNC_LESS,
-    DEPTH_FUNC_LEQUAL,
-    DEPTH_FUNC_EQUAL,
-    DEPTH_FUNC_GEQUAL,
-    DEPTH_FUNC_GREATER,
-    DEPTH_FUNC_NOTEQUAL
-};
-
-/**
- * @enum RenderSystem_t
- * Enum that give the possible render system that one can use
- */
-enum RenderSystem_t {
-	RENDER_SYSTEM_OPENGL,
-	RENDER_SYSTEM_DIRECT3D9
-};
-
-/**
- * @enum RenderMode
- * Enum that give the possible rendering mode
- */
-enum RenderMode_t {
-	RENDER_MODE_FILL,
-	RENDER_MODE_WIREFRAME,
-	RENDER_MODE_POINT
-};
-
-/**
- * @struct FrustumPlanes_t
- * Struct containing the 6 planes of the view frustum
- */
-struct FrustumPlanes_t {
-    Plane nearPlane;
-    Plane farPlane;
-    Plane leftPlane;
-    Plane rightPlane;
-    Plane bottomPlane;
-    Plane topPlane;
-
-    /**
-     * Returns true if the specified sphere is completely outside the view frustum, false otherwise
-     */
-    bool IsSphereOutside(const Sphere& boundingSphere) const;
-};
 
 /**
  * @class Renderer
@@ -144,10 +45,11 @@ class Renderer {
 		 * Initialize the renderer
 		 * @param renderSystem The render system to use
 		 * @param window The window for which to create a rendering context
+         * @param renderParameters The rendering parameters to use when creating the render context
 		 * @return true if the initialization went correctly
 		 */
 		bool				    Initialize(RenderSystem_t renderSystem,
-									       Window& window);
+									       Window& window, const RenderParameters_t& renderParameters);
 
 		/**
 		 * Change the clear color
