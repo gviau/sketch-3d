@@ -75,6 +75,8 @@ class RenderTextureDirect3D9  : public RenderTexture {
         IDirect3DDevice9*           device_;    /**< Direct3D9 device */
         IDirect3DSurface9*          depthBufferSurface_;    /**< Surface used to render in depth buffer */
         vector<IDirect3DSurface9*>  attachedSurfaces_;  /**< List of attached textures' surface */
+
+        static int                  numGeneratedTextures_;
 };
 
 }

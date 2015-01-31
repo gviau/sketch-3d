@@ -214,8 +214,9 @@ Texture3D* RenderSystemOpenGL::CreateTexture3D() const {
     return new Texture3DOpenGL;
 }
 
-RenderTexture* RenderSystemOpenGL::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
-    return new RenderTextureOpenGL(width, height, format);
+RenderTexture* RenderSystemOpenGL::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) {
+    renderTextures_.push_back(new RenderTextureOpenGL(width, height, format));
+    return renderTextures_.back();
 }
 
 void RenderSystemOpenGL::BindScreenBuffer() const {

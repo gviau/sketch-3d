@@ -34,7 +34,7 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename);
         virtual Texture2D* CreateTexture2D() const;
         virtual Texture3D* CreateTexture3D() const;
-        virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const;
+        virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format);
         virtual void BindScreenBuffer() const;
         virtual void EnableBlending(bool val) const;
         virtual void SetBlendingEquation(BlendingEquation_t equation) const;

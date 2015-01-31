@@ -1,5 +1,6 @@
 #include "render/Direct3D9/RenderTextureDirect3D9.h"
 
+#include "render/TextureManager.h"
 #include "render/Direct3D9/Texture2DDirect3D9.h"
 
 #include "system/Logger.h"
@@ -8,6 +9,8 @@
 #include <d3dx9.h>
 
 namespace Sketch3D {
+int RenderTextureDirect3D9::numGeneratedTextures_ = 0;
+
 RenderTextureDirect3D9::RenderTextureDirect3D9(IDirect3DDevice9* device, unsigned int width, unsigned int height, TextureFormat_t format) :
     RenderTexture(width, height, format), device_(device), depthBufferSurface_(nullptr)
 {
@@ -83,6 +86,8 @@ Texture2D* RenderTextureDirect3D9::CreateTexture2D() const {
     texture->height_ = height_;
     texture->format_ = format_;
 
+    TextureManager::GetInstance()->CacheTexture("__RenderTexture_Generated_Texture_" + to_string(numGeneratedTextures_++), texture);
+
     return texture;
 }
 
@@ -101,6 +106,8 @@ Texture2D* RenderTextureDirect3D9::CreateDepthBufferTexture() const {
     texture->width_ = width_;
     texture->height_ = height_;
     texture->format_ = TEXTURE_FORMAT_DEPTH;
+
+    TextureManager::GetInstance()->CacheTexture("__RenderTexture_Generated_Texture_" + to_string(numGeneratedTextures_++), texture);
 
     return texture;
 }

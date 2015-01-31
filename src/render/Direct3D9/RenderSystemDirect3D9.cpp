@@ -205,7 +205,7 @@ void RenderSystemDirect3D9::SetCullingMethod(CullingMethod_t cullingMethod) cons
 
 Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename) {
     shaders_.push_back(new ShaderDirect3D9(vertexFilename + ".hlsl", fragmentFilename + ".hlsl", device_));
-    return shaders_[shaders_.size() - 1];
+    return shaders_.back();
 }
 
 Texture2D* RenderSystemDirect3D9::CreateTexture2D() const {
@@ -216,8 +216,9 @@ Texture3D* RenderSystemDirect3D9::CreateTexture3D() const {
     return nullptr;
 }
 
-RenderTexture* RenderSystemDirect3D9::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const {
-    return new RenderTextureDirect3D9(device_, width, height, format);
+RenderTexture* RenderSystemDirect3D9::CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) {
+    renderTextures_.push_back(new RenderTextureDirect3D9(device_, width, height, format));
+    return renderTextures_.back();
 }
 
 void RenderSystemDirect3D9::BindScreenBuffer() const {

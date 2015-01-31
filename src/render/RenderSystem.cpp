@@ -24,6 +24,10 @@ RenderSystem::~RenderSystem() {
         delete shaders_[i];
     }
 
+    for (size_t i = 0; i < renderTextures_.size(); i++) {
+        delete renderTextures_[i];
+    }
+
     delete bufferObjectManager_;
 }
 

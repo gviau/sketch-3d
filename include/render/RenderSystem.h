@@ -186,7 +186,7 @@ class RenderSystem {
          * @param format The format of the render texture
          * @return A pointer to a render texture
          */
-        virtual RenderTexture*              CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) const = 0;
+        virtual RenderTexture*              CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format) = 0;
 
         /**
          * Binds the render system frame buffer that is used to draw on the screen
@@ -252,6 +252,7 @@ class RenderSystem {
 		bool							    windowed_;		/**< Is the window in windowed mode ? */
 
         vector<Shader*>                     shaders_;       /**< List of all shaders created */
+        vector<RenderTexture*>              renderTextures_;/**< List of all render textures created */
 
         DeviceCapabilities_t                deviceCapabilities_;
         BufferObjectManager*                bufferObjectManager_;

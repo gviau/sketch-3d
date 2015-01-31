@@ -70,6 +70,8 @@ class RenderTextureOpenGL : public RenderTexture {
         size_t              framebuffer_; /**< OpenGL's name of the framebuffer */
         size_t              renderbuffer_;    /**< OpenGL's name of the renderbuffer */
         vector<Texture2D*>  textures_;   /**< The textures used to receive the output of the rendering */
+
+        static int          numGeneratedTextures_;
 };
 
 }

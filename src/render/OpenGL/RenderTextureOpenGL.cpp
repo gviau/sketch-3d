@@ -1,12 +1,16 @@
 #include "render/OpenGL/RenderTextureOpenGL.h"
 
 #include "render/Renderer.h"
+#include "render/TextureManager.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
+
 #include "system/Logger.h"
 
 #include "render/OpenGL/gl/glew.h"
 
 namespace Sketch3D {
+
+int RenderTextureOpenGL::numGeneratedTextures_ = 0;
 
 RenderTextureOpenGL::RenderTextureOpenGL(unsigned int width, unsigned int height, TextureFormat_t format) :
         RenderTexture(width, height, format), framebuffer_(0), renderbuffer_(0)
@@ -52,6 +56,8 @@ Texture2D* RenderTextureOpenGL::CreateTexture2D() const {
     texture->SetTextureFormat(format_);
     texture->Create();
 
+    TextureManager::GetInstance()->CacheTexture("__RenderTexture_Generated_Texture_" + to_string(numGeneratedTextures_++), texture);
+
     return texture;
 }
 
@@ -61,6 +67,8 @@ Texture2D* RenderTextureOpenGL::CreateDepthBufferTexture() const {
     texture->SetHeight(height_);
     texture->SetTextureFormat(TEXTURE_FORMAT_DEPTH);
     texture->Create();
+
+    TextureManager::GetInstance()->CacheTexture("__RenderTexture_Generated_Texture_" + to_string(numGeneratedTextures_++), texture);
 
     return texture;
 }
