@@ -5,6 +5,7 @@
 #include "math/Plane.h"
 #include "math/Vector3.h"
 
+#include "render/RenderQueue.h"
 #include "render/SceneTree.h"
 #include "render/Texture.h"
 
@@ -18,6 +19,7 @@ class BufferObjectManager;
 class RenderSystem;
 class RenderTexture;
 class Shader;
+class Sphere;
 class Texture2D;
 class Texture3D;
 class Window;
@@ -102,6 +104,24 @@ enum RenderMode_t {
 	RENDER_MODE_FILL,
 	RENDER_MODE_WIREFRAME,
 	RENDER_MODE_POINT
+};
+
+/**
+ * @struct FrustumPlanes_t
+ * Struct containing the 6 planes of the view frustum
+ */
+struct FrustumPlanes_t {
+    Plane nearPlane;
+    Plane farPlane;
+    Plane leftPlane;
+    Plane rightPlane;
+    Plane bottomPlane;
+    Plane topPlane;
+
+    /**
+     * Returns true if the specified sphere is completely outside the view frustum, false otherwise
+     */
+    bool IsSphereOutside(const Sphere& boundingSphere) const;
 };
 
 /**
@@ -344,6 +364,18 @@ class Renderer {
          */
         void                    BindShader(const Shader* shader);
 
+        /**
+         * Extract the frustum planes from the view projection matrix
+         * @return A FrustumPlanes_t object, containing the 6 view frustum planes
+         */
+        FrustumPlanes_t         ExtractViewFrustumPlanes() const;
+
+        /**
+         * Enable frustum culling of the processed nodes
+         * @param val If true, the culling will be enabled and disabled if false
+         */
+        void                    EnableFrustumCulling(bool bal);
+
 		const Matrix4x4&	    GetProjectionMatrix() const;
 		const Matrix4x4&	    GetViewMatrix() const;
 		const Matrix4x4&	    GetViewProjectionMatrix() const;
@@ -383,6 +415,9 @@ class Renderer {
         TextureUnitNode_t*      head_;                  /**< Head of the double linked list */
         TextureUnitNode_t*      tail_;                  /**< Tail of the double linked list */
         TextureCache_t          textureCache_;          /**< Texture pointers refer directly to a cache element for faster lookup */
+
+        RenderQueue             renderQueue_;           /**< The render queue used for drawing */
+        bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
 
 		/**
 		 * Constructor

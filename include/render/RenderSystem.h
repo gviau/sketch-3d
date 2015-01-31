@@ -18,6 +18,7 @@ namespace Sketch3D {
 
 // Forward declaration
 class BufferObjectManager;
+class RenderQueue;
 class RenderTexture;
 class Shader;
 class Texture2D;
@@ -83,11 +84,6 @@ class RenderSystem {
 		 * Ends the rendering process
 		 */
 		virtual void					    EndRender() = 0;
-
-		/**
-		 * The actual rendering process
-		 */
-		virtual void					    Render() = 0;
 
         /**
          * Presents the drawn frame to the front buffer
@@ -235,6 +231,13 @@ class RenderSystem {
          * @param shader The shader to bind. If set to nullptr, then it will unbind the current shader
          */
         virtual void                        BindShader(const Shader* shader) = 0;
+
+        /**
+         * Extract the frustum planes from the view projection matrix
+         * @param viewProjection The view projection matrix of the view frustum used to extract the planes
+         * @return A FrustumPlanes_t object, containing the 6 view frustum planes
+         */
+        virtual FrustumPlanes_t             ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const = 0;
 
         size_t                              GetWidth() const { return width_; }
         size_t                              GetHeight() const { return height_; }

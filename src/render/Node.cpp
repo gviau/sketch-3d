@@ -79,25 +79,13 @@ void Node::Render() const {
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
-    Matrix4x4 model;
 
     // Setup the transformation matrix for this node
-    model[0][0] = scale_.x;
-    model[1][1] = scale_.y;
-    model[2][2] = scale_.z;
-
-    Matrix4x4 rotation;
-    orientation_.ToRotationMatrix(rotation);
-    model = rotation * model;
-
-    model[0][3] = position_.x;
-    model[1][3] = position_.y;
-    model[2][3] = position_.z;
-
-    // Set the uniform matrices
+    Matrix4x4 model = ConstructModelMatrix();
     Matrix4x4 modelViewProjection(viewProjection * model);
     Matrix4x4 modelView(view * model);
 
+    // Set the uniform matrices
     Renderer::GetInstance()->BindShader(shader);
     shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
     shader->SetUniformMatrix4x4("modelView", modelView);
@@ -211,6 +199,23 @@ void Node::RotateAroundAxis(float angle, const Vector3& axis) {
 	orientation_ = rot * orientation_;
 }
 
+Matrix4x4 Node::ConstructModelMatrix() const {
+    Matrix4x4 model;
+    model[0][0] = scale_.x;
+    model[1][1] = scale_.y;
+    model[2][2] = scale_.z;
+
+    Matrix4x4 rotation;
+    orientation_.ToRotationMatrix(rotation);
+    model = rotation * model;
+
+    model[0][3] = position_.x;
+    model[1][3] = position_.y;
+    model[2][3] = position_.z;
+
+    return model;
+}
+
 void Node::SetParent(Node* parent) {
 	parent_ = parent;
 }
@@ -263,12 +268,31 @@ Material* Node::GetMaterial() const {
 	return material_;
 }
 
-void Node::Render(RenderQueue& renderQueue) const {
-    renderQueue.AddItem(this);
+void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) const {
+    if (mesh_ != nullptr) {
+        bool addMeshToRenderQueue = true;
+
+        if (useFrustumCulling) {
+            float maxScaleValue = max(scale_.x, max(scale_.y, scale_.z));
+            Matrix4x4 model = ConstructModelMatrix();
+
+            const Sphere& meshBoundingSphere = mesh_->GetBoundingSphere();
+            Vector4 transformedCenter = model * meshBoundingSphere.GetCenter();
+            Sphere nodeBoundingSphere(Vector3(transformedCenter.x, transformedCenter.y, transformedCenter.z), meshBoundingSphere.GetRadius() * maxScaleValue);
+
+            if (frustumPlanes.IsSphereOutside(nodeBoundingSphere)) {
+                addMeshToRenderQueue = false;
+            }
+        }
+
+        if (addMeshToRenderQueue) {
+            renderQueue.AddItem(this);
+        }
+    }
 
 	map<string, Node*>::const_iterator it = children_.begin();
 	for (; it != children_.end(); ++it) {
-		it->second->Render(renderQueue);
+		it->second->Render(frustumPlanes, useFrustumCulling, renderQueue);
 	}
 }
 

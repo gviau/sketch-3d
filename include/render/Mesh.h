@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_MESH_H
 #define SKETCH_3D_MESH_H
 
+#include "math/Sphere.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
@@ -145,9 +146,12 @@ class Mesh {
 		 */
         void					GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const;
 
+        const Sphere&           GetBoundingSphere() const;
+
 	protected:
         MeshType_t              meshType_;  /**< The type of the mesh */
         vector<ModelSurface_t>  surfaces_;  /**< List of surfaces for the model */
+        Sphere                  boundingSphere_;    /**< Bounding sphere for the whole mesh */
         string                  filename_;  /**< The name of the file loaded, if we loaded it from a file */
         bool                    fromCache_; /**< Set to true if the model is cached, false otherwise */
         Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
@@ -159,6 +163,8 @@ class Mesh {
          * Free the mesh memory
          */
         virtual void            FreeMeshMemory();
+public:
+        void                    ConstructBoundingSphere();
 };
 
 }

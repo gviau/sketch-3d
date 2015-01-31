@@ -1,6 +1,7 @@
 #include "render/Renderer.h"
 
 #include "math/Constants.h"
+#include "math/Sphere.h"
 
 #include "render/OpenGL/RenderSystemOpenGL.h"
 
@@ -23,7 +24,7 @@ namespace Sketch3D {
 
 Renderer Renderer::instance_;
 
-Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr) {
+Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr), useFrustumCulling_(true) {
 }
 
 Renderer::~Renderer() {
@@ -108,12 +109,16 @@ void Renderer::EndRender() {
 }
 
 void Renderer::Render() {
-	// Render all the nodes in the scene tree. This call prepares the data for
-	// the rendering process.
-	sceneTree_.Render();
+	// Populate the render queue with nodes from the scene tree
+    FrustumPlanes_t frustumPlanes;
+    if (useFrustumCulling_) {
+        frustumPlanes = ExtractViewFrustumPlanes();
+    }
 
-	// The RenderSystem draws what it received from the scene tree.
-	renderSystem_->Render();
+	sceneTree_.Render(frustumPlanes, useFrustumCulling_, renderQueue_);
+
+	// Draw the render queue contents
+    renderQueue_.Render();
 }
 
 void Renderer::PresentFrame() {
@@ -308,6 +313,14 @@ void Renderer::BindShader(const Shader* shader) {
     }
 }
 
+FrustumPlanes_t Renderer::ExtractViewFrustumPlanes() const {
+    return renderSystem_->ExtractViewFrustumPlanes(viewProjection_);
+}
+
+void Renderer::EnableFrustumCulling(bool val) {
+    useFrustumCulling_ = val;
+}
+
 const Matrix4x4& Renderer::GetProjectionMatrix() const {
 	return projection_;
 }
@@ -330,6 +343,15 @@ SceneTree& Renderer::GetSceneTree() {
 
 BufferObjectManager* Renderer::GetBufferObjectManager() const {
     return renderSystem_->GetBufferObjectManager();
+}
+
+bool FrustumPlanes_t::IsSphereOutside(const Sphere& sphere) const {
+    return sphere.IntersectsPlane(nearPlane) == RELATIVE_PLANE_POSITION_OUTSIDE ||
+           sphere.IntersectsPlane(farPlane) == RELATIVE_PLANE_POSITION_OUTSIDE ||
+           sphere.IntersectsPlane(leftPlane) == RELATIVE_PLANE_POSITION_OUTSIDE ||
+           sphere.IntersectsPlane(rightPlane) == RELATIVE_PLANE_POSITION_OUTSIDE ||
+           sphere.IntersectsPlane(bottomPlane) == RELATIVE_PLANE_POSITION_OUTSIDE ||
+           sphere.IntersectsPlane(topPlane) == RELATIVE_PLANE_POSITION_OUTSIDE;
 }
 
 }

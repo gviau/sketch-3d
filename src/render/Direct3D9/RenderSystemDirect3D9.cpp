@@ -73,10 +73,6 @@ void RenderSystemDirect3D9::EndRender() {
     device_->EndScene();
 }
 
-void RenderSystemDirect3D9::Render() {
-
-}
-
 void RenderSystemDirect3D9::PresentFrame() {
     renderContext_->SwapBuffers();
 }
@@ -285,6 +281,42 @@ void RenderSystemDirect3D9::BindShader(const Shader* shader) {
         device_->SetVertexShader(shaderDirect3D9->vertexShader_);
         device_->SetPixelShader(shaderDirect3D9->fragmentShader_);
     }
+}
+
+FrustumPlanes_t RenderSystemDirect3D9::ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const {
+    FrustumPlanes_t frustumPlanes;
+
+    Vector3 nearPlaneNormal(viewProjection[2][0], viewProjection[2][1], viewProjection[2][2]);
+    float nearPlaneLength = nearPlaneNormal.Length();
+    frustumPlanes.nearPlane.SetNormalizedNormal(nearPlaneNormal / nearPlaneLength);
+    frustumPlanes.nearPlane.SetDistance( (viewProjection[3][3] + viewProjection[2][3]) / nearPlaneLength );
+
+    Vector3 farPlaneNormal(viewProjection[3][0] - viewProjection[2][0], viewProjection[3][1] - viewProjection[2][1], viewProjection[3][2] - viewProjection[2][2]);
+    float farPlaneLength = farPlaneNormal.Length();
+    frustumPlanes.farPlane.SetNormalizedNormal(farPlaneNormal / farPlaneLength);
+    frustumPlanes.farPlane.SetDistance( (viewProjection[3][3] - viewProjection[2][3]) / farPlaneLength );
+
+    Vector3 leftPlaneNormal(viewProjection[3][0] + viewProjection[0][0], viewProjection[3][1] + viewProjection[0][1], viewProjection[3][2] + viewProjection[0][2]);
+    float leftPlaneLength = leftPlaneNormal.Length();
+    frustumPlanes.leftPlane.SetNormalizedNormal(leftPlaneNormal / leftPlaneLength);
+    frustumPlanes.leftPlane.SetDistance( (viewProjection[3][3] + viewProjection[0][3]) / leftPlaneLength );
+
+    Vector3 rightPlaneNormal(viewProjection[3][0] - viewProjection[0][0], viewProjection[3][1] - viewProjection[0][1], viewProjection[3][2] - viewProjection[0][2]);
+    float rightPlaneLength = rightPlaneNormal.Length();
+    frustumPlanes.rightPlane.SetNormalizedNormal(rightPlaneNormal / rightPlaneLength);
+    frustumPlanes.rightPlane.SetDistance( (viewProjection[3][3] - viewProjection[0][3]) / rightPlaneLength );
+
+    Vector3 bottomPlaneNormal(viewProjection[3][0] + viewProjection[1][0], viewProjection[3][1] + viewProjection[1][1], viewProjection[3][2] + viewProjection[1][2]);
+    float bottomPlaneLength = bottomPlaneNormal.Length();
+    frustumPlanes.bottomPlane.SetNormalizedNormal(bottomPlaneNormal / bottomPlaneLength);
+    frustumPlanes.bottomPlane.SetDistance( (viewProjection[3][3] + viewProjection[1][3]) / bottomPlaneLength );
+
+    Vector3 topPlaneNormal(viewProjection[3][0] - viewProjection[1][0], viewProjection[3][1] - viewProjection[1][1], viewProjection[3][2] - viewProjection[1][2]);
+    float topPlaneLength = topPlaneNormal.Length();
+    frustumPlanes.topPlane.SetNormalizedNormal(topPlaneNormal / topPlaneLength);
+    frustumPlanes.topPlane.SetDistance( (viewProjection[3][3] - viewProjection[1][3]) / topPlaneLength );
+
+    return frustumPlanes;
 }
 
 unsigned int RenderSystemDirect3D9::GetBlendingFactor(BlendingFactor_t factor) const {

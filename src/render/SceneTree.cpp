@@ -13,13 +13,11 @@ SceneTree::SceneTree() {
 SceneTree::~SceneTree() {
 }
 
-void SceneTree::Render() {
+void SceneTree::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) {
     map<string, Node*>::iterator it = root_.children_.begin();
     for (; it != root_.children_.end(); ++it) {
-        it->second->Render(renderQueue_);
+        it->second->Render(frustumPlanes, useFrustumCulling, renderQueue);
     }
-
-    renderQueue_.Render();
 }
 
 bool SceneTree::AddNode(Node* node) {

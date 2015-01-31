@@ -366,6 +366,8 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
 
         bufferObject->SetIndexData(surfaces_[i].geometry->indices, surfaces_[i].geometry->numIndices);
     }
+
+    ConstructBoundingSphere();
 }
 
 void Mesh::UpdateMeshData() const {
@@ -448,6 +450,10 @@ void Mesh::GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& 
     surfaces = surfaces_;
 }
 
+const Sphere& Mesh::GetBoundingSphere() const {
+    return boundingSphere_;
+}
+
 void Mesh::FreeMeshMemory() {
     delete importer_;
 
@@ -485,6 +491,49 @@ void Mesh::FreeMeshMemory() {
 
         surfaces_.clear();
     }
+}
+
+void Mesh::ConstructBoundingSphere() {
+    Vector3 meanPosition;
+    size_t numberOfVertices = 0;
+
+    Vector3 minX;
+    Vector3 minY;
+    Vector3 minZ;
+    Vector3 maxX;
+    Vector3 maxY;
+    Vector3 maxZ;
+
+    for (size_t i = 0; i < surfaces_.size(); i++) {
+        SurfaceTriangles_t* surface = surfaces_[i].geometry;
+
+        numberOfVertices += surface->numVertices;
+        for (size_t j = 0; j < surface->numVertices; j++) {
+            meanPosition += surface->vertices[j];
+            float x = surface->vertices[j].x;
+            float y = surface->vertices[j].y;
+            float z = surface->vertices[j].z;
+
+            if (x < minX.x) { minX.x = x; minX.y = y; minX.z = z; } else if (x > maxX.x) { maxX.x = x; maxX.y = y; maxX.z = z; }
+            if (y < minY.y) { minY.x = x; minY.y = y; minY.z = z; } else if (y > maxY.y) { maxY.x = x; maxY.y = y; maxY.z = z; }
+            if (z < minZ.z) { minZ.x = x; minZ.y = y; minZ.z = z; } else if (z > maxZ.z) { maxZ.x = x; maxZ.y = y; maxZ.z = z; }
+        }
+    }
+
+    meanPosition /= (float)numberOfVertices;
+
+    float magnitude = 0.0f;
+    float maxMagnitude = 0.0f;
+    magnitude = minX.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+    magnitude = minY.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+    magnitude = minZ.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+
+    magnitude = maxX.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+    magnitude = maxY.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+    magnitude = maxZ.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+
+    boundingSphere_.SetCenter(meanPosition);
+    boundingSphere_.SetRadius(sqrtf(maxMagnitude));
 }
 
 }

@@ -7,6 +7,19 @@
 namespace Sketch3D
 {
 /**
+ * @enum RelativePlanePosition_t
+ * Enum that gives the relative position of an object in regards to the plane:
+ *  - OUTSIDE: The object is on the other side of the plane in regards to its normal
+ *  - INSIDE: The object is on the same side of the plane in regards to its normal
+ *  - INTERSECTS: An intersection occurs with the plane and the object
+ */
+enum RelativePlanePosition_t {
+    RELATIVE_PLANE_POSITION_OUTSIDE,
+    RELATIVE_PLANE_POSITION_INSIDE,
+    RELATIVE_PLANE_POSITION_INTERSECTS
+};
+
+/**
  * @class Plane
  * Represents an infinite plane defined by its normal and its distance from the
  * origin.

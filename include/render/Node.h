@@ -10,8 +10,10 @@
 using namespace std;
 
 namespace Sketch3D {
+// Forward struct declaration
+struct FrustumPlanes_t;
 
-// Forward declaration
+// Forward class declaration
 class Material;
 class Mesh;
 class RenderQueue;
@@ -147,6 +149,11 @@ class Node {
 		 */
 		void				RotateAroundAxis(float angle, const Vector3& axis);
 
+        /** 
+         * Construct the model matrix for this node
+         */
+        Matrix4x4           ConstructModelMatrix() const;
+
 		void				SetParent(Node* parent);
 		void				SetPosition(const Vector3& position);
 		void				SetScale(const Vector3& scale);
@@ -180,9 +187,11 @@ class Node {
 
 		/**
 		 * This function sends the data required for the rendering.
+         * @param frustumPlanes The 6 view frustum planes to cull nodes
+         * @param useFrustumCulling If set to true, the frustum planes will be used to cull this node
          * @param renderQueue The render queue to use for drawing
 		 */
-		void                Render(RenderQueue& renderQueue) const;
+		void                Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) const;
 };
 
 }

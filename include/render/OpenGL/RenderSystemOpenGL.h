@@ -21,7 +21,6 @@ class RenderSystemOpenGL : public RenderSystem {
 		virtual void Clear(int buffer) const;
         virtual void StartRender();
 		virtual void EndRender();
-		virtual void Render();
         virtual void PresentFrame();
         virtual Matrix4x4 OrthoProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
         virtual Matrix4x4 PerspectiveProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
@@ -42,6 +41,7 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
         virtual void BindTexture(const Texture* texture, size_t unit) const;
         virtual void BindShader(const Shader* shader);
+        virtual FrustumPlanes_t ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const;
 
 	private:
 		RenderContextOpenGL*	renderContext_;	/**< The render context to create for OpenGL */

@@ -2,12 +2,16 @@
 #define SKETCH_3D_SCENE_TREE_H
 
 #include "render/Node.h"
-#include "render/RenderQueue.h"
 
 #include <string>
 using namespace std;
 
 namespace Sketch3D {
+// Forward struct declaration
+struct FrustumPlanes_t;
+
+// Forward class declaration
+class RenderQueue;
 
 /**
  * @class SceneTree
@@ -31,11 +35,13 @@ class SceneTree {
 		virtual			   ~SceneTree();
 			
 		/**
-		 * Render all the nodes in the tree. Note that this call doesn't
-		 * immediatly render the nodes on the screen, but it prepares the
-		 * rendering process.
+         * Populate the render queue with nodes. This will cull nodes that aren't in the view frustum and
+         * prepare the data for the actual rendering process
+         * @param frustumPlanes The 6 view frustum planes to cull objects that are not visible by the camera
+         * @param useFrustumCulling If set to true, the frustum planes will be used to cull objects
+		 * @param renderQueue The render queue to populate
 		 */
-		void		        Render();
+		void		        Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue);
 
         /**
          * Add a node to the scene tree. This will add the node directly to the root node
@@ -66,7 +72,6 @@ class SceneTree {
         bool                RemoveNodeByName(const string& name);
 
     private:
-        RenderQueue         renderQueue_;   /**< The render queue used for drawing */
         Node                root_;          /**< The root node of the scene tree */
 };
 
