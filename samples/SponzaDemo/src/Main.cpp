@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window);
     Renderer::GetInstance()->SetClearColor(0.1f, 0.1f, 0.1f);
     Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 500.0f);
+    Renderer::GetInstance()->EnableFrustumCulling(false);
 
     ////////////////////////////////////////////////////////////////////////////
     // Create the GBuffer render texture
