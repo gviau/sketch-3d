@@ -17,6 +17,6 @@ void main() {
 	vec3 B = cross(N, T);
 	mat3 tangentToWorld = mat3(T, B, N);
 
-	norm = tangentToWorld * (texture2D(texture1, uv).rgb * 2.0 - 1.0);
-	albedo = texture2D(texture0, uv).rgb;
+	norm.xyz = tangentToWorld * (texture2D(texture1, uv).rgb * 2.0 - 1.0);
+	albedo.xyz = texture2D(texture0, uv).rgb;
 }

@@ -7,6 +7,6 @@ out vec4 pos;
 out vec4 norm;
 
 void main() {
-	pos = position;
-	norm = normal;
+	pos.xyz = position;
+	norm.xyz = normal;
 }

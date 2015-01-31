@@ -9,6 +9,6 @@ out vec4 norm;
 out vec4 albedo;
 
 void main() {
-	norm = normal;
-	albedo = texture2D(texture0, uv).rgb;
+	norm.xyz = normal;
+	albedo.xyz = texture2D(texture0, uv).rgb;
 }
