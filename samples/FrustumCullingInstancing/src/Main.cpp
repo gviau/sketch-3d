@@ -5,6 +5,7 @@
 #include <render/SceneTree.h>
 #include <render/Shader.h>
 
+#include <system/Logger.h>
 #include <system/Window.h>
 #include <system/WindowEvent.h>
 using namespace Sketch3D;
@@ -28,15 +29,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 int main(int argc, char** argv) {
 #endif
 
-    Window window("Sample_FrustumCullingInstancing", 1024, 768, true);
-    RenderParameters_t renderParameters;
-    renderParameters.width = 1024;
-    renderParameters.height = 768;
-    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
-    renderParameters.refreshRate = 0;
-    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+    ConfigFileAttributes_t configFileAttributes;;
+    if (!ParseConfigFile("init.cfg", configFileAttributes)) {
+        Logger::GetInstance()->Error("Error while reading config file");
+        return 1;
+    }
 
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
+    RenderParameters_t renderParameters;
+    renderParameters.width = configFileAttributes.width;
+    renderParameters.height = configFileAttributes.height;
+    renderParameters.displayFormat = configFileAttributes.displayFormat;
+    renderParameters.depthStencilBits = configFileAttributes.depthStencilBits;
+    renderParameters.refreshRate = configFileAttributes.refreshRate;
+
+    Window window("Sample_FrustumCullingInstancing", renderParameters.width, renderParameters.height, configFileAttributes.windowed);
+    Renderer::GetInstance()->Initialize(configFileAttributes.renderSystem, window, renderParameters);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     VertexAttributesMap_t vertexAttributes;

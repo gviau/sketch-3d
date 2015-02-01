@@ -320,6 +320,12 @@ class Renderer {
 
         RenderQueue             renderQueue_;           /**< The render queue used for drawing */
         bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
+        RenderParameters_t      renderParamters_;       /**< The rendering parameters used when creating the rendering context */
+
+        /**
+         * Initializes some default values
+         */
+        void                    SetDefaultRenderingValues();
 
 		/**
 		 * Constructor

@@ -46,6 +46,8 @@ Renderer* Renderer::GetInstance() {
 bool Renderer::Initialize(RenderSystem_t renderSystem,
 						  Window& window, const RenderParameters_t& renderParameters)
 {
+    renderParamters_ = renderParameters;
+
 	switch (renderSystem) {
 		case RENDER_SYSTEM_OPENGL:
 			renderSystem_ = new RenderSystemOpenGL(window);
@@ -60,34 +62,12 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			break;
 	}
 
-	if (!renderSystem_->Initialize(renderParameters)) {
+	if (!renderSystem_->Initialize(renderParamters_)) {
         Logger::GetInstance()->Error("Couldn't initialize render system properly");
         return false;
     }
 
-    // Some initial values
-    PerspectiveProjection(45.0f, (float)renderParameters.width / (float)renderParameters.height, 1.0f, 1000.0f);
-    CameraLookAt(Vector3::ZERO, Vector3::LOOK);
-
-    SetCullingMethod(CULLING_METHOD_BACK_FACE);
-    EnableDepthTest(true);
-    SetDepthComparisonFunc(DEPTH_FUNC_LESS);
-    SetRenderFillMode(RENDER_MODE_FILL);
-
-    // Construct the texture cache
-    const DeviceCapabilities_t* deviceCapabilities = renderSystem_->GetDeviceCapabilities();
-    head_ = new TextureUnitNode_t;
-    head_->textureUnit = 0;
-    head_->prev = nullptr;
-    tail_ = head_;
-
-    for (int i = 1; i < deviceCapabilities->maxActiveTextures_ + 1; i++) {
-        tail_->next = new TextureUnitNode_t;
-        tail_->next->prev = tail_;
-        tail_ = tail_->next;
-        tail_->textureUnit = i;
-    }
-    tail_->next = nullptr;
+    SetDefaultRenderingValues();
 
     return true;
 }
@@ -343,6 +323,32 @@ SceneTree& Renderer::GetSceneTree() {
 
 BufferObjectManager* Renderer::GetBufferObjectManager() const {
     return renderSystem_->GetBufferObjectManager();
+}
+
+void Renderer::SetDefaultRenderingValues() {
+    // Some initial values
+    PerspectiveProjection(45.0f, (float)renderParamters_.width / (float)renderParamters_.height, 1.0f, 1000.0f);
+    CameraLookAt(Vector3::ZERO, Vector3::LOOK);
+
+    SetCullingMethod(CULLING_METHOD_BACK_FACE);
+    EnableDepthTest(true);
+    SetDepthComparisonFunc(DEPTH_FUNC_LESS);
+    SetRenderFillMode(RENDER_MODE_FILL);
+
+    // Construct the texture cache
+    const DeviceCapabilities_t* deviceCapabilities = renderSystem_->GetDeviceCapabilities();
+    head_ = new TextureUnitNode_t;
+    head_->textureUnit = 0;
+    head_->prev = nullptr;
+    tail_ = head_;
+
+    for (int i = 1; i < deviceCapabilities->maxActiveTextures_ + 1; i++) {
+        tail_->next = new TextureUnitNode_t;
+        tail_->next->prev = tail_;
+        tail_ = tail_->next;
+        tail_->textureUnit = i;
+    }
+    tail_->next = nullptr;
 }
 
 bool FrustumPlanes_t::IsSphereOutside(const Sphere& sphere) const {

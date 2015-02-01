@@ -16,6 +16,7 @@ set(SRC
 	${SRC_PATH}/Node.cpp
 	${SRC_PATH}/RenderContext.cpp
 	${SRC_PATH}/Renderer.cpp
+	${SRC_PATH}/Renderer_Common.cpp
 	${SRC_PATH}/RenderQueue.cpp
 	${SRC_PATH}/RenderQueueItem.cpp
     ${SRC_PATH}/RenderSystem.cpp

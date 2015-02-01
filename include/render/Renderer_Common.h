@@ -156,6 +156,23 @@ struct RenderParameters_t {
     DisplayFormat_t     displayFormat;      /**< Display format for this set of resolution and refresh rate */
     DepthStencilBits_t  depthStencilBits;   /**< Number of depth and stencil bits per pixel */
 };
+
+/**
+ * @struct ConfigFileAttributes_t
+ * This struct is filled by a config file and contains all the necessary information to initialize the engine
+ */
+struct ConfigFileAttributes_t {
+    RenderSystem_t      renderSystem;
+    size_t              width;
+    size_t              height;
+    bool                windowed;
+    size_t              refreshRate;
+    DisplayFormat_t     displayFormat;
+    DepthStencilBits_t  depthStencilBits;
+};
+
+bool ParseConfigFile(const string& filename, ConfigFileAttributes_t& configFileAttributes);
+
 }
 
 #endif
