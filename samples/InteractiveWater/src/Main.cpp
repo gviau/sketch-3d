@@ -153,7 +153,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         // for it to compute the ripples
 
         if (mouse->getMouseState().buttonDown(OIS::MB_Left)) {
-            Vector3 pos = Renderer::GetInstance()->ScreenToWorldPoint(Vector2(mouse->getMouseState().X.abs, mouse->getMouseState().Y.abs));
+            Vector3 pos = Renderer::GetInstance()->ScreenToWorldPoint(Vector2((float)mouse->getMouseState().X.abs, (float)mouse->getMouseState().Y.abs));
 
             // Transform the position into the range [0, 1] so that we can map it as texture coordinates of the water plane
             // Because the water plane ranges from (-1, -1) to (1, 1), the transformation is trivial
@@ -163,8 +163,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
             if (point.x >= 0.0f && point.y >= 0.0f && point.x <= 1.0f && point.y <= 1.0f) {
                 //waterShader->SetUniformVector2("disturbancePoint", pos.x, pos.y);
-                size_t i = min(max(point.x * NUM_VERTICES, 1), NUM_VERTICES - 1);
-                size_t j = min(max(point.y * NUM_VERTICES, 1), NUM_VERTICES - 1);
+                size_t i = (size_t) min(max(point.x * NUM_VERTICES, 1), NUM_VERTICES - 1);
+                size_t j = (size_t)min(max(point.y * NUM_VERTICES, 1), NUM_VERTICES - 1);
                 size_t idx = i * NUM_VERTICES + j;
 
                 buffer[idx].z = splashForce;

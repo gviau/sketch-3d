@@ -275,21 +275,21 @@ int main(int argc, char** argv) {
         }
 
         if (keyboard->isKeyDown(OIS::KC_W) || keyboard->isKeyDown(OIS::KC_UP)) {
-            cameraPosition += Vector3(look.x, 0.0f, look.z) * moveSpeed * dt;
+            cameraPosition += Vector3(look.x, 0.0f, look.z) * moveSpeed * (float)dt;
         } else if (keyboard->isKeyDown(OIS::KC_S) || keyboard->isKeyDown(OIS::KC_DOWN)) {
-            cameraPosition -= Vector3(look.x, 0.0f, look.z)  * moveSpeed * dt;
+            cameraPosition -= Vector3(look.x, 0.0f, look.z)  * moveSpeed * (float)dt;
         }
 
         if (keyboard->isKeyDown(OIS::KC_A) || keyboard->isKeyDown(OIS::KC_LEFT)) {
-            cameraPosition -= Vector3(right.x, 0.0f, right.z)  * moveSpeed * dt;
+            cameraPosition -= Vector3(right.x, 0.0f, right.z)  * moveSpeed * (float)dt;
         } else if (keyboard->isKeyDown(OIS::KC_D) || keyboard->isKeyDown(OIS::KC_RIGHT)) {
-            cameraPosition += Vector3(right.x, 0.0f, right.z)  * moveSpeed * dt;
+            cameraPosition += Vector3(right.x, 0.0f, right.z)  * moveSpeed * (float)dt;
         }
 
         if (keyboard->isKeyDown(OIS::KC_Q)) {
-            cameraPosition.y += moveSpeed * dt;
+            cameraPosition.y += moveSpeed * (float)dt;
         } else if (keyboard->isKeyDown(OIS::KC_E)) {
-            cameraPosition.y -= moveSpeed * dt;
+            cameraPosition.y -= moveSpeed * (float)dt;
         }
 
         static bool debouncer = false;
@@ -319,9 +319,9 @@ int main(int argc, char** argv) {
             float angleY = 0.0f;
             if (x != 0) {
                 if (x > 0) {
-                    angleY = mouseSpeed * dt;
+                    angleY = mouseSpeed * (float)dt;
                 } else if (x < 0) {
-                    angleY = -mouseSpeed * dt;
+                    angleY = -mouseSpeed * (float)dt;
                 }
 
                 Matrix3x3 yaw;
@@ -333,9 +333,9 @@ int main(int argc, char** argv) {
             float angleX = 0.0f;
             if (y != 0) {
                 if (y > 0) {
-                    angleX = mouseSpeed * dt;
+                    angleX = mouseSpeed * (float)dt;
                 } else if (y < 0) {
-                    angleX = -mouseSpeed * dt;
+                    angleX = -mouseSpeed * (float)dt;
                 }
             
                 Matrix3x3 pitch;

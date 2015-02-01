@@ -91,7 +91,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     Renderer::GetInstance()->GetSceneTree().AddNode(&oceanNode_);
 
     // Initialize the FFT specific members
-    log_2_N_ = log(numberOfPoints_) / log(2);
+    log_2_N_ = (size_t)(log(numberOfPoints_) / log(2));
 
     reversed_ = new size_t[numberOfPoints_];
     for (int i = 0; i < numberOfPoints_; i++) {
@@ -270,7 +270,7 @@ float Ocean::Phillips(int i, int j) const {
 
 size_t Ocean::Reverse(int i) const {
     size_t res = 0;
-    for (int j = 0; j < log_2_N_; j++) {
+    for (int j = 0; j < (int)log_2_N_; j++) {
         res = (res << 1) + (i & 1);
         i >>= 1;
     }
@@ -286,7 +286,7 @@ Complex Ocean::ComputeTwiddleFactor(int x, int dimension) const {
 Complex Ocean::ComputeHTilde(double t, int i, int j) const {
     size_t index = i * numberOfPoints_ + j;
 
-    float omegat = Dispersion(i, j) * t;
+    float omegat = Dispersion(i, j) * (float)t;
 
     float cos_ = cosf(omegat);
     float sin_ = sinf(omegat);
@@ -318,7 +318,7 @@ void Ocean::Fft(Complex* input, Complex* output, size_t stride, size_t offset, C
     for (size_t i = 1; i <= log_2_N_; i++) {
         which ^= 1;
 
-        for (size_t j = 0; j < loops; j++) {
+        for (size_t j = 0; j < (size_t)loops; j++) {
             for (size_t k = 0; k < size_over_2; k++) {
                 c[which][size * j + k] = c[which^1][size * j + k] + c[which^1][size * j + size_over_2 + k] * twiddleFactors_[w_][k];
             }

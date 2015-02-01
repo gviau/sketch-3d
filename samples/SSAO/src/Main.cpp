@@ -31,7 +31,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #else
 int main(int argc, char** argv) {
 #endif
-    srand(time(nullptr));
+    srand((size_t)time(nullptr));
     Window window("Sample_SSAO", 1024, 768, true);
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;
@@ -149,8 +149,8 @@ int main(int argc, char** argv) {
     for (int i = 0; i < 16 * 3; i += 3) {
         Vector3 noiseValue(RandomFloat(-1.0f, 1.0f), RandomFloat(-1.0f, 1.0f), 0.0f);
         noiseValue.Normalize();
-        noiseData[i    ] = (noiseValue.x / 2.0f + 0.5f) * 255;
-        noiseData[i + 1] = (noiseValue.y / 2.0f + 0.5f) * 255;
+        noiseData[i    ] = (unsigned char)((noiseValue.x / 2.0f + 0.5f) * 255);
+        noiseData[i + 1] = (unsigned char)((noiseValue.y / 2.0f + 0.5f) * 255);
         noiseData[i + 2] = 0;
     }
     noise->SetPixelDataBytes(noiseData, 4, 4);
