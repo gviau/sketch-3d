@@ -90,11 +90,16 @@ class BufferObject {
          */
         virtual void            AppendIndexData(unsigned short* indexData, size_t numIndex) = 0;
 
+        size_t                  GetId() const;
+
     protected:
         VertexAttributesMap_t   vertexAttributes_;  /**< The vertex attributes to use for the vertex buffer */
         BufferUsage_t           usage_;       /**< The buffer usage */
         size_t                  vertexCount_;
         size_t                  indexCount_;
+        size_t                  id_;
+
+        static size_t           nextAvailableId_;
 };
 
 }

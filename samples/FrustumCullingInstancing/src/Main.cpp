@@ -17,8 +17,8 @@ using namespace std;
 #include <OIS.h>
 #endif
 
-#define NUM_TEAPOTS_X 25
-#define NUM_TEAPOTS_Z 25
+#define NUM_TEAPOTS_X 100
+#define NUM_TEAPOTS_Z 100
 #define NUM_TEAPOTS   NUM_TEAPOTS_X * NUM_TEAPOTS_Z
 
 #if defined(__WIN32__) || defined(_WIN32)

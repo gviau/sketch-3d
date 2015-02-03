@@ -286,7 +286,7 @@ void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, 
         }
 
         if (addMeshToRenderQueue) {
-            renderQueue.AddItem(this);
+            renderQueue.AddNode(this);
         }
     }
 

@@ -25,11 +25,12 @@ class RenderQueue {
                                     RenderQueue();
 
         /**
-         * Adds a render item to the queue
+         * Adds a node to the queue. This will actually add all of SurfaceTriangles_t object of the mesh contained by the node, along with its model
+         * matrix.
          * @param node The node to render
          * @param layer On which layer are we drawing everything. This option might change render state, such as depth testing
          */
-        void                        AddItem(const Node* node, Layer_t layer=LAYER_GAME);
+        void                        AddNode(const Node* node, Layer_t layer=LAYER_GAME);
 
         /**
          * Renders the content of the queue. This invalidates the queue by removing all items in the queue.
@@ -37,7 +38,8 @@ class RenderQueue {
         void                        Render();
 
     private:
-         vector<RenderQueueItem*>   items_; /**< The items in the queue */
+         vector<RenderQueueItem>    items_;         /**< The items in the queue */
+         vector<size_t>             itemsIndex_;    /**< This list is the list that get actually sorted. When can then use temporal coherence to have less things to sort on subsequent frames */
 };
 
 }
