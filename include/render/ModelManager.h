@@ -43,7 +43,8 @@ class ModelManager {
         bool                    CheckIfSkeletonLoaded(const string& filename) const;
 
         /**
-         * Cache the model. This means that it is the responsability of the manager to free the memory
+         * Cache the model. This means that it is the responsability of the manager to free the memory.
+         * The user have to check if the model is already cached or not before calling this function
          * @param filename The name of the mesh file
          * @param model The list of ModelSurface_t objects representing the model
          */
@@ -51,7 +52,7 @@ class ModelManager {
 
         /**
          * Cache the skeleton for the model. This means that it is the responsability of the manager to free the
-         * memory.
+         * memory. The user have to check if the skeleton is already cached or not before calling this function
          * @param filename The name of the mesh file
          * @param skeleton The skeleton of the model
          */
@@ -59,7 +60,7 @@ class ModelManager {
 
         /**
          * Load the model from the cache. This increases a pair mesh counter which tells the manager how
-         * many meshes still have a reference to the model.
+         * many meshes still have a reference to the model. The user have to check if the model is already cached or not before calling this function
          * @param filename The name of the mesh file
          * @return A list of ModelSurface_t objects representing the model
          */
@@ -67,21 +68,22 @@ class ModelManager {
 
         /**
          * Load the skeleton of the model from the cache. This increases a counter which tells the manager how
-         * many times the skeleton have been referenced for that model
+         * many times the skeleton have been referenced for that model. The user have to check if the skeleton is already cached or not before calling this function
          * @param filename The name of the mesh file
          * @return A pointer representing the skeleton of the model
          */
         Skeleton*               LoadSkeletonFromCache(const string& filename);
 
         /**
-         * Remove a reference from the specified cached model. When the reference count reaches 0, the model will be freed
+         * Remove a reference from the specified cached model. When the reference count reaches 0, the model will be freed.
+         * The user have to check if the model is already cached or not before calling this function
          * @param filename The name of the model
          */
         void                    RemoveModelReferenceFromCache(const string& filename);
 
         /**
-         * Remove a reference for the skeleton of the specified cached model. when the reference count reaches 0, the skeleton will
-         * be freed.
+         * Remove a reference for the skeleton of the specified cached model. When the reference count reaches 0, the skeleton will
+         * be freed. The user have to check if the skeleton is already cached or not before calling this function
          * @param filename The name of the model
          */
         void                    RemoveSkeletonReferenceFromCache(const string& filename);

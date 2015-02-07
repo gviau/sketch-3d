@@ -1,6 +1,12 @@
 #include "render/ModelManager.h"
 
+#include "render/Texture2D.h"
+#include "render/TextureManager.h"
+
 #include "system/Logger.h"
+
+#include <set>
+using namespace std;
 
 namespace Sketch3D {
 
@@ -23,7 +29,8 @@ ModelManager::~ModelManager() {
             delete[] model.geometry->bones;
             delete[] model.geometry->weights;
             delete[] model.geometry->indices;
-            delete[] model.geometry->textures;
+
+            // We let the TextureManager take care of freeing the textures pointer
         }
 
         Logger::GetInstance()->Info("Model \"" + m_it->first + "\" freed");
@@ -53,15 +60,11 @@ bool ModelManager::CheckIfSkeletonLoaded(const string& filename) const {
 }
 
 void ModelManager::CacheModel(const string& filename, const vector<ModelSurface_t>& model) {
-    if (!CheckIfModelLoaded(filename)) {
-        cachedModels_[filename] = pair<int, vector<ModelSurface_t>>(1, model);
-    }
+    cachedModels_[filename] = pair<int, vector<ModelSurface_t>>(1, model);
 }
 
 void ModelManager::CacheSkeleton(const string& filename, Skeleton* skeleton) {
-    if (!CheckIfSkeletonLoaded(filename)) {
-        cachedSkeletons_[filename] = pair<int, Skeleton*>(1, skeleton);
-    }
+    cachedSkeletons_[filename] = pair<int, Skeleton*>(1, skeleton);
 }
 
 vector<ModelSurface_t> ModelManager::LoadModelFromCache(const string& filename) {
@@ -80,6 +83,7 @@ void ModelManager::RemoveModelReferenceFromCache(const string& filename) {
     cachedModels_[filename].first -= 1;
     if (cachedModels_[filename].first == 0) {
         vector<ModelSurface_t>& models = cachedModels_[filename].second;
+        set<Texture2D*> texturesToDelete;
 
         for (size_t i = 0; i < models.size(); i++) {
             ModelSurface_t& model = models[i];
@@ -88,7 +92,24 @@ void ModelManager::RemoveModelReferenceFromCache(const string& filename) {
             delete[] model.geometry->texCoords;
             delete[] model.geometry->tangents;
             delete[] model.geometry->indices;
-            delete[] model.geometry->textures;
+
+            for (size_t j = 0; j < model.geometry->numTextures; j++) {
+                Texture2D* texture = model.geometry->textures[j];
+                texturesToDelete.insert(texture);
+            }
+
+            // We let the TextureManager take care of freeing the textures pointer
+        }
+
+        set<Texture2D*>::iterator it = texturesToDelete.begin();
+        for (; it != texturesToDelete.end(); ++it) {
+            Texture2D* texture = *it;
+
+            if (texture != nullptr) {
+                if (TextureManager::GetInstance()->CheckIfTextureLoaded(texture->GetFilename())) {
+                    TextureManager::GetInstance()->RemoveTextureReferenceFromCache(texture->GetFilename());
+                }
+            }
         }
 
         cachedModels_.erase(filename);

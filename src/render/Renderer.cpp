@@ -212,7 +212,7 @@ Texture2D* Renderer::CreateTexture2D() const {
 Texture2D* Renderer::CreateTexture2DFromFile(const string& filename, bool generateMipmaps) const {
     // Check cache first
     if (TextureManager::GetInstance()->CheckIfTextureLoaded(filename)) {
-        return TextureManager::GetInstance()->LoadFromCache(filename);
+        return TextureManager::GetInstance()->LoadTextureFromCache(filename);
     }
 
     Texture2D* texture = renderSystem_->CreateTexture2D();

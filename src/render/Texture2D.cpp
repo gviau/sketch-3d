@@ -34,8 +34,6 @@ Texture2D::Texture2D(unsigned int width, unsigned int height, bool generateMipma
 Texture2D::~Texture2D() {
     if (!fromCache_) {
         free(data_);
-    } else {
-        TextureManager::GetInstance()->RemoveReferenceFromCache(filename_);
     }
 }
 
@@ -47,7 +45,7 @@ bool Texture2D::Load(const string& filename) {
     // Delete last texture if present
     if (data_ != nullptr) {
         if (fromCache_) {
-            TextureManager::GetInstance()->RemoveReferenceFromCache(filename_);
+            TextureManager::GetInstance()->RemoveTextureReferenceFromCache(filename_);
         } else {
             free(data_);
             data_ = nullptr;

@@ -21,6 +21,7 @@
 
 #include <FreeImage.h>
 
+#include <memory>
 #include <queue>
 
 namespace Sketch3D {
@@ -90,7 +91,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
 
                 for (size_t j = 0; j < model.geometry->numTextures; j++) {
                     if (TextureManager::GetInstance()->CheckIfTextureLoaded(model.geometry->textures[j]->GetFilename())) {
-                        TextureManager::GetInstance()->RemoveReferenceFromCache(model.geometry->textures[j]->GetFilename());
+                        TextureManager::GetInstance()->RemoveTextureReferenceFromCache(model.geometry->textures[j]->GetFilename());
                     }
                 }
                 delete[] model.geometry->textures;
@@ -149,6 +150,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
         }
     }
 
+    set<size_t> textureSet;
     queue<const aiNode*> nodes;
     nodes.push(scene->mRootNode);
 
@@ -223,37 +225,79 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
             }
 
             if (scene->HasMaterials()) {
-                const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+                set<size_t>::iterator it = textureSet.find(mesh->mMaterialIndex);
+                if (it == textureSet.end()) {
+                    const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
                 
-                // Get all the textures referenced by the material
-                surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE) +
-                                       material->GetTextureCount(aiTextureType_NORMALS) +
-                                       material->GetTextureCount(aiTextureType_SPECULAR);
-                surface->textures = new Texture2D* [surface->numTextures];
+                    // Get all the textures referenced by the material
+                    surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE) +
+                                           material->GetTextureCount(aiTextureType_NORMALS) +
+                                           material->GetTextureCount(aiTextureType_SPECULAR);
+                    surface->textures = new Texture2D* [surface->numTextures];
+                    vector<string> texturesFilename;
 
-                size_t textureIdx = 0;
-                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
-                    aiString textureName;
-                    material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
+                    size_t textureIdx = 0;
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                    surface->textures[textureIdx++] = texture;
-                }
+                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
+                        surface->textures[textureIdx++] = texture;
 
-                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
-                    aiString textureName;
-                    material->GetTexture(aiTextureType_NORMALS, j, &textureName);
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                    surface->textures[textureIdx++] = texture;
-                }
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_NORMALS, j, &textureName);
 
-                for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
-                    aiString textureName;
-                    material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
+                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
+                        surface->textures[textureIdx++] = texture;
 
-                    Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                    surface->textures[textureIdx++] = texture;
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
+
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
+
+                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
+                        surface->textures[textureIdx++] = texture;
+
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
+
+                    textureSet.insert(mesh->mMaterialIndex);
+                    TextureManager::GetInstance()->CacheTextureSet(texturesFilename, surface->textures);
+                } else {
+                    vector<string> texturesFilename;
+                    const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+                
+                    // Get all the textures referenced by the material
+                    surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE) +
+                                           material->GetTextureCount(aiTextureType_NORMALS) +
+                                           material->GetTextureCount(aiTextureType_SPECULAR);
+
+                    size_t textureIdx = 0;
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
+
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_NORMALS, j, &textureName);
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
+
+                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
+                        aiString textureName;
+                        material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
+                        texturesFilename.push_back(textureName.C_Str());
+                    }
+
+                    surface->textures = TextureManager::GetInstance()->LoadTextureSetFromCache(texturesFilename);
                 }
             }
 
@@ -474,7 +518,7 @@ void Mesh::FreeMeshMemory() {
 
                     if (texture != nullptr) {
                         if (TextureManager::GetInstance()->CheckIfTextureLoaded(texture->GetFilename())) {
-                            TextureManager::GetInstance()->RemoveReferenceFromCache(texture->GetFilename());
+                            TextureManager::GetInstance()->RemoveTextureReferenceFromCache(texture->GetFilename());
                         }
                     }
                 }
