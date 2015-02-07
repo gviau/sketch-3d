@@ -18,14 +18,31 @@ using namespace std;
 namespace Sketch3D {
 
 /**
- * @struct RenderGroup_t
- * Structure containing containing the actual rendering data after sorting the render queue
+ * @enum RenderCommand_t
+ * This enum defines the different rendering command used by the render queue to actually draw
+ * on the screen. The commands are used in an array of commands to sequentially make API calls.
  */
-struct RenderGroup_t {
-    Texture2D**             textures;
-    size_t                  numTextures;
-    set<BufferObject*>      bufferObjects;
-    set<shared_ptr<Matrix4x4>>   transformations;
+enum RenderCommand_t {
+    RENDER_COMMAND_USE_MATERIAL,
+    RENDER_COMMAND_BIND_TEXTURES,
+    RENDER_COMMAND_SET_MODEL_MATRIX,
+    RENDER_COMMAND_RENDER_BUFFER_OBJECTS,
+
+    NUMBER_RENDER_COMMANDS
+};
+
+/**
+ * @struct BindTextures_t
+ * Little struct used to pack information required textures that we have to bind
+ */
+struct BindTextures_t {
+    size_t      numTextures;
+    Texture2D** textures;
+
+    // Required to be used in a set
+    bool operator<(const BindTextures_t& rhs) const {
+        return textures < rhs.textures;
+    }
 };
 
 RenderQueue::RenderQueue() {
@@ -62,115 +79,117 @@ void RenderQueue::Render() {
     // Sort the indices
     stable_sort(itemsIndex_.begin(), itemsIndex_.end(), RenderQueueItemKeyComparator(items_));
 
-    // For group of identical objects, that is if they have the exact same mesh and exact same material so
-    // that we can batch them
-    vector<pair<const Material*, vector<RenderGroup_t>>> renderGroups;
-    map<const Material*, size_t> materialIndexMap;
-    map<const Material*, map<string, size_t>> textureIndexMap;
-    //map<const Material*, map<Texture2D**, map<const Matrix4x4*, size_t>>> transformationIndexMap;
+    vector<pair<RenderCommand_t, void*>> renderCommands;
+    set<BindTextures_t> bindTexturesSet;
+
+    // This array is used to determine when to insert a new render command in the list of render commands
+    void* previousRenderCommands[NUMBER_RENDER_COMMANDS];
+    for (size_t i = 0; i < NUMBER_RENDER_COMMANDS; i++) {
+        previousRenderCommands[i] = nullptr;
+    }
+    bool modelViewMatrixChanged = false;
 
     for (size_t i = 0; i < itemsIndex_.size(); i++) {
         size_t idx = itemsIndex_[i];
         const RenderQueueItem& item = items_[idx];
 
-        map<const Material*, size_t>::iterator m_it = materialIndexMap.find(item.material_);
-        size_t materialIndex = 0;
-        size_t textureIndex = 0;
-
-        string textureGroup;
-        for (size_t i = 0; i < item.numTextures_; i++) {
-            textureGroup += item.textures_[i]->GetId();
+        void* material = static_cast<void*>(item.material_);
+        if (previousRenderCommands[RENDER_COMMAND_USE_MATERIAL] != material) {
+            renderCommands.push_back(pair<RenderCommand_t, void*>(RENDER_COMMAND_USE_MATERIAL, material));
+            previousRenderCommands[RENDER_COMMAND_USE_MATERIAL] = material;
         }
 
-        if (m_it == materialIndexMap.end()) {
-            materialIndexMap[item.material_] = renderGroups.size();
-            materialIndex = materialIndexMap[item.material_];
-            renderGroups.push_back(pair<const Material*, vector<RenderGroup_t>>(item.material_, vector<RenderGroup_t>()));
-
-            textureIndexMap[item.material_][textureGroup] = renderGroups[materialIndex].second.size();
-
-            RenderGroup_t renderGroup;
-            renderGroup.textures = item.textures_;
-            renderGroup.numTextures = item.numTextures_;
-
-            renderGroups[materialIndex].second.push_back(renderGroup);
-        } else {
-            materialIndex = materialIndexMap[item.material_];
+        if (item.numTextures_ > 0) {
+            BindTextures_t bindTextures;
+            bindTextures.numTextures = item.numTextures_;
+            bindTextures.textures = item.textures_;
+            pair<set<BindTextures_t>::iterator, bool> ret = bindTexturesSet.insert(bindTextures);
+        
+            void* textures = static_cast<void*>(const_cast<BindTextures_t*>(&(*(ret.first)))); // Evil stuff to make it work :/
+            if (previousRenderCommands[RENDER_COMMAND_BIND_TEXTURES] != textures) {
+                renderCommands.push_back(pair<RenderCommand_t, void*>(RENDER_COMMAND_BIND_TEXTURES, textures));
+                previousRenderCommands[RENDER_COMMAND_BIND_TEXTURES] = textures;
+            }
         }
 
-        map<string, size_t>::iterator t_it = textureIndexMap[item.material_].find(textureGroup);
-        if (t_it == textureIndexMap[item.material_].end()) {
-            textureIndexMap[item.material_][textureGroup] = renderGroups[materialIndex].second.size();
-            textureIndex = textureIndexMap[item.material_][textureGroup];
-
-            RenderGroup_t renderGroup;
-            renderGroup.textures = item.textures_;
-            renderGroup.numTextures = item.numTextures_;
-            renderGroups[materialIndex].second.push_back(renderGroup);
-        } else {
-            textureIndex = textureIndexMap[item.material_][textureGroup];
+        void* modelMatrix = static_cast<void*>(item.modelMatrix_.get());
+        if (previousRenderCommands[RENDER_COMMAND_SET_MODEL_MATRIX] != modelMatrix) {
+            renderCommands.push_back(pair<RenderCommand_t, void*>(RENDER_COMMAND_SET_MODEL_MATRIX, modelMatrix));
+            previousRenderCommands[RENDER_COMMAND_SET_MODEL_MATRIX] = modelMatrix;
+            modelViewMatrixChanged = true;
         }
 
-        renderGroups[materialIndex].second[textureIndex].transformations.insert(item.modelMatrix_);
-        renderGroups[materialIndex].second[textureIndex].bufferObjects.insert(item.bufferObject_);
+        void* bufferObject = static_cast<void*>(item.bufferObject_);
+        if (modelViewMatrixChanged || previousRenderCommands[RENDER_COMMAND_RENDER_BUFFER_OBJECTS] != bufferObject) {
+            renderCommands.push_back(pair<RenderCommand_t, void*>(RENDER_COMMAND_RENDER_BUFFER_OBJECTS, bufferObject));
+            previousRenderCommands[RENDER_COMMAND_RENDER_BUFFER_OBJECTS] = bufferObject;
+            modelViewMatrixChanged = false;
+        }
     }
+
+    // Execute the commands sequentially
+    const Material* currentMaterial = nullptr;
+    const BindTextures_t* currentTextures = nullptr;
+    const Matrix4x4* currentModelMatrix;
+    BufferObject* currentBufferObject = nullptr;
+    Shader* currentShader = nullptr;
+    const map<string, Texture*>* currentMaterialTextures = nullptr;
+    map<string, Texture*>::const_iterator mt_it;
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
 
-    // Draw the render groups
-    for (size_t i = 0; i < renderGroups.size(); i++) {
-        const pair<const Material*, vector<RenderGroup_t>>& materialRenderGroups = renderGroups[i];
-        const Material* material = materialRenderGroups.first;
-        const vector<RenderGroup_t>& groups = materialRenderGroups.second;
+    for (size_t i = 0; i < renderCommands.size(); i++) {
+        RenderCommand_t renderCommand = renderCommands[i].first;
 
-        // Bind the shader for all following draw calls
-        Shader* shader = material->GetShader();
-        Renderer::GetInstance()->BindShader(shader);
+        switch (renderCommand) {
+            case RENDER_COMMAND_USE_MATERIAL:
+                currentMaterial = static_cast<Material*>(renderCommands[i].second);
+                currentShader = currentMaterial->GetShader();
 
-        shader->SetUniformMatrix4x4("view", view);
+                // Bind the current shader for all the following draw calls
+                Renderer::GetInstance()->BindShader(currentShader);
+                currentShader->SetUniformMatrix4x4("view", view);
 
-        // Material's textures
-        const map<string, Texture*>& materialTextures = material->GetTextures();
-        map<string, Texture*>::const_iterator it = materialTextures.begin();
+                // Material's textures
+                currentMaterialTextures = &(currentMaterial->GetTextures());
+                mt_it = currentMaterialTextures->begin();
 
-        for (; it != materialTextures.end(); ++it) {
-            if (it->second != nullptr) {
-                shader->SetUniformTexture(it->first, it->second);
-            }
-        }
-
-        // For each set of textures
-        for (size_t j = 0; j < groups.size(); j++) {
-            const RenderGroup_t& renderGroup = groups[j];
-
-            for (size_t k = 0; k < renderGroup.numTextures; k++) {
-                Texture2D* texture = renderGroup.textures[k];
-                if (texture != nullptr) {
-                    shader->SetUniformTexture("texture" + to_string(k), texture);
+                for (; mt_it != currentMaterialTextures->end(); ++mt_it) {
+                    if (mt_it->second != nullptr) {
+                        currentShader->SetUniformTexture(mt_it->first, mt_it->second);
+                    }
                 }
-            }
 
-            // For all the different transformation matrices
-            set<shared_ptr<Matrix4x4>>::iterator it = renderGroup.transformations.begin();
-            for (; it != renderGroup.transformations.end(); ++it) {
-                const Matrix4x4& model = *(*it);
+                break;
 
-                // Setup the transformation matrix for this set of buffer objects
-                Matrix4x4 modelViewProjection(viewProjection * model);
-                Matrix4x4 modelView(view * model);
+            case RENDER_COMMAND_BIND_TEXTURES:
+                // Bind the textures for the next sets of buffer objects
+                currentTextures = static_cast<BindTextures_t*>(renderCommands[i].second);
+
+                for (size_t j = 0; j < currentTextures->numTextures; j++) {
+                    Texture2D* texture = currentTextures->textures[j];
+                    if (texture != nullptr) {
+                        currentShader->SetUniformTexture("texture" + to_string(j), texture);
+                    }
+                }
+                break;
+
+            case RENDER_COMMAND_SET_MODEL_MATRIX:
+                // Setup the transformation matrix for the next sets of buffer objects
+                currentModelMatrix = static_cast<Matrix4x4*>(renderCommands[i].second);
 
                 // Set the uniform matrices
-                shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
-                shader->SetUniformMatrix4x4("modelView", modelView);
-                shader->SetUniformMatrix4x4("model", model);
+                currentShader->SetUniformMatrix4x4("modelViewProjection", viewProjection * (*currentModelMatrix));
+                currentShader->SetUniformMatrix4x4("modelView", view * (*currentModelMatrix));
+                currentShader->SetUniformMatrix4x4("model", (*currentModelMatrix));
+                break;
 
-                // Render the BufferObjects
-                set<BufferObject*>::iterator bo_it = renderGroup.bufferObjects.begin();
-                for (; bo_it != renderGroup.bufferObjects.end(); ++bo_it) {
-                    (*bo_it)->Render();
-                }
-            }
+            case RENDER_COMMAND_RENDER_BUFFER_OBJECTS:
+                // Draw a buffer object
+                currentBufferObject = static_cast<BufferObject*>(renderCommands[i].second);
+                currentBufferObject->Render();
+                break;
         }
     }
 
