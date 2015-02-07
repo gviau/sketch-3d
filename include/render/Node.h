@@ -75,7 +75,7 @@ class Node {
         /**
          * Renders the node on the screen
          */
-        void                Render() const;
+        void                Render();
 
 		/**
 		 * Add a node to this node's childrens. The name of the node must not already
@@ -152,7 +152,7 @@ class Node {
         /** 
          * Construct the model matrix for this node
          */
-        Matrix4x4           ConstructModelMatrix() const;
+        Matrix4x4           ConstructModelMatrix();
 
 		void				SetParent(Node* parent);
 		void				SetPosition(const Vector3& position);
@@ -181,6 +181,7 @@ class Node {
 		Quaternion			orientation_;	/**< The orientation of this node */
 
 		Matrix4x4			cachedTransformation_;	/**< The cached matrix transformation */
+        bool                needTransformationUpdate_;
 
 		Mesh*				mesh_; /**< Geometric represention of the node */
 		Material*			material_; /**< The material of the node. It will be applied to the mesh, if any */
@@ -191,7 +192,7 @@ class Node {
          * @param useFrustumCulling If set to true, the frustum planes will be used to cull this node
          * @param renderQueue The render queue to use for drawing
 		 */
-		void                Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) const;
+		void                Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue);
 };
 
 }

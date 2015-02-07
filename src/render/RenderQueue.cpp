@@ -10,6 +10,8 @@
 #include "render/Texture2D.h"
 
 #include <algorithm>
+#include <memory>
+#include <set>
 #include <utility>
 using namespace std;
 
@@ -22,22 +24,23 @@ namespace Sketch3D {
 struct RenderGroup_t {
     Texture2D**             textures;
     size_t                  numTextures;
-    vector<BufferObject*>   bufferObjects;
-    vector<Matrix4x4>       transformations;
+    set<BufferObject*>      bufferObjects;
+    set<shared_ptr<Matrix4x4>>   transformations;
 };
 
 RenderQueue::RenderQueue() {
 }
 
-void RenderQueue::AddNode(const Node* node, Layer_t layer) {
+void RenderQueue::AddNode(Node* node, Layer_t layer) {
     // TODO
     // Got to change the distance from the camera
     BufferObject** bufferObjects;
     vector<ModelSurface_t> surfaces;
     node->GetMesh()->GetRenderInfo(bufferObjects, surfaces);
-    
+    shared_ptr<Matrix4x4> model(new Matrix4x4(node->ConstructModelMatrix()));
+
     for (size_t i = 0; i < surfaces.size(); i++) {
-        items_.push_back(RenderQueueItem(node->ConstructModelMatrix(), node->GetMaterial(), surfaces[i].geometry->textures,
+        items_.push_back(RenderQueueItem(model, node->GetMaterial(), surfaces[i].geometry->textures,
                                          surfaces[i].geometry->numTextures, bufferObjects[i], 0, layer));
 
         if (items_.size() > itemsIndex_.size()) {
@@ -63,7 +66,8 @@ void RenderQueue::Render() {
     // that we can batch them
     vector<pair<const Material*, vector<RenderGroup_t>>> renderGroups;
     map<const Material*, size_t> materialIndexMap;
-    map<const Material*, map<Texture2D**, size_t>> textureIndexMap;
+    map<const Material*, map<string, size_t>> textureIndexMap;
+    //map<const Material*, map<Texture2D**, map<const Matrix4x4*, size_t>>> transformationIndexMap;
 
     for (size_t i = 0; i < itemsIndex_.size(); i++) {
         size_t idx = itemsIndex_[i];
@@ -73,37 +77,42 @@ void RenderQueue::Render() {
         size_t materialIndex = 0;
         size_t textureIndex = 0;
 
+        string textureGroup;
+        for (size_t i = 0; i < item.numTextures_; i++) {
+            textureGroup += item.textures_[i]->GetId();
+        }
+
         if (m_it == materialIndexMap.end()) {
             materialIndexMap[item.material_] = renderGroups.size();
             materialIndex = materialIndexMap[item.material_];
             renderGroups.push_back(pair<const Material*, vector<RenderGroup_t>>(item.material_, vector<RenderGroup_t>()));
-            
-            textureIndexMap[item.material_][item.textures_] = renderGroups[materialIndex].second.size();
+
+            textureIndexMap[item.material_][textureGroup] = renderGroups[materialIndex].second.size();
 
             RenderGroup_t renderGroup;
-            renderGroup.bufferObjects.push_back(item.bufferObject_);
             renderGroup.textures = item.textures_;
             renderGroup.numTextures = item.numTextures_;
+
             renderGroups[materialIndex].second.push_back(renderGroup);
         } else {
             materialIndex = materialIndexMap[item.material_];
         }
 
-        map<Texture2D**, size_t>::iterator t_it = textureIndexMap[item.material_].find(item.textures_);
+        map<string, size_t>::iterator t_it = textureIndexMap[item.material_].find(textureGroup);
         if (t_it == textureIndexMap[item.material_].end()) {
-            textureIndexMap[item.material_][item.textures_] = renderGroups[materialIndex].second.size();
-            textureIndex = textureIndexMap[item.material_][item.textures_];
+            textureIndexMap[item.material_][textureGroup] = renderGroups[materialIndex].second.size();
+            textureIndex = textureIndexMap[item.material_][textureGroup];
 
             RenderGroup_t renderGroup;
-            renderGroup.bufferObjects.push_back(item.bufferObject_);
             renderGroup.textures = item.textures_;
             renderGroup.numTextures = item.numTextures_;
             renderGroups[materialIndex].second.push_back(renderGroup);
         } else {
-            textureIndex = textureIndexMap[item.material_][item.textures_];
+            textureIndex = textureIndexMap[item.material_][textureGroup];
         }
 
-        renderGroups[materialIndex].second[textureIndex].transformations.push_back(item.modelMatrix_);
+        renderGroups[materialIndex].second[textureIndex].transformations.insert(item.modelMatrix_);
+        renderGroups[materialIndex].second[textureIndex].bufferObjects.insert(item.bufferObject_);
     }
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
@@ -119,7 +128,7 @@ void RenderQueue::Render() {
         Shader* shader = material->GetShader();
         Renderer::GetInstance()->BindShader(shader);
 
-        shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
+        shader->SetUniformMatrix4x4("view", view);
 
         // Material's textures
         const map<string, Texture*>& materialTextures = material->GetTextures();
@@ -142,11 +151,12 @@ void RenderQueue::Render() {
                 }
             }
 
-            // For all different transformations applying to the same buffer object
-            for (size_t k = 0; k < renderGroup.transformations.size(); k++) {
-                const Matrix4x4& model = renderGroup.transformations[k];
+            // For all the different transformation matrices
+            set<shared_ptr<Matrix4x4>>::iterator it = renderGroup.transformations.begin();
+            for (; it != renderGroup.transformations.end(); ++it) {
+                const Matrix4x4& model = *(*it);
 
-                // Setup the transformation matrix for this node
+                // Setup the transformation matrix for this set of buffer objects
                 Matrix4x4 modelViewProjection(viewProjection * model);
                 Matrix4x4 modelView(view * model);
 
@@ -156,15 +166,17 @@ void RenderQueue::Render() {
                 shader->SetUniformMatrix4x4("model", model);
 
                 // Render the BufferObjects
-                for (size_t l = 0; l < renderGroup.bufferObjects.size(); l++) {
-                    renderGroup.bufferObjects[l]->Render();
+                set<BufferObject*>::iterator bo_it = renderGroup.bufferObjects.begin();
+                for (; bo_it != renderGroup.bufferObjects.end(); ++bo_it) {
+                    (*bo_it)->Render();
                 }
             }
         }
     }
 
-    // Invalidate the render queue
+    // Invalidate the render queue and approximate the next batch's size
     items_.clear();
+    items_.reserve(itemsIndex_.size());
 }
 
 }

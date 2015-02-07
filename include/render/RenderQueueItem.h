@@ -6,6 +6,7 @@
 #include "math/Matrix4x4.h"
 
 #include <map>
+#include <memory>
 #include <stdint.h>
 #include <string>
 #include <utility>
@@ -67,7 +68,7 @@ class RenderQueueItem {
          * A distance of 0 means on the near plane and a distance corresponding to the maximum value of a unsigned 32 btis word means on the far plane.
          * @param layer On which layer are we drawing everything. This option might change render state, such as depth testing
          */
-                            RenderQueueItem(const Matrix4x4& modelMatrix, Material* material, Texture2D** textures,
+                            RenderQueueItem(shared_ptr<Matrix4x4> modelMatrix, Material* material, Texture2D** textures,
                                             size_t numTextures, BufferObject* bufferObject, uint32_t distanceFromCamera, Layer_t layer=LAYER_GAME);
 
         /**
@@ -83,7 +84,7 @@ class RenderQueueItem {
         uint32_t            distanceFromCamera_;
         int                 materialId_;
 
-        Matrix4x4           modelMatrix_;       /**< The model matrix to use to position the sub-mesh */
+        shared_ptr<Matrix4x4>   modelMatrix_;       /**< The model matrix to use to position the sub-mesh */
         Material*           material_;          /**< The material to use to draw the sub-mesh */
         Texture2D**         textures_;          /**< The textures to use on this sub-mesh */
         size_t              numTextures_;       /**< The number of textures to use on this sub-mesh */

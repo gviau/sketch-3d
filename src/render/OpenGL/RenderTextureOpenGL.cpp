@@ -181,7 +181,7 @@ void RenderTextureOpenGL::Bind() const {
         glDrawBuffers(numBuffers, buffers);
         delete[] buffers;
 
-        glViewport(0, 0, width_, height_);
+        Renderer::GetInstance()->SetViewport(0, 0, width_, height_);
     }
 }
 

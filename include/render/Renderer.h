@@ -322,6 +322,12 @@ class Renderer {
         bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
         RenderParameters_t      renderParamters_;       /**< The rendering parameters used when creating the rendering context */
 
+        // Old viewport data
+        size_t                  oldViewportX_;
+        size_t                  oldViewportY_;
+        size_t                  oldViewportWidth_;
+        size_t                  oldViewportHeight_;
+
         /**
          * Initializes some default values
          */

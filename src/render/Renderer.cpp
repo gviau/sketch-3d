@@ -24,7 +24,9 @@ namespace Sketch3D {
 
 Renderer Renderer::instance_;
 
-Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr), useFrustumCulling_(true) {
+Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr), useFrustumCulling_(true), oldViewportX_(0),
+                       oldViewportY_(0), oldViewportWidth_(0), oldViewportHeight_(0)
+{
 }
 
 Renderer::~Renderer() {
@@ -169,7 +171,14 @@ void Renderer::SetRenderFillMode(RenderMode_t mode) const {
 }
 
 void Renderer::SetViewport(size_t x, size_t y, size_t width, size_t height) {
-    renderSystem_->SetViewport(x, y, width, height);
+    if (x != oldViewportX_ || y != oldViewportY_ || width != oldViewportWidth_ || height != oldViewportHeight_) {
+        renderSystem_->SetViewport(x, y, width, height);
+
+        oldViewportX_ = x;
+        oldViewportY_ = y;
+        oldViewportWidth_ = width;
+        oldViewportHeight_ = height;
+    }
 }
 
 void Renderer::EnableDepthTest(bool val) const {

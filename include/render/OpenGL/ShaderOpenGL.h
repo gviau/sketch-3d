@@ -5,7 +5,9 @@
 
 #include "gl/glew.h"
 
+#include <hash_map>
 #include <map>
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -34,10 +36,11 @@ class ShaderOpenGL : public Shader {
 		virtual bool SetUniformTexture(const string& uniform, const Texture* texture);
 
 	private:
-        GLuint              vertex_;    /**< Represents the vertex shader */
-        GLuint              fragment_;  /**< Represents the fragment shader */
-		GLuint				program_;	/**< Represents the shader program */
-		map<GLint, GLuint>	textures_;	/**< Allows the shader to map textures to its different texture units */
+        GLuint                      vertex_;    /**< Represents the vertex shader */
+        GLuint                      fragment_;  /**< Represents the fragment shader */
+		GLuint				        program_;	/**< Represents the shader program */
+		map<GLint, GLuint>	        textures_;	/**< Allows the shader to map textures to its different texture units */
+        hash_map<string, GLuint>    nameToUniforms_;    /**< Map of uniform names to location */
 
 		/**
 		 * Read the shader file and output a string to pass to the GLSL

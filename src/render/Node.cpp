@@ -17,7 +17,7 @@ namespace Sketch3D {
 long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
-						   scale_(1.0f, 1.0f, 1.0)
+						   scale_(1.0f, 1.0f, 1.0), needTransformationUpdate_(true)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -27,7 +27,7 @@ Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
 
 Node::Node(const string& name, Node* parent) : name_(name), parent_(parent),
 											   mesh_(NULL), material_(NULL),
-											   scale_(1.0f, 1.0f, 1.0f)
+											   scale_(1.0f, 1.0f, 1.0f), needTransformationUpdate_(true)
 {
 }
 
@@ -37,7 +37,8 @@ Node::Node(const Vector3& position, const Vector3& scale,
 														  scale_(scale),
 														  orientation_(orientation),
 														  mesh_(NULL),
-														  material_(NULL)
+														  material_(NULL),
+                                                          needTransformationUpdate_(true)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -52,7 +53,8 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 														  scale_(scale),
 														  orientation_(orientation),
 														  mesh_(NULL),
-														  material_(NULL)
+														  material_(NULL),
+                                                          needTransformationUpdate_(true)
 {
 }
 
@@ -60,7 +62,8 @@ Node::Node(const Node& src) : parent_(src.parent_),
                               position_(src.position_),
                               scale_(src.scale_),
                               orientation_(src.orientation_),
-                              material_(src.material_)
+                              material_(src.material_),
+                              needTransformationUpdate_(true)
 {
     // TODO
     // Better manage name copy
@@ -74,14 +77,14 @@ Node::Node(const Node& src) : parent_(src.parent_),
 Node::~Node() {
 }
 
-void Node::Render() const {
+void Node::Render() {
 	Shader* shader = material_->GetShader();
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
 
     // Setup the transformation matrix for this node
-    Matrix4x4 model = ConstructModelMatrix();
+    const Matrix4x4& model = ConstructModelMatrix();
     Matrix4x4 modelViewProjection(viewProjection * model);
     Matrix4x4 modelView(view * model);
 
@@ -172,12 +175,14 @@ bool Node::RemoveChildren(const Node* const node) {
 
 void Node::Translate(const Vector3& translation) {
 	position_ += translation;
+    needTransformationUpdate_ = true;
 }
 
 void Node::Scale(const Vector3& scale) {
 	scale_.x *= scale.x;
 	scale_.y *= scale.y;
 	scale_.z *= scale.z;
+    needTransformationUpdate_ = true;
 }
 
 void Node::Pitch(float angle) {
@@ -197,23 +202,29 @@ void Node::RotateAroundAxis(float angle, const Vector3& axis) {
 	rot.MakeFromAngleAxis(angle, axis);
 	rot.Normalize();
 	orientation_ = rot * orientation_;
+    needTransformationUpdate_ = true;
 }
 
-Matrix4x4 Node::ConstructModelMatrix() const {
-    Matrix4x4 model;
-    model[0][0] = scale_.x;
-    model[1][1] = scale_.y;
-    model[2][2] = scale_.z;
+Matrix4x4 Node::ConstructModelMatrix() {
+    if (needTransformationUpdate_) {
+        Matrix4x4 model;
+        model[0][0] = scale_.x;
+        model[1][1] = scale_.y;
+        model[2][2] = scale_.z;
 
-    Matrix4x4 rotation;
-    orientation_.ToRotationMatrix(rotation);
-    model = rotation * model;
+        Matrix4x4 rotation;
+        orientation_.ToRotationMatrix(rotation);
+        model = rotation * model;
 
-    model[0][3] = position_.x;
-    model[1][3] = position_.y;
-    model[2][3] = position_.z;
+        model[0][3] = position_.x;
+        model[1][3] = position_.y;
+        model[2][3] = position_.z;
 
-    return model;
+        needTransformationUpdate_ = false;
+        cachedTransformation_ = model;
+    }
+
+    return cachedTransformation_;
 }
 
 void Node::SetParent(Node* parent) {
@@ -222,14 +233,17 @@ void Node::SetParent(Node* parent) {
 
 void Node::SetPosition(const Vector3& position) {
 	position_ = position;
+    needTransformationUpdate_ = true;
 }
 
 void Node::SetScale(const Vector3& scale) {
 	scale_ = scale;
+    needTransformationUpdate_ = true;
 }
 
 void Node::SetOrientation(const Quaternion& orientation) {
 	orientation_ = orientation;
+    needTransformationUpdate_ = true;
 }
 
 void Node::SetMesh(Mesh* mesh) {
@@ -268,13 +282,13 @@ Material* Node::GetMaterial() const {
 	return material_;
 }
 
-void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) const {
+void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) {
     if (mesh_ != nullptr) {
         bool addMeshToRenderQueue = true;
 
         if (useFrustumCulling) {
             float maxScaleValue = max(scale_.x, max(scale_.y, scale_.z));
-            Matrix4x4 model = ConstructModelMatrix();
+            const Matrix4x4& model = ConstructModelMatrix();
 
             const Sphere& meshBoundingSphere = mesh_->GetBoundingSphere();
             Vector4 transformedCenter = model * meshBoundingSphere.GetCenter();

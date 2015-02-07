@@ -221,7 +221,7 @@ RenderTexture* RenderSystemOpenGL::CreateRenderTexture(unsigned int width, unsig
 
 void RenderSystemOpenGL::BindScreenBuffer() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, width_, height_);
+    Renderer::GetInstance()->SetViewport(0, 0, width_, height_);
 }
 
 void RenderSystemOpenGL::EnableBlending(bool val) const {
