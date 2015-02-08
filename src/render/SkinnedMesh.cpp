@@ -563,4 +563,11 @@ void SkinnedMesh::FreeMeshMemory() {
     }
 }
 
+void SkinnedMesh::ConstructBoundingSphere() {
+    // For skinned mesh, apply an arbitrary scale. It is assumed that the animation will never be more than 3 times
+    // larger than bind pose
+    Mesh::ConstructBoundingSphere();
+    boundingSphere_.SetRadius(boundingSphere_.GetRadius() * 3.0f);
+}
+
 }

@@ -111,6 +111,7 @@ class SkinnedMesh : public Mesh {
          * Free the mesh memory
          */
         virtual void                    FreeMeshMemory();
+        virtual void                    ConstructBoundingSphere();
 };
 
 }

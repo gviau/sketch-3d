@@ -168,8 +168,7 @@ class Mesh {
          * Free the mesh memory
          */
         virtual void            FreeMeshMemory();
-public:
-        void                    ConstructBoundingSphere();
+        virtual void            ConstructBoundingSphere();
 };
 
 }
