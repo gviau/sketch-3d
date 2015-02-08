@@ -544,46 +544,56 @@ void Mesh::FreeMeshMemory() {
 }
 
 void Mesh::ConstructBoundingSphere() {
-    Vector3 meanPosition;
-    size_t numberOfVertices = 0;
-
-    Vector3 minX;
-    Vector3 minY;
-    Vector3 minZ;
-    Vector3 maxX;
-    Vector3 maxY;
-    Vector3 maxZ;
+    vector<Vector3> vertices;
+    size_t size = 0;
+    for (size_t i = 0; i < surfaces_.size(); i++) {
+        size += surfaces_[i].geometry->numVertices;
+    }
+    vertices.reserve(size);
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
         SurfaceTriangles_t* surface = surfaces_[i].geometry;
 
-        numberOfVertices += surface->numVertices;
         for (size_t j = 0; j < surface->numVertices; j++) {
-            meanPosition += surface->vertices[j];
-            float x = surface->vertices[j].x;
-            float y = surface->vertices[j].y;
-            float z = surface->vertices[j].z;
-
-            if (x < minX.x) { minX.x = x; minX.y = y; minX.z = z; } else if (x > maxX.x) { maxX.x = x; maxX.y = y; maxX.z = z; }
-            if (y < minY.y) { minY.x = x; minY.y = y; minY.z = z; } else if (y > maxY.y) { maxY.x = x; maxY.y = y; maxY.z = z; }
-            if (z < minZ.z) { minZ.x = x; minZ.y = y; minZ.z = z; } else if (z > maxZ.z) { maxZ.x = x; maxZ.y = y; maxZ.z = z; }
+            vertices.push_back(surface->vertices[j]);
         }
     }
 
-    meanPosition /= (float)numberOfVertices;
+    // From http://stackoverflow.com/questions/17331203/bouncing-bubble-algorithm-for-smallest-enclosing-sphere
+    // Original algorithm is from Bo Tian
+    Vector3 center = vertices[0];
+    float radius = 0.0001f;
+    Vector3 pos, diff;
+    float length, alpha, alphaSq;
 
-    float magnitude = 0.0f;
-    float maxMagnitude = 0.0f;
-    magnitude = minX.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
-    magnitude = minY.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
-    magnitude = minZ.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+    for (size_t i = 0; i < 2; i++) {
+        for (size_t j = 0; j < vertices.size(); j++) {
+            pos = vertices[j];
+            diff = pos - center;
+            length = diff.Length();
 
-    magnitude = maxX.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
-    magnitude = maxY.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
-    magnitude = maxZ.Dot(minX); if (magnitude > maxMagnitude) { maxMagnitude = magnitude; }
+            if (length > radius) {
+                alpha = length / radius;
+                alphaSq = alpha * alpha;
+                radius = 0.5f * (alpha + 1.0f / alpha) * radius;
+                center = 0.5f * ((1.0f + 1.0f / alphaSq) * center + (1.0f - 1.0f / alphaSq) * pos);
+            }
+        }
+    }
 
-    boundingSphere_.SetCenter(meanPosition);
-    boundingSphere_.SetRadius(sqrtf(maxMagnitude));
+    for (size_t i = 0; i < vertices.size(); i++) {
+        pos = vertices[i];
+        diff = pos - center;
+        length = diff.Length();
+
+        if (length > radius) {
+            radius = (radius + length) / 2.0f;
+            center = center + ((length - radius) / length * diff);
+        }
+    }
+
+    boundingSphere_.SetCenter(center);
+    boundingSphere_.SetRadius(radius);
 }
 
 }
