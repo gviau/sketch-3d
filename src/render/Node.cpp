@@ -102,7 +102,7 @@ void Node::Render() {
 
     // Get the rendering data
     BufferObject** bufferObjects;
-    vector<ModelSurface_t> surfaces;
+    vector<SurfaceTriangles_t*> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
     // Material's textures
@@ -118,8 +118,8 @@ void Node::Render() {
     // Render the mesh
     for (size_t i = 0; i < surfaces.size(); i++) {
         // Textures associated with the surface
-        for (size_t j = 0; j < surfaces[i].geometry->numTextures; j++) {
-            Texture2D* texture = surfaces[i].geometry->textures[j];
+        for (size_t j = 0; j < surfaces[i]->numTextures; j++) {
+            Texture2D* texture = surfaces[i]->textures[j];
             if (texture != nullptr) {
                 shader->SetUniformTexture("texture" + to_string(j), texture);
             }

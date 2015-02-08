@@ -55,11 +55,8 @@ int main(int argc, char** argv) {
     surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
     surface.indices[0] = 0; surface.indices[1] = 3; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 1;
 
-    ModelSurface_t surfaceTriangles;
-    surfaceTriangles.geometry = &surface;
-
     Mesh fullscreenQuadMesh;
-    fullscreenQuadMesh.AddSurface(surfaceTriangles);
+    fullscreenQuadMesh.AddSurface(&surface);
     
     VertexAttributesMap_t fullscreenQuadVertexAttributes;
     fullscreenQuadVertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;

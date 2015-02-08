@@ -49,10 +49,8 @@ int main(int argc, char** argv) {
     surface.texCoords[0] = Vector2(0.0f, 0.0f); surface.texCoords[1] = Vector2(0.0f, 1.0f); surface.texCoords[2] = Vector2(1.0f, 1.0f); surface.texCoords[3] = Vector2(1.0f, 0.0f);
     surface.indices[0] = 0; surface.indices[1] = 2; surface.indices[2] = 1; surface.indices[3] = 0; surface.indices[4] = 3; surface.indices[5] = 2;
 
-    ModelSurface_t model;
-    model.geometry = &surface;
     Mesh paperMesh;
-    paperMesh.AddSurface(model);
+    paperMesh.AddSurface(&surface);
 
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;

@@ -17,30 +17,30 @@ namespace Sketch3D {
  * This class acts as a cache for loaded models
  */
 class ModelManager {
-    typedef map<string, pair<int, vector<ModelSurface_t>>> ModelCacheMap_t;
+    typedef map<string, pair<int, vector<SurfaceTriangles_t*>>> ModelCacheMap_t;
     typedef map<string, pair<int, Skeleton*>> SkeletonCacheMap_t;
 
     public:
         /**
          * Destructor
          */
-                               ~ModelManager();
+                                   ~ModelManager();
 
-        static ModelManager*    GetInstance();
+        static ModelManager*        GetInstance();
 
         /**
          * Checks if the model is already loaded
          * @param filename The name of the mesh file
          * @return true if the model is already loaded, false otherwise
          */
-        bool                    CheckIfModelLoaded(const string& filename) const;
+        bool                        CheckIfModelLoaded(const string& filename) const;
 
         /**
          * Checks if the skeleton for the model is already loaded
          * @param filename The name of the mesh file
          * @return true if the skeleton for that model is already loaded, false otherwise
          */
-        bool                    CheckIfSkeletonLoaded(const string& filename) const;
+        bool                        CheckIfSkeletonLoaded(const string& filename) const;
 
         /**
          * Cache the model. This means that it is the responsability of the manager to free the memory.
@@ -48,7 +48,7 @@ class ModelManager {
          * @param filename The name of the mesh file
          * @param model The list of ModelSurface_t objects representing the model
          */
-        void                    CacheModel(const string& filename, const vector<ModelSurface_t>& model);
+        void                        CacheModel(const string& filename, const vector<SurfaceTriangles_t*>& model);
 
         /**
          * Cache the skeleton for the model. This means that it is the responsability of the manager to free the
@@ -56,7 +56,7 @@ class ModelManager {
          * @param filename The name of the mesh file
          * @param skeleton The skeleton of the model
          */
-        void                    CacheSkeleton(const string& filename, Skeleton* bones);
+        void                        CacheSkeleton(const string& filename, Skeleton* bones);
 
         /**
          * Load the model from the cache. This increases a pair mesh counter which tells the manager how
@@ -64,7 +64,7 @@ class ModelManager {
          * @param filename The name of the mesh file
          * @return A list of ModelSurface_t objects representing the model
          */
-        vector<ModelSurface_t>  LoadModelFromCache(const string& filename);
+        vector<SurfaceTriangles_t*> LoadModelFromCache(const string& filename);
 
         /**
          * Load the skeleton of the model from the cache. This increases a counter which tells the manager how
@@ -72,35 +72,35 @@ class ModelManager {
          * @param filename The name of the mesh file
          * @return A pointer representing the skeleton of the model
          */
-        Skeleton*               LoadSkeletonFromCache(const string& filename);
+        Skeleton*                   LoadSkeletonFromCache(const string& filename);
 
         /**
          * Remove a reference from the specified cached model. When the reference count reaches 0, the model will be freed.
          * The user have to check if the model is already cached or not before calling this function
          * @param filename The name of the model
          */
-        void                    RemoveModelReferenceFromCache(const string& filename);
+        void                        RemoveModelReferenceFromCache(const string& filename);
 
         /**
          * Remove a reference for the skeleton of the specified cached model. When the reference count reaches 0, the skeleton will
          * be freed. The user have to check if the skeleton is already cached or not before calling this function
          * @param filename The name of the model
          */
-        void                    RemoveSkeletonReferenceFromCache(const string& filename);
+        void                        RemoveSkeletonReferenceFromCache(const string& filename);
 
     private:
-        static ModelManager     instance_;      /**< Singleton's instance */
-        ModelCacheMap_t         cachedModels_;  /**< Cached models for faster loading and reuse of data */
-        SkeletonCacheMap_t      cachedSkeletons_;   /**< Cached skeletons for the models */
+        static ModelManager         instance_;      /**< Singleton's instance */
+        ModelCacheMap_t             cachedModels_;  /**< Cached models for faster loading and reuse of data */
+        SkeletonCacheMap_t          cachedSkeletons_;   /**< Cached skeletons for the models */
 
         /**
          * Constructor
          */
-                                ModelManager();
+                                    ModelManager();
 
         // Disallow copy and assignation
-                                ModelManager(ModelManager& src);
-        ModelManager&           operator= (ModelManager& rhs);
+                                    ModelManager(ModelManager& src);
+        ModelManager&               operator= (ModelManager& rhs);
 };
 
 }

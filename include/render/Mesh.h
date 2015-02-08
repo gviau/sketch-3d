@@ -53,16 +53,6 @@ struct SurfaceTriangles_t {
 };
 
 /**
- * @struct ModelSurface_t
- * Struct representing a surface geometry data paired with a material
- */
-struct ModelSurface_t {
-    int                 id;
-    const Material*     material;
-    SurfaceTriangles_t* geometry;
-};
-
-/**
  * @enum MeshType_t
  * The type of mesh that will be rendered, static or dynamic
  */
@@ -82,7 +72,7 @@ class Mesh {
          * Constructor. Initialize everything to 0
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          */
-                                Mesh(MeshType_t meshType=MESH_TYPE_STATIC);
+                                    Mesh(MeshType_t meshType=MESH_TYPE_STATIC);
 
 		/**
 		 * Constructor. Read a mesh from a file and load the data in memory
@@ -92,25 +82,25 @@ class Mesh {
          * @param meshType The type of the mesh. Static means that its data will not be updated, dynamic means that it can be
          * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
 		 */
-                                Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
-                                     MeshType_t meshType=MESH_TYPE_STATIC, bool counterClockWise=true);
+                                    Mesh(const string& filename, const VertexAttributesMap_t& vertexAttributes,
+                                         MeshType_t meshType=MESH_TYPE_STATIC, bool counterClockWise=true);
 
         /**
          * Copy constructor
          * @param src The mesh to copy
          */
-                                Mesh(const Mesh& mesh);
+                                    Mesh(const Mesh& mesh);
 
         /**
          * Destructor - release the buffer objects
          */
-        virtual                ~Mesh();
+        virtual                    ~Mesh();
 
         /**
          * Assignment operator
          * @param rhs The mesh to assign
          */
-        Mesh&                   operator= (const Mesh& mesh);
+        Mesh&                       operator= (const Mesh& mesh);
 
         /**
          * Load the model from a file
@@ -119,56 +109,56 @@ class Mesh {
          * key is the vertex attributes and the value is its attribute location.
          * @param counterClockWise Is the data loaded in counter clock wise order or clock wise?
          */
-        virtual void            Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise=true);
+        virtual void                Load(const string& filename, const VertexAttributesMap_t& vertexAttributes, bool counterClockWise=true);
 
         /**
-         * Add a model surface to the mesh
-         * @param modelSurface The model surface to add
+         * Add a surface to the mesh. It is the responsability of the user to manager the memory of the SurfaceTriangles_t, but not its content.
+         * @param surface The surface to add
          */
-        void                    AddSurface(const ModelSurface_t& surface);
+        void                        AddSurface(SurfaceTriangles_t* surface);
 
         /**
          * Initialize the mesh with geometry data
          * @param vertexAttributes A map of the vertex attributes to use. Each entry is a pair<VertexAttributes_t, size_t> where the
          * key is the vertex attributes and the value is its attribute location.
          */
-        virtual void            Initialize(const VertexAttributesMap_t& vertexAttributes);
+        virtual void                Initialize(const VertexAttributesMap_t& vertexAttributes);
 
         /**
          * If the mesh is a dynamic mesh, re-uploads the mesh data
          */
-        virtual void            UpdateMeshData() const;
+        virtual void                UpdateMeshData() const;
 
         /**
          * Prepare the mesh for instanced rendering by allocating additional buffers
          */
-        virtual void            PrepareInstancingData();
+        virtual void                PrepareInstancingData();
 
 		/**
 		 * Get the rendering information about the mesh for rendering
          * @param bufferObjects A pointer to the buffer objects
          * @param surfaces The list of surfaces
 		 */
-        void					GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const;
+        void					    GetRenderInfo(BufferObject**& bufferObjects, vector<SurfaceTriangles_t*>& surfaces) const;
 
-        const Sphere&           GetBoundingSphere() const;
+        const Sphere&               GetBoundingSphere() const;
 
 	protected:
-        MeshType_t              meshType_;  /**< The type of the mesh */
-        vector<ModelSurface_t>  surfaces_;  /**< List of surfaces for the model */
-        Sphere                  boundingSphere_;    /**< Bounding sphere for the whole mesh */
-        string                  filename_;  /**< The name of the file loaded, if we loaded it from a file */
-        bool                    fromCache_; /**< Set to true if the model is cached, false otherwise */
-        Assimp::Importer*       importer_;  /**< Importer used to load a model from a file */
-        VertexAttributesMap_t   vertexAttributes_;  /**< Vertex attributes used by the mesh */
+        MeshType_t                  meshType_;  /**< The type of the mesh */
+        vector<SurfaceTriangles_t*> surfaces_;  /**< List of surfaces for the model */
+        Sphere                      boundingSphere_;    /**< Bounding sphere for the whole mesh */
+        string                      filename_;  /**< The name of the file loaded, if we loaded it from a file */
+        bool                        fromCache_; /**< Set to true if the model is cached, false otherwise */
+        Assimp::Importer*           importer_;  /**< Importer used to load a model from a file */
+        VertexAttributesMap_t       vertexAttributes_;  /**< Vertex attributes used by the mesh */
 
-        BufferObject**          bufferObjects_; /**< Buffer objects for all the sub mesh */
+        BufferObject**              bufferObjects_; /**< Buffer objects for all the sub mesh */
 
         /**
          * Free the mesh memory
          */
-        virtual void            FreeMeshMemory();
-        virtual void            ConstructBoundingSphere();
+        virtual void                FreeMeshMemory();
+        virtual void                ConstructBoundingSphere();
 };
 
 }

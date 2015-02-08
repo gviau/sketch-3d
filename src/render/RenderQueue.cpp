@@ -54,13 +54,13 @@ void RenderQueue::AddNode(Node* node, Layer_t layer) {
     // TODO
     // Got to change the distance from the camera
     BufferObject** bufferObjects;
-    vector<ModelSurface_t> surfaces;
+    vector<SurfaceTriangles_t*> surfaces;
     node->GetMesh()->GetRenderInfo(bufferObjects, surfaces);
     shared_ptr<Matrix4x4> model(new Matrix4x4(node->ConstructModelMatrix()));
 
     for (size_t i = 0; i < surfaces.size(); i++) {
-        items_.push_back(RenderQueueItem(model, node->GetMaterial(), surfaces[i].geometry->textures,
-                                         surfaces[i].geometry->numTextures, bufferObjects[i], node->UseInstancing(), 0, layer));
+        items_.push_back(RenderQueueItem(model, node->GetMaterial(), surfaces[i]->textures,
+                                         surfaces[i]->numTextures, bufferObjects[i], node->UseInstancing(), 0, layer));
 
         if (items_.size() > itemsIndex_.size()) {
             itemsIndex_.push_back(itemsIndex_.size());

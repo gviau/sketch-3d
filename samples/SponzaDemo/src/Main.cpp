@@ -147,11 +147,8 @@ int main(int argc, char** argv) {
         surface.normals[i] = Vector3(homogenousCorners[i].x, homogenousCorners[i].y, homogenousCorners[i].z);
     }
 
-    ModelSurface_t modelSurface;
-    modelSurface.geometry = &surface;
-
     Mesh fullscreenQuadMesh;
-    fullscreenQuadMesh.AddSurface(modelSurface);
+    fullscreenQuadMesh.AddSurface(&surface);
 
     VertexAttributesMap_t fullscreenQuadVertexAttributes;
     fullscreenQuadVertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;

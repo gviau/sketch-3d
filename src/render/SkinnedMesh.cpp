@@ -95,8 +95,7 @@ void SkinnedMesh::Load(const string& filename, const VertexAttributesMap_t& vert
             size_t numVertices = mesh->mNumVertices;
 
             // Get the surface to set the bones and weights for GPU skinned meshes
-            ModelSurface_t& modelSurface = surfaces_[node->mMeshes[i]];
-            SurfaceTriangles_t* surface = modelSurface.geometry;
+            SurfaceTriangles_t* surface = surfaces_[node->mMeshes[i]];
 
             // Retrieve for each bones the offset matrix and the vertex with their weight that are attached to it
             if (mesh->HasBones()) {
@@ -334,67 +333,67 @@ void SkinnedMesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
 
 	    // Interleave the data
 	    vector<float> data;
-        size_t sizeToReserve = surfaces_[i].geometry->numVertices * 3 +
-                               surfaces_[i].geometry->numNormals * 3 +
-                               surfaces_[i].geometry->numTexCoords * 2 +
-                               surfaces_[i].geometry->numTangents * 3;
+        size_t sizeToReserve = surfaces_[i]->numVertices * 3 +
+                               surfaces_[i]->numNormals * 3 +
+                               surfaces_[i]->numTexCoords * 2 +
+                               surfaces_[i]->numTangents * 3;
 
         // Add the data for the bones since it will be skinned on the GPU
         if (meshType_ == MESH_TYPE_STATIC) {
-            sizeToReserve += surfaces_[i].geometry->numBones * 4 +
-                             surfaces_[i].geometry->numWeights * 4;
+            sizeToReserve += surfaces_[i]->numBones * 4 +
+                             surfaces_[i]->numWeights * 4;
         }
 
         data.reserve(sizeToReserve);
 
-        bool hasNormals = surfaces_[i].geometry->numNormals > 0;
-        bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
-        bool hasTangents = surfaces_[i].geometry->numTangents > 0;
-        bool hasBones = surfaces_[i].geometry->numBones > 0;
-        bool hasWeights = surfaces_[i].geometry->numWeights > 0;
+        bool hasNormals = surfaces_[i]->numNormals > 0;
+        bool hasTexCoords = surfaces_[i]->numTexCoords > 0;
+        bool hasTangents = surfaces_[i]->numTangents > 0;
+        bool hasBones = surfaces_[i]->numBones > 0;
+        bool hasWeights = surfaces_[i]->numWeights > 0;
 
         Vector3 vertex;
-        for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
+        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
             map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
 
             for (; v_it != attributesFromIndex.end(); ++v_it) {
                 switch (v_it->second) {
                     case VERTEX_ATTRIBUTES_POSITION:
-                        vertex = surfaces_[i].geometry->vertices[j];
+                        vertex = surfaces_[i]->vertices[j];
                         data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
                         break;
 
                     case VERTEX_ATTRIBUTES_NORMAL:
                         if (hasNormals) {
-                            Vector3& normal = surfaces_[i].geometry->normals[j];
+                            Vector3& normal = surfaces_[i]->normals[j];
                             data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TEX_COORDS:
                         if (hasTexCoords) {
-                            Vector2& texCoords = surfaces_[i].geometry->texCoords[j];
+                            Vector2& texCoords = surfaces_[i]->texCoords[j];
                             data.push_back(texCoords.x); data.push_back(texCoords.y);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TANGENT:
                         if (hasTangents) {
-                            Vector3& tangents = surfaces_[i].geometry->tangents[j];
+                            Vector3& tangents = surfaces_[i]->tangents[j];
                             data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_BONES:
                         if (hasBones) {
-                            Vector4& bones = surfaces_[i].geometry->bones[j];
+                            Vector4& bones = surfaces_[i]->bones[j];
                             data.push_back(bones.x); data.push_back(bones.y); data.push_back(bones.z); data.push_back(bones.w);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_WEIGHTS:
                         if (hasWeights) {
-                            Vector4& weights = surfaces_[i].geometry->weights[j];
+                            Vector4& weights = surfaces_[i]->weights[j];
                             data.push_back(weights.x); data.push_back(weights.y); data.push_back(weights.z); data.push_back(weights.w);
                         }
                         break;
@@ -429,7 +428,7 @@ void SkinnedMesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
             break;
         }
 
-        bufferObject->SetIndexData(surfaces_[i].geometry->indices, surfaces_[i].geometry->numIndices);
+        bufferObject->SetIndexData(surfaces_[i]->indices, surfaces_[i]->numIndices);
     }
 }
 
@@ -455,17 +454,17 @@ bool SkinnedMesh::Animate(double deltaTime, vector<Matrix4x4>& boneTransformatio
         vector<vector<Vector3>> originalVertices, originalNormals;
 
         for (size_t i = 0; i < surfaces_.size(); i++) {
-            ModelSurface_t& surface = surfaces_[i];
-            bool hasNormals = (surface.geometry->numNormals > 0);
+            SurfaceTriangles_t* surface = surfaces_[i];
+            bool hasNormals = (surface->numNormals > 0);
 
-            Vector3* vertices = surface.geometry->vertices;
-            Vector3* normals = surface.geometry->normals;
+            Vector3* vertices = surface->vertices;
+            Vector3* normals = surface->normals;
             originalVertices.push_back(vector<Vector3>());
             if (useNormals && hasNormals) {
                 originalNormals.push_back(vector<Vector3>());
             }
 
-            for (size_t j = 0; j < surface.geometry->numVertices; j++) {
+            for (size_t j = 0; j < surface->numVertices; j++) {
                 Matrix4x4 boneTransform;
                 it = transformationMatrices.begin();
                 size_t numberOfBones = 0;
@@ -507,19 +506,19 @@ bool SkinnedMesh::Animate(double deltaTime, vector<Matrix4x4>& boneTransformatio
                 }
             }
 
-            baseIndex += surface.geometry->numVertices;
+            baseIndex += surface->numVertices;
         }
 
         Mesh::UpdateMeshData();
 
         for (size_t i = 0; i < surfaces_.size(); i++) {
-            ModelSurface_t& surface = surfaces_[i];
-            bool hasNormals = (surface.geometry->numNormals > 0);
+            SurfaceTriangles_t* surface = surfaces_[i];
+            bool hasNormals = (surface->numNormals > 0);
 
-            Vector3* vertices = surface.geometry->vertices;
-            Vector3* normals = surface.geometry->normals;
+            Vector3* vertices = surface->vertices;
+            Vector3* normals = surface->normals;
 
-            for (size_t j = 0; j < surface.geometry->numVertices; j++) {
+            for (size_t j = 0; j < surface->numVertices; j++) {
                 vertices[j] = originalVertices[i][j];
 
                 if (useNormals && hasNormals) {

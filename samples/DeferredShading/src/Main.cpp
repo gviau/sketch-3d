@@ -55,11 +55,8 @@ int main(int argc, char** argv) {
     surface.vertices[0] = Vector3(-1.0f, -1.0f, 0.0f); surface.vertices[1] = Vector3(-1.0f, 1.0f, 0.0f); surface.vertices[2] = Vector3(1.0f, 1.0f, 0.0f); surface.vertices[3] = Vector3(1.0f, -1.0f, 0.0f);
     surface.indices[0] = 0; surface.indices[1] = 3; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 1;
 
-    ModelSurface_t modelSurface;
-    modelSurface.geometry = &surface;
-
     Mesh planeMesh;
-    planeMesh.AddSurface(modelSurface);
+    planeMesh.AddSurface(&surface);
 
     VertexAttributesMap_t vertexAttributesPlane;
     vertexAttributesPlane[VERTEX_ATTRIBUTES_POSITION] = 0;

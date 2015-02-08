@@ -76,11 +76,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         }
     }
 
-    ModelSurface_t modelSurface;
-    modelSurface.geometry = &surface;
-
     Mesh waterMesh(MESH_TYPE_DYNAMIC);
-    waterMesh.AddSurface(modelSurface);
+    waterMesh.AddSurface(&surface);
 
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;

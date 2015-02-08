@@ -118,10 +118,7 @@ int main(int argc, char** argv) {
     surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
     surface.textures[0] = Renderer::GetInstance()->CreateTexture2DFromFile("Media/tiled.jpg");
 
-    ModelSurface_t groundSurface;
-    groundSurface.geometry = &surface;
-    groundMesh.AddSurface(groundSurface);
-
+    groundMesh.AddSurface(&surface);
     groundMesh.Initialize(vertexAttributes);
 
     // Create the ground

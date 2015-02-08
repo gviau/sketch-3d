@@ -18,17 +18,18 @@ ModelManager::ModelManager() {
 ModelManager::~ModelManager() {
     ModelCacheMap_t::iterator m_it = cachedModels_.begin();
     for (; m_it != cachedModels_.end(); ++m_it) {
-        vector<ModelSurface_t>& models = m_it->second.second;
+        vector<SurfaceTriangles_t*>& models = m_it->second.second;
 
         for (size_t i = 0; i < models.size(); i++) {
-            ModelSurface_t model = models[i];
-            delete[] model.geometry->vertices;
-            delete[] model.geometry->normals;
-            delete[] model.geometry->texCoords;
-            delete[] model.geometry->tangents;
-            delete[] model.geometry->bones;
-            delete[] model.geometry->weights;
-            delete[] model.geometry->indices;
+            SurfaceTriangles_t* surface = models[i];
+
+            delete[] surface->vertices;
+            delete[] surface->normals;
+            delete[] surface->texCoords;
+            delete[] surface->tangents;
+            delete[] surface->bones;
+            delete[] surface->weights;
+            delete[] surface->indices;
 
             // We let the TextureManager take care of freeing the textures pointer
         }
@@ -59,16 +60,16 @@ bool ModelManager::CheckIfSkeletonLoaded(const string& filename) const {
     return (it != cachedSkeletons_.end());
 }
 
-void ModelManager::CacheModel(const string& filename, const vector<ModelSurface_t>& model) {
-    cachedModels_[filename] = pair<int, vector<ModelSurface_t>>(1, model);
+void ModelManager::CacheModel(const string& filename, const vector<SurfaceTriangles_t*>& model) {
+    cachedModels_[filename] = pair<int, vector<SurfaceTriangles_t*>>(1, model);
 }
 
 void ModelManager::CacheSkeleton(const string& filename, Skeleton* skeleton) {
     cachedSkeletons_[filename] = pair<int, Skeleton*>(1, skeleton);
 }
 
-vector<ModelSurface_t> ModelManager::LoadModelFromCache(const string& filename) {
-    vector<ModelSurface_t> model = cachedModels_[filename].second;
+vector<SurfaceTriangles_t*> ModelManager::LoadModelFromCache(const string& filename) {
+    vector<SurfaceTriangles_t*> model = cachedModels_[filename].second;
     cachedModels_[filename].first += 1;
     return model;
 }
@@ -82,19 +83,20 @@ Skeleton* ModelManager::LoadSkeletonFromCache(const string& filename) {
 void ModelManager::RemoveModelReferenceFromCache(const string& filename) {
     cachedModels_[filename].first -= 1;
     if (cachedModels_[filename].first == 0) {
-        vector<ModelSurface_t>& models = cachedModels_[filename].second;
+        vector<SurfaceTriangles_t*>& models = cachedModels_[filename].second;
         set<Texture2D*> texturesToDelete;
 
         for (size_t i = 0; i < models.size(); i++) {
-            ModelSurface_t& model = models[i];
-            delete[] model.geometry->vertices;
-            delete[] model.geometry->normals;
-            delete[] model.geometry->texCoords;
-            delete[] model.geometry->tangents;
-            delete[] model.geometry->indices;
+            SurfaceTriangles_t* surface = models[i];
 
-            for (size_t j = 0; j < model.geometry->numTextures; j++) {
-                Texture2D* texture = model.geometry->textures[j];
+            delete[] surface->vertices;
+            delete[] surface->normals;
+            delete[] surface->texCoords;
+            delete[] surface->tangents;
+            delete[] surface->indices;
+
+            for (size_t j = 0; j < surface->numTextures; j++) {
+                Texture2D* texture = surface->textures[j];
                 texturesToDelete.insert(texture);
             }
 

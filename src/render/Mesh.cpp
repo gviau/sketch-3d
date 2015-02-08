@@ -80,21 +80,22 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
             ModelManager::GetInstance()->RemoveModelReferenceFromCache(filename_);
         } else {
             for (size_t i = 0; i < surfaces_.size(); i++) {
-                ModelSurface_t& model = surfaces_[i];
-                delete[] model.geometry->vertices;
-                delete[] model.geometry->normals;
-                delete[] model.geometry->texCoords;
-                delete[] model.geometry->tangents;
-                delete[] model.geometry->bones;
-                delete[] model.geometry->weights;
-                delete[] model.geometry->indices;
+                SurfaceTriangles_t* surface = surfaces_[i];
 
-                for (size_t j = 0; j < model.geometry->numTextures; j++) {
-                    if (TextureManager::GetInstance()->CheckIfTextureLoaded(model.geometry->textures[j]->GetFilename())) {
-                        TextureManager::GetInstance()->RemoveTextureReferenceFromCache(model.geometry->textures[j]->GetFilename());
+                delete[] surface->vertices;
+                delete[] surface->normals;
+                delete[] surface->texCoords;
+                delete[] surface->tangents;
+                delete[] surface->bones;
+                delete[] surface->weights;
+                delete[] surface->indices;
+
+                for (size_t j = 0; j < surface->numTextures; j++) {
+                    if (TextureManager::GetInstance()->CheckIfTextureLoaded(surface->textures[j]->GetFilename())) {
+                        TextureManager::GetInstance()->RemoveTextureReferenceFromCache(surface->textures[j]->GetFilename());
                     }
                 }
-                delete[] model.geometry->textures;
+                delete[] surface->textures;
             }
         }
     }
@@ -301,10 +302,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                 }
             }
 
-            ModelSurface_t modelSurface;
-            modelSurface.geometry = surface;
-
-            surfaces_.push_back(modelSurface);
+            surfaces_.push_back(surface);
         }
 
         for (size_t i = 0; i < node->mNumChildren; i++) {
@@ -320,7 +318,7 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
     Logger::GetInstance()->Info("Successfully loaded mesh from file " + filename);
 }
 
-void Mesh::AddSurface(const ModelSurface_t& surface) {
+void Mesh::AddSurface(SurfaceTriangles_t* surface) {
     surfaces_.push_back(surface);
 }
 
@@ -343,45 +341,45 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
 
 	    // Interleave the data
 	    vector<float> data;
-        data.reserve(surfaces_[i].geometry->numVertices * 3 +
-                     surfaces_[i].geometry->numNormals * 3 +
-                     surfaces_[i].geometry->numTexCoords * 2 +
-                     surfaces_[i].geometry->numTangents * 3);
+        data.reserve(surfaces_[i]->numVertices * 3 +
+                     surfaces_[i]->numNormals * 3 +
+                     surfaces_[i]->numTexCoords * 2 +
+                     surfaces_[i]->numTangents * 3);
 
-        bool hasNormals = surfaces_[i].geometry->numNormals > 0;
-        bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
-        bool hasTangents = surfaces_[i].geometry->numTangents > 0;
-        bool hasBones = surfaces_[i].geometry->numBones > 0;
-        bool hasWeights = surfaces_[i].geometry->numWeights > 0;
+        bool hasNormals = surfaces_[i]->numNormals > 0;
+        bool hasTexCoords = surfaces_[i]->numTexCoords > 0;
+        bool hasTangents = surfaces_[i]->numTangents > 0;
+        bool hasBones = surfaces_[i]->numBones > 0;
+        bool hasWeights = surfaces_[i]->numWeights > 0;
 
         Vector3 vertex;
-        for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
+        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
             map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
 
             for (; v_it != attributesFromIndex.end(); ++v_it) {
                 switch (v_it->second) {
                     case VERTEX_ATTRIBUTES_POSITION:
-                        vertex = surfaces_[i].geometry->vertices[j];
+                        vertex = surfaces_[i]->vertices[j];
                         data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
                         break;
 
                     case VERTEX_ATTRIBUTES_NORMAL:
                         if (hasNormals) {
-                            Vector3 normal = surfaces_[i].geometry->normals[j];
+                            Vector3 normal = surfaces_[i]->normals[j];
                             data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TEX_COORDS:
                         if (hasTexCoords) {
-                            Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
+                            Vector2 texCoords = surfaces_[i]->texCoords[j];
                             data.push_back(texCoords.x); data.push_back(texCoords.y);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TANGENT:
                         if (hasTangents) {
-                            Vector3 tangents = surfaces_[i].geometry->tangents[j];
+                            Vector3 tangents = surfaces_[i]->tangents[j];
                             data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
                         }
                         break;
@@ -408,7 +406,7 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
             break;
         }
 
-        bufferObject->SetIndexData(surfaces_[i].geometry->indices, surfaces_[i].geometry->numIndices);
+        bufferObject->SetIndexData(surfaces_[i]->indices, surfaces_[i]->numIndices);
     }
 
     ConstructBoundingSphere();
@@ -427,44 +425,44 @@ void Mesh::UpdateMeshData() const {
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
 	    vector<float> data;
-        data.reserve(surfaces_[i].geometry->numVertices * 3 +
-                     surfaces_[i].geometry->numNormals * 3 +
-                     surfaces_[i].geometry->numTexCoords * 2 +
-                     surfaces_[i].geometry->numTangents * 3);
+        data.reserve(surfaces_[i]->numVertices * 3 +
+                     surfaces_[i]->numNormals * 3 +
+                     surfaces_[i]->numTexCoords * 2 +
+                     surfaces_[i]->numTangents * 3);
 
-        bool hasNormals = surfaces_[i].geometry->numNormals > 0;
-        bool hasTexCoords = surfaces_[i].geometry->numTexCoords > 0;
-        bool hasTangents = surfaces_[i].geometry->numTangents > 0;
+        bool hasNormals = surfaces_[i]->numNormals > 0;
+        bool hasTexCoords = surfaces_[i]->numTexCoords > 0;
+        bool hasTangents = surfaces_[i]->numTangents > 0;
 
         // Interleave the data
         Vector3 vertex;
-        for (size_t j = 0; j < surfaces_[i].geometry->numVertices; j++) {
+        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
             map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
 
             for (; v_it != attributesFromIndex.end(); ++v_it) {
                 switch (v_it->second) {
                     case VERTEX_ATTRIBUTES_POSITION:
-                        vertex = surfaces_[i].geometry->vertices[j];
+                        vertex = surfaces_[i]->vertices[j];
                         data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
                         break;
 
                     case VERTEX_ATTRIBUTES_NORMAL:
                         if (hasNormals) {
-                            Vector3 normal = surfaces_[i].geometry->normals[j];
+                            Vector3 normal = surfaces_[i]->normals[j];
                             data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TEX_COORDS:
                         if (hasTexCoords) {
-                            Vector2 texCoords = surfaces_[i].geometry->texCoords[j];
+                            Vector2 texCoords = surfaces_[i]->texCoords[j];
                             data.push_back(texCoords.x); data.push_back(texCoords.y);
                         }
                         break;
 
                     case VERTEX_ATTRIBUTES_TANGENT:
                         if (hasTangents) {
-                            Vector3 tangents = surfaces_[i].geometry->tangents[j];
+                            Vector3 tangents = surfaces_[i]->tangents[j];
                             data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
                         }
                         break;
@@ -495,7 +493,7 @@ void Mesh::PrepareInstancingData() {
     }
 }
 
-void Mesh::GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const {
+void Mesh::GetRenderInfo(BufferObject**& bufferObjects, vector<SurfaceTriangles_t*>& surfaces) const {
     bufferObjects = bufferObjects_;
     surfaces = surfaces_;
 }
@@ -510,17 +508,18 @@ void Mesh::FreeMeshMemory() {
     if (surfaces_.size() > 0) {
         if (!fromCache_) {
             for (size_t i = 0; i < surfaces_.size(); i++) {
-                ModelSurface_t& model = surfaces_[i];
-                delete[] model.geometry->vertices;
-                delete[] model.geometry->normals;
-                delete[] model.geometry->texCoords;
-                delete[] model.geometry->tangents;
-                delete[] model.geometry->bones;
-                delete[] model.geometry->weights;
-                delete[] model.geometry->indices;
+                SurfaceTriangles_t* surface = surfaces_[i];
 
-                for (size_t j = 0; j < model.geometry->numTextures; j++) {
-                    Texture2D* texture = model.geometry->textures[j];
+                delete[] surface->vertices;
+                delete[] surface->normals;
+                delete[] surface->texCoords;
+                delete[] surface->tangents;
+                delete[] surface->bones;
+                delete[] surface->weights;
+                delete[] surface->indices;
+
+                for (size_t j = 0; j < surface->numTextures; j++) {
+                    Texture2D* texture = surface->textures[j];
 
                     if (texture != nullptr) {
                         if (TextureManager::GetInstance()->CheckIfTextureLoaded(texture->GetFilename())) {
@@ -528,7 +527,7 @@ void Mesh::FreeMeshMemory() {
                         }
                     }
                 }
-                delete[] model.geometry->textures;
+                delete[] surface->textures;
             }
         } else {
             ModelManager::GetInstance()->RemoveModelReferenceFromCache(filename_);
@@ -547,15 +546,13 @@ void Mesh::ConstructBoundingSphere() {
     vector<Vector3> vertices;
     size_t size = 0;
     for (size_t i = 0; i < surfaces_.size(); i++) {
-        size += surfaces_[i].geometry->numVertices;
+        size += surfaces_[i]->numVertices;
     }
     vertices.reserve(size);
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
-        SurfaceTriangles_t* surface = surfaces_[i].geometry;
-
-        for (size_t j = 0; j < surface->numVertices; j++) {
-            vertices.push_back(surface->vertices[j]);
+        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
+            vertices.push_back(surfaces_[i]->vertices[j]);
         }
     }
 

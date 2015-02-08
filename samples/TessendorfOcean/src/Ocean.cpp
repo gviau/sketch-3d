@@ -69,9 +69,7 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
         }
     }
 
-    ModelSurface_t surface;
-    surface.geometry = &oceanSurface_;
-    oceanMesh_.AddSurface(surface);
+    oceanMesh_.AddSurface(&oceanSurface_);
 
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;

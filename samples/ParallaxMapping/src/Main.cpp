@@ -57,11 +57,8 @@ int main(int argc, char** argv) {
     surface.indices = new unsigned short[surface.numIndices];
     surface.indices[0] = 0; surface.indices[1] = 1; surface.indices[2] = 2; surface.indices[3] = 0; surface.indices[4] = 2; surface.indices[5] = 3;
 
-    ModelSurface_t modelSurface;
-    modelSurface.geometry = &surface;
-
     Mesh mesh;
-    mesh.AddSurface(modelSurface);
+    mesh.AddSurface(&surface);
 
     VertexAttributesMap_t vertexAttributes;
     vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
