@@ -64,12 +64,14 @@ class RenderQueueItem {
          * @param textures The textures to use on this sub-mesh
          * @param numTextures The number of textures to use on this sub-mesh
          * @param bufferObject The buffer object representing the actual sub-mesh to draw
+         * @param useInstancing If set to true, the bufferObject will be used in instanced rendering
          * @param distanceFromCamera The distance that the mesh is from the camera, normalized on the distance between the near and far plane of the camera.
          * A distance of 0 means on the near plane and a distance corresponding to the maximum value of a unsigned 32 btis word means on the far plane.
          * @param layer On which layer are we drawing everything. This option might change render state, such as depth testing
          */
                             RenderQueueItem(shared_ptr<Matrix4x4> modelMatrix, Material* material, Texture2D** textures,
-                                            size_t numTextures, BufferObject* bufferObject, uint32_t distanceFromCamera, Layer_t layer=LAYER_GAME);
+                                            size_t numTextures, BufferObject* bufferObject, bool useInstancing,
+                                            uint32_t distanceFromCamera, Layer_t layer=LAYER_GAME);
 
         /**
          * Destructor. Frees the uniform map
@@ -89,6 +91,7 @@ class RenderQueueItem {
         Texture2D**         textures_;          /**< The textures to use on this sub-mesh */
         size_t              numTextures_;       /**< The number of textures to use on this sub-mesh */
         BufferObject*       bufferObject_;      /**< The buffer object representing the actual sub-mesh to draw */
+        bool                useInstancing_;     /**< Determine if we draw multiple instances of the buffer object */
 
         /**
          * Construct the 30 bits material id from the material properties

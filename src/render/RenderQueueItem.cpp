@@ -20,9 +20,9 @@ const int MATERIAL_SHIFT = 32;
 const uint32_t DISTANCE_TRUNCATION = 0xFFFFFFFF;
 
 RenderQueueItem::RenderQueueItem(shared_ptr<Matrix4x4> modelMatrix, Material* material, Texture2D** textures,
-                                 size_t numTextures, BufferObject* bufferObject, uint32_t distanceFromCamera, Layer_t layer) : key_(0),
+                                 size_t numTextures, BufferObject* bufferObject, bool useInstancing, uint32_t distanceFromCamera, Layer_t layer) : key_(0),
         layer_(layer), transluencyType_(TRANSLUENCY_TYPE_OPAQUE), distanceFromCamera_(distanceFromCamera), materialId_(0), modelMatrix_(modelMatrix),
-        material_(material), textures_(textures), numTextures_(numTextures), bufferObject_(bufferObject)
+        material_(material), textures_(textures), numTextures_(numTextures), bufferObject_(bufferObject), useInstancing_(useInstancing)
 {
     TransluencyType_t transluencyType = material_->GetTransluencyType();
     key_ |= ((uint64_t)layer_) << LAYER_SHIFT;

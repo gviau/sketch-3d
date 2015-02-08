@@ -60,12 +60,14 @@ int main(int argc, char** argv) {
     size_t idx = 0;
     for (size_t i = 0; i < NUM_TEAPOTS_X; i++) {
         for (size_t j = 0; j < NUM_TEAPOTS_Z; j++) {
-            nodes[idx    ].SetMaterial(&material);
-            nodes[idx    ].SetMesh(&mesh);
-            Renderer::GetInstance()->GetSceneTree().AddNode(&nodes[idx    ]);
-            nodes[idx    ].Pitch(-PI_OVER_2);
-            nodes[idx    ].Scale(Vector3(0.2f, 0.2f, 0.2f));
-            nodes[idx    ].SetPosition(Vector3(-NUM_TEAPOTS_X / 2.0f + stepX * j, 0.0f, -NUM_TEAPOTS_Z / 2.0f + stepZ * i));
+            nodes[idx].SetMaterial(&material);
+            nodes[idx].SetMesh(&mesh);
+            Renderer::GetInstance()->GetSceneTree().AddNode(&nodes[idx]);
+            nodes[idx].Pitch(-PI_OVER_2);
+            nodes[idx].Scale(Vector3(0.2f, 0.2f, 0.2f));
+            nodes[idx].SetPosition(Vector3(-NUM_TEAPOTS_X / 2.0f + stepX * j, 0.0f, -NUM_TEAPOTS_Z / 2.0f + stepZ * i));
+
+            nodes[idx].SetInstancing(true);
             idx += 1;
         }
     }

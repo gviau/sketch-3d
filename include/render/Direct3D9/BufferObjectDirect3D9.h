@@ -21,10 +21,12 @@ class BufferObjectDirect3D9 : public BufferObject {
                                                               BufferUsage_t usage=BUFFER_USAGE_STATIC);
         virtual                        ~BufferObjectDirect3D9();
         virtual void                    Render();
+        virtual void                    RenderInstances(const vector<Matrix4x4>& modelMatrices);
         virtual bool                    SetVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual bool                    AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual void                    SetIndexData(unsigned short* indexdata, size_t numIndex);
         virtual void                    AppendIndexData(unsigned short* indexData, size_t numIndex);
+        virtual void                    PrepareInstanceBuffers();
 
     private:
         IDirect3DDevice9*               device_;
@@ -33,6 +35,8 @@ class BufferObjectDirect3D9 : public BufferObject {
         IDirect3DVertexDeclaration9*    vertexDeclaration_;
         size_t                          stride_;
         size_t                          primitivesCount_;
+        IDirect3DVertexBuffer9*         instanceBuffer_;
+        bool                            instanceDataPrepared_;
 
         void                            GenerateBuffers();
 };

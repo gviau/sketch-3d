@@ -1,9 +1,13 @@
-float4x4 modelViewProjection;
-float4x4 modelView;
+float4x4 viewProjection;
+float4x4 view;
 
 struct VS_INPUT {
     float3 in_vertex : POSITION;
     float3 in_normal : NORMAL;
+    float4 in_world0 : TEXCOORD0;
+    float4 in_world1 : TEXCOORD1;
+    float4 in_world2 : TEXCOORD2;
+    float4 in_world3 : TEXCOORD3;
 };
 
 struct VS_OUTPUT {
@@ -14,6 +18,13 @@ struct VS_OUTPUT {
 
 VS_OUTPUT main(VS_INPUT input) {
     VS_OUTPUT output;
+
+    float4x4 model = float4x4(input.in_world0,
+                              input.in_world1,
+                              input.in_world2,
+                              float4(input.in_world3.xyz, 1.0));
+    float4x4 modelView = mul(view, model);
+    float4x4 modelViewProjection = mul(viewProjection, model);
 
     output.normal = mul((float3x3)modelView, input.in_normal);
 

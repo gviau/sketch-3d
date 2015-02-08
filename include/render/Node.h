@@ -160,6 +160,7 @@ class Node {
 		void				SetOrientation(const Quaternion& orientation);
 		void				SetMesh(Mesh* mesh);
 		void				SetMaterial(Material* material);
+        void                SetInstancing(bool useInstancing);
 
 		const string&		GetName() const;
 		Node*				GetParent() const;
@@ -168,6 +169,7 @@ class Node {
 		const Quaternion&	GetOrientation() const;
 		Mesh*				GetMesh() const;
 		Material*			GetMaterial() const;
+        bool                UseInstancing() const;
 
 	private:
 		static long long	nextNameIndex_;	/**< The next available number for the automatic name */
@@ -185,6 +187,8 @@ class Node {
 
 		Mesh*				mesh_; /**< Geometric represention of the node */
 		Material*			material_; /**< The material of the node. It will be applied to the mesh, if any */
+        
+        bool                useInstancing_; /**< If set to true, the node will use instanced rendering */
 
 		/**
 		 * This function sends the data required for the rendering.

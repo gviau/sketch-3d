@@ -17,15 +17,18 @@ class BufferObjectOpenGL : public BufferObject {
                         BufferObjectOpenGL(const VertexAttributesMap_t& vertexAttributes, BufferUsage_t usage=BUFFER_USAGE_STATIC);
         virtual        ~BufferObjectOpenGL();
         virtual void    Render();
+        virtual void    RenderInstances(const vector<Matrix4x4>& modelMatrices);
         virtual bool    SetVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual bool    AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes);
         virtual void    SetIndexData(unsigned short* indexData, size_t numIndex);
         virtual void    AppendIndexData(unsigned short* indexData, size_t numIndex);
+        virtual void    PrepareInstanceBuffers();
 
     private:
         GLuint          vao_;   /**< Vertex array object */
         GLuint          vbo_;   /**< Vertex buffer object */
         GLuint          ibo_;   /**< infex buffer object */
+        GLuint          instanceBuffer_;    /**< Buffer object used for instanced rendering */
 
         /**
          * Generate the buffers' name

@@ -139,6 +139,11 @@ class Mesh {
          */
         virtual void            UpdateMeshData() const;
 
+        /**
+         * Prepare the mesh for instanced rendering by allocating additional buffers
+         */
+        virtual void            PrepareInstancingData();
+
 		/**
 		 * Get the rendering information about the mesh for rendering
          * @param bufferObjects A pointer to the buffer objects

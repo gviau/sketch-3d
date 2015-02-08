@@ -1,5 +1,6 @@
 #include "render/OpenGL/BufferObjectOpenGL.h"
 
+#include "math/Matrix4x4.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
@@ -7,18 +8,32 @@
 namespace Sketch3D {
 
 BufferObjectOpenGL::BufferObjectOpenGL(const VertexAttributesMap_t& vertexAttributes, BufferUsage_t usage) : BufferObject(vertexAttributes, usage),
-        vao_(0), vbo_(0), ibo_(0) {
+        vao_(0), vbo_(0), ibo_(0), instanceBuffer_(0)
+{
 }
 
 BufferObjectOpenGL::~BufferObjectOpenGL() {
     glDeleteVertexArrays(1, &vao_);
     glDeleteBuffers(1, &vbo_);
     glDeleteBuffers(1, &ibo_);
+    
+    if (instanceBuffer_ != 0) {
+        glDeleteBuffers(1, &instanceBuffer_);
+    }
 }
 
 void BufferObjectOpenGL::Render() {
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, indexCount_, GL_UNSIGNED_SHORT, 0);
+}
+
+void BufferObjectOpenGL::RenderInstances(const vector<Matrix4x4>& modelMatrices) {
+    glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4x4) * modelMatrices.size(), &modelMatrices[0], GL_DYNAMIC_DRAW);
+
+    glBindVertexArray(vao_);
+
+    glDrawElementsInstanced(GL_TRIANGLES, indexCount_, GL_UNSIGNED_SHORT, 0, modelMatrices.size());
 }
 
 bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
@@ -161,6 +176,33 @@ void BufferObjectOpenGL::SetIndexData(unsigned short* indexData, size_t numIndex
 }
 
 void BufferObjectOpenGL::AppendIndexData(unsigned short* indexData, size_t numIndex) {
+}
+
+void BufferObjectOpenGL::PrepareInstanceBuffers() {
+    if (instanceBuffer_ != 0) {
+        return;
+    }
+
+    glGenBuffers(1, &instanceBuffer_);
+
+    glBindVertexArray(vao_);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer_);
+
+    // Populate the buffer with the model matrices
+    size_t attributeLocation = 0;
+    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+    for (; it != vertexAttributes_.end(); ++it) {
+        if (it->second > attributeLocation) {
+            attributeLocation = it->second;
+        }
+    }
+    attributeLocation += 1;
+
+    for (size_t i = 0; i < 4; i++) {
+        glEnableVertexAttribArray(attributeLocation + i);
+        glVertexAttribPointer(attributeLocation + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4x4), (const void*)(sizeof(GLfloat) * i * 4));
+        glVertexAttribDivisor(attributeLocation + i, 1);
+    }
 }
 
 void BufferObjectOpenGL::GenerateBuffers() {

@@ -17,7 +17,8 @@ namespace Sketch3D {
 long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
-						   scale_(1.0f, 1.0f, 1.0), needTransformationUpdate_(true)
+						   scale_(1.0f, 1.0f, 1.0), needTransformationUpdate_(true),
+                           useInstancing_(false)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -27,7 +28,8 @@ Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
 
 Node::Node(const string& name, Node* parent) : name_(name), parent_(parent),
 											   mesh_(NULL), material_(NULL),
-											   scale_(1.0f, 1.0f, 1.0f), needTransformationUpdate_(true)
+											   scale_(1.0f, 1.0f, 1.0f), needTransformationUpdate_(true),
+                                               useInstancing_(false)
 {
 }
 
@@ -38,7 +40,8 @@ Node::Node(const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
-                                                          needTransformationUpdate_(true)
+                                                          needTransformationUpdate_(true),
+                                                          useInstancing_(false)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -54,7 +57,8 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
-                                                          needTransformationUpdate_(true)
+                                                          needTransformationUpdate_(true),
+                                                          useInstancing_(false)
 {
 }
 
@@ -63,7 +67,8 @@ Node::Node(const Node& src) : parent_(src.parent_),
                               scale_(src.scale_),
                               orientation_(src.orientation_),
                               material_(src.material_),
-                              needTransformationUpdate_(true)
+                              needTransformationUpdate_(true),
+                              useInstancing_(false)
 {
     // TODO
     // Better manage name copy
@@ -254,6 +259,13 @@ void Node::SetMaterial(Material* material) {
 	material_ = material;
 }
 
+void Node::SetInstancing(bool val) {
+    useInstancing_ = val;
+    if (mesh_ != nullptr) {
+        mesh_->PrepareInstancingData();
+    }
+}
+
 const string& Node::GetName() const {
 	return name_;
 }
@@ -280,6 +292,10 @@ Mesh* Node::GetMesh() const {
 
 Material* Node::GetMaterial() const {
 	return material_;
+}
+
+bool Node::UseInstancing() const {
+    return useInstancing_;
 }
 
 void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) {

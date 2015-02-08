@@ -489,6 +489,12 @@ void Mesh::UpdateMeshData() const {
     }
 }
 
+void Mesh::PrepareInstancingData() {
+    for (size_t i = 0; i < surfaces_.size(); i++) {
+        bufferObjects_[i]->PrepareInstanceBuffers();
+    }
+}
+
 void Mesh::GetRenderInfo(BufferObject**& bufferObjects, vector<ModelSurface_t>& surfaces) const {
     bufferObjects = bufferObjects_;
     surfaces = surfaces_;

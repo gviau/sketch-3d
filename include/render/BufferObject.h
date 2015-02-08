@@ -7,6 +7,9 @@ using namespace std;
 
 namespace Sketch3D {
 
+// Forward declaration
+class Matrix4x4;
+
 /**
  * @enum BufferUsage_t
  * Determines how to internally manage the buffer
@@ -61,6 +64,13 @@ class BufferObject {
         virtual void            Render() = 0;
 
         /**
+         * Actually render several instances of the buffer object contents
+         * @param modelMatrices A list of model matrices to use to draw all the instances of the buffer object. The
+         * size of this list is the number of instances that will be drawn
+         */
+        virtual void            RenderInstances(const vector<Matrix4x4>& modelMatrices) = 0;
+
+        /**
          * Set the vertices for the vertex buffer
          * @param vertexData An array of float that represent the vertex data
          * @param presentVertexAttributes Bitfield specifying what vertex attributes are actually present
@@ -89,6 +99,11 @@ class BufferObject {
          * @param numIndex The number of index in the array to append
          */
         virtual void            AppendIndexData(unsigned short* indexData, size_t numIndex) = 0;
+
+        /**
+         * Prepare buffers for instanced rendering
+         */
+        virtual void            PrepareInstanceBuffers() = 0;
 
         size_t                  GetId() const;
 
