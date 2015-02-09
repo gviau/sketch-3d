@@ -166,8 +166,9 @@ int main(int argc, char** argv) {
 
             if (point.x >= 0.0f && point.y >= 0.0f && point.x <= 1.0f && point.y <= 1.0f) {
                 //waterShader->SetUniformVector2("disturbancePoint", pos.x, pos.y);
-                size_t i = (size_t) min(max(point.x * NUM_VERTICES, 1), NUM_VERTICES - 1);
-                size_t j = (size_t)min(max(point.y * NUM_VERTICES, 1), NUM_VERTICES - 1);
+                /*
+                size_t i = (size_t) min(maxf(point.x * NUM_VERTICES, 1), NUM_VERTICES - 1);
+                size_t j = (size_t) minsf(maxf(point.y * NUM_VERTICES, 1), NUM_VERTICES - 1);
                 size_t idx = i * NUM_VERTICES + j;
 
                 buffer[idx].z = splashForce;
@@ -179,7 +180,7 @@ int main(int argc, char** argv) {
                 buffer[(i + 1) * NUM_VERTICES + j - 1].z = splashForce;
                 buffer[(i - 1) * NUM_VERTICES + j + 1].z = splashForce;
                 buffer[(i - 1) * NUM_VERTICES + j - 1].z = splashForce;
-
+                */
             } else {
                 //waterShader->SetUniformVector2("disturbancePoint", -1.0f, -1.0f);
             }

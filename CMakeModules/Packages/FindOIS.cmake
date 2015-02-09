@@ -40,7 +40,7 @@ FIND_PATH(OIS_INCLUDE_DIR OIS.h
     )
 
 FIND_LIBRARY(OIS_LIBRARY
-    NAMES OIS_static
+    NAMES OIS_static OIS
     PATHS
     $ENV{OISDIR}/lib
     /usr/local/lib
@@ -53,7 +53,7 @@ FIND_LIBRARY(OIS_LIBRARY
     )
 
 FIND_LIBRARY(OIS_LIBRARY_DEBUG
-    NAMES OIS_static_d
+    NAMES OIS_static_d OIS
     PATHS
     $ENV{OISDIR}/lib
     /usr/local/lib

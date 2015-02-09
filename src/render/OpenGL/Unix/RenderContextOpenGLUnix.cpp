@@ -6,6 +6,7 @@
 
 #include <X11/Xutil.h>
 
+#include "render/OpenGL/gl/glew.h"
 #include "render/OpenGL/gl/glxext.h"
 
 namespace Sketch3D {
@@ -140,6 +141,11 @@ bool RenderContextOpenGLUnix::Initialize(Window& window, const RenderParameters_
 
     if (!glXMakeCurrent(display_, xWindow_, renderContext_)) {
         Logger::GetInstance()->Error("Couldn't set current OpenGL context");
+        return false;
+    }
+
+    if (GLEW_OK != glewInit()) {
+        Logger::GetInstance()->Error("Couldn't initialize GLEW library");
         return false;
     }
 
