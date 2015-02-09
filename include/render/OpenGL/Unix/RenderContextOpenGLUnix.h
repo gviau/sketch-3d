@@ -27,13 +27,15 @@ class RenderContextOpenGLUnix : public RenderContextOpenGL {
          */
         virtual        ~RenderContextOpenGLUnix();
 
-        virtual bool    Initialize(Window& window);
+        virtual bool    Initialize(Window& window, const RenderParameters_t& renderParameters);
         virtual void    SwapBuffers();
           
     private:
         ::Window        xWindow_;  /**< X11 structure defining the window */
         ::Display*      display_;   /**< Pointer to the display */
         GLXContext      renderContext_; /**< The render context to create */
+
+        virtual void    QueryAdapterSupportedDisplayFormats();
 };
 
 }

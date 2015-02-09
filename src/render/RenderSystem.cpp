@@ -32,7 +32,7 @@ RenderSystem::~RenderSystem() {
     delete bufferObjectManager_;
 }
 
-Vector3 RenderSystem::ScreenToWorldPoint(Matrix4x4& inversedViewProjection, const Vector2& point) const {
+Vector3 RenderSystem::ScreenToWorldPoint(const Matrix4x4& inversedViewProjection, const Vector2& point) const {
     // Transformation of normalized coordinates (-1, 1)
     Vector3 transformation(2.0f * point.x / width_ - 1.0f, -2.0f * point.y / height_ + 1.0f, 0.0f);
     return Matrix3x3(inversedViewProjection) * transformation;

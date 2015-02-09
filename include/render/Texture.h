@@ -95,7 +95,7 @@ class Texture {
          * Activate the texture
          * @return The texture unit on which the texture was bound
          */
-        size_t                  Bind() const;
+        unsigned int            Bind() const;
 
 		void			        SetWidth(unsigned int width);
 		void			        SetHeight(unsigned int height);

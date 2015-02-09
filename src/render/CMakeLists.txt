@@ -151,4 +151,5 @@ target_link_libraries(
     render
     math
     ${OPENGL_LIBRARIES}
+    ${X11_LIBRARIES}
 )

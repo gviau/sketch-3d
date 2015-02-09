@@ -76,7 +76,7 @@ class SkinnedMesh : public Mesh {
          * that will skin the mesh (if it is to be skinned on the GPU)
          * @return true If the transformation matrices were correctly calculated, false otherwise
          */
-        bool                        Animate(double deltaTime, vector<Matrix4x4>& boneTransformationMatrices=vector<Matrix4x4>());
+        bool                        Animate(double deltaTime, vector<Matrix4x4>& boneTransformationMatricesi=defaultParameter_);
 
         /**
          * Set the current animation state by its name
@@ -101,6 +101,8 @@ class SkinnedMesh : public Mesh {
         bool                        IsAnimationRunning() const;
 
     private:
+        static vector<Matrix4x4>    defaultParameter_;
+
         Skeleton*                   skeleton_;  /**< The rigged skeleton of this mesh */
         double                      time_;      /**< Current animation time for this skinned mesh */
         const AnimationState*       currentAnimationState_; /**< The animation state to use while animating the skeleton */

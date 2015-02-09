@@ -22,7 +22,7 @@ Texture::Texture(unsigned int width, unsigned int height, bool generateMipmaps,
 Texture::~Texture() {
 }
 
-size_t Texture::Bind() const {
+unsigned int Texture::Bind() const {
     return Renderer::GetInstance()->BindTexture(this);
 }
 

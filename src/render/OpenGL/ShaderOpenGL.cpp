@@ -93,7 +93,7 @@ ShaderOpenGL::~ShaderOpenGL() {
 }
 
 bool ShaderOpenGL::SetUniformInt(const string& uniformName, int value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -104,7 +104,7 @@ bool ShaderOpenGL::SetUniformInt(const string& uniformName, int value) {
 }
 
 bool ShaderOpenGL::SetUniformFloat(const string& uniformName, float value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -115,7 +115,7 @@ bool ShaderOpenGL::SetUniformFloat(const string& uniformName, float value) {
 }
 
 bool ShaderOpenGL::SetUniformVector2(const string& uniformName, float value1, float value2) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -126,7 +126,7 @@ bool ShaderOpenGL::SetUniformVector2(const string& uniformName, float value1, fl
 }
 
 bool ShaderOpenGL::SetUniformVector3(const string& uniformName, const Vector3& value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -137,7 +137,7 @@ bool ShaderOpenGL::SetUniformVector3(const string& uniformName, const Vector3& v
 }
 
 bool ShaderOpenGL::SetUniformVector3Array(const string& uniformName, const Vector3* values, int arraySize) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -148,7 +148,7 @@ bool ShaderOpenGL::SetUniformVector3Array(const string& uniformName, const Vecto
 }
 
 bool ShaderOpenGL::SetUniformVector4(const string& uniformName, const Vector4& value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -159,7 +159,7 @@ bool ShaderOpenGL::SetUniformVector4(const string& uniformName, const Vector4& v
 }
 
 bool ShaderOpenGL::SetUniformMatrix3x3(const string& uniformName, const Matrix3x3& value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -172,7 +172,7 @@ bool ShaderOpenGL::SetUniformMatrix3x3(const string& uniformName, const Matrix3x
 }
 
 bool ShaderOpenGL::SetUniformMatrix4x4(const string& uniformName, const Matrix4x4& value) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -185,7 +185,7 @@ bool ShaderOpenGL::SetUniformMatrix4x4(const string& uniformName, const Matrix4x
 }
 
 bool ShaderOpenGL::SetUniformMatrix4x4Array(const string& uniformName, const Matrix4x4* values, int arraySize) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;
@@ -209,7 +209,7 @@ bool ShaderOpenGL::SetUniformMatrix4x4Array(const string& uniformName, const Mat
 }
 
 bool ShaderOpenGL::SetUniformTexture(const string& uniformName, const Texture* texture) {
-    hash_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
+    unordered_map<string, GLuint>::iterator it = nameToUniforms_.find(uniformName);
     if (it == nameToUniforms_.end()) {
         Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
         return false;

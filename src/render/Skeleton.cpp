@@ -64,7 +64,7 @@ Bone_t* Skeleton::CreateBone(const string& name, const Matrix4x4& offsetMatrix) 
 }
 
 Bone_t* Skeleton::FindBoneByName(const string& name) {
-    hash_map<string, Bone_t>::iterator it = bones_.find(name);
+    BoneCacheMap_t::iterator it = bones_.find(name);
     if (it != bones_.end()) {
         return &(it->second);
     }

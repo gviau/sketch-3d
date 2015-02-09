@@ -7,7 +7,7 @@
 
 #include "system/Common.h"
 
-#include <hash_map>
+#include <unordered_map>
 #include <map>
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ struct Bone_t {
     vector<Bone_t*> linkedBones;
     Matrix4x4 offsetMatrix;
     string name;
-    hash_map<size_t, float> vertexWeight;
+    unordered_map<size_t, float> vertexWeight;
 };
 
 /**
@@ -35,6 +35,8 @@ struct Bone_t {
  * that the skeleton posses.
  */
 class Skeleton {
+    typedef unordered_map<string, Bone_t> BoneCacheMap_t;
+
     public:
         /**
          * Constructor
@@ -97,7 +99,7 @@ class Skeleton {
 
     private:
         map<string, AnimationState> animationStates_;   /**< The animation that this skeleton can perform */
-        hash_map<string, Bone_t>    bones_; /**< List of bones of the skeleton */
+        BoneCacheMap_t              bones_; /**< List of bones of the skeleton */
         Bone_t*                     root_;  /**< Root bone of the skeleton */
         Matrix4x4                   globalInverseTransform_;   /**< The global inverse transform of the skeleton */
 

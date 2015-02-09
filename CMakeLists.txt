@@ -70,6 +70,20 @@ if (OIS_FOUND)
 	message (STATUS "OIS libs release: ${OIS_LIBRARY}")
 endif ()
 
+if (UNIX)
+    find_package (X11)
+
+    message (STATUS "X11 found? ${X11_FOUND}")
+    if (X11_FOUND)
+        message (STATUS "X11 include: ${X11_INCLUDE_DIR}")
+        message (STATUS "X11 libs: ${X11_LIBRARIES}")
+    else ()
+        set (MISSING_MODULES ${MISSING_MODULES} "X11")
+    endif ()
+
+    find_package (Threads)
+endif ()
+
 if (WIN32)
 	find_package (DirectX)
 	

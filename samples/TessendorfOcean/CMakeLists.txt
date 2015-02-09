@@ -34,6 +34,13 @@ set(LIBRARIES
 	${FreeImage_LIBRARIES}
 )
 
+if (UNIX)
+    set (LIBRARIES
+         ${LIBRARIES}
+         ${CMAKE_THREAD_LIBS_INIT}
+    )
+endif ()
+
 if (WIN32)
 	set (WIN32_EXECUTABLE "WIN32")
 	set (LIBRARIES

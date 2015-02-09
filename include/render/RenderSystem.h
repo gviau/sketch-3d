@@ -218,7 +218,7 @@ class RenderSystem {
          * @param screenPoint A vector representing the point in screen space
          * @return A vector representing the point in world space
          */
-        Vector3                             ScreenToWorldPoint(Matrix4x4& inversedViewProjection, const Vector2& point) const;
+        Vector3                             ScreenToWorldPoint(const Matrix4x4& inversedViewProjection, const Vector2& point) const;
 
         /**
          * Bind a texture to a texture unit

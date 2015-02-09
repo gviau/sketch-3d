@@ -23,6 +23,8 @@ using namespace std;
 
 namespace Sketch3D {
 
+vector<Matrix4x4> SkinnedMesh::defaultParameter_;
+
 SkinnedMesh::SkinnedMesh(bool isSkinnedOnGpu, bool counterClockWise) : Mesh((isSkinnedOnGpu) ? MESH_TYPE_STATIC : MESH_TYPE_DYNAMIC),
                                                                        skeleton_(nullptr), time_(0.0), currentAnimationState_(nullptr), isLooping_(false)
 {
@@ -474,7 +476,7 @@ bool SkinnedMesh::Animate(double deltaTime, vector<Matrix4x4>& boneTransformatio
 
                     // The key is the vertex index, taking into account at which mesh we're at and the
                     // value if the weight of that vertex for that bone
-                    hash_map<size_t, float>::const_iterator w_it = bone->vertexWeight.find(baseIndex + j);
+                    unordered_map<size_t, float>::const_iterator w_it = bone->vertexWeight.find(baseIndex + j);
                     if (w_it != bone->vertexWeight.end()) {
                         if (numberOfBones == 0) {
                             boneTransform = it->second * w_it->second;

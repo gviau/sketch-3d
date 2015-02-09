@@ -55,10 +55,11 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			renderSystem_ = new RenderSystemOpenGL(window);
 			break;
 
+#if defined(__WIN32__) || defined(_WIN32)
 		case RENDER_SYSTEM_DIRECT3D9:
             renderSystem_ = new RenderSystemDirect3D9(window);			
 			break;
-
+#endif
 		default:
 			Logger::GetInstance()->Error("Unknown render system");
 			break;

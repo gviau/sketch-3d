@@ -17,11 +17,17 @@ using namespace Sketch3D;
 #include <vector>
 using namespace std;
 
+#ifdef OIS_AVAILABLE
 #include <OIS.h>
+#endif
 
+#if defined(__WIN32__) || defined(_WIN32)
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+#else
+int main(int argc, char** argv) {
+#endif
     Window window("Sample_InteractiveWater", 1024, 768, true);
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;

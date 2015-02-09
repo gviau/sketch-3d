@@ -42,7 +42,7 @@
 #pragma message enable nosimpint
 #endif
 #endif
-#include <GL/gl.h>
+#include "gl.h"
 
 
 #if defined(USE_MGL_NAMESPACE)
@@ -343,7 +343,7 @@ typedef __GLXextFuncPtr (* PFNGLXGETPROCADDRESSPROC) (const GLubyte *procName);
 
 #ifndef GLX_GLXEXT_LEGACY
 
-#include <GL/glxext.h>
+#include "glxext.h"
 
 #endif /* GLX_GLXEXT_LEGACY */
 

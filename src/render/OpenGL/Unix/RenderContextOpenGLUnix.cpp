@@ -17,11 +17,10 @@ RenderContextOpenGLUnix::RenderContextOpenGLUnix()  {
 RenderContextOpenGLUnix::~RenderContextOpenGLUnix() {
 }
 
-bool RenderContextOpenGLUnix::Initialize(Window& window) {
+bool RenderContextOpenGLUnix::Initialize(Window& window, const RenderParameters_t& renderParameters) {
     Logger::GetInstance()->Debug("Initializing OpenGL context");
 
     xWindow_ = static_cast< ::Window>(window.GetHandle());
-    XVisualInfo* visual = NULL;
 
     const GLubyte* name = reinterpret_cast<const GLubyte*>("glXCreateContextAttribsARB");
     PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = reinterpret_cast<PFNGLXCREATECONTEXTATTRIBSARBPROC>(glXGetProcAddress(name));
@@ -31,13 +30,83 @@ bool RenderContextOpenGLUnix::Initialize(Window& window) {
         return false;
     }
 
+    int colorBits, redBits, greenBits, blueBits, depthBits;
+    int alphaBits = 0;
+    int stencilBits = 0;
+    switch (renderParameters.displayFormat) {
+        case DISPLAY_FORMAT_A1R5G5B5:
+            colorBits = 16;
+            alphaBits = 1;
+            redBits = blueBits = 5;
+            greenBits = 6;
+            break;
+
+        case DISPLAY_FORMAT_A2R10G10B10:
+            colorBits = 24;
+            alphaBits = 2;
+            redBits = greenBits = blueBits = 10;
+            break;
+
+        case DISPLAY_FORMAT_A8R8G8B8:
+            colorBits = 24;
+            alphaBits = 8;
+            redBits = greenBits = blueBits = 8;
+            break;
+
+        case DISPLAY_FORMAT_R5G6B5:
+            colorBits = 16;
+            redBits = blueBits = 5;
+            greenBits = 6;
+            break;
+
+        case DISPLAY_FORMAT_X1R5G5B5:
+            colorBits = 16;
+            redBits = greenBits = blueBits = 5;
+            break;
+
+        case DISPLAY_FORMAT_X8R8G8B8:
+            colorBits = 24;
+            redBits = greenBits = blueBits = 8;
+            break;
+    }
+
+    switch (renderParameters.depthStencilBits) {
+        case DEPTH_STENCIL_BITS_D15S1:
+            depthBits = 15;
+            stencilBits = 1;
+            break;
+
+        case DEPTH_STENCIL_BITS_D16:
+            depthBits = 16;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24S8:
+            depthBits = 24;
+            stencilBits = 8;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24X4S4:
+            depthBits = 24;
+            stencilBits = 4;
+            break;
+
+        case DEPTH_STENCIL_BITS_D24X8:
+            depthBits = 24;
+            break;
+
+        case DEPTH_STENCIL_BITS_D32:
+            depthBits = 32;
+            break;
+    }
+
     int nbConfigs = 0;
     int fbAttributes[] = {
-        GLX_DEPTH_SIZE, 24,
-        GLX_RED_SIZE, 8,
-        GLX_GREEN_SIZE, 8,
-        GLX_BLUE_SIZE, 8,
-        GLX_ALPHA_SIZE, 8,
+        GLX_DEPTH_SIZE, depthBits,
+        GLX_STENCIL_SIZE, stencilBits,
+        GLX_RED_SIZE, redBits,
+        GLX_GREEN_SIZE, greenBits,
+        GLX_BLUE_SIZE, blueBits,
+        GLX_ALPHA_SIZE, alphaBits,
         GLX_DOUBLEBUFFER, True,
         GLX_X_RENDERABLE, True,
         GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -55,7 +124,7 @@ bool RenderContextOpenGLUnix::Initialize(Window& window) {
 
     int attributes[] = {
         GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-        GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 3,
         GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
         0, 0
     };
@@ -67,11 +136,12 @@ bool RenderContextOpenGLUnix::Initialize(Window& window) {
         return false;
     }
 
-    visual = glXGetVisualFromFBConfig(display_, configs[0]);
-
     XFree(configs);
 
-    glXMakeCurrent(display_, xWindow_, renderContext_);
+    if (!glXMakeCurrent(display_, xWindow_, renderContext_)) {
+        Logger::GetInstance()->Error("Couldn't set current OpenGL context");
+        return false;
+    }
 
     Logger::GetInstance()->Debug("Render context created");
     return true;
@@ -79,6 +149,9 @@ bool RenderContextOpenGLUnix::Initialize(Window& window) {
 
 void RenderContextOpenGLUnix::SwapBuffers() {
     glXSwapBuffers(display_, xWindow_);
+}
+
+void RenderContextOpenGLUnix::QueryAdapterSupportedDisplayFormats() {
 }
                                                                        
 }
