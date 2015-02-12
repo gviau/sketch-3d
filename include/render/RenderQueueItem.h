@@ -5,6 +5,8 @@
 
 #include "math/Matrix4x4.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <memory>
 #include <stdint.h>
@@ -51,7 +53,7 @@ enum Layer_t {
  * NOTE: if the transluency type is opaque, the Material Id and Depth value are swapped together, so that opaque objects are sorted
  * through material ids before depth. Otherwise, we sort via depth.
  */
-class RenderQueueItem {
+class SKETCH_3D_API RenderQueueItem {
     friend class RenderQueue;
     friend class RenderQueueItemKeyComparator;
 
@@ -100,7 +102,7 @@ class RenderQueueItem {
 };
 
 
-class RenderQueueItemKeyComparator {
+class SKETCH_3D_API RenderQueueItemKeyComparator {
     public:
         RenderQueueItemKeyComparator(const vector<RenderQueueItem>& items) : items_(items) {
         }

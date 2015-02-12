@@ -9,7 +9,7 @@ namespace Sketch3D {
  * @class Vector2
  * Represents a 2D vector
  */
-class Vector2 {
+class SKETCH_3D_API Vector2 {
     public:
         float                   x;  /**< X component */
         float                   y;  /**< Y component */

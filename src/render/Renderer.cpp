@@ -5,8 +5,10 @@
 
 #include "render/OpenGL/RenderSystemOpenGL.h"
 
+#include "system/Platform.h"
+
 // Windows is the only OS where it makes sense to have DirectX
-#if defined(__WIN32__) || defined(_WIN32)
+#if PLATFORM == PLATFORM_WIN32
 #include "render/Direct3D9/RenderSystemDirect3D9.h"
 #endif
 
@@ -47,7 +49,7 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 			renderSystem_ = new RenderSystemOpenGL(window);
 			break;
 
-#if defined(__WIN32__) || defined(_WIN32)
+#if PLATFORM == PLATFORM_WIN32
 		case RENDER_SYSTEM_DIRECT3D9:
             renderSystem_ = new RenderSystemDirect3D9(window);			
 			break;

@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_BUFFER_OBJECT_H
 #define SKETCH_3D_BUFFER_OBJECT_H
 
+#include "system/Platform.h"
+
 #include <map>
 #include <vector>
 using namespace std;
@@ -44,7 +46,7 @@ typedef map<VertexAttributes_t, size_t> VertexAttributesMap_t;
  * This class represents the base class for API dependent buffer object of a vertex buffer
  * coupled with an index buffer
  */
-class BufferObject {
+class SKETCH_3D_API BufferObject {
     public:
         /**
          * Constructor

@@ -4,6 +4,8 @@
 #include "math/Matrix3x3.h"
 #include "math/Matrix4x4.h"
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 
 // Forward class declaration
@@ -17,7 +19,7 @@ class Vector3;
  *
  * Multiplications of Quaternions are used to combine rotations.
  */
-class Quaternion
+class SKETCH_3D_API Quaternion
 {
     public:
         float                   w;   /**< Real part */

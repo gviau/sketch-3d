@@ -9,7 +9,7 @@ namespace Sketch3D {
  * @class Complex
  * Defines a complex number a + i*b where i is the imaginary number
  */
-class Complex {
+class SKETCH_3D_API Complex {
     public:
         float                   a;  /**< Real part */
         float                   b;  /**< Imaginary part */

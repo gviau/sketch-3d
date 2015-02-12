@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_LOGGER_H
 #define SKETCH_3D_LOGGER_H
 
+#include "system/Platform.h"
+
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -27,7 +29,7 @@ enum LoggerLevel_t {
  * This class is a singleton and is used to log information, warnings and
  * errors into a structure html file.
  */
-class Logger {
+class SKETCH_3D_API Logger {
 	public:
 		/**
 		 * Destructor

@@ -3,6 +3,8 @@
 
 #include "math/Vector3.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -23,7 +25,7 @@ class Texture2D;
  * @class Text
  * Singleton class that is used to handle everything related to text rendering
  */
-class Text {
+class SKETCH_3D_API Text {
     typedef pair<vector<int>, Texture2D*> TextureAtlas_t;
 
     public:

@@ -3,6 +3,8 @@
 
 #include "render/Renderer_Common.h"
 
+#include "system/Platform.h"
+
 #include <vector>
 using namespace std;
 
@@ -16,7 +18,7 @@ class Window;
  * This class provides an interface for creating a render context depending on
  * the API used (Direct3D, OpenGL) and the OS the user is using.
  */
-class RenderContext {
+class SKETCH_3D_API RenderContext {
 	public:
 		/**
 		 * Initialize the context.

@@ -1,8 +1,8 @@
 #ifndef SKETCH_3D_RAY_H
 #define SKETCH_3D_RAY_H
 
-#include "system/Common.h"
 #include "math/Vector3.h"
+#include "system/Common.h"
 
 namespace Sketch3D
 {
@@ -14,7 +14,7 @@ class Plane;
  * @class Ray
  * Represents a ray in space as an origin and a unit length direction vector.
  */
-class Ray
+class SKETCH_3D_API Ray
 {
     public:
         /**

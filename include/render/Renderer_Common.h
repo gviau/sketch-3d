@@ -3,6 +3,8 @@
 
 #include "math/Plane.h"
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 // Forward struct declaration
 class Sphere;
@@ -106,7 +108,7 @@ enum RenderMode_t {
  * @struct FrustumPlanes_t
  * Struct containing the 6 planes of the view frustum
  */
-struct FrustumPlanes_t {
+struct SKETCH_3D_API FrustumPlanes_t {
     Plane nearPlane;
     Plane farPlane;
     Plane leftPlane;
@@ -137,7 +139,7 @@ enum DisplayFormat_t {
  * @struct DisplayMode_t
  * Specifies the supported mode of a display adapter. An adapter can have several modes.
  */
-struct DisplayMode_t {
+struct SKETCH_3D_API DisplayMode_t {
     size_t          width;          /**< Width of the screen in pixels */
     size_t          height;         /**< Height of the screen in pixels */
     size_t          refreshRate;    /**< Refresh rate of the screen. 0 indicates an adapter default */
@@ -149,7 +151,7 @@ struct DisplayMode_t {
  * This struct contains all the information necessary to initialize the rendering context with the appropriates
  * rendering parameters.
  */
-struct RenderParameters_t {
+struct SKETCH_3D_API RenderParameters_t {
     size_t              width;              /**< Width of the screen in pixels */
     size_t              height;             /**< Height of the screen in pixels */
     size_t              refreshRate;        /**< Refresh rate of the screen. 0 indicates an adapter default */
@@ -161,7 +163,7 @@ struct RenderParameters_t {
  * @struct ConfigFileAttributes_t
  * This struct is filled by a config file and contains all the necessary information to initialize the engine
  */
-struct ConfigFileAttributes_t {
+struct SKETCH_3D_API ConfigFileAttributes_t {
     RenderSystem_t      renderSystem;
     size_t              width;
     size_t              height;
@@ -171,7 +173,7 @@ struct ConfigFileAttributes_t {
     DepthStencilBits_t  depthStencilBits;
 };
 
-bool ParseConfigFile(const string& filename, ConfigFileAttributes_t& configFileAttributes);
+bool SKETCH_3D_API ParseConfigFile(const string& filename, ConfigFileAttributes_t& configFileAttributes);
 
 }
 

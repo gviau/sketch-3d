@@ -3,6 +3,8 @@
 
 #include "render/Texture.h"
 
+#include "system/Platform.h"
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -20,7 +22,7 @@ class RenderSystemOpenGL;
  * This class implements functionnalities that are specific to a texture that
  * is to be applied on a polygon
  */
-class Texture2D : public Texture {
+class SKETCH_3D_API Texture2D : public Texture {
 
 	public:
 		/**

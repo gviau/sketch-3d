@@ -4,6 +4,8 @@
 #include "math/Quaternion.h"
 #include "math/Vector3.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -16,7 +18,7 @@ namespace Sketch3D {
  * This class represents a set of keyframes for an animation that will be used on a skeleton
  * to transform its bones
  */
-class AnimationState {
+class SKETCH_3D_API AnimationState {
     typedef map<string, vector<pair<double, Vector3>>> VectorKey_t;
     typedef map<string, vector<pair<double, Quaternion>>> QuaternionKey_t;
 

@@ -5,6 +5,8 @@
 #include "math/Quaternion.h"
 #include "math/Vector3.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 using namespace std;
@@ -22,7 +24,7 @@ class RenderQueue;
  * @class Node
  * This class provides the base functionnality of a node the SceneTree
  */
-class Node {
+class SKETCH_3D_API Node {
     friend class SceneTree;
 
 	public:

@@ -24,7 +24,7 @@ enum RelativePlanePosition_t {
  * Represents an infinite plane defined by its normal and its distance from the
  * origin.
  */
-class Plane
+class SKETCH_3D_API Plane
 {
     public:
         /**

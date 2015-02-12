@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_SHADER_H
 #define SKETCH_3D_SHADER_H
 
+#include "system/Platform.h"
+
 #include <map>
 #include <stdint.h>
 #include <string>
@@ -32,7 +34,7 @@ enum ShaderType_t {
  * object as well as to pass properties to the shader. It acts as an interface
  * for the DirectX and OpenGL type of shaders
  */
-class Shader {
+class SKETCH_3D_API Shader {
 	public:
 		/**
 		 * Constructor

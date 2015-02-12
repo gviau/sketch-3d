@@ -119,6 +119,11 @@ else (WIN32)
     add_definitions(-std=c++11)
 endif (WIN32)
 
+set (SKETCH_3D_BUILD_STATIC TRUE CACHE BOOL "Build Sketch3D as a set of static libraries")
+if (SKETCH_3D_BUILD_STATIC)
+	add_definitions(-DSKETCH_3D_BUILD_STATIC)
+endif ()
+
 add_subdirectory (src)
 add_subdirectory (samples)
 

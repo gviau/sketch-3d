@@ -3,6 +3,8 @@
 
 #include "render/Texture2D.h"
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 
 /**
@@ -10,7 +12,7 @@ namespace Sketch3D {
  * Interface for render textures. Render textures are used to output a fragment shader to a texture, instead of the
  * screen.
  */
-class RenderTexture {
+class SKETCH_3D_API RenderTexture {
     public:
         /**
          * Constructor

@@ -8,6 +8,8 @@
 
 #include "render/BufferObject.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -28,7 +30,7 @@ class Texture2D;
  * @struct SurfaceTriangles_t
  * Structure containing the information about a surface to draw regarding the vertices
  */
-struct SurfaceTriangles_t {
+struct SKETCH_3D_API SurfaceTriangles_t {
                     SurfaceTriangles_t() : vertices(nullptr), normals(nullptr), texCoords(nullptr), tangents(nullptr), bones(nullptr), weights(nullptr),
                                            indices(nullptr), textures(nullptr), numVertices(0), numNormals(0), numTexCoords(0), numTangents(0),
                                            numBones(0), numWeights(0), numIndices(0), numTextures(0) {}
@@ -66,7 +68,7 @@ enum MeshType_t {
  * This class holds the representation of a 3D model. It is reponsible to send
  * the needed data to the underlying rendering system.
  */
-class Mesh {
+class SKETCH_3D_API Mesh {
 	public:
         /**
          * Constructor. Initialize everything to 0

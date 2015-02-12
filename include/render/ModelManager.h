@@ -4,6 +4,8 @@
 #include "render/Mesh.h"
 #include "render/Skeleton.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <utility>
@@ -16,7 +18,7 @@ namespace Sketch3D {
  * @class ModelManager
  * This class acts as a cache for loaded models
  */
-class ModelManager {
+class SKETCH_3D_API ModelManager {
     typedef map<string, pair<int, vector<SurfaceTriangles_t*>>> ModelCacheMap_t;
     typedef map<string, pair<int, Skeleton*>> SkeletonCacheMap_t;
 

@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_WINDOW_IMPLEMENTATION_H
 #define SKETCH_3D_WINDOW_IMPLEMENTATION_H
 
+#include "system/Platform.h"
 #include "system/WindowEvent.h"
 #include "system/WindowHandle.h"
 
@@ -15,7 +16,7 @@ namespace Sketch3D {
  * This class is an interface for the platform dependend implementation of a
  * window.
  */
-class WindowImplementation {
+class SKETCH_3D_API WindowImplementation {
 	public:
         /**
          * Close the window

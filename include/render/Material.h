@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_MATERIAL_H
 #define SKETCH_3D_MATERIAL_H
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 using namespace std;
@@ -25,7 +27,7 @@ enum TransluencyType_t {
  * properties that will be pass to the shader to control how the mesh will be
  * rendered.
  */
-class Material {
+class SKETCH_3D_API Material {
 	public:
 		/**
 		 * Constructor. Sets the shader for the material

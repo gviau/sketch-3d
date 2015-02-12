@@ -34,7 +34,7 @@ struct Bone_t {
  * the information regarding the bones, the vertices that are attached to them and the animations
  * that the skeleton posses.
  */
-class Skeleton {
+class SKETCH_3D_API Skeleton {
     typedef unordered_map<string, Bone_t> BoneCacheMap_t;
 
     public:

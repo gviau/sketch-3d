@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_TEXTURE_MANAGER_H
 #define SKETCH_3D_TEXTURE_MANAGER_H
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <utility>
@@ -15,7 +17,7 @@ class Texture2D;
  * @class TextureManager
  * This class acts as a cache for loaded textures
  */
-class TextureManager {
+class SKETCH_3D_API TextureManager {
     typedef map<string, pair<int, Texture2D*>> TextureCacheMap_t;
     typedef map<size_t, pair<int, Texture2D**>> TextureSetCacheMap_t;
 

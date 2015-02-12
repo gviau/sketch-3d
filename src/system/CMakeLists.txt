@@ -58,9 +58,15 @@ if (UNIX)
 	include_directories(${X11_INCLUDE_DIR})
 endif()
 
+if (NOT SKETCH_3D_BUILD_STATIC)
+	set (LIBRARY_TYPE SHARED)
+else ()
+	set (LIBRARY_TYPE STATIC)
+endif ()
+
 add_library(
     system
-    STATIC
+    ${LIBRARY_TYPE}
     ${SRC} ${PLATFORM_SRC}
     ${HEADER} ${PLATFORM_HEADER}
 )

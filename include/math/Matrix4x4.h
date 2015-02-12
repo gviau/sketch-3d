@@ -15,7 +15,7 @@ class Vector4;
  * @class Matrix4x4
  * Represents a column-major 4x4 matrix.
  */
-class Matrix4x4
+class SKETCH_3D_API Matrix4x4
 {
     public:
         // USEFUL STATICS

@@ -3,6 +3,8 @@
 
 #include "render/RenderQueueItem.h"
 
+#include "system/Platform.h"
+
 #include <vector>
 using namespace std;
 
@@ -17,7 +19,7 @@ class Node;
  * The render queue will also try to batch geometry data if they share the same material and
  * that they are both the same type of vertex buffers (static or dynamic)
  */
-class RenderQueue {
+class SKETCH_3D_API RenderQueue {
     public:
         /**
          * Constructor

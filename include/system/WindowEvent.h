@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_WINDOW_EVENT_H
 #define SKETCH_3D_WINDOW_EVENT_H
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 
 /**
@@ -8,7 +10,7 @@ namespace Sketch3D {
  * Represents an event from the OS dependent window to be processed by the
  * application.
  */
-class WindowEvent {
+class SKETCH_3D_API WindowEvent {
     public:
         WindowEvent();
 };

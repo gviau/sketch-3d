@@ -3,6 +3,8 @@
 
 #include "render/Texture.h"
 
+#include "system/Platform.h"
+
 #include <cstdlib>
 
 namespace Sketch3D {
@@ -11,7 +13,7 @@ namespace Sketch3D {
  * @class Texture3D
  * This class implements the functionalities that are specific to a 3d texture
  */
-class Texture3D : public Texture {
+class SKETCH_3D_API Texture3D : public Texture {
     public:
 		/**
 		 * Constructor. Initializes the width, height and depth to 0, the filter mode

@@ -69,6 +69,35 @@ namespace Sketch3D
 #   define HAVE_SSE 0
 #endif
 
+// DLL stuff
+#if !defined(SKETCH_3D_BUILD_STATIC)
+#   if PLATFORM == PLATFORM_WIN32
+#       define SKETCH_3D_API_EXPORT __declspec(dllexport)
+#       define SKETCH_3D_API_IMPORT __declspec(dllimport)
+
+        // TODO
+        // Might want to properly investigate this so that we don't disable the warning
+#       if COMPILER == COMPILER_MSVC
+#           pragma warning(disable: 4251)
+#       endif
+#   elif COMPILER == COMPILER_GNUC
+#       define SKETCH_3D_API_EXPORT __attribute__ ((__visibility__ ("default")))
+#       define SKETCH_3D_API_IMPORT __attribute__ ((__visibility__ ("default")))
+#   else
+#       define SKETCH_3D_API_EXPORT
+#       define SKETCH_3D_API_IMPORT
+#   endif
+#else
+#   define SKETCH_3D_API_EXPORT
+#   define SKETCH_3D_API_IMPORT
+#endif
+
+#if defined(SKETCH_3D_NONCLIENT_BUILD)
+#   define SKETCH_3D_API SKETCH_3D_API_EXPORT
+#else
+#   define SKETCH_3D_API SKETCH_3D_API_IMPORT
+#endif
+
 /**
  * @class PlatformInformation
  * This class provides methods to retrieve information about the cpu.
@@ -85,19 +114,19 @@ class PlatformInformation
         /**
          * Gets a string of the CPU identifier
          */
-        static const string&    GetCpuIdentifier();
+        static SKETCH_3D_API const string&    GetCpuIdentifier();
 
         /**
          * Returns the features supported by the cpu
          */
-        static unsigned int     GetCpuFeatures();
+        static SKETCH_3D_API unsigned int     GetCpuFeatures();
 
         /**
          * Tests wether or not a feature is supported by the cpu
          * @param feature The feature to test
          * @return true if the feature is supported, false otherwise
          */
-        static bool             HasCpuFeature(CpuFeatures feature);
+        static SKETCH_3D_API bool             HasCpuFeature(CpuFeatures feature);
 };
 }
 

@@ -1,6 +1,7 @@
 #ifndef SKETCH_3D_WINDOW_H
 #define SKETCH_3D_WINDOW_H
 
+#include "system/Platform.h"
 #include "system/WindowHandle.h"
 
 #include <string>
@@ -17,7 +18,7 @@ class WindowImplementation;
  * This class provides an interface to create a window independently of the
  * platform on which we are
  */
-class Window {
+class SKETCH_3D_API Window {
 	public:
 		/**
 		 * Constructor

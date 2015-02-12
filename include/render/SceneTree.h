@@ -3,6 +3,8 @@
 
 #include "render/Node.h"
 
+#include "system/Platform.h"
+
 #include <string>
 using namespace std;
 
@@ -22,7 +24,7 @@ class RenderQueue;
  *
  * The name of this node is automatically set to "root" and it has no parent.
  */
-class SceneTree {
+class SKETCH_3D_API SceneTree {
 	public:
 		/**
 		 * Constructor

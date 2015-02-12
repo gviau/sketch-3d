@@ -12,7 +12,7 @@ class Matrix4x4;
  * @class Vector4
  * The Vector4 class represents a 4D vector.
  */
-class Vector4 {
+class SKETCH_3D_API Vector4 {
     public:
         float                   x;      /**< X component */
         float                   y;      /**< Y component */

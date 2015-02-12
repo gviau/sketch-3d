@@ -4,6 +4,8 @@
 #include "math/Plane.h"
 #include "math/Vector3.h"
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 // Forward declaration
 class Ray;
@@ -12,7 +14,7 @@ class Ray;
  * @class Sphere
  * This class represents a sphere.
  */
-class Sphere {
+class SKETCH_3D_API Sphere {
     public:
         /**
          * Default constructor. Initializes a unit sphere at the origin

@@ -12,7 +12,7 @@ class Matrix3x3;
  * @class Vector3
  * The Vector3 class represents a 3D vector class.
  */
-class Vector3 {
+class SKETCH_3D_API Vector3 {
     public:
         float                   x;    /**< X component */
         float                   y;    /**< Y component */

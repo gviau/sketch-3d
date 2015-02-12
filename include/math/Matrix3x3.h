@@ -15,7 +15,7 @@ class Vector3;
  * @class Matrix3x3
  * Represents a column-major 3x3 matrix.
  */
-class Matrix3x3
+class SKETCH_3D_API Matrix3x3
 {
 	friend class ShaderOpenGL;
 

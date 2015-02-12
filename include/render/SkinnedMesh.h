@@ -6,6 +6,8 @@
 #include "render/Mesh.h"
 #include "render/Skeleton.h"
 
+#include "system/Platform.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -22,7 +24,7 @@ namespace Sketch3D {
  * This class implements the required functionality to read and play animation from
  * a rigged character. For now, the skinned mesh supports a maximum of 4 weights per bone
  */
-class SkinnedMesh : public Mesh {
+class SKETCH_3D_API SkinnedMesh : public Mesh {
     public:
         /**
          * Constructor

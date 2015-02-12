@@ -18,13 +18,20 @@ file(
 
 include_directories(../../include)
 
+if (NOT SKETCH_3D_BUILD_STATIC)
+	set (LIBRARY_TYPE SHARED)
+else ()
+	set (LIBRARY_TYPE STATIC)
+endif ()
+
 add_library(
     math
-    STATIC
+    ${LIBRARY_TYPE}
     ${source_files}
     ${header_files}
 )
 
 target_link_libraries(
     math
+	system
 )

@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_TEXTURE_H
 #define SKETCH_3D_TEXTURE_H
 
+#include "system/Platform.h"
+
 namespace Sketch3D {
 
 /**
@@ -57,7 +59,7 @@ enum TextureType_t {
  * This class serves as a base class to other classes that act as textures,
  * such as the Texture2D and RenderTexture classes.
  */
-class Texture {
+class SKETCH_3D_API Texture {
 	public:
 		/**
 		 * Constructor. Initializes the width and height to 0, the filter mode

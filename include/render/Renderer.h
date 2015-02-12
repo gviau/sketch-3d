@@ -10,6 +10,8 @@
 #include "render/SceneTree.h"
 #include "render/Texture.h"
 
+#include "system/Platform.h"
+
 #include <string>
 using namespace std;
 
@@ -32,7 +34,7 @@ class Window;
  * the user can draw things on the screen and modify certain parameters of the
  * rendering context
  */
-class Renderer {
+class SKETCH_3D_API Renderer {
 	public:
 		/**
 		 * Destructor

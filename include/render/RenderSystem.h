@@ -41,7 +41,7 @@ struct DeviceCapabilities_t {
  *
  * This interface is basically the context of the API.
  */
-class RenderSystem {
+class SKETCH_3D_API RenderSystem {
 	public:
 		/**
 		 * Constructor. Initializes the underlying API.

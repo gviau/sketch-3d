@@ -3,6 +3,8 @@
 
 #include "render/BufferObject.h"
 
+#include "system/Platform.h"
+
 #include <set>
 using namespace std;
 
@@ -12,7 +14,7 @@ namespace Sketch3D {
  * @class BufferObjectManager
  * This class acts as a manager to create and handle buffer objects that are API dependent
  */
-class BufferObjectManager {
+class SKETCH_3D_API BufferObjectManager {
     public:
         /**
          * Destructor - releases all buffer objects

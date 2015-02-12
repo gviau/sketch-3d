@@ -143,9 +143,15 @@ endif ()
 
 add_definitions(-DGLEW_BUILD)
 
+if (NOT SKETCH_3D_BUILD_STATIC)
+	set (LIBRARY_TYPE SHARED)
+else ()
+	set (LIBRARY_TYPE STATIC)
+endif ()
+
 add_library(
     render
-    STATIC
+    ${LIBRARY_TYPE}
     ${SRC} ${OPENGL_SRC} ${DIRECT3D9_SRC}
     ${HEADER} ${OPENGL_HEADER} ${DIRECT3D9_HEADER}
 )
