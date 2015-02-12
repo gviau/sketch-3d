@@ -100,6 +100,16 @@ if (WIN32)
 	endif ()
 endif ()
 
+find_package (FREETYPE)
+
+message (STATUS "FreeType found? ${FREETYPE_FOUND}")
+if (FREETYPE_FOUND)
+	message (STATUS "FreeType include: ${FREETYPE_INCLUDE_DIRS}")
+	message (STATUS "FreeType libs: ${FREETYPE_LIBRARIES}")
+else ()
+	set (MISSING_MODULES ${MISSING_MODULES} "FreeType")
+endif ()
+
 if (MISSING_MODULES)
     message(FATAL_ERROR "Could generate all makefiles: missing modules: ${MISSING_MODULES}")
 endif (MISSING_MODULES)
