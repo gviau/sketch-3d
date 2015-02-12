@@ -4,6 +4,7 @@
 #include "render/OpenGL/gl/gl.h"
 
 #include "render/OpenGL/BufferObjectManagerOpenGL.h"
+#include "render/OpenGL/BufferObjectOpenGL.h"
 #include "render/OpenGL/RenderTextureOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
@@ -20,13 +21,19 @@
 
 namespace Sketch3D {
 
-RenderSystemOpenGL::RenderSystemOpenGL(Window& window) : RenderSystem(window),
-                                                         renderContext_(NULL)
-{
+RenderSystemOpenGL::RenderSystemOpenGL(Window& window) : RenderSystem(window), renderContext_(NULL) {
 	Logger::GetInstance()->Info("Current rendering API: OpenGL");
 }
 
 RenderSystemOpenGL::~RenderSystemOpenGL() {
+    TextureUnitNode_t* node = head_;
+    TextureUnitNode_t* toDelete = nullptr;
+    while (node != nullptr) {
+        toDelete = node;
+        node = node->next;
+        delete toDelete;
+    }
+
 	Logger::GetInstance()->Info("Shutdown OpenGL");
 	delete renderContext_;
 }
@@ -51,6 +58,22 @@ bool RenderSystemOpenGL::Initialize(const RenderParameters_t& renderParameters) 
     glEnable(GL_TEXTURE_2D);
 
     bufferObjectManager_ = new BufferObjectManagerOpenGL;
+
+    // Construct the texture cache
+    head_ = new TextureUnitNode_t;
+    head_->textureUnit = 0;
+    head_->prev = nullptr;
+    tail_ = head_;
+
+    for (int i = 1; i < deviceCapabilities_.maxActiveTextures_ + 1; i++) {
+        tail_->next = new TextureUnitNode_t;
+        tail_->next->prev = tail_;
+        tail_ = tail_->next;
+        tail_->textureUnit = i;
+    }
+    tail_->next = nullptr;
+
+    CreateTextShader();
 
 	return true;
 }
@@ -201,8 +224,8 @@ void RenderSystemOpenGL::SetCullingMethod(CullingMethod_t cullingMethod) const {
     }
 }
 
-Shader* RenderSystemOpenGL::CreateShader(const string& vertexFilename, const string& fragmentFilename) {
-    shaders_.push_back(new ShaderOpenGL(vertexFilename + ".glsl", fragmentFilename + ".glsl"));
+Shader* RenderSystemOpenGL::CreateShader() {
+    shaders_.push_back(new ShaderOpenGL);
     return shaders_[shaders_.size() - 1];
 }
 
@@ -259,29 +282,67 @@ void RenderSystemOpenGL::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingF
     glBlendFunc(GetBlendingFactor(srcFactor), GetBlendingFactor(dstFactor));
 }
 
-void RenderSystemOpenGL::BindTexture(const Texture* texture, size_t unit) const {
-    TextureType_t textureType = texture->GetType();
-    size_t textureName = 0;
+size_t RenderSystemOpenGL::BindTexture(const Texture* texture) {
+    const Texture2DOpenGL* textureOpenGL = static_cast<const Texture2DOpenGL*>(texture);
 
-    glActiveTexture(GL_TEXTURE0 + unit);
-    if (textureType == TEXTURE_TYPE_2D) {
-        textureName = dynamic_cast<const Texture2DOpenGL*>(texture)->textureName_;
-        glBindTexture(GL_TEXTURE_2D, textureName);
-    } else if (textureType == TEXTURE_TYPE_3D) {
-        textureName = dynamic_cast<const Texture3DOpenGL*>(texture)->textureName_;
-        glBindTexture(GL_TEXTURE_2D, textureName);
+    // Verify if the node is already bound
+    size_t textureUnit = 0;
+    TextureUnitNode_t* nodeToUse = head_;
+    TextureCache_t::iterator it = textureCache_.find(textureOpenGL->textureName_);
+
+    if (it != textureCache_.end()) {
+        nodeToUse = it->second;
     } else {
-        Logger::GetInstance()->Error("Invalid texture type for binding!");
-        return;
+        // Bind it otherwise
+        TextureType_t textureType = texture->GetType();
+
+        glActiveTexture(GL_TEXTURE0 + nodeToUse->textureUnit);
+        if (textureType == TEXTURE_TYPE_2D) {
+            glBindTexture(GL_TEXTURE_2D, textureOpenGL->textureName_);
+        } else if (textureType == TEXTURE_TYPE_3D) {
+            glBindTexture(GL_TEXTURE_2D, textureOpenGL->textureName_);
+        }
+
+        textureCache_[textureOpenGL->textureName_] = nodeToUse;
     }
+    textureUnit = nodeToUse->textureUnit;
+
+    // Put the node to use at the end of the list if it isn't there yet
+    if (tail_ != nodeToUse) {
+        tail_->next = nodeToUse;
+
+        // Remove that node from the list since its now a duplicate
+        if (nodeToUse->prev) {
+            nodeToUse->prev->next = nodeToUse->next;
+        }
+
+        if (nodeToUse->next) {
+            nodeToUse->next->prev = nodeToUse->prev;
+        }
+
+        // Advance head if needed
+        if (nodeToUse == head_) {
+            head_ = head_->next;
+        }
+
+        tail_->next->prev = tail_;
+        tail_ = tail_->next;
+        tail_->next = nullptr;
+    }
+
+    return textureUnit;
 }
 
 void RenderSystemOpenGL::BindShader(const Shader* shader) {
-    if (shader == nullptr) {
-        glUseProgram(0);
-    } else {
-        const ShaderOpenGL* shaderOpengl = static_cast<const ShaderOpenGL*>(shader);
-        glUseProgram(shaderOpengl->program_);
+    if (shader != boundShader_) {
+        if (shader == nullptr) {
+            glUseProgram(0);
+        } else {
+            const ShaderOpenGL* shaderOpengl = static_cast<const ShaderOpenGL*>(shader);
+            glUseProgram(shaderOpengl->program_);
+        }
+
+        boundShader_ = shader;
     }
 }
 
@@ -364,6 +425,46 @@ unsigned int RenderSystemOpenGL::GetBlendingFactor(BlendingFactor_t factor) cons
     }
 
     return blendingFactor;
+}
+
+void RenderSystemOpenGL::CreateTextShader() {
+    const char* textVertexShaderSource = \
+        "#version 330\n"
+
+        "layout (location=0) in vec3 in_vertex;\n"
+        "layout (location=1) in vec2 in_uv;\n"
+
+        "out vec2 uv;\n"
+
+        "void main() {\n"
+            "uv = in_uv;\n"
+            "gl_Position = vec4(in_vertex.xy, 0.0, 1.0);\n"
+        "}"
+    ;
+
+    const char* textFragmentShaderSource = \
+        "#version 330\n"
+
+        "uniform sampler2D fontAtlas;\n"
+        "uniform vec3 textColor;\n"
+
+        "in vec2 uv;\n"
+        "out vec4 color;\n"
+
+        "void main() {\n"
+            "float val = texture2D(fontAtlas, uv).r;\n"
+            "if (val < 0.5) {\n"
+                "discard;\n"
+            "}\n"
+
+            "color = vec4(textColor, 1.0);\n"
+        "}"
+    ;
+
+    textShader_ = Renderer::GetInstance()->CreateShader();
+    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
+        Logger::GetInstance()->Error("Couldn't create text shader");
+    }
 }
 
 }

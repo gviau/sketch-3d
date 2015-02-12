@@ -184,15 +184,13 @@ class Renderer {
          * Select the culling method
          * @param cullingMethod The culling method to use
          */
-        void                    SetCullingMethod(CullingMethod_t cullingMethod) const;
+        void                    SetCullingMethod(CullingMethod_t cullingMethod);
 
         /**
          * Create a shader object
-         * @param vertexFilename The vertex shader filename
-         * @param fragmentFilename The fragment shader filename
          * @return A pointer to a shader
          */
-        Shader*                 CreateShader(const string& vertexFilename, const string& fragmentFilename) const;
+        Shader*                 CreateShader() const;
 
         /**
          * Create a 2D texture object
@@ -278,6 +276,14 @@ class Renderer {
          */
         void                    EnableFrustumCulling(bool bal);
 
+        /**
+         * Draw the content of a buffer object using a shader made for drawing text
+         * @param bufferObject The buffer object to draw
+         * @param fontAtlas A texture atlas representing the font that is going to be used
+         * @parma textColor The color of the text been rendered
+         */
+        void                    DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor);
+
 		const Matrix4x4&	    GetProjectionMatrix() const;
 		const Matrix4x4&	    GetViewMatrix() const;
 		const Matrix4x4&	    GetViewProjectionMatrix() const;
@@ -287,20 +293,11 @@ class Renderer {
 
         BufferObjectManager*    GetBufferObjectManager() const;
 
-	private:
-        /**
-         * @struct TextureUnitNode_t
-         * This texture serves as an element for the texture unit cache. All that it contains is
-         * a pointer to the next element and the texture unit it refers to. It is used as a single
-         * linked list
-         */
-        struct TextureUnitNode_t {
-            size_t              textureUnit;
-            TextureUnitNode_t*  next;
-            TextureUnitNode_t*  prev;
-        };
-        typedef map<const Texture*, TextureUnitNode_t*> TextureCache_t;
+        size_t                  GetScreenWidth() const;
+        size_t                  GetScreenHeight() const;
+        CullingMethod_t         GetCullingMethod() const;
 
+	private:
 		static Renderer		    instance_;	            /**< Singleton instance of this class */
 
 		RenderSystem*		    renderSystem_;		    /**< The render system that is currently being used */
@@ -311,12 +308,7 @@ class Renderer {
 
 		SceneTree			    sceneTree_;			    /**< The scene tree to render */
 
-        const Shader*           boundShader_;           /**< The currently bound shader */
         BufferObjectManager*    bufferObjectManager_;   /**< Buffer object manager used to create the buffer objects */
-
-        TextureUnitNode_t*      head_;                  /**< Head of the double linked list */
-        TextureUnitNode_t*      tail_;                  /**< Tail of the double linked list */
-        TextureCache_t          textureCache_;          /**< Texture pointers refer directly to a cache element for faster lookup */
 
         RenderQueue             renderQueue_;           /**< The render queue used for drawing */
         bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
@@ -327,6 +319,8 @@ class Renderer {
         size_t                  oldViewportY_;
         size_t                  oldViewportWidth_;
         size_t                  oldViewportHeight_;
+
+        CullingMethod_t         cullingMethod_;         /**< Current culling method */
 
         /**
          * Initializes some default values

@@ -27,6 +27,8 @@ enum WrapMode_t {
  * The format of the texture, describing how to interpret the bytes
  */
 enum TextureFormat_t {
+    TEXTURE_FORMAT_GRAYSCALE,
+
 	TEXTURE_FORMAT_RGB24,
 	TEXTURE_FORMAT_RGBA32,
     TEXTURE_FORMAT_BGR24,

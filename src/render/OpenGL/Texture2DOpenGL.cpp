@@ -22,6 +22,7 @@ bool Texture2DOpenGL::Create() {
     }
 
     Bind();
+    glBindTexture(GL_TEXTURE_2D, textureName_);
 
     GLuint filter = GetOpenglFilterMode();
     GLuint wrap = GetOpenglWrapMode();
@@ -29,20 +30,14 @@ bool Texture2DOpenGL::Create() {
     GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
-    if (data_ != nullptr) {
-	    glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0,
-				     components, type, data_);
-
-        if (generateMipmaps_) {
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-
-    } else if (format == GL_DEPTH_COMPONENT16) {
+    if (format == GL_DEPTH_COMPONENT16) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, components, type, nullptr);
-    } else {
-        glTexStorage2D(GL_TEXTURE_2D, 1, format, width_, height_);
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, components, type, data_);
+
+    if (generateMipmaps_) {
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
@@ -112,6 +107,13 @@ void Texture2DOpenGL::SetPixelDataFloatsImp(float* data) {
 
 void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLuint& internalFormat, GLuint& format, GLuint& type, GLuint& bpp) const {
 	switch (textureFormat) {
+        case TEXTURE_FORMAT_GRAYSCALE:
+            internalFormat = GL_R8;
+            format = GL_RED;
+            type = GL_UNSIGNED_BYTE;
+            bpp = 1;
+            break;
+
 		case TEXTURE_FORMAT_RGB24:
             internalFormat = GL_RGB;
             format = GL_RGB;

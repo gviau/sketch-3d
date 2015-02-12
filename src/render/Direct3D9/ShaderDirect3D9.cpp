@@ -14,92 +14,8 @@
 
 namespace Sketch3D {
 
-ShaderDirect3D9::ShaderDirect3D9(const string& vertexFilename, const string& fragmentFilename,
-                                 IDirect3DDevice9* device) : Shader(vertexFilename, fragmentFilename),
-                                                             device_(device)
-{
+ShaderDirect3D9::ShaderDirect3D9(IDirect3DDevice9* device) : device_(device) {
     Logger::GetInstance()->Debug("Direct3D9 shader creation");
-
-    DWORD flags = 0;
-
-#ifdef _DEBUG
-    flags = D3DXSHADER_DEBUG;
-#else
-    flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
-#endif
-
-    ID3DXBuffer* shader = nullptr;
-    ID3DXBuffer* errorBuffer = nullptr;
-
-    Logger::GetInstance()->Debug("Vertex shader creation");
-
-    HRESULT hr = D3DXCompileShaderFromFile(vertexFilename.c_str(), nullptr, nullptr, "main", "vs_3_0", flags,
-                                           &shader, &errorBuffer, &vertexConstants_);
-    if (errorBuffer != nullptr) {
-        Logger::GetInstance()->Error("Shader error for file : " + vertexFilename);
-        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
-        errorBuffer->Release();
-        errorBuffer = nullptr;
-    }
-
-    if (FAILED(hr)) {
-        Logger::GetInstance()->Error("Couldn't compile vertex shader : " + vertexFilename);
-
-        if (shader != nullptr) {
-            shader->Release();
-        }
-
-        return;
-    }
-
-    device_->CreateVertexShader((DWORD*)shader->GetBufferPointer(), &vertexShader_);
-    if (FAILED(hr)) {
-        Logger::GetInstance()->Error("Couldn't create vertex shader : " + vertexFilename);
-
-        if (shader != nullptr) {
-            shader->Release();
-        }
-
-        return;
-    }
-
-    shader->Release();
-    shader = nullptr;
-
-    Logger::GetInstance()->Debug("Fragment shader creation");
-
-    hr = D3DXCompileShaderFromFile(fragmentFilename.c_str(), nullptr, nullptr, "main", "ps_3_0", flags,
-                                   &shader, &errorBuffer, &fragmentConstants_);
-    if (errorBuffer != nullptr) {
-        Logger::GetInstance()->Error("Shader error for file : " + fragmentFilename);
-        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
-        errorBuffer->Release();
-        errorBuffer = nullptr;
-    }
-
-    if (FAILED(hr)) {
-        Logger::GetInstance()->Error("Couldn't compile fragment shader : " + fragmentFilename);
-
-        if (shader != nullptr) {
-            shader->Release();
-        }
-
-        return;
-    }
-
-    device_->CreatePixelShader((DWORD*)shader->GetBufferPointer(), &fragmentShader_);
-    if (FAILED(hr)) {
-        Logger::GetInstance()->Error("Couldn't create fragment shader : " + fragmentFilename);
-
-        if (shader != nullptr) {
-            shader->Release();
-        }
-
-        return;
-    }
-
-    shader->Release();
-    shader = nullptr;
 }
 
 ShaderDirect3D9::~ShaderDirect3D9() {
@@ -118,6 +34,176 @@ ShaderDirect3D9::~ShaderDirect3D9() {
     if (fragmentConstants_ != nullptr) {
         fragmentConstants_->Release();
     }
+}
+
+bool ShaderDirect3D9::SetSourceFile(const string& vertexFilename, const string& fragmentFilename) {
+    DWORD flags = 0;
+
+#ifdef _DEBUG
+    flags = D3DXSHADER_DEBUG;
+#else
+    flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
+#endif
+
+    ID3DXBuffer* shader = nullptr;
+    ID3DXBuffer* errorBuffer = nullptr;
+
+    Logger::GetInstance()->Debug("Vertex shader creation");
+
+    HRESULT hr = D3DXCompileShaderFromFile((vertexFilename + ".hlsl").c_str(), nullptr, nullptr, "main", "vs_3_0", flags,
+                                           &shader, &errorBuffer, &vertexConstants_);
+    if (errorBuffer != nullptr) {
+        Logger::GetInstance()->Error("Shader error for file : " + (vertexFilename + ".hlsl"));
+        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
+        errorBuffer->Release();
+        errorBuffer = nullptr;
+    }
+
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't compile vertex shader : " + (vertexFilename + ".hlsl"));
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    device_->CreateVertexShader((DWORD*)shader->GetBufferPointer(), &vertexShader_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create vertex shader : " + (vertexFilename + ".hlsl"));
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    shader->Release();
+    shader = nullptr;
+
+    Logger::GetInstance()->Debug("Fragment shader creation");
+
+    hr = D3DXCompileShaderFromFile((fragmentFilename + ".hlsl").c_str(), nullptr, nullptr, "main", "ps_3_0", flags,
+                                   &shader, &errorBuffer, &fragmentConstants_);
+    if (errorBuffer != nullptr) {
+        Logger::GetInstance()->Error("Shader error for file : " + (fragmentFilename + ".hlsl"));
+        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
+        errorBuffer->Release();
+        errorBuffer = nullptr;
+    }
+
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't compile fragment shader : " + (fragmentFilename + ".hlsl"));
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    device_->CreatePixelShader((DWORD*)shader->GetBufferPointer(), &fragmentShader_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create fragment shader : " + (fragmentFilename + ".hlsl"));
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    shader->Release();
+    shader = nullptr;
+
+    return true;
+}
+
+bool ShaderDirect3D9::SetSource(const string& vertexSource, const string& fragmentSource) {
+    DWORD flags = 0;
+
+#ifdef _DEBUG
+    flags = D3DXSHADER_DEBUG;
+#else
+    flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
+#endif
+
+    ID3DXBuffer* shader = nullptr;
+    ID3DXBuffer* errorBuffer = nullptr;
+
+    Logger::GetInstance()->Debug("Vertex shader creation");
+
+    HRESULT hr = D3DXCompileShader(vertexSource.c_str(), vertexSource.size(), nullptr, nullptr, "main", "vs_3_0", flags,
+                                           &shader, &errorBuffer, &vertexConstants_);
+    if (errorBuffer != nullptr) {
+        Logger::GetInstance()->Error("Shader error from vertex source");
+        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
+        errorBuffer->Release();
+        errorBuffer = nullptr;
+    }
+
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't compile vertex shader from source");
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    device_->CreateVertexShader((DWORD*)shader->GetBufferPointer(), &vertexShader_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create vertex shader from source");
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    shader->Release();
+    shader = nullptr;
+
+    Logger::GetInstance()->Debug("Fragment shader creation");
+
+    hr = D3DXCompileShader(fragmentSource.c_str(), fragmentSource.size(), nullptr, nullptr, "main", "ps_3_0", flags,
+                           &shader, &errorBuffer, &fragmentConstants_);
+    if (errorBuffer != nullptr) {
+        Logger::GetInstance()->Error("Shader error from fragment source");
+        Logger::GetInstance()->Error((char*)errorBuffer->GetBufferPointer());
+        errorBuffer->Release();
+        errorBuffer = nullptr;
+    }
+
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't compile fragment shader from source");
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    device_->CreatePixelShader((DWORD*)shader->GetBufferPointer(), &fragmentShader_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create fragment shader from source");
+
+        if (shader != nullptr) {
+            shader->Release();
+        }
+
+        return false;
+    }
+
+    shader->Release();
+    shader = nullptr;
+
+    return true;
 }
 
 bool ShaderDirect3D9::SetUniformInt(const string& uniformName, int value) {

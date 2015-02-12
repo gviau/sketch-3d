@@ -32,7 +32,7 @@ class RenderSystemDirect3D9 : public RenderSystem {
         virtual void EnableColorWrite(bool val) const;
         virtual void SetDepthComparisonFunc(DepthFunc_t comparison) const;
         virtual void SetCullingMethod(CullingMethod_t cullingMethod) const;
-        virtual Shader* CreateShader(const string& vertexFilename, const string& fragmentFilename);
+        virtual Shader* CreateShader();
         virtual Texture2D* CreateTexture2D() const;
         virtual Texture3D* CreateTexture3D() const;
         virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format);
@@ -40,7 +40,6 @@ class RenderSystemDirect3D9 : public RenderSystem {
         virtual void EnableBlending(bool val) const;
         virtual void SetBlendingEquation(BlendingEquation_t equation) const;
         virtual void SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t destFactor) const;
-        virtual void BindTexture(const Texture* texture, size_t unit) const;
         virtual void BindShader(const Shader* shader);
         virtual FrustumPlanes_t ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const;
 
@@ -54,6 +53,7 @@ class RenderSystemDirect3D9 : public RenderSystem {
 
         unsigned int GetBlendingFactor(BlendingFactor_t factor) const;
         virtual void QueryDeviceCapabilities();
+        virtual void CreateTextShader();
 };
 
 }

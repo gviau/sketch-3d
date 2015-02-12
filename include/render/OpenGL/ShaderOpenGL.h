@@ -21,8 +21,11 @@ class ShaderOpenGL : public Shader {
     friend class RenderSystemOpenGL;
 
 	public:
-		ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename);
+		ShaderOpenGL();
         virtual ~ShaderOpenGL();
+
+        virtual bool SetSourceFile(const string& vertexFilename, const string& fragmentFilename);
+        virtual bool SetSource(const string& vertexSource, const string& fragmentSource);
 
 		virtual bool SetUniformInt(const string& uniform, int value);
 		virtual bool SetUniformFloat(const string& uniform, float value);

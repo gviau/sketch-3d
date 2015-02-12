@@ -162,11 +162,9 @@ class RenderSystem {
 
         /**
          * Create an empty shader
-         * @param vertexFilename The vertex shader filename
-         * @param fragmentFilename The fragment shader filename
          * @return A pointer to a shader
          */
-        virtual Shader*                     CreateShader(const string& vertexFilename, const string& fragmentFilename) = 0;
+        virtual Shader*                     CreateShader() = 0;
 
         /**
          * Create an empty texture
@@ -223,9 +221,8 @@ class RenderSystem {
         /**
          * Bind a texture to a texture unit
          * @param texture A pointer to the texture object to bind
-         * @param unit The texture unit to bind it to
          */
-        virtual void                        BindTexture(const Texture* texture, size_t unit) const = 0;
+        virtual size_t                      BindTexture(const Texture* texture);
 
         /**
          * Bind the specified shader to the GPU
@@ -239,6 +236,14 @@ class RenderSystem {
          * @return A FrustumPlanes_t object, containing the 6 view frustum planes
          */
         virtual FrustumPlanes_t             ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const = 0;
+
+        /**
+         * Draw the content of a buffer object using a shader made for drawing text
+         * @param bufferObject The buffer object to draw
+         * @param fontAtlas A texture atlas representing the font that is going to be used
+         * @parma textColor The color of the text been rendered
+         */
+        void                                DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor);
 
         size_t                              GetWidth() const { return width_; }
         size_t                              GetHeight() const { return height_; }
@@ -254,14 +259,22 @@ class RenderSystem {
 
         vector<Shader*>                     shaders_;       /**< List of all shaders created */
         vector<RenderTexture*>              renderTextures_;/**< List of all render textures created */
+        const Shader*                       boundShader_;   /**< The currently bound shader */
 
         DeviceCapabilities_t                deviceCapabilities_;
         BufferObjectManager*                bufferObjectManager_;
+
+        Shader*                             textShader_;    /**< Shader used to draw text on screen */
 
 		/**
 		 * Query the device capabilities
 		 */
 		virtual void					    QueryDeviceCapabilities() = 0;
+
+        /**
+         * Create the shader that will be used to draw the text on screen
+         */
+        virtual void                        CreateTextShader() = 0;
 };
 
 }

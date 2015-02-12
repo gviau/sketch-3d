@@ -7,6 +7,7 @@
 #include <render/Renderer.h>
 #include <render/SceneTree.h>
 #include <render/Shader.h>
+#include <render/Text.h>
 #include <render/Texture2D.h>
 
 #include <system/Window.h>
@@ -58,7 +59,8 @@ int main(int argc, char** argv) {
     paperMesh.Initialize(vertexAttributes);
     
     // Create the paper material
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/BurningPaper/vert", "Shaders/BurningPaper/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/BurningPaper/vert", "Shaders/BurningPaper/frag");
     Material paperMaterial(shader);
 
     Texture2D* paperTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/paper.jpg");
@@ -79,6 +81,13 @@ int main(int argc, char** argv) {
     float t = 0.0f;
     clock_t begin, end;
 
+    Text::GetInstance()->SetTextFont("C:/Windows/Fonts/Arial.ttf");
+    Text::GetInstance()->SetTextSize(24, 24);
+    
+    float fps = 0;
+    float dt = 0.0f;
+    size_t numFrames = 0;
+
     while (window.IsOpen()) {
         begin = clock();
 
@@ -86,19 +95,30 @@ int main(int argc, char** argv) {
         if (window.PollEvents(windowEvent)) {
         }
 
-        //threshold = powf(1.05, t / 5000.0f);
-        threshold += t / 7500.0f;
+        threshold += t / 3.0f;
+        Renderer::GetInstance()->BindShader(shader);
         shader->SetUniformVector2("thresholds", threshold, range);
 
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
+
+        Text::GetInstance()->Write(to_string(fps), 5, 5);
+
         Renderer::GetInstance()->EndRender();
 
         Renderer::GetInstance()->PresentFrame();
 
         end = clock();
-        t += float(end - begin) / CLOCKS_PER_SEC;
+        t = float(end - begin) / CLOCKS_PER_SEC;
+        dt += float(end - begin) / CLOCKS_PER_SEC;
+
+        numFrames += 1;
+        if (dt >= 0.25f) {
+            fps = (float)numFrames / dt;
+            numFrames = 0;
+            dt -= 0.25f;
+        }
     }
 
     return 0;

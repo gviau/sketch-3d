@@ -24,20 +24,12 @@ namespace Sketch3D {
 
 Renderer Renderer::instance_;
 
-Renderer::Renderer() : renderSystem_(nullptr), boundShader_(nullptr), useFrustumCulling_(true), oldViewportX_(0),
+Renderer::Renderer() : renderSystem_(nullptr), useFrustumCulling_(true), oldViewportX_(0),
                        oldViewportY_(0), oldViewportWidth_(0), oldViewportHeight_(0)
 {
 }
 
 Renderer::~Renderer() {
-    TextureUnitNode_t* node = head_;
-    TextureUnitNode_t* toDelete = nullptr;
-    while (node != nullptr) {
-        toDelete = node;
-        node = node->next;
-        delete toDelete;
-    }
-
 	delete renderSystem_;
 }
 
@@ -198,12 +190,13 @@ void Renderer::SetDepthComparisonFunc(DepthFunc_t comparison) const {
     renderSystem_->SetDepthComparisonFunc(comparison);
 }
 
-void Renderer::SetCullingMethod(CullingMethod_t cullingMethod) const {
+void Renderer::SetCullingMethod(CullingMethod_t cullingMethod) {
+    cullingMethod_ = cullingMethod;
     renderSystem_->SetCullingMethod(cullingMethod);
 }
 
-Shader* Renderer::CreateShader(const string& vertexFilename, const string& fragmentFilename) const {
-    return renderSystem_->CreateShader(vertexFilename, fragmentFilename);
+Shader* Renderer::CreateShader() const {
+    return renderSystem_->CreateShader();
 }
 
 Texture2D* Renderer::CreateTexture2D() const {
@@ -256,51 +249,11 @@ Vector3 Renderer::ScreenToWorldPoint(const Vector2& point) const {
 }
 
 size_t Renderer::BindTexture(const Texture* texture) {
-    // Verify if the node is already bound
-    size_t textureUnit = 0;
-    TextureUnitNode_t* nodeToUse = head_;
-    TextureCache_t::iterator it = textureCache_.find(texture);
-
-    if (it != textureCache_.end()) {
-        nodeToUse = it->second;
-    } else {
-        // Bind it otherwise
-        renderSystem_->BindTexture(texture, nodeToUse->textureUnit);
-        textureCache_[texture] = nodeToUse;
-    }
-    textureUnit = nodeToUse->textureUnit;
-
-    // Put the node to use at the end of the list if it isn't there yet
-    if (tail_ != nodeToUse) {
-        tail_->next = nodeToUse;
-
-        // Remove that node from the list since its now a duplicate
-        if (nodeToUse->prev) {
-            nodeToUse->prev->next = nodeToUse->next;
-        }
-
-        if (nodeToUse->next) {
-            nodeToUse->next->prev = nodeToUse->prev;
-        }
-
-        // Advance head if needed
-        if (nodeToUse == head_) {
-            head_ = head_->next;
-        }
-
-        tail_->next->prev = tail_;
-        tail_ = tail_->next;
-        tail_->next = nullptr;
-    }
-
-    return textureUnit;
+    return renderSystem_->BindTexture(texture);
 }
 
 void Renderer::BindShader(const Shader* shader) {
-    if (shader != boundShader_) {
-        renderSystem_->BindShader(shader);
-        boundShader_ = shader;
-    }
+    renderSystem_->BindShader(shader);
 }
 
 FrustumPlanes_t Renderer::ExtractViewFrustumPlanes() const {
@@ -309,6 +262,10 @@ FrustumPlanes_t Renderer::ExtractViewFrustumPlanes() const {
 
 void Renderer::EnableFrustumCulling(bool val) {
     useFrustumCulling_ = val;
+}
+
+void Renderer::DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor) {
+    renderSystem_->DrawTextBuffer(bufferObject, fontAtlas, textColor);
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {
@@ -335,6 +292,18 @@ BufferObjectManager* Renderer::GetBufferObjectManager() const {
     return renderSystem_->GetBufferObjectManager();
 }
 
+size_t Renderer::GetScreenWidth() const {
+    return renderSystem_->GetWidth();
+}
+
+size_t Renderer::GetScreenHeight() const {
+    return renderSystem_->GetHeight();
+}
+
+CullingMethod_t Renderer::GetCullingMethod() const {
+    return cullingMethod_;
+}
+
 void Renderer::SetDefaultRenderingValues() {
     // Some initial values
     PerspectiveProjection(45.0f, (float)renderParamters_.width / (float)renderParamters_.height, 1.0f, 1000.0f);
@@ -344,21 +313,6 @@ void Renderer::SetDefaultRenderingValues() {
     EnableDepthTest(true);
     SetDepthComparisonFunc(DEPTH_FUNC_LESS);
     SetRenderFillMode(RENDER_MODE_FILL);
-
-    // Construct the texture cache
-    const DeviceCapabilities_t* deviceCapabilities = renderSystem_->GetDeviceCapabilities();
-    head_ = new TextureUnitNode_t;
-    head_->textureUnit = 0;
-    head_->prev = nullptr;
-    tail_ = head_;
-
-    for (int i = 1; i < deviceCapabilities->maxActiveTextures_ + 1; i++) {
-        tail_->next = new TextureUnitNode_t;
-        tail_->next->prev = tail_;
-        tail_ = tail_->next;
-        tail_->textureUnit = i;
-    }
-    tail_->next = nullptr;
 }
 
 bool FrustumPlanes_t::IsSphereOutside(const Sphere& sphere) const {

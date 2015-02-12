@@ -35,16 +35,30 @@ enum ShaderType_t {
 class Shader {
 	public:
 		/**
-		 * Constructor. Load the shaders
-         * @param vertexFilename The name of the vertex shader file
-         * @param fragmentFilename The name of the fragment shader file
+		 * Constructor
 		 */
-		                    Shader(const string& vertexFilename, const string& fragmentFilename);
+		                    Shader();
 
         /**
          * Destructor
          */
         virtual            ~Shader();
+
+        /**
+         * Set the source of the shader using text files
+         * @param vertexFilename The name of the vertex shader file
+         * @param fragmentFilename The name of the fragment shader file
+         * @return true if the shaders were succesfully created, false otherwise
+         */
+        virtual bool        SetSourceFile(const string& vertexFilename, const string& fragmentFilename) = 0;
+
+        /**
+         * Set the source of the shader using in-memory source
+         * @param vertexSource The source code of the vertex shader
+         * @param fragmentSource The source code of the fragment shader
+         * @return true if the shaders were succesfully created, false otherwise
+         */
+        virtual bool        SetSource(const string& vertexSource, const string& fragmentSource) = 0;
 
 		// UNIFORM SETTERS
 		virtual bool	    SetUniformInt(const string& uniform, int value) = 0;

@@ -25,6 +25,7 @@ set(SRC
 	${SRC_PATH}/Shader.cpp
 	${SRC_PATH}/Skeleton.cpp
 	${SRC_PATH}/SkinnedMesh.cpp
+	${SRC_PATH}/Text.cpp
 	${SRC_PATH}/Texture.cpp
 	${SRC_PATH}/Texture2D.cpp
 	${SRC_PATH}/Texture3D.cpp
@@ -50,6 +51,7 @@ set(HEADER
 	${HEADER_PATH}/Shader.h
 	${HEADER_PATH}/Skeleton.h
 	${HEADER_PATH}/SkinnedMesh.h
+	${HEADER_PATH}/Text.h
 	${HEADER_PATH}/Texture.h
 	${HEADER_PATH}/Texture2D.h
 	${HEADER_PATH}/Texture3D.h
@@ -133,6 +135,7 @@ source_group("Header Files\\OpenGL" FILES ${OPENGL_HEADER})
 include_directories (../../include)
 include_directories (${ASSIMP_INCLUDE_DIR})
 include_directories (${FreeImage_INCLUDE_DIRS})
+include_directories (${FREETYPE_INCLUDE_DIRS})
 
 if (WIN32)
 	include_directories (${DirectX_INCLUDE_DIR})

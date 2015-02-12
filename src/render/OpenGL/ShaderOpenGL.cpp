@@ -16,50 +16,61 @@ using namespace std;
 
 namespace Sketch3D {
 
-ShaderOpenGL::ShaderOpenGL(const string& vertexFilename, const string& fragmentFilename) :
-            Shader(vertexFilename, fragmentFilename), vertex_(0), fragment_(0)
-{
-	Logger::GetInstance()->Debug("OpenGL shader creation");
+ShaderOpenGL::ShaderOpenGL() : vertex_(0), fragment_(0) {
+    Logger::GetInstance()->Debug("OpenGL Shader creation");
+    program_ = glCreateProgram();
+}
 
-	program_ = glCreateProgram();
+ShaderOpenGL::~ShaderOpenGL() {
+    if (vertex_ != 0) {
+        glDeleteShader(vertex_);
+    }
 
+    if (fragment_ != 0) {
+        glDeleteShader(fragment_);
+    }
+
+    glDeleteProgram(program_);
+}
+
+bool ShaderOpenGL::SetSourceFile(const string& vertexFilename, const string& fragmentFilename) {
 	vertex_ = glCreateShader(GL_VERTEX_SHADER);
 	if (!vertex_) {
 		Logger::GetInstance()->Error("Couldn't create vertex shader");
-		return;
+		return false;
 	}
 
 	fragment_ = glCreateShader(GL_FRAGMENT_SHADER);
 	if (!fragment_) {
 		Logger::GetInstance()->Error("Couldn't create fragment shader");
-		return;
+		return false;
 	}
 
 	// Create the vertex shader
 	Logger::GetInstance()->Debug("Vertex shader creation");
-	const char* vertexFile = ReadShader(vertexFilename);
+	const char* vertexFile = ReadShader(vertexFilename + ".glsl");
     if (vertexFile == nullptr) {
-        Logger::GetInstance()->Error("Couldn't read vertex shader file " + vertexFilename);
-        return;
+        Logger::GetInstance()->Error("Couldn't read vertex shader file " + vertexFilename + ".glsl");
+        return false;
     }
 
 	glShaderSource(vertex_, 1, &vertexFile, NULL);
 	glCompileShader(vertex_);
 	glAttachShader(program_, vertex_);
-	LogShaderErrors(vertex_, vertexFilename);
+	LogShaderErrors(vertex_, vertexFilename + ".glsl");
 
 	// Create the fragment shader
 	Logger::GetInstance()->Debug("Fragment shader creation");
-	const char* fragmentFile = ReadShader(fragmentFilename);
+	const char* fragmentFile = ReadShader(fragmentFilename + ".glsl");
     if (fragmentFile == nullptr) {
-        Logger::GetInstance()->Error("Couldn't read fragment shader file " + fragmentFilename);
-        return;
+        Logger::GetInstance()->Error("Couldn't read fragment shader file " + fragmentFilename + ".glsl");
+        return false;
     }
 
 	glShaderSource(fragment_, 1, &fragmentFile, NULL);
 	glCompileShader(fragment_);
 	glAttachShader(program_, fragment_);
-	LogShaderErrors(fragment_, fragmentFilename);
+	LogShaderErrors(fragment_, fragmentFilename + ".glsl");
 
 	Logger::GetInstance()->Debug("Shader program linking");
 	glLinkProgram(program_);
@@ -84,12 +95,64 @@ ShaderOpenGL::ShaderOpenGL(const string& vertexFilename, const string& fragmentF
 
         nameToUniforms_[name] = glGetUniformLocation(program_, name.c_str());
     }
+
+    return true;
 }
 
-ShaderOpenGL::~ShaderOpenGL() {
-    glDeleteProgram(program_);
-    glDeleteShader(vertex_);
-    glDeleteShader(fragment_);
+bool ShaderOpenGL::SetSource(const string& vertexSource, const string& fragmentSource) {
+	vertex_ = glCreateShader(GL_VERTEX_SHADER);
+	if (!vertex_) {
+		Logger::GetInstance()->Error("Couldn't create vertex shader");
+		return false;
+	}
+
+	fragment_ = glCreateShader(GL_FRAGMENT_SHADER);
+	if (!fragment_) {
+		Logger::GetInstance()->Error("Couldn't create fragment shader");
+		return false;
+	}
+
+	// Create the vertex shader
+	Logger::GetInstance()->Debug("Vertex shader creation");
+    const char* vertexSourceCode = vertexSource.c_str();
+    glShaderSource(vertex_, 1, &vertexSourceCode, NULL);
+	glCompileShader(vertex_);
+	glAttachShader(program_, vertex_);
+	LogShaderErrors(vertex_, "Vertex source");
+
+	// Create the fragment shader
+	Logger::GetInstance()->Debug("Fragment shader creation");
+    const char* fragmentSourceCode = fragmentSource.c_str();
+    glShaderSource(fragment_, 1, &fragmentSourceCode, NULL);
+	glCompileShader(fragment_);
+	glAttachShader(program_, fragment_);
+	LogShaderErrors(fragment_, "Fragment source");
+
+	Logger::GetInstance()->Debug("Shader program linking");
+	glLinkProgram(program_);
+	LogProgramErrors();
+
+    GLint numActiveUniforms;
+    char uniformName[256];
+    glGetProgramiv(program_, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
+    for (int i = 0; i < numActiveUniforms; i++) {
+        GLint arraySize = 0;
+        GLenum type = 0;
+        GLsizei actualLength = 0;
+        glGetActiveUniform(program_, i, 256, &actualLength, &arraySize, &type, uniformName);
+        string name = uniformName;
+        
+        // Arrays' name are messed up
+        if (name.back() == ']') {
+            name.pop_back();
+            name.pop_back();
+            name.pop_back();
+        }
+
+        nameToUniforms_[name] = glGetUniformLocation(program_, name.c_str());
+    }
+
+    return true;
 }
 
 bool ShaderOpenGL::SetUniformInt(const string& uniformName, int value) {

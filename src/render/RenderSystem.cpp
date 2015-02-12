@@ -13,7 +13,7 @@
 
 namespace Sketch3D {
 
-RenderSystem::RenderSystem(Window& window) : window_(window), bufferObjectManager_(nullptr) {
+RenderSystem::RenderSystem(Window& window) : window_(window), boundShader_(nullptr), bufferObjectManager_(nullptr), textShader_(nullptr) {
     windowHandle_ = window_.GetHandle();
     width_ = window_.GetWidth();
     height_ = window_.GetHeight();
@@ -36,6 +36,17 @@ Vector3 RenderSystem::ScreenToWorldPoint(const Matrix4x4& inversedViewProjection
     // Transformation of normalized coordinates (-1, 1)
     Vector3 transformation(2.0f * point.x / width_ - 1.0f, -2.0f * point.y / height_ + 1.0f, 0.0f);
     return Matrix3x3(inversedViewProjection) * transformation;
+}
+
+size_t RenderSystem::BindTexture(const Texture* texture) {
+    return 0;
+}
+
+void RenderSystem::DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor) {
+    Renderer::GetInstance()->BindShader(textShader_);
+    textShader_->SetUniformTexture("fontAtlas", fontAtlas);
+    textShader_->SetUniformVector3("textColor", textColor);
+    bufferObject->Render();
 }
 
 BufferObjectManager* RenderSystem::GetBufferObjectManager() const {

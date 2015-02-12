@@ -32,6 +32,11 @@ bool Texture2DDirect3D9::Create() {
     size_t bpp;
 
     switch (format_) {
+        case TEXTURE_FORMAT_GRAYSCALE:
+            format = D3DFMT_A8;
+            bpp = 1;
+            break;
+
         case TEXTURE_FORMAT_RGB24:
             format = D3DFMT_R8G8B8;
             bpp = 3;
@@ -121,6 +126,52 @@ void Texture2DDirect3D9::SetWrapModeImpl() const {
 }
 
 void Texture2DDirect3D9::SetPixelDataBytesImp(unsigned char* data) {
+    // TODO
+    // FIX THAT
+    D3DLOCKED_RECT lockedRect;
+    size_t bpp = 0;
+
+    switch (format_) {
+        case TEXTURE_FORMAT_GRAYSCALE:
+            bpp = 1;
+            break;
+
+        case TEXTURE_FORMAT_RGB24:
+            bpp = 3;
+            break;
+
+        case TEXTURE_FORMAT_RGBA32:
+            bpp = 4;
+            break;
+
+        case TEXTURE_FORMAT_R32F:
+            bpp = 1;
+            break;
+
+        case TEXTURE_FORMAT_RG32F:
+            bpp = 2;
+            break;
+
+        case TEXTURE_FORMAT_RGBA32F:
+            bpp = 4;
+            break;
+
+        case TEXTURE_FORMAT_DEPTH:
+            bpp = 0;
+            break;
+
+        default:
+            Logger::GetInstance()->Warning("Unsupported texture format");
+            return;
+    }
+
+    if (SUCCEEDED(texture_->LockRect(0, &lockedRect, nullptr, 0))) {
+        unsigned char* rect = static_cast<unsigned char*>(lockedRect.pBits);
+
+        memcpy(rect, data, width_ * height_ * bpp);
+    
+        texture_->UnlockRect(0);
+    }
 }
 
 void Texture2DDirect3D9::SetPixelDataFloatsImp(float* data) {

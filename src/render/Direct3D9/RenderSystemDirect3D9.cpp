@@ -42,6 +42,8 @@ bool RenderSystemDirect3D9::Initialize(const RenderParameters_t& renderParameter
     device_->GetDepthStencilSurface(&depthBuffer_);
     device_->GetRenderTarget(0, &renderTarget_);
 
+    CreateTextShader();
+
     return true;
 }
 
@@ -203,8 +205,8 @@ void RenderSystemDirect3D9::SetCullingMethod(CullingMethod_t cullingMethod) cons
     device_->SetRenderState(D3DRS_CULLMODE, cullMode);
 }
 
-Shader* RenderSystemDirect3D9::CreateShader(const string& vertexFilename,  const string& fragmentFilename) {
-    shaders_.push_back(new ShaderDirect3D9(vertexFilename + ".hlsl", fragmentFilename + ".hlsl", device_));
+Shader* RenderSystemDirect3D9::CreateShader() {
+    shaders_.push_back(new ShaderDirect3D9(device_));
     return shaders_.back();
 }
 
@@ -270,17 +272,18 @@ void RenderSystemDirect3D9::SetBlendingFactor(BlendingFactor_t srcFactor, Blendi
     device_->SetRenderState(D3DRS_DESTBLEND, dstBlendFactor);
 }
 
-void RenderSystemDirect3D9::BindTexture(const Texture* texture, size_t unit) const {
-}
-
 void RenderSystemDirect3D9::BindShader(const Shader* shader) {
-    if (shader == nullptr) {
-        device_->SetVertexShader(nullptr);
-        device_->SetPixelShader(nullptr);
-    } else {
-        const ShaderDirect3D9* shaderDirect3D9 = static_cast<const ShaderDirect3D9*>(shader);
-        device_->SetVertexShader(shaderDirect3D9->vertexShader_);
-        device_->SetPixelShader(shaderDirect3D9->fragmentShader_);
+    if (shader != boundShader_) {
+        if (shader == nullptr) {
+            device_->SetVertexShader(nullptr);
+            device_->SetPixelShader(nullptr);
+        } else {
+            const ShaderDirect3D9* shaderDirect3D9 = static_cast<const ShaderDirect3D9*>(shader);
+            device_->SetVertexShader(shaderDirect3D9->vertexShader_);
+            device_->SetPixelShader(shaderDirect3D9->fragmentShader_);
+        }
+
+        boundShader_ = shader;
     }
 }
 
@@ -376,6 +379,51 @@ void RenderSystemDirect3D9::QueryDeviceCapabilities() {
     device_->GetDeviceCaps(&caps);
     deviceCapabilities_.maxActiveTextures_ = caps.MaxTextureBlendStages;
     deviceCapabilities_.maxNumberRenderTargets_ = caps.NumSimultaneousRTs;
+}
+
+void RenderSystemDirect3D9::CreateTextShader() {
+    const char* textVertexShaderSource = \
+        "struct VS_INPUT {\n"
+            "float3 in_vertex : POSITION;\n"
+            "float2 in_uv : TEXCOORD;\n"
+        "};\n"
+
+        "struct VS_OUTPUT {\n"
+            "float4 position : POSITION;\n"
+            "float2 uv : TEXCOORD;\n"
+        "};\n"
+
+        "VS_OUTPUT main(VS_INPUT input) {\n"
+            "VS_OUTPUT output;\n"
+            "output.uv = input.in_uv;\n"
+            "output.position = float4(input.in_vertex.xy, 0.0, 1.0);\n"
+            "return output;\n"
+        "}"
+    ;
+
+    const char* textFragmentShaderSource = \
+        "sampler2D fontAtlas;\n"
+        "float3 textColor;\n"
+
+        "struct PS_INPUT {\n"
+            "float4 position : POSITION;\n"
+            "float2 uv : TEXCOORD;\n"
+        "};\n"
+
+        "float4 main(PS_INPUT input) : COLOR {\n"
+            "float val = tex2D(fontAtlas, input.uv).a;\n"
+            "if (val < 0.5) {\n"
+                "discard;\n"
+            "}\n"
+
+            "return float4(textColor, 1.0);\n"
+        "}"
+    ;
+
+    textShader_ = Renderer::GetInstance()->CreateShader();
+    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
+        Logger::GetInstance()->Error("Couldn't create text shader");
+    }
 }
 
 }

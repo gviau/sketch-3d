@@ -22,8 +22,11 @@ class ShaderDirect3D9 : public Shader {
     friend class RenderSystemDirect3D9;
 
     public:
-                                ShaderDirect3D9(const string& vertexFilename, const string& fragmentFilename, IDirect3DDevice9* device);
+                                ShaderDirect3D9(IDirect3DDevice9* device);
         virtual                ~ShaderDirect3D9();
+
+        virtual bool SetSourceFile(const string& vertexFilename, const string& fragmentFilename);
+        virtual bool SetSource(const string& vertexSource, const string& fragmentSource);
 
 		virtual bool SetUniformInt(const string& uniform, int value);
 		virtual bool SetUniformFloat(const string& uniform, float value);
