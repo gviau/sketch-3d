@@ -42,8 +42,9 @@ The following environment variables should be set so that CMake can properly fin
 * OISDIR : Points at the base of your OIS directory
 
 ### Linux
-On Linux, you also need the libx11 library on top of all the other libraries. All the libraries can be installed via apt-get
+On Linux, you also need the libx11 library on top of all the other libraries. You also have to install CMake. All the libraries can be installed via apt-get
 ```
+sudo apt-get install cmake
 sudo apt-get install libassimp-dev
 sudo apt-get install libboost-all-dev
 sudo apt-get install libfreeimage-dev
