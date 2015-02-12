@@ -46,7 +46,8 @@ int main(int argc, char** argv) {
     Mesh sphereMesh("Media/sphere.obj", vertexAttributes);
 
     // Create the material for the sphere
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/NormalMapping/vert", "Shaders/NormalMapping/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/NormalMapping/vert", "Shaders/NormalMapping/frag");
     Material sphereMaterial(shader);
 
     // Add the diffuse and normal texture

@@ -92,7 +92,8 @@ int main(int argc, char** argv) {
     waterMesh.Initialize(vertexAttributes);
 
     // Material surface
-    Shader* waterShader = Renderer::GetInstance()->CreateShader("Shaders/vert", "Shaders/frag");
+    Shader* waterShader = Renderer::GetInstance()->CreateShader();
+    waterShader->SetSourceFile("Shaders/vert", "Shaders/frag");
 
     Material waterMaterial(waterShader);
     Texture2D* waterTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/water.jpg");

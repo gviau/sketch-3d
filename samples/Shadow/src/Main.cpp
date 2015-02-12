@@ -65,7 +65,8 @@ int main(int argc, char** argv) {
     }
 
     // Create the shader
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/vert", "Shaders/Shadow/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/Shadow/vert", "Shaders/Shadow/frag");
     Material material(shader);
 
     // Create the jeep
@@ -94,7 +95,8 @@ int main(int argc, char** argv) {
     Renderer::GetInstance()->GetSceneTree().AddNode(&jeepNode2);
 
     // Create the record shadow material
-    Shader* recordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/Shadow/recordShadow_vert", "Shaders/Shadow/recordShadow_frag");
+    Shader* recordShadowShader = Renderer::GetInstance()->CreateShader();
+    recordShadowShader->SetSourceFile("Shaders/Shadow/recordShadow_vert", "Shaders/Shadow/recordShadow_frag");
     Material recordShadowMaterial(recordShadowShader);
 
     // Create the ground

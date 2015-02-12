@@ -56,7 +56,8 @@ int main(int argc, char** argv) {
     } else {
         vertexFilename = "Shaders/SkeletalAnimation/vert";
     }
-    Shader* shader = Renderer::GetInstance()->CreateShader(vertexFilename, "Shaders/SkeletalAnimation/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile(vertexFilename, "Shaders/SkeletalAnimation/frag");
 
     Material material(shader);
 

@@ -51,7 +51,8 @@ int main(int argc, char** argv) {
     vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
     Mesh mesh("Media/teapot.nff", vertexAttributes, MESH_TYPE_STATIC, false);
 
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/FrustumCullingInstancing/vert", "Shaders/FrustumCullingInstancing/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/FrustumCullingInstancing/vert", "Shaders/FrustumCullingInstancing/frag");
     Material material(shader);
 
     Node* nodes = new Node[NUM_TEAPOTS];

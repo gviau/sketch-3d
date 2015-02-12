@@ -76,7 +76,8 @@ int main(int argc, char** argv) {
     Mesh sponzaMesh("Media/sponza.obj", sponzaVertexAttributes, MESH_TYPE_STATIC, false);
 
     // Create the material for the sponza
-    Shader* sponzaShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_vert", "Shaders/SponzaDemo/sponza_frag");
+    Shader* sponzaShader = Renderer::GetInstance()->CreateShader();
+    sponzaShader->SetSourceFile("Shaders/SponzaDemo/sponza_vert", "Shaders/SponzaDemo/sponza_frag");
     Material sponzaMaterial(sponzaShader);
 
     // Create the node for the ponza
@@ -98,7 +99,8 @@ int main(int argc, char** argv) {
     SkinnedMesh hellknightMesh("Media/models/md5/monsters/hellknight/hellknight.md5mesh", hellknightVertexAttributes, true, false);
 
     // Create the material for the hellknight
-    Shader* hellknightShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_vert", "Shaders/SponzaDemo/hellknight_frag");
+    Shader* hellknightShader = Renderer::GetInstance()->CreateShader();
+    hellknightShader->SetSourceFile("Shaders/SponzaDemo/hellknight_vert", "Shaders/SponzaDemo/hellknight_frag");
     Material hellknightMaterial(hellknightShader);
 
     // Create the node for the hellknight
@@ -156,7 +158,8 @@ int main(int argc, char** argv) {
     fullscreenQuadMesh.Initialize(fullscreenQuadVertexAttributes);
 
     // Create the fullscreen quad material
-    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/fullscreen_vert", "Shaders/SponzaDemo/fullscreen_frag");
+    Shader* fullscreenQuadShader = Renderer::GetInstance()->CreateShader();
+    fullscreenQuadShader->SetSourceFile("Shaders/SponzaDemo/fullscreen_vert", "Shaders/SponzaDemo/fullscreen_frag");
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
     fullscreenQuadMaterial.AddTexture("normals", normalsTexture);
@@ -182,12 +185,12 @@ int main(int argc, char** argv) {
     fullscreenQuadMaterial.AddTexture("shadowMap0", shadowMapTexture0);
 
     // Create the shader used to record the shadows
-    Shader* sponzaRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/sponza_record_shadow_vert",
-                                                                             "Shaders/SponzaDemo/record_shadow_frag");
+    Shader* sponzaRecordShadowShader = Renderer::GetInstance()->CreateShader();
+    sponzaRecordShadowShader->SetSourceFile("Shaders/SponzaDemo/sponza_record_shadow_vert", "Shaders/SponzaDemo/record_shadow_frag");
     Material sponzaRecordShadowMaterial(sponzaRecordShadowShader);
 
-    Shader* hellknightRecordShadowShader = Renderer::GetInstance()->CreateShader("Shaders/SponzaDemo/hellknight_record_shadow_vert",
-                                                                                 "Shaders/SponzaDemo/record_shadow_frag");
+    Shader* hellknightRecordShadowShader = Renderer::GetInstance()->CreateShader();
+    hellknightRecordShadowShader->SetSourceFile("Shaders/SponzaDemo/hellknight_record_shadow_vert", "Shaders/SponzaDemo/record_shadow_frag");
     Material hellknightRecordShadowMaterial(hellknightRecordShadowShader);
 
     ////////////////////////////////////////////////////////////////////////////

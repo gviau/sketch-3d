@@ -63,10 +63,12 @@ int main(int argc, char** argv) {
     planeMesh.Initialize(vertexAttributesPlane);
 
     // Create the materials
-    Shader* recordShader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/record_vert", "Shaders/DeferredShading/record_frag");
+    Shader* recordShader = Renderer::GetInstance()->CreateShader();
+    recordShader->SetSourceFile("Shaders/DeferredShading/record_vert", "Shaders/DeferredShading/record_frag");
     Material recordMaterial(recordShader);
 
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/DeferredShading/vert", "Shaders/DeferredShading/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/DeferredShading/vert", "Shaders/DeferredShading/frag");
     Material material(shader);
 
     // Create the nodes

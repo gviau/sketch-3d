@@ -46,8 +46,10 @@ int main(int argc, char** argv) {
     Mesh teapotMesh("Media/teapot.nff", vertexAttributes);
 
     // Create the material
-    Shader* normalRenderShader = Renderer::GetInstance()->CreateShader("Shaders/CelShading/normalRender_vert", "Shaders/CelShading/normalRender_frag");
-    Shader* contourRenderShader = Renderer::GetInstance()->CreateShader("Shaders/CelShading/contourRender_vert", "Shaders/CelShading/contourRender_frag");
+    Shader* normalRenderShader = Renderer::GetInstance()->CreateShader();
+    Shader* contourRenderShader = Renderer::GetInstance()->CreateShader();
+    normalRenderShader->SetSourceFile("Shaders/CelShading/normalRender_vert", "Shaders/CelShading/normalRender_frag");
+    contourRenderShader->SetSourceFile("Shaders/CelShading/contourRender_vert", "Shaders/CelShading/contourRender_frag");
 
     Material normalRenderMaterial(normalRenderShader);
     Material contourRenderMaterial(contourRenderShader);

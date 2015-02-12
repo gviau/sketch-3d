@@ -68,7 +68,8 @@ int main(int argc, char** argv) {
     mesh.Initialize(vertexAttributes);
 
     // Create the material for the sphere
-    Shader* shader = Renderer::GetInstance()->CreateShader("Shaders/ParallaxMapping/vert", "Shaders/ParallaxMapping/frag");
+    Shader* shader = Renderer::GetInstance()->CreateShader();
+    shader->SetSourceFile("Shaders/ParallaxMapping/vert", "Shaders/ParallaxMapping/frag");
     Material sphereMaterial(shader);
 
     // Add the diffuse and normal texture
