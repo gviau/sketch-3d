@@ -26,6 +26,8 @@ SET(FreeImage_INCLUDE_SEARCH_DIRS
 	/opt/freeimage/include
 	C:/FreeImage
 	C:/FreeImage/include
+	$ENV{FREEIMAGE_DIR}
+	$ENV{FREEIMAGE_DIR}/include
 )
 
 SET(FreeImage_LIBRARY_SEARCH_DIRS
@@ -37,6 +39,8 @@ SET(FreeImage_LIBRARY_SEARCH_DIRS
 	/opt/freeimage/lib
 	C:/FreeImage
 	C:/FreeImage/lib
+	$ENV{FREEIMAGE_DIR}
+	$ENV{FREEIMAGE_DIR}/lib
 )
 
 FIND_PATH(FreeImage_INCLUDE_DIRS FreeImage.h ${FreeImage_INCLUDE_SEARCH_DIRS})
