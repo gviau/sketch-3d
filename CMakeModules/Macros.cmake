@@ -64,7 +64,7 @@ function (sketch3d_add_sample target)
 		
 		set (LINK_LIBRARIES
 			${LINK_LIBRARIES}
-			${OIS_LIBRARY_DEBUG}
+			debug ${OIS_LIBRARY_DEBUG} optimized ${OIS_LIBRARY}
 		)
 	endif ()
 
