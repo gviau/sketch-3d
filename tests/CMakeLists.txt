@@ -32,7 +32,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
 )
 
-include_directories(../include)
+include_directories(../sketch3d-main/include)
 
 link_directories(${Boost_LIBRARY_DIRS})
 link_directories(${CMAKE_SOURCE_DIR}/lib/)
@@ -50,9 +50,7 @@ SOURCE_GROUP ("Render" REGULAR_EXPRESSION render/.*\\.cpp)
 
 target_link_libraries(
     tests
-    math
-    render
-    system
+    sketch-3d
     ${Boost_LIBRARIES}
 )
 

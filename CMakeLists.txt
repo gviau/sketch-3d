@@ -124,8 +124,8 @@ if (SKETCH_3D_BUILD_STATIC)
 	add_definitions(-DSKETCH_3D_BUILD_STATIC)
 endif ()
 
-add_subdirectory (src)
 add_subdirectory (samples)
+add_subdirectory (sketch3d-main)
 
 enable_testing()
 include(CTest)
