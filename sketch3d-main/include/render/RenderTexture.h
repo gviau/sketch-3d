@@ -35,13 +35,15 @@ class SKETCH_3D_API RenderTexture {
         virtual bool        AddDepthBuffer() = 0;
 
         /**
-         * Create a texture to be used with this RenderTexture
+         * Create a texture to be used with this RenderTexture. The user doesn't have to free the memory returned, it will be taken
+         * care of.
          * @return A pointer to a valid texture that can be used with this RenderTexture
          */
         virtual Texture2D*  CreateTexture2D() const = 0;
 
         /**
-         * Create a texture to be used as a depth buffer with this RenderTexture
+         * Create a texture to be used as a depth buffer with this RenderTexture. The user doesn't have to free the memory returned, it will be taken
+         * care of.
          * @return A pointer to a valid texture that can be used as a depth buffer with this RenderTexture
          */
         virtual Texture2D*  CreateDepthBufferTexture() const = 0;

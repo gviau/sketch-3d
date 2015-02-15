@@ -22,7 +22,8 @@ class SKETCH_3D_API BufferObjectManager {
         virtual                ~BufferObjectManager();
 
         /**
-         * Create a buffer object
+         * Create a buffer object. The user doesn't have to free the memory returned, the BufferObjectManager will take
+         * care of it.
          */
         virtual BufferObject*   CreateBufferObject(const VertexAttributesMap_t& vertexAttributes, BufferUsage_t usage=BUFFER_USAGE_STATIC) = 0;
 

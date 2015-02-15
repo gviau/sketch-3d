@@ -189,32 +189,37 @@ class SKETCH_3D_API Renderer {
         void                    SetCullingMethod(CullingMethod_t cullingMethod);
 
         /**
-         * Create a shader object
+         * Create a shader object. The user doesn't have to free the memory returned, the Renderer will take
+         * care of it.
          * @return A pointer to a shader
          */
         Shader*                 CreateShader() const;
 
         /**
-         * Create a 2D texture object
+         * Create a 2D texture object. The user have to free the memory returned, the Renderer will not take
+         * care of it.
          * @return A pointer to a 2D texture
          */
         Texture2D*              CreateTexture2D() const;
 
         /**
-         * Create a 2D texture object from a file
+         * Create a 2D texture object from a file. The user doesn't have to free the memory returned, the Renderer will take
+         * care of it.
          * @param generateMipmaps If set to true, generate mipmaps for this texture
          * @return A pointer to a 2D texture
          */
         Texture2D*              CreateTexture2DFromFile(const string& filename, bool generateMipmaps=false) const;
 
         /**
-         * Create a 3D texture object
+         * Create a 3D texture object. The user have to free the memory returned, the Renderer will not take
+         * care of it.
          * @return A pointer to a 3D texture
          */
         Texture3D*              CreateTexture3D() const;
 
         /**
-         * Create a render texture
+         * Create a render texture. The user doesn't have to free the memory returned, the Renderer will take
+         * care of it.
          * @param width The width of the render texture
          * @param height The height of the render texture
          * @param format The format of the render texture

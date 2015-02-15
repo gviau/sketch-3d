@@ -247,6 +247,8 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->PresentFrame();
     }
 
+    delete noise;
+
     return 0;
 }
 

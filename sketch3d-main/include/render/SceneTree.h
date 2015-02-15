@@ -21,8 +21,6 @@ class RenderQueue;
  * to render a whole scene. The actual rendering process isn't done by this
  * class; its responsability is to accumulate the geometry and transformation
  * of all its children node and send it for rendering.
- *
- * The name of this node is automatically set to "root" and it has no parent.
  */
 class SKETCH_3D_API SceneTree {
 	public:
@@ -46,7 +44,8 @@ class SKETCH_3D_API SceneTree {
 		void		        Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue);
 
         /**
-         * Add a node to the scene tree. This will add the node directly to the root node
+         * Add a node to the scene tree. This will add the node directly to the root node. It is the responsability of the  caller
+         * to free the memory used by the node. The SceneTree will free no memory for the nodes
          * @param node A pointer to the node to add to the scene tree
          * @return true if the node could be added, false if the node was already present
          */
