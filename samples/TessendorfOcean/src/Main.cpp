@@ -11,7 +11,7 @@ using namespace Sketch3D;
 #include <time.h>
 using namespace std;
 
-#if defined(__WIN32__) || defined(_WIN32)
+#if PLATFORM == PLATFORM_WIN32
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {

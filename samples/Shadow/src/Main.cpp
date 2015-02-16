@@ -32,7 +32,7 @@ using namespace std;
 
 void UpdateLights(double t, Vector3 initialLightPositions[], Vector3 newLightPositions[]);
 
-#if defined(__WIN32__) || defined(_WIN32)
+#if PLATFORM == PLATFORM_WIN32
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {

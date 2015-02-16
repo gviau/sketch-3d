@@ -21,7 +21,7 @@ using namespace std;
 #define NUM_TEAPOTS_Z 100
 #define NUM_TEAPOTS   NUM_TEAPOTS_X * NUM_TEAPOTS_Z
 
-#if defined(__WIN32__) || defined(_WIN32)
+#if PLATFORM == PLATFORM_WIN32
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
