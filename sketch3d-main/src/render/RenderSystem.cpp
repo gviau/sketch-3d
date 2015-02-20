@@ -21,15 +21,6 @@ RenderSystem::RenderSystem(Window& window) : window_(window), boundShader_(nullp
 }
 
 RenderSystem::~RenderSystem() {
-    for (size_t i = 0; i < shaders_.size(); i++) {
-        delete shaders_[i];
-    }
-
-    for (size_t i = 0; i < renderTextures_.size(); i++) {
-        delete renderTextures_[i];
-    }
-
-    delete bufferObjectManager_;
 }
 
 Vector3 RenderSystem::ScreenToWorldPoint(const Matrix4x4& inversedViewProjection, const Vector2& point) const {
@@ -51,6 +42,18 @@ void RenderSystem::DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtl
 
 BufferObjectManager* RenderSystem::GetBufferObjectManager() const {
     return bufferObjectManager_;
+}
+
+void RenderSystem::FreeRenderSystem() {
+    for (size_t i = 0; i < shaders_.size(); i++) {
+        delete shaders_[i];
+    }
+
+    for (size_t i = 0; i < renderTextures_.size(); i++) {
+        delete renderTextures_[i];
+    }
+
+    delete bufferObjectManager_;
 }
 
 }

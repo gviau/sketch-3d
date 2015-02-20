@@ -35,6 +35,7 @@ RenderSystemOpenGL::~RenderSystemOpenGL() {
     }
 
 	Logger::GetInstance()->Info("Shutdown OpenGL");
+    FreeRenderSystem();
 	delete renderContext_;
 }
 

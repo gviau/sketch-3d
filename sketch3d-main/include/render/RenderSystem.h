@@ -275,6 +275,11 @@ class SKETCH_3D_API RenderSystem {
          * Create the shader that will be used to draw the text on screen
          */
         virtual void                        CreateTextShader() = 0;
+
+        /**
+         * Free the render system
+         */
+        void                                FreeRenderSystem();
 };
 
 }
