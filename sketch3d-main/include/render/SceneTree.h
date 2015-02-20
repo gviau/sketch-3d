@@ -39,9 +39,11 @@ class SKETCH_3D_API SceneTree {
          * prepare the data for the actual rendering process
          * @param frustumPlanes The 6 view frustum planes to cull objects that are not visible by the camera
          * @param useFrustumCulling If set to true, the frustum planes will be used to cull objects
-		 * @param renderQueue The render queue to populate
+		 * @param opaqueRenderQueue The render queue to populate with opaque objects
+         * @param transparentRenderQueue The render queue to populate with transparent objects
 		 */
-		void		        Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue);
+		void		        Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& opaqueRenderQueue,
+                                   RenderQueue& transparentRenderQueue);
 
         /**
          * Add a node to the scene tree. This will add the node directly to the root node. It is the responsability of the  caller

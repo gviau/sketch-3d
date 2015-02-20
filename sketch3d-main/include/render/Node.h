@@ -196,9 +196,11 @@ class SKETCH_3D_API Node {
 		 * This function sends the data required for the rendering.
          * @param frustumPlanes The 6 view frustum planes to cull nodes
          * @param useFrustumCulling If set to true, the frustum planes will be used to cull this node
-         * @param renderQueue The render queue to use for drawing
+         * @param opaqueRenderQueue The render queue to use for drawing opaque objects
+         * @param transparentRenderQueue The render queue to use for drawing transparent objects
 		 */
-		void                Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue);
+		void                Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& opaqueRenderQueue,
+                                   RenderQueue& transparentRenderQueue);
 };
 
 }

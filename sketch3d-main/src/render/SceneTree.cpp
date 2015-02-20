@@ -13,10 +13,10 @@ SceneTree::SceneTree() {
 SceneTree::~SceneTree() {
 }
 
-void SceneTree::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) {
+void SceneTree::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& opaqueRenderQueue, RenderQueue& transparentRenderQueue) {
     map<string, Node*>::iterator it = root_.children_.begin();
     for (; it != root_.children_.end(); ++it) {
-        it->second->Render(frustumPlanes, useFrustumCulling, renderQueue);
+        it->second->Render(frustumPlanes, useFrustumCulling, opaqueRenderQueue, transparentRenderQueue);
     }
 }
 

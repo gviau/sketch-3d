@@ -17,7 +17,7 @@ const int LAYER_SHIFT = 62;
 const int DEPTH_SHIFT = 30;
 const int MATERIAL_SHIFT = 32;
 
-const uint32_t DISTANCE_TRUNCATION = 0xFFFFFFFF;
+const uint32_t DISTANCE_TRUNCATION = 0xFFFFFFFC;
 
 RenderQueueItem::RenderQueueItem(shared_ptr<Matrix4x4> modelMatrix, Material* material, Texture2D** textures,
                                  size_t numTextures, BufferObject* bufferObject, bool useInstancing, uint32_t distanceFromCamera, Layer_t layer) : key_(0),

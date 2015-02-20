@@ -294,6 +294,8 @@ class SKETCH_3D_API Renderer {
 		const Matrix4x4&	    GetProjectionMatrix() const;
 		const Matrix4x4&	    GetViewMatrix() const;
 		const Matrix4x4&	    GetViewProjectionMatrix() const;
+        float                   GetNearFrustumPlane() const;
+        float                   GetFarFrustumPlane() const;
 
 		const SceneTree&	    GetSceneTree() const;
 		SceneTree&			    GetSceneTree();
@@ -312,12 +314,15 @@ class SKETCH_3D_API Renderer {
 		Matrix4x4			    projection_;		    /**< The projection matrix */
 		Matrix4x4			    view_;				    /**< The view matrix */
 		Matrix4x4			    viewProjection_;	    /**< Pre-computed view-projection matrix */
+        float                   nearFrustumPlane_;      /**< The near plane of the view frustum */
+        float                   farFrustumPlane_;       /**< The far plane of the view frustum */
 
 		SceneTree			    sceneTree_;			    /**< The scene tree to render */
 
         BufferObjectManager*    bufferObjectManager_;   /**< Buffer object manager used to create the buffer objects */
 
-        RenderQueue             renderQueue_;           /**< The render queue used for drawing */
+        RenderQueue             opaqueRenderQueue_;     /**< The render queue used for drawing opaque objects */
+        RenderQueue             transparentRenderQueue_;/**< The render queue used for drawing transparent objects */
         bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
         RenderParameters_t      renderParamters_;       /**< The rendering parameters used when creating the rendering context */
 

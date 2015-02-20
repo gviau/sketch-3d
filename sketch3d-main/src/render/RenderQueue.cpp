@@ -58,9 +58,13 @@ void RenderQueue::AddNode(Node* node, Layer_t layer) {
     node->GetMesh()->GetRenderInfo(bufferObjects, surfaces);
     shared_ptr<Matrix4x4> model(new Matrix4x4(node->ConstructModelMatrix()));
 
+    const Matrix4x4& modelView = Renderer::GetInstance()->GetViewMatrix() * *(model.get());
+    float dist = -(modelView[2][3] + Renderer::GetInstance()->GetNearFrustumPlane()) / (Renderer::GetInstance()->GetFarFrustumPlane() - Renderer::GetInstance()->GetNearFrustumPlane());
+    uint32_t distanceToCamera = (uint32_t)(dist * (float)UINT32_MAX);
+
     for (size_t i = 0; i < surfaces.size(); i++) {
         items_.push_back(RenderQueueItem(model, node->GetMaterial(), surfaces[i]->textures,
-                                         surfaces[i]->numTextures, bufferObjects[i], node->UseInstancing(), 0, layer));
+                         surfaces[i]->numTextures, bufferObjects[i], node->UseInstancing(), distanceToCamera, layer));
 
         if (items_.size() > itemsIndex_.size()) {
             itemsIndex_.push_back(itemsIndex_.size());
@@ -298,6 +302,10 @@ void RenderQueue::Render() {
     // Invalidate the render queue and approximate the next batch's size
     items_.clear();
     items_.reserve(itemsIndex_.size());
+}
+
+bool RenderQueue::IsEmpty() const {
+    return items_.empty();
 }
 
 }

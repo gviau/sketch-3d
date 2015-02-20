@@ -298,7 +298,7 @@ bool Node::UseInstancing() const {
     return useInstancing_;
 }
 
-void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& renderQueue) {
+void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& opaqueRenderQueue, RenderQueue& transparentRenderQueue) {
     if (mesh_ != nullptr) {
         bool addMeshToRenderQueue = true;
 
@@ -316,13 +316,16 @@ void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, 
         }
 
         if (addMeshToRenderQueue) {
-            renderQueue.AddNode(this);
+            if (material_->GetTransluencyType() == TRANSLUENCY_TYPE_OPAQUE) {
+                opaqueRenderQueue.AddNode(this);
+            } else {
+                transparentRenderQueue.AddNode(this);
         }
     }
 
 	map<string, Node*>::const_iterator it = children_.begin();
 	for (; it != children_.end(); ++it) {
-		it->second->Render(frustumPlanes, useFrustumCulling, renderQueue);
+        it->second->Render(frustumPlanes, useFrustumCulling, opaqueRenderQueue, transparentRenderQueue);
 	}
 }
 

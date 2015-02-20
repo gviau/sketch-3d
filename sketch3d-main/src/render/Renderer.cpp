@@ -26,8 +26,8 @@ namespace Sketch3D {
 
 Renderer Renderer::instance_;
 
-Renderer::Renderer() : renderSystem_(nullptr), useFrustumCulling_(true), oldViewportX_(0),
-                       oldViewportY_(0), oldViewportWidth_(0), oldViewportHeight_(0)
+Renderer::Renderer() : renderSystem_(nullptr), useFrustumCulling_(true), nearFrustumPlane_(0.0f), farFrustumPlane_(0.0f),
+                       oldViewportX_(0), oldViewportY_(0), oldViewportWidth_(0), oldViewportHeight_(0)
 {
 }
 
@@ -92,10 +92,17 @@ void Renderer::Render() {
         frustumPlanes = ExtractViewFrustumPlanes();
     }
 
-	sceneTree_.Render(frustumPlanes, useFrustumCulling_, renderQueue_);
+    sceneTree_.Render(frustumPlanes, useFrustumCulling_, opaqueRenderQueue_, transparentRenderQueue_);
 
 	// Draw the render queue contents
-    renderQueue_.Render();
+    opaqueRenderQueue_.Render();
+
+    if (!transparentRenderQueue_.IsEmpty()) {
+        SetBlendingEquation(BLENDING_EQUATION_ADD);
+        EnableBlending(true);
+        transparentRenderQueue_.Render();
+        EnableBlending(false);
+    }
 }
 
 void Renderer::PresentFrame() {
@@ -108,6 +115,9 @@ void Renderer::OrthoProjection(float left, float right,
 {
     projection_ = renderSystem_->OrthoProjection(left, right, bottom, top, nearPlane, farPlane);
 	viewProjection_ = projection_ * view_;
+
+    nearFrustumPlane_ = nearPlane;
+    farFrustumPlane_ = farPlane;
 }
 
 void Renderer::PerspectiveProjection(float left, float right,
@@ -116,6 +126,9 @@ void Renderer::PerspectiveProjection(float left, float right,
 {
     projection_ = renderSystem_->PerspectiveProjection(left, right, bottom, top, nearPlane, farPlane);
 	viewProjection_ = projection_ * view_;
+
+    nearFrustumPlane_ = nearPlane;
+    farFrustumPlane_ = farPlane;
 }
 
 void Renderer::PerspectiveProjection(float fov, float aspect, float nearPlane,
@@ -280,6 +293,14 @@ const Matrix4x4& Renderer::GetViewMatrix() const {
 
 const Matrix4x4& Renderer::GetViewProjectionMatrix() const {
 	return viewProjection_;
+}
+
+float Renderer::GetNearFrustumPlane() const {
+    return nearFrustumPlane_;
+}
+
+float Renderer::GetFarFrustumPlane() const {
+    return farFrustumPlane_;
 }
 
 const SceneTree& Renderer::GetSceneTree() const {

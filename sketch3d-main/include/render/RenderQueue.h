@@ -39,9 +39,14 @@ class SKETCH_3D_API RenderQueue {
          */
         void                        Render();
 
+        /**
+         * Checks if the render queue is empty or not
+         */
+        bool                        IsEmpty() const;
+
     private:
          vector<RenderQueueItem>    items_;         /**< The items in the queue */
-         vector<size_t>             itemsIndex_;    /**< This list is the list that get actually sorted. When can then use temporal coherence to have less things to sort on subsequent frames */
+         vector<size_t>             itemsIndex_;    /**< This list is the list that get actually sorted. We can then use temporal coherence to have less things to sort on subsequent frames */
 };
 
 }
