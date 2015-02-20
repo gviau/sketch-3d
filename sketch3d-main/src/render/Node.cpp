@@ -17,8 +17,8 @@ namespace Sketch3D {
 long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
-						   scale_(1.0f, 1.0f, 1.0), needTransformationUpdate_(true),
-                           useInstancing_(false)
+						   scale_(1.0f, 1.0f, 1.0), parentTransformation_(nullptr),
+                           needTransformationUpdate_(true), useInstancing_(false)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -28,8 +28,8 @@ Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
 
 Node::Node(const string& name, Node* parent) : name_(name), parent_(parent),
 											   mesh_(NULL), material_(NULL),
-											   scale_(1.0f, 1.0f, 1.0f), needTransformationUpdate_(true),
-                                               useInstancing_(false)
+											   scale_(1.0f, 1.0f, 1.0f), parentTransformation_(nullptr),
+                                               needTransformationUpdate_(true), useInstancing_(false)
 {
 }
 
@@ -40,6 +40,7 @@ Node::Node(const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
+                                                          parentTransformation_(nullptr),
                                                           needTransformationUpdate_(true),
                                                           useInstancing_(false)
 {
@@ -57,6 +58,7 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
+                                                          parentTransformation_(nullptr),
                                                           needTransformationUpdate_(true),
                                                           useInstancing_(false)
 {
@@ -67,6 +69,7 @@ Node::Node(const Node& src) : parent_(src.parent_),
                               scale_(src.scale_),
                               orientation_(src.orientation_),
                               material_(src.material_),
+                              parentTransformation_(nullptr),
                               needTransformationUpdate_(true),
                               useInstancing_(false)
 {
@@ -136,6 +139,7 @@ bool Node::AddChildren(Node* node) {
 		return false;
 	}
 
+    node->parentTransformation_ = &cachedTransformation_;
 	children_[name] = node;
 	return true;
 }
@@ -229,7 +233,7 @@ Matrix4x4 Node::ConstructModelMatrix() {
         cachedTransformation_ = model;
     }
 
-    return cachedTransformation_;
+    return (*parentTransformation_) * cachedTransformation_;
 }
 
 void Node::SetParent(Node* parent) {
@@ -320,6 +324,7 @@ void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, 
                 opaqueRenderQueue.AddNode(this);
             } else {
                 transparentRenderQueue.AddNode(this);
+            }
         }
     }
 

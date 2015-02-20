@@ -184,6 +184,7 @@ class SKETCH_3D_API Node {
 		Vector3				scale_;		/**< The scale factor of this node */
 		Quaternion			orientation_;	/**< The orientation of this node */
 
+        Matrix4x4*          parentTransformation_;  /**< Transformation matrix from the parent */
 		Matrix4x4			cachedTransformation_;	/**< The cached matrix transformation */
         bool                needTransformationUpdate_;
 
