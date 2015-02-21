@@ -20,6 +20,8 @@ RenderSystemDirect3D9::RenderSystemDirect3D9(Window& window) : RenderSystem(wind
 
 RenderSystemDirect3D9::~RenderSystemDirect3D9() {
     Logger::GetInstance()->Info("Shutdown Direct3D9");
+    device_->SetVertexShader(nullptr);
+    device_->SetPixelShader(nullptr);
     FreeRenderSystem();
     delete renderContext_;
 }

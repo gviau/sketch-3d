@@ -10,6 +10,10 @@ RenderContextDirect3D9::RenderContextDirect3D9() : direct3D9Context_(nullptr), d
 }
 
 RenderContextDirect3D9::~RenderContextDirect3D9() {
+    if (direct3D9Device_ != nullptr) {
+        direct3D9Device_->Release();
+    }
+
     if (direct3D9Context_ != nullptr) {
         direct3D9Context_->Release();
     }
@@ -75,7 +79,7 @@ bool RenderContextDirect3D9::Initialize(Window& window, const RenderParameters_t
         presentParameters.BackBufferHeight = renderParameters.height;
     }
 
-    HRESULT hr = direct3D9Context_->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
+    HRESULT hr = direct3D9Context_->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED,
                                                  &presentParameters, &direct3D9Device_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create Direct3D9 device");
