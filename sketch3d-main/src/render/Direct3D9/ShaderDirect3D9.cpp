@@ -19,15 +19,6 @@ ShaderDirect3D9::ShaderDirect3D9(IDirect3DDevice9* device) : device_(device) {
 }
 
 ShaderDirect3D9::~ShaderDirect3D9() {
-    /*
-    if (vertexShader_ != nullptr) {
-        vertexShader_->Release();
-    }
-
-    if (fragmentShader_ != nullptr) {
-        fragmentShader_->Release();
-    }
-    */
     if (vertexConstants_ != nullptr) {
         vertexConstants_->Release();
     }

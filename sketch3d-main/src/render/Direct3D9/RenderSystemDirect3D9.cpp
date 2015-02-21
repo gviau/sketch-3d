@@ -398,7 +398,7 @@ void RenderSystemDirect3D9::CreateTextShader() {
 
         "VS_OUTPUT main(VS_INPUT input) {\n"
             "VS_OUTPUT output;\n"
-            "output.uv = input.in_uv;\n"
+            "output.uv = input.in_uv - float2(-0.0001, 0.0001);\n"  // Offsetting the uv in the texture seems to solve a little artifact
             "output.position = float4(input.in_vertex.xy, 0.0, 1.0);\n"
             "return output;\n"
         "}"
