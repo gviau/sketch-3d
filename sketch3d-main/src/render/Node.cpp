@@ -17,7 +17,7 @@ namespace Sketch3D {
 long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
-						   scale_(1.0f, 1.0f, 1.0), parentTransformation_(nullptr),
+                           scale_(1.0f, 1.0f, 1.0), parentTransformation_(&Matrix4x4::IDENTITY),
                            needTransformationUpdate_(true), useInstancing_(false)
 {
     ostringstream convert;
@@ -28,7 +28,7 @@ Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
 
 Node::Node(const string& name, Node* parent) : name_(name), parent_(parent),
 											   mesh_(NULL), material_(NULL),
-											   scale_(1.0f, 1.0f, 1.0f), parentTransformation_(nullptr),
+											   scale_(1.0f, 1.0f, 1.0f), parentTransformation_(&Matrix4x4::IDENTITY),
                                                needTransformationUpdate_(true), useInstancing_(false)
 {
 }
@@ -40,7 +40,7 @@ Node::Node(const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
-                                                          parentTransformation_(nullptr),
+                                                          parentTransformation_(&Matrix4x4::IDENTITY),
                                                           needTransformationUpdate_(true),
                                                           useInstancing_(false)
 {
@@ -58,7 +58,7 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 														  orientation_(orientation),
 														  mesh_(NULL),
 														  material_(NULL),
-                                                          parentTransformation_(nullptr),
+                                                          parentTransformation_(&Matrix4x4::IDENTITY),
                                                           needTransformationUpdate_(true),
                                                           useInstancing_(false)
 {
@@ -69,7 +69,7 @@ Node::Node(const Node& src) : parent_(src.parent_),
                               scale_(src.scale_),
                               orientation_(src.orientation_),
                               material_(src.material_),
-                              parentTransformation_(nullptr),
+                              parentTransformation_(&Matrix4x4::IDENTITY),
                               needTransformationUpdate_(true),
                               useInstancing_(false)
 {

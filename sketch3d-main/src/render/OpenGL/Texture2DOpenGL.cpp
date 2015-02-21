@@ -22,7 +22,6 @@ bool Texture2DOpenGL::Create() {
     }
 
     Bind();
-    glBindTexture(GL_TEXTURE_2D, textureName_);
 
     GLuint filter = GetOpenglFilterMode();
     GLuint wrap = GetOpenglWrapMode();
@@ -30,7 +29,7 @@ bool Texture2DOpenGL::Create() {
     GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
-    if (format == GL_DEPTH_COMPONENT16) {
+    if (format_ == TEXTURE_FORMAT_DEPTH) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
     }
