@@ -14,7 +14,9 @@
 namespace Sketch3D {
 Text Text::instance_;
 
-Text::Text() : library_(nullptr), currentFont_(nullptr), bufferObject_(nullptr), textShader_(nullptr), textWidth_(32), textHeight_(32), textColor_(1.0f, 1.0f, 1.0f) {
+Text::Text() : library_(nullptr), currentFont_(nullptr), bufferObject_(nullptr), textShader_(nullptr), textWidth_(32), textHeight_(32), textColor_(1.0f, 1.0f, 1.0f),
+               bufferText_(false)
+{
     FT_Error error = FT_Init_FreeType(&library_);
     if (error != FT_Err_Ok) {
         Logger::GetInstance()->Warning("Couldn't initialize text rendering");
@@ -138,7 +140,7 @@ void Text::SetTextColor(const Vector3& color) {
     textColor_ = color;
 }
 
-void Text::Write(const string& text, size_t x, size_t y) const {
+void Text::Write(const string& text, size_t x, size_t y) {
     if (currentFont_ == nullptr) {
         Logger::GetInstance()->Warning("No font loaded in Text::Write");
         return;
@@ -153,12 +155,6 @@ void Text::Write(const string& text, size_t x, size_t y) const {
     float halfScreenWidth = screenWidth * 0.5f;
     float halfScreenHeight = screenHeight * 0.5f;
 
-    vector<float> vertexData;
-    vertexData.reserve(text.size() * 5);
-
-    unsigned short* indices = new unsigned short[text.size() * 6];
-    size_t indexIdx = 0;
-
     Texture2D* textureFont = currentTextureAtlas_.second;
 
     float yScale = (float)textHeight_ / (float)textureFont->GetHeight();
@@ -172,41 +168,75 @@ void Text::Write(const string& text, size_t x, size_t y) const {
 
         float xScale = (float)textWidth_ / 30.0f;
 
+        if (text[i] == ' ') {
+            // We shift by 6 to the right because the advance value is expressed in the 1/64th of a pixel
+            pen.x += (FT_Pos)((float)(slot->advance.x >> 6) * xScale);
+            continue;
+        }
+
         float xPos = (float)(pen.x + slot->bitmap_left * xScale);
         float yPos = (float)Renderer::GetInstance()->GetScreenHeight() - (float)(pen.y + textureFont->GetHeight() * yScale);
         float u = ((float)currentTextureAtlas_.first[(int)text[i] - (int)'!']) / (float)textureFont->GetWidth();
         float uWidth = (float)slot->bitmap.width / (float)textureFont->GetWidth();
 
-        vertexData.push_back(xPos / halfScreenWidth - 1.0f); vertexData.push_back(yPos / halfScreenHeight - 1.0f); vertexData.push_back(0.0f);
-        vertexData.push_back(u); vertexData.push_back(0.0f);
+        textVertices_.push_back(xPos / halfScreenWidth - 1.0f); textVertices_.push_back(yPos / halfScreenHeight - 1.0f); textVertices_.push_back(0.0f);
+        textVertices_.push_back(u); textVertices_.push_back(0.0f);
 
-        vertexData.push_back(xPos / halfScreenWidth - 1.0f); vertexData.push_back((yPos + textureFont->GetHeight() * yScale)/ halfScreenHeight - 1.0f); vertexData.push_back(0.0f);
-        vertexData.push_back(u); vertexData.push_back(1.0f);
+        textVertices_.push_back(xPos / halfScreenWidth - 1.0f); textVertices_.push_back((yPos + textureFont->GetHeight() * yScale)/ halfScreenHeight - 1.0f); textVertices_.push_back(0.0f);
+        textVertices_.push_back(u); textVertices_.push_back(1.0f);
 
-        vertexData.push_back((xPos + slot->bitmap.width * xScale) / halfScreenWidth - 1.0f); vertexData.push_back((yPos + textureFont->GetHeight() * yScale) / halfScreenHeight - 1.0f); vertexData.push_back(0.0f);
-        vertexData.push_back(u + uWidth); vertexData.push_back(1.0f);
+        textVertices_.push_back((xPos + slot->bitmap.width * xScale) / halfScreenWidth - 1.0f); textVertices_.push_back((yPos + textureFont->GetHeight() * yScale) / halfScreenHeight - 1.0f); textVertices_.push_back(0.0f);
+        textVertices_.push_back(u + uWidth); textVertices_.push_back(1.0f);
 
-        vertexData.push_back((xPos + slot->bitmap.width * yScale) / halfScreenWidth - 1.0f); vertexData.push_back(yPos / halfScreenHeight - 1.0f); vertexData.push_back(0.0f);
-        vertexData.push_back(u + uWidth); vertexData.push_back(0.0f);
+        textVertices_.push_back((xPos + slot->bitmap.width * yScale) / halfScreenWidth - 1.0f); textVertices_.push_back(yPos / halfScreenHeight - 1.0f); textVertices_.push_back(0.0f);
+        textVertices_.push_back(u + uWidth); textVertices_.push_back(0.0f);
 
-        size_t idx = i * 4;
+        unsigned short idx = 0;
+        if (!textIndices_.empty()) {
+            idx = textIndices_.back() + ((Renderer::GetInstance()->GetCullingMethod() == CULLING_METHOD_BACK_FACE) ? 2 : 1);
+        }
+
         if (Renderer::GetInstance()->GetCullingMethod() == CULLING_METHOD_BACK_FACE) {
-            indices[indexIdx++] = idx; indices[indexIdx++] = idx + 2; indices[indexIdx++] = idx + 1;
-            indices[indexIdx++] = idx; indices[indexIdx++] = idx + 3; indices[indexIdx++] = idx + 2;
+            textIndices_.push_back(idx); textIndices_.push_back(idx + 2); textIndices_.push_back(idx + 1);
+            textIndices_.push_back(idx); textIndices_.push_back(idx + 3); textIndices_.push_back(idx + 2);
         } else {
-            indices[indexIdx++] = idx; indices[indexIdx++] = idx + 1; indices[indexIdx++] = idx + 2;
-            indices[indexIdx++] = idx; indices[indexIdx++] = idx + 2; indices[indexIdx++] = idx + 3;
+            textIndices_.push_back(idx); textIndices_.push_back(idx + 1); textIndices_.push_back(idx + 2);
+            textIndices_.push_back(idx); textIndices_.push_back(idx + 2); textIndices_.push_back(idx + 3);
         }
         
         // We shift by 6 to the right because the advance value is expressed in the 1/64th of a pixel
         pen.x += (FT_Pos)((float)(slot->advance.x >> 6) * xScale);
     }
 
-    bufferObject_->SetVertexData(vertexData, VERTEX_ATTRIBUTES_POSITION | VERTEX_ATTRIBUTES_TEX_COORDS);
-    bufferObject_->SetIndexData(indices, indexIdx);
-    delete[] indices;
+    if (!bufferText_) {
+        bufferObject_->SetVertexData(textVertices_, VERTEX_ATTRIBUTES_POSITION | VERTEX_ATTRIBUTES_TEX_COORDS);
+        bufferObject_->SetIndexData(&textIndices_[0], textIndices_.size());
+        textVertices_.clear();
+        textIndices_.clear();
+
+        Renderer::GetInstance()->DrawTextBuffer(bufferObject_, textureFont, textColor_);
+    }
+}
+
+void Text::BeginTextGroup() {
+    if (bufferText_) {
+        Logger::GetInstance()->Warning("Already called BeginTextGroup");
+    }
+
+    bufferText_ = true;
+}
+
+void Text::EndTextGroup() {
+    Texture2D* textureFont = currentTextureAtlas_.second;
+
+    bufferObject_->SetVertexData(textVertices_, VERTEX_ATTRIBUTES_POSITION | VERTEX_ATTRIBUTES_TEX_COORDS);
+    bufferObject_->SetIndexData(&textIndices_[0], textIndices_.size());
+    textVertices_.clear();
+    textIndices_.clear();
 
     Renderer::GetInstance()->DrawTextBuffer(bufferObject_, textureFont, textColor_);
+
+    bufferText_ = false;
 }
 
 }

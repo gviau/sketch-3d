@@ -65,7 +65,20 @@ class SKETCH_3D_API Text {
          * @param x The x position of the start of the text on the screen, in pixels
          * @param y The y position of the start of the text on the screen, in pixels
          */
-        void                        Write(const string& text, size_t x, size_t y) const;
+        void                        Write(const string& text, size_t x, size_t y);
+
+        /**
+         * Begin a text group. This function should be paired with a EndTextGroup() function call.
+         * It enables the user to buffer all Write() function call into the same buffer for more
+         * efficient text rendering. The buffers are rendered when calling EndTextGroup()
+         */
+        void                        BeginTextGroup();
+
+        /**
+         * Ends a text group. This function actually draws all the text that has been buffered between
+         * the BeginTextGroup() and this function call.
+         */
+        void                        EndTextGroup();
 
     private:
         static Text                 instance_;              /**< Singleton's instance */
@@ -79,6 +92,9 @@ class SKETCH_3D_API Text {
         size_t                      textWidth_;             /**< Text width */
         size_t                      textHeight_;            /**< Text height */
         Vector3                     textColor_;             /**< Color of the text */
+        bool                        bufferText_;            /**< Used to determine if we are between a Begin and an End call */
+        vector<float>               textVertices_;          /**< List of vertices */
+        vector<unsigned short>      textIndices_;           /**< List of indices */
 
         /**
          * Constructor
