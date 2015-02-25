@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_TEXTURE_3D_H
 #define SKETCH_3D_TEXTURE_3D_H
 
-#include "render/Texture.h"
+#include "render/Texture2D.h"
 
 #include "system/Platform.h"
 
@@ -42,6 +42,13 @@ class SKETCH_3D_API Texture3D : public Texture {
          * Destructor
          */
         virtual                ~Texture3D();
+
+        /**
+         * Load several textures to create the 3D texture
+         * @param filenames A list of texture filenames to be loaded
+         * @return true if all the textures were loaded, false otherwise
+         */
+        bool                    Load(const vector<string>& filenames);
 
         /**
          * Create the actual texture handle

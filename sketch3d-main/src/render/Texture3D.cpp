@@ -17,6 +17,10 @@ Texture3D::~Texture3D() {
     free(data_);
 }
 
+bool Texture3D::Load(const vector<string>& filenames) {
+    return false;
+}
+
 bool Texture3D::SetPixelDataBytes(unsigned char* data, size_t width, size_t height, size_t depth) {
     if (format_ >= TEXTURE_FORMAT_R32F || format_ == TEXTURE_FORMAT_DEPTH) {
         Logger::GetInstance()->Warning("Operation not supported for format different than byte texture format in SetPixelDataBytes");

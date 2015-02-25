@@ -20,7 +20,7 @@ bool Texture3DOpenGL::Create() {
     if (textureName_ == 0) {
         glGenTextures(1, &textureName_);
     }
-
+    
     Bind();
 
     GLuint filter = GetOpenglFilterMode();
@@ -30,6 +30,11 @@ bool Texture3DOpenGL::Create() {
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
     glTexImage3D(GL_TEXTURE_3D, 0, format, width_, height_, depth_, 0, components, type, data_);
+
+    if (generateMipmaps_) {
+        glGenerateMipmap(GL_TEXTURE_3D);
+    }
+
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrap);
@@ -82,6 +87,13 @@ void Texture3DOpenGL::SetPixelDataFloatsImp(float* data) {
 
 void Texture3DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLuint& internalFormat, GLuint& format, GLuint& type, GLuint& bpp) const {
 	switch (textureFormat) {
+        case TEXTURE_FORMAT_GRAYSCALE:
+            internalFormat = GL_R8;
+            format = GL_RED;
+            type = GL_UNSIGNED_BYTE;
+            bpp = 1;
+            break;
+
 		case TEXTURE_FORMAT_RGB24:
             internalFormat = GL_RGB;
             format = GL_RGB;
@@ -133,7 +145,7 @@ void Texture3DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
             break;
 
         case TEXTURE_FORMAT_DEPTH:
-            internalFormat = GL_DEPTH_COMPONENT16;
+            internalFormat = GL_DEPTH_COMPONENT32;
             format = GL_DEPTH_COMPONENT;
             type = GL_UNSIGNED_INT;
 
@@ -146,10 +158,10 @@ void Texture3DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
 GLuint Texture3DOpenGL::GetOpenglFilterMode() const {
 	switch (filterMode_) {
 		case FILTER_MODE_NEAREST:
-			return GL_NEAREST;
+			return (generateMipmaps_) ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST;
 
 		case FILTER_MODE_LINEAR:
-			return GL_LINEAR;
+			return (generateMipmaps_) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
 	}
 
     return 0;

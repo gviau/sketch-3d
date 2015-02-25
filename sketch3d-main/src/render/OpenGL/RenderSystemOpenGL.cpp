@@ -284,27 +284,28 @@ void RenderSystemOpenGL::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingF
 }
 
 size_t RenderSystemOpenGL::BindTexture(const Texture* texture) {
-    const Texture2DOpenGL* textureOpenGL = static_cast<const Texture2DOpenGL*>(texture);
+    size_t textureName;
+    GLint textureType;
+    if (texture->GetType() == TEXTURE_TYPE_2D) {
+        textureName = static_cast<const Texture2DOpenGL*>(texture)->textureName_;
+        textureType = GL_TEXTURE_2D;
+    } else {
+        textureName = static_cast<const Texture3DOpenGL*>(texture)->textureName_;
+        textureType = GL_TEXTURE_3D;
+    }
 
     // Verify if the node is already bound
     size_t textureUnit = 0;
     TextureUnitNode_t* nodeToUse = head_;
-    TextureCache_t::iterator it = textureCache_.find(textureOpenGL->textureName_);
+    TextureCache_t::iterator it = textureCache_.find(textureName);
 
     if (it != textureCache_.end()) {
         nodeToUse = it->second;
     } else {
-        // Bind it otherwise
-        TextureType_t textureType = texture->GetType();
-
         glActiveTexture(GL_TEXTURE0 + nodeToUse->textureUnit);
-        if (textureType == TEXTURE_TYPE_2D) {
-            glBindTexture(GL_TEXTURE_2D, textureOpenGL->textureName_);
-        } else if (textureType == TEXTURE_TYPE_3D) {
-            glBindTexture(GL_TEXTURE_2D, textureOpenGL->textureName_);
-        }
+        glBindTexture(textureType, textureName);
 
-        textureCache_[textureOpenGL->textureName_] = nodeToUse;
+        textureCache_[textureName] = nodeToUse;
     }
     textureUnit = nodeToUse->textureUnit;
 
