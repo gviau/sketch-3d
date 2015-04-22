@@ -2,6 +2,8 @@
 
 #include "math/Constants.h"
 #include "math/Matrix3x3.h"
+#include "math/Vector4.h"
+
 #include "system/Platform.h"
 
 #include <iostream>
@@ -24,6 +26,9 @@ Vector3::Vector3(float x, float y, float z)
     this->x = x;
     this->y = y;
     this->z = z;
+}
+
+Vector3::Vector3(const Vector4& vec) : x(vec.x), y(vec.y), z(vec.z) {
 }
 
 Vector3::Vector3(const Vector3& src)
@@ -257,6 +262,13 @@ void Vector3::operator*=(const Matrix3x3& m)
     x = nx;
     y = ny;
     z = nz;
+}
+
+Vector3& Vector3::operator=(const Vector4& v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    return *this;
 }
 
 }

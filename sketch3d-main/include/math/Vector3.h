@@ -7,6 +7,7 @@ namespace Sketch3D {
 
 // Forward dependencies
 class Matrix3x3;
+class Vector4;
 
 /**
  * @class Vector3
@@ -38,6 +39,12 @@ class SKETCH_3D_API Vector3 {
          * @param z The z component
          */
                                 Vector3(float x, float y, float z);
+
+        /**
+         * Constructor. Ignores w component of 4D vector
+         * @param vec A 4D vector from which we copy only the x, y and z components
+         */
+                                Vector3(const Vector4& vec);
 
         /**
          * Copy constructor
@@ -112,7 +119,7 @@ class SKETCH_3D_API Vector3 {
         INLINE bool             operator!=(const Vector3& v) const;
 
         INLINE Vector3&         operator=(const Vector3& v);
-
+        Vector3&                operator=(const Vector4& v);
 };
 
 INLINE Vector3 Vector3::operator-() const
