@@ -86,6 +86,9 @@ void Renderer::EndRender() {
 }
 
 void Renderer::Render() {
+    // Draw the static batches first
+    sceneTree_.RenderStaticBatches();
+
 	// Populate the render queue with nodes from the scene tree
     FrustumPlanes_t frustumPlanes;
     if (useFrustumCulling_) {
