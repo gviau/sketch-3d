@@ -424,7 +424,7 @@ void SkinnedMesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
             presentVertexAttributes |= VERTEX_ATTRIBUTES_WEIGHTS;
         }
 
-        if (!bufferObject->SetVertexData(data, presentVertexAttributes)) {
+        if (bufferObject->SetVertexData(data, presentVertexAttributes) != BUFFER_OBJECT_ERROR_NONE) {
             Logger::GetInstance()->Error("The vertex attributes are not all present");
             FreeMeshMemory();
             break;

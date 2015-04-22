@@ -12,7 +12,7 @@ using namespace std;
 namespace Sketch3D {
 BufferObjectDirect3D9::BufferObjectDirect3D9(IDirect3DDevice9* device, const VertexAttributesMap_t& vertexAttributes,
                                              BufferUsage_t usage) : BufferObject(vertexAttributes, usage), device_(device),
-                                             vertexBuffer_(nullptr), indexBuffer_(nullptr), vertexDeclaration_(nullptr), stride_(0), primitivesCount_(0),
+                                             vertexBuffer_(nullptr), indexBuffer_(nullptr), vertexDeclaration_(nullptr), primitivesCount_(0),
                                              instanceBuffer_(nullptr), instanceDataPrepared_(false)
 {
 }
@@ -72,19 +72,20 @@ void BufferObjectDirect3D9::RenderInstances(const vector<Matrix4x4>& modelMatric
     device_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, vertexCount_, 0, primitivesCount_);
 }
 
-bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
-    // We implicitely count position
-    size_t count = 1;
-    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+BufferObjectError_t BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
+    bool hasNormals = ((presentVertexAttributes & VERTEX_ATTRIBUTES_NORMAL) > 0);
+    bool hasTexCoords = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TEX_COORDS) > 0);
+    bool hasTangents = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TANGENT) > 0);
 
-    for (; it != vertexAttributes_.end(); ++it) {
-        if ((presentVertexAttributes & it->first) > 0) {
-            count += 1;
-        }
-    }
+    stride_ = sizeof(Vector3) +
+                ((hasNormals) ? sizeof(Vector3) : 0) +
+                ((hasTexCoords) ? sizeof(Vector2) : 0) +
+                ((hasTangents) ? sizeof(Vector3) : 0);
 
-    if (count != vertexAttributes_.size()) {
-        return false;
+    if ( (vertexData.size() / (stride_ / sizeof(float))) > 65535) {
+        return BUFFER_OBJECT_ERROR_NOT_ENOUGH_SPACE;
+    } else if (!AreVertexAttributesValid(presentVertexAttributes)) {
+        return BUFFER_OBJECT_ERROR_INVALID_VERTEX_ATTRIBUTES;
     }
 
     if (vertexDeclaration_ != nullptr) {
@@ -93,14 +94,12 @@ bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int p
     }
 
     map<size_t, VertexAttributes_t> attributesFromIndex;
-    it = vertexAttributes_.begin();
+    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
     for (; it != vertexAttributes_.end(); ++it) {
         attributesFromIndex[it->second] = it->first;
     }
 
     vector<D3DVERTEXELEMENT9> vertexElements;
-    stride_ = 0;
-
     map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
     for (; v_it != attributesFromIndex.end(); ++v_it) {
         size_t offset = 0;
@@ -141,8 +140,6 @@ bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int p
         vertexElement.Method = D3DDECLMETHOD_DEFAULT;
         vertexElement.UsageIndex = 0;
         vertexElements.push_back(vertexElement);
-
-        stride_ += offset;
     }
 
     D3DVERTEXELEMENT9 endVertexElement = D3DDECL_END();
@@ -170,14 +167,56 @@ bool BufferObjectDirect3D9::SetVertexData(const vector<float>& vertexData, int p
 
     vertexBuffer_->Unlock();
 
-    return true;
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-bool BufferObjectDirect3D9::AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
-    return false;
+BufferObjectError_t BufferObjectDirect3D9::AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
+    if (vertexCount_ == 0) {
+        return SetVertexData(vertexData, presentVertexAttributes);
+    } else if ( (vertexCount_ + (vertexData.size() / (stride_ / sizeof(float))) ) > 65535) {
+        return BUFFER_OBJECT_ERROR_NOT_ENOUGH_SPACE;
+    }
+
+    if (!AreVertexAttributesValid(presentVertexAttributes)) {
+        return BUFFER_OBJECT_ERROR_INVALID_VERTEX_ATTRIBUTES;
+    }
+
+    // We have to copy the buffer that we have, reallocate the space for it, append the data and copy back the new array
+    size_t arraySize = vertexCount_ * (stride_ / sizeof(float));
+    size_t newSize = arraySize + vertexData.size();
+    vector<float> newVertexData;
+    newVertexData.resize(newSize);
+
+    // Get the old data
+    void* data;
+    DWORD lockFlags = (usage_ == BUFFER_USAGE_DYNAMIC) ? D3DLOCK_DISCARD : 0;
+    vertexBuffer_->Lock(0, 0, &data, lockFlags);
+
+    memcpy(&newVertexData[0], data, vertexCount_ * sizeof(float));
+
+    vertexBuffer_->Unlock();
+
+    // Append the new
+    size_t idx = 0;
+    for (size_t i = arraySize; i < newSize; i++) {
+        newVertexData[i] = vertexData[idx++];
+    }
+
+    // Create a new vertex buffer and assign the new vertex data
+    vertexCount_ = newSize / (stride_ / sizeof(float));
+    vertexBuffer_->Release();
+    DWORD usage = (usage_ == BUFFER_USAGE_STATIC) ? D3DUSAGE_WRITEONLY : D3DUSAGE_DYNAMIC;
+    device_->CreateVertexBuffer(newSize * sizeof(float), usage, 0, D3DPOOL_MANAGED, &vertexBuffer_, nullptr);
+    vertexBuffer_->Lock(0, 0, &data, lockFlags);
+
+    memcpy(data, &newVertexData[0], newSize * sizeof(float));
+
+    vertexBuffer_->Unlock();
+
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-void BufferObjectDirect3D9::SetIndexData(unsigned short* indexData, size_t numIndex) {
+BufferObjectError_t BufferObjectDirect3D9::SetIndexData(unsigned short* indexData, size_t numIndex) {
     if (indexBuffer_ != nullptr) {
         indexBuffer_->Release();
         indexBuffer_ = nullptr;
@@ -195,9 +234,48 @@ void BufferObjectDirect3D9::SetIndexData(unsigned short* indexData, size_t numIn
     indexBuffer_->Unlock();
 
     primitivesCount_ = numIndex / 3;
+
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-void BufferObjectDirect3D9::AppendIndexData(unsigned short* indexData, size_t numIndex) {
+BufferObjectError_t BufferObjectDirect3D9::AppendIndexData(unsigned short* indexData, size_t numIndex) {
+    if (indexCount_ == 0) {
+        return SetIndexData(indexData, numIndex);
+    }
+
+    // We have to copy the buffer that we have, reallocate the space for it, append the data and copy back the new array
+    size_t newSize = indexCount_ + numIndex;
+    vector<unsigned int> newIndexData;
+    newIndexData.resize(newSize);
+
+    // Get the old data
+    void* data;
+    DWORD lockFlags = 0;
+    indexBuffer_->Lock(0, 0, &data, lockFlags);
+
+    memcpy(&newIndexData[0], data, indexCount_* sizeof(unsigned short));
+
+    indexBuffer_->Unlock();
+
+    // Append the new
+    size_t idx = 0;
+    for (size_t i = indexCount_; i < newSize; i++) {
+        newIndexData[i] = indexData[idx++];
+    }
+    indexCount_ = newSize;
+
+    // Create a new vertex buffer and assign the new vertex data
+    primitivesCount_ = indexCount_ / 3;
+
+    indexBuffer_->Release();
+    device_->CreateIndexBuffer(numIndex * sizeof(unsigned short), D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_MANAGED, &indexBuffer_, nullptr);
+    indexBuffer_->Lock(0, indexCount_ * sizeof(unsigned short), &data, lockFlags);
+
+    memcpy(data, (void*)&newIndexData[0], indexCount_ * sizeof(unsigned short));
+
+    indexBuffer_->Unlock();
+
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
 void BufferObjectDirect3D9::PrepareInstanceBuffers() {

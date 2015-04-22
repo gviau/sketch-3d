@@ -18,7 +18,7 @@ long long Node::nextNameIndex_ = 0;
 
 Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
                            scale_(1.0f, 1.0f, 1.0), parentTransformation_(&Matrix4x4::IDENTITY),
-                           needTransformationUpdate_(true), useInstancing_(false)
+                           needTransformationUpdate_(true), useInstancing_(false), isStatic_(false)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -29,7 +29,7 @@ Node::Node(Node* parent) : parent_(parent), mesh_(NULL), material_(NULL),
 Node::Node(const string& name, Node* parent) : name_(name), parent_(parent),
 											   mesh_(NULL), material_(NULL),
 											   scale_(1.0f, 1.0f, 1.0f), parentTransformation_(&Matrix4x4::IDENTITY),
-                                               needTransformationUpdate_(true), useInstancing_(false)
+                                               needTransformationUpdate_(true), useInstancing_(false), isStatic_(false)
 {
 }
 
@@ -42,7 +42,8 @@ Node::Node(const Vector3& position, const Vector3& scale,
 														  material_(NULL),
                                                           parentTransformation_(&Matrix4x4::IDENTITY),
                                                           needTransformationUpdate_(true),
-                                                          useInstancing_(false)
+                                                          useInstancing_(false),
+                                                          isStatic_(false)
 {
     ostringstream convert;
     convert << nextNameIndex_;
@@ -60,7 +61,8 @@ Node::Node(const string& name, const Vector3& position, const Vector3& scale,
 														  material_(NULL),
                                                           parentTransformation_(&Matrix4x4::IDENTITY),
                                                           needTransformationUpdate_(true),
-                                                          useInstancing_(false)
+                                                          useInstancing_(false),
+                                                          isStatic_(false)
 {
 }
 
@@ -71,7 +73,8 @@ Node::Node(const Node& src) : parent_(src.parent_),
                               material_(src.material_),
                               parentTransformation_(&Matrix4x4::IDENTITY),
                               needTransformationUpdate_(true),
-                              useInstancing_(false)
+                              useInstancing_(false),
+                              isStatic_(false)
 {
     // TODO
     // Better manage name copy
@@ -270,6 +273,10 @@ void Node::SetInstancing(bool val) {
     }
 }
 
+void Node::SetStatic(bool val) {
+    isStatic_ = val;
+}
+
 const string& Node::GetName() const {
 	return name_;
 }
@@ -302,8 +309,12 @@ bool Node::UseInstancing() const {
     return useInstancing_;
 }
 
+bool Node::IsStatic() const {
+    return isStatic_;
+}
+
 void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, RenderQueue& opaqueRenderQueue, RenderQueue& transparentRenderQueue) {
-    if (mesh_ != nullptr) {
+    if (mesh_ != nullptr && !isStatic_) {
         bool addMeshToRenderQueue = true;
 
         if (useFrustumCulling) {

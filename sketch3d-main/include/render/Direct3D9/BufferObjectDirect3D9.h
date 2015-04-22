@@ -22,10 +22,10 @@ class BufferObjectDirect3D9 : public BufferObject {
         virtual                        ~BufferObjectDirect3D9();
         virtual void                    Render();
         virtual void                    RenderInstances(const vector<Matrix4x4>& modelMatrices);
-        virtual bool                    SetVertexData(const vector<float>& vertexData, int presentVertexAttributes);
-        virtual bool                    AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes);
-        virtual void                    SetIndexData(unsigned short* indexdata, size_t numIndex);
-        virtual void                    AppendIndexData(unsigned short* indexData, size_t numIndex);
+        virtual BufferObjectError_t     SetVertexData(const vector<float>& vertexData, int presentVertexAttributes);
+        virtual BufferObjectError_t     AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes);
+        virtual BufferObjectError_t     SetIndexData(unsigned short* indexdata, size_t numIndex);
+        virtual BufferObjectError_t     AppendIndexData(unsigned short* indexData, size_t numIndex);
         virtual void                    PrepareInstanceBuffers();
 
     private:
@@ -33,7 +33,6 @@ class BufferObjectDirect3D9 : public BufferObject {
         IDirect3DVertexBuffer9*         vertexBuffer_;
         IDirect3DIndexBuffer9*          indexBuffer_;
         IDirect3DVertexDeclaration9*    vertexDeclaration_;
-        size_t                          stride_;
         size_t                          primitivesCount_;
         IDirect3DVertexBuffer9*         instanceBuffer_;
         bool                            instanceDataPrepared_;

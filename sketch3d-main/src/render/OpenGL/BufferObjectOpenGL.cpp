@@ -36,19 +36,24 @@ void BufferObjectOpenGL::RenderInstances(const vector<Matrix4x4>& modelMatrices)
     glDrawElementsInstanced(GL_TRIANGLES, indexCount_, GL_UNSIGNED_SHORT, 0, modelMatrices.size());
 }
 
-bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
-    // We implicitely count position
-    size_t count = 1;
-    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+BufferObjectError_t BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
+    bool hasNormals = ((presentVertexAttributes & VERTEX_ATTRIBUTES_NORMAL) > 0);
+    bool hasTexCoords = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TEX_COORDS) > 0);
+    bool hasTangents = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TANGENT) > 0);
+    bool hasBones = ((presentVertexAttributes & VERTEX_ATTRIBUTES_BONES) > 0);
+    bool hasWeights = ((presentVertexAttributes & VERTEX_ATTRIBUTES_WEIGHTS) > 0);
 
-    for (; it != vertexAttributes_.end(); ++it) {
-        if ((presentVertexAttributes & it->first) > 0) {
-            count += 1;
-        }
-    }
+    stride_ = sizeof(Vector3) +
+                ((hasNormals) ? sizeof(Vector3) : 0) +
+                ((hasTexCoords) ? sizeof(Vector2) : 0) +
+                ((hasTangents) ? sizeof(Vector3) : 0) +
+                ((hasBones) ? sizeof(Vector4) : 0) +
+                ((hasWeights) ? sizeof(Vector4) : 0);
 
-    if (count != vertexAttributes_.size()) {
-        return false;
+    if ( (vertexData.size() / (stride_ / sizeof(float))) > 65535) {
+        return BUFFER_OBJECT_ERROR_NOT_ENOUGH_SPACE;
+    } else if (!AreVertexAttributesValid(presentVertexAttributes)) {
+        return BUFFER_OBJECT_ERROR_INVALID_VERTEX_ATTRIBUTES;
     }
 
     GenerateBuffers();
@@ -72,19 +77,6 @@ bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int pres
         for (; it != vertexAttributes_.end(); ++it) {
             attributesFromIndex[it->second] = it->first;
         }
-
-        bool hasNormals = ((presentVertexAttributes & VERTEX_ATTRIBUTES_NORMAL) > 0);
-        bool hasTexCoords = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TEX_COORDS) > 0);
-        bool hasTangents = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TANGENT) > 0);
-        bool hasBones = ((presentVertexAttributes & VERTEX_ATTRIBUTES_BONES) > 0);
-        bool hasWeights = ((presentVertexAttributes & VERTEX_ATTRIBUTES_WEIGHTS) > 0);
-
-        size_t stride = sizeof(Vector3) +
-                        ((hasNormals) ? sizeof(Vector3) : 0) +
-                        ((hasTexCoords) ? sizeof(Vector2) : 0) +
-                        ((hasTangents) ? sizeof(Vector3) : 0) +
-                        ((hasBones) ? sizeof(Vector4) : 0) +
-                        ((hasWeights) ? sizeof(Vector4) : 0);
 
         size_t cumulativeOffset = 0;
         map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
@@ -145,7 +137,7 @@ bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int pres
             }
 
             glEnableVertexAttribArray(v_it->first);
-            glVertexAttribPointer(v_it->first, size, GL_FLOAT, GL_FALSE, stride, (void*)cumulativeOffset);
+            glVertexAttribPointer(v_it->first, size, GL_FLOAT, GL_FALSE, stride_, (void*)cumulativeOffset);
             cumulativeOffset += offset;
         }
     }
@@ -156,14 +148,41 @@ bool BufferObjectOpenGL::SetVertexData(const vector<float>& vertexData, int pres
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertexData.size() * sizeof(float), &vertexData[0]);
     }
 
-    return true;
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-bool BufferObjectOpenGL::AppendVertexData(const vector<float>& vertexData, int presentVertexData) {
-    return false;
+BufferObjectError_t BufferObjectOpenGL::AppendVertexData(const vector<float>& vertexData, int presentVertexAttributes) {
+    if (vertexCount_ == 0) {
+        return SetVertexData(vertexData, presentVertexAttributes);
+    } else if ( ((vertexCount_ + vertexData.size()) / (stride_ / sizeof(float))) > 65535) {
+        return BUFFER_OBJECT_ERROR_NOT_ENOUGH_SPACE;
+    }
+
+    if (!AreVertexAttributesValid(presentVertexAttributes)) {
+        return BUFFER_OBJECT_ERROR_INVALID_VERTEX_ATTRIBUTES;
+    }
+
+    // We have to copy the buffer that we have, reallocate the space for it, append the data and copy back the new array
+    size_t newSize = vertexCount_ + vertexData.size();
+    vector<float> newVertexData;
+    newVertexData.resize(newSize);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, vertexCount_ * sizeof(float), &newVertexData[0]);
+
+    size_t idx = 0;
+    for (size_t i = vertexCount_; i < newSize; i++) {
+        newVertexData[i] = vertexData[idx++];
+    }
+
+    vertexCount_ = newSize;
+    int type = (usage_ == BUFFER_USAGE_STATIC) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
+    glBufferData(GL_ARRAY_BUFFER, vertexCount_ * sizeof(float), &newVertexData[0], type);
+
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-void BufferObjectOpenGL::SetIndexData(unsigned short* indexData, size_t numIndex) {
+BufferObjectError_t BufferObjectOpenGL::SetIndexData(unsigned short* indexData, size_t numIndex) {
     GenerateBuffers();
 
     indexCount_ = numIndex;
@@ -173,9 +192,32 @@ void BufferObjectOpenGL::SetIndexData(unsigned short* indexData, size_t numIndex
     // Index buffer object
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * sizeof(unsigned short), indexData, GL_STATIC_DRAW);
+
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
-void BufferObjectOpenGL::AppendIndexData(unsigned short* indexData, size_t numIndex) {
+BufferObjectError_t BufferObjectOpenGL::AppendIndexData(unsigned short* indexData, size_t numIndex) {
+    if (indexCount_ == 0) {
+        return SetIndexData(indexData, numIndex);
+    }
+
+    // We have to copy the buffer that we have, reallocate the space for it, append the data and copy back the new array
+    size_t newSize = indexCount_ + numIndex;
+    vector<unsigned int> newIndexData;
+    newIndexData.resize(newSize);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_);
+    glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexCount_ * sizeof(unsigned short), &newIndexData[0]);
+
+    size_t idx = 0;
+    for (size_t i = indexCount_; i < newSize; i++) {
+        newIndexData[i] = indexData[idx++];
+    }
+
+    indexCount_ = newSize;
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * sizeof(unsigned short), &newIndexData[0], GL_STATIC_DRAW);
+    
+    return BUFFER_OBJECT_ERROR_NONE;
 }
 
 void BufferObjectOpenGL::PrepareInstanceBuffers() {

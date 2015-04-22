@@ -339,68 +339,13 @@ void Mesh::Initialize(const VertexAttributesMap_t& vertexAttributes) {
         bufferObjects_[i] = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes_, bufferUsage);
         BufferObject* bufferObject = bufferObjects_[i];
 
-	    // Interleave the data
 	    vector<float> data;
-        data.reserve(surfaces_[i]->numVertices * 3 +
-                     surfaces_[i]->numNormals * 3 +
-                     surfaces_[i]->numTexCoords * 2 +
-                     surfaces_[i]->numTangents * 3);
+        int presentVertexAttributes;
+        size_t stride;
 
-        bool hasNormals = surfaces_[i]->numNormals > 0;
-        bool hasTexCoords = surfaces_[i]->numTexCoords > 0;
-        bool hasTangents = surfaces_[i]->numTangents > 0;
-        bool hasBones = surfaces_[i]->numBones > 0;
-        bool hasWeights = surfaces_[i]->numWeights > 0;
+        PackSurfaceTriangleVertices(surfaces_[i], attributesFromIndex, data, presentVertexAttributes, stride);
 
-        Vector3 vertex;
-        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
-            map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
-
-            for (; v_it != attributesFromIndex.end(); ++v_it) {
-                switch (v_it->second) {
-                    case VERTEX_ATTRIBUTES_POSITION:
-                        vertex = surfaces_[i]->vertices[j];
-                        data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-                        break;
-
-                    case VERTEX_ATTRIBUTES_NORMAL:
-                        if (hasNormals) {
-                            Vector3 normal = surfaces_[i]->normals[j];
-                            data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
-                        }
-                        break;
-
-                    case VERTEX_ATTRIBUTES_TEX_COORDS:
-                        if (hasTexCoords) {
-                            Vector2 texCoords = surfaces_[i]->texCoords[j];
-                            data.push_back(texCoords.x); data.push_back(texCoords.y);
-                        }
-                        break;
-
-                    case VERTEX_ATTRIBUTES_TANGENT:
-                        if (hasTangents) {
-                            Vector3 tangents = surfaces_[i]->tangents[j];
-                            data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
-                        }
-                        break;
-                }
-            }
-	    }
-
-        int presentVertexAttributes = 0;
-        if (hasNormals) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_NORMAL;
-        }
-
-        if (hasTexCoords) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_TEX_COORDS;
-        }
-
-        if (hasTangents) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_TANGENT;
-        }
-
-        if (!bufferObject->SetVertexData(data, presentVertexAttributes)) {
+        if (bufferObject->SetVertexData(data, presentVertexAttributes) != BUFFER_OBJECT_ERROR_NONE) {
             Logger::GetInstance()->Error("The vertex attributes are not all present");
             FreeMeshMemory();
             break;
@@ -425,63 +370,10 @@ void Mesh::UpdateMeshData() const {
 
     for (size_t i = 0; i < surfaces_.size(); i++) {
 	    vector<float> data;
-        data.reserve(surfaces_[i]->numVertices * 3 +
-                     surfaces_[i]->numNormals * 3 +
-                     surfaces_[i]->numTexCoords * 2 +
-                     surfaces_[i]->numTangents * 3);
+        int presentVertexAttributes;
+        size_t stride;
 
-        bool hasNormals = surfaces_[i]->numNormals > 0;
-        bool hasTexCoords = surfaces_[i]->numTexCoords > 0;
-        bool hasTangents = surfaces_[i]->numTangents > 0;
-
-        // Interleave the data
-        Vector3 vertex;
-        for (size_t j = 0; j < surfaces_[i]->numVertices; j++) {
-            map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
-
-            for (; v_it != attributesFromIndex.end(); ++v_it) {
-                switch (v_it->second) {
-                    case VERTEX_ATTRIBUTES_POSITION:
-                        vertex = surfaces_[i]->vertices[j];
-                        data.push_back(vertex.x); data.push_back(vertex.y); data.push_back(vertex.z);
-                        break;
-
-                    case VERTEX_ATTRIBUTES_NORMAL:
-                        if (hasNormals) {
-                            Vector3 normal = surfaces_[i]->normals[j];
-                            data.push_back(normal.x); data.push_back(normal.y); data.push_back(normal.z);
-                        }
-                        break;
-
-                    case VERTEX_ATTRIBUTES_TEX_COORDS:
-                        if (hasTexCoords) {
-                            Vector2 texCoords = surfaces_[i]->texCoords[j];
-                            data.push_back(texCoords.x); data.push_back(texCoords.y);
-                        }
-                        break;
-
-                    case VERTEX_ATTRIBUTES_TANGENT:
-                        if (hasTangents) {
-                            Vector3 tangents = surfaces_[i]->tangents[j];
-                            data.push_back(tangents.x); data.push_back(tangents.y); data.push_back(tangents.z);
-                        }
-                        break;
-                }
-            }
-	    }
-
-        int presentVertexAttributes = 0;
-        if (hasNormals) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_NORMAL;
-        }
-
-        if (hasTexCoords) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_TEX_COORDS;
-        }
-
-        if (hasTangents) {
-            presentVertexAttributes |= VERTEX_ATTRIBUTES_TANGENT;
-        }
+        PackSurfaceTriangleVertices(surfaces_[i], attributesFromIndex, data, presentVertexAttributes, stride);
 
         bufferObjects_[i]->SetVertexData(data, presentVertexAttributes);
     }
@@ -593,4 +485,17 @@ void Mesh::ConstructBoundingSphere() {
     boundingSphere_.SetRadius(radius);
 }
 
+const VertexAttributesMap_t& Mesh::GetVertexAttributes() const {
+    return vertexAttributes_;
+}
+
+size_t Mesh::GetVertexAttributesBitField() const {
+    size_t vertexAttributes = 0;
+    VertexAttributesMap_t::const_iterator it = vertexAttributes_.begin();
+    for (; it != vertexAttributes_.end(); ++it) {
+        vertexAttributes |= it->first;
+    }
+
+    return vertexAttributes;
+}
 }

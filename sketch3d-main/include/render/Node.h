@@ -163,6 +163,7 @@ class SKETCH_3D_API Node {
 		void				SetMesh(Mesh* mesh);
 		void				SetMaterial(Material* material);
         void                SetInstancing(bool useInstancing);
+        void                SetStatic(bool isStatic);
 
 		const string&		GetName() const;
 		Node*				GetParent() const;
@@ -172,6 +173,7 @@ class SKETCH_3D_API Node {
 		Mesh*				GetMesh() const;
 		Material*			GetMaterial() const;
         bool                UseInstancing() const;
+        bool                IsStatic() const;
 
 	private:
 		static long long	nextNameIndex_;	/**< The next available number for the automatic name */
@@ -192,6 +194,7 @@ class SKETCH_3D_API Node {
 		Material*			material_; /**< The material of the node. It will be applied to the mesh, if any */
         
         bool                useInstancing_; /**< If set to true, the node will use instanced rendering */
+        bool                isStatic_;      /**< If set to true, the node will be batched with other static nodes */
 
 		/**
 		 * This function sends the data required for the rendering.
