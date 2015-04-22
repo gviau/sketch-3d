@@ -249,15 +249,10 @@ Vector4 Matrix4x4::operator*(const Vector4& v) const
 {
     Vector4 w;
 
-    w.x = v.x * data_[0][0] + v.y * data_[0][1] + v.z * data_[0][2] + data_[0][3];
-    w.y = v.x * data_[1][0] + v.y * data_[1][1] + v.z * data_[1][2] + data_[1][3];
-    w.z = v.x * data_[2][0] + v.y * data_[2][1] + v.z * data_[2][2] + data_[2][3];
-    w.w = v.x * data_[3][0] + v.y * data_[3][1] + v.z * data_[3][2] + data_[3][3];
-
-    w.x /= w.w;
-    w.y /= w.w;
-    w.z /= w.w;
-    w.w = 1.0f;
+    w.x = v.x * data_[0][0] + v.y * data_[0][1] + v.z * data_[0][2] + v.w * data_[0][3];
+    w.y = v.x * data_[1][0] + v.y * data_[1][1] + v.z * data_[1][2] + v.w * data_[1][3];
+    w.z = v.x * data_[2][0] + v.y * data_[2][1] + v.z * data_[2][2] + v.w * data_[2][3];
+    w.w = v.x * data_[3][0] + v.y * data_[3][1] + v.z * data_[3][2] + v.w * data_[3][3];
 
     return w;
 }
