@@ -56,6 +56,7 @@ void SceneTree::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCull
 void SceneTree::RenderStaticBatches() const {
     const Matrix4x4& viewProjectionMatrix = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& viewMatrix = Renderer::GetInstance()->GetViewMatrix();
+    const Matrix4x4& transposedInverseViewMatrix = viewMatrix.Inverse().Transpose();
 
     StaticBatches_t::const_iterator it = staticBatches_.begin();
     for (; it != staticBatches_.end(); ++it) {
@@ -66,6 +67,7 @@ void SceneTree::RenderStaticBatches() const {
         Renderer::GetInstance()->BindShader(shader);
         shader->SetUniformMatrix4x4("viewProjection", viewProjectionMatrix);
         shader->SetUniformMatrix4x4("view", viewMatrix);
+        shader->SetUniformMatrix4x4("transInvView", transposedInverseViewMatrix);
 
         for (; ttb_it != it->second.end(); ++ttb_it) {
             const TexturesBuffersPair_t& texturesToBuffers = ttb_it->second;
@@ -147,6 +149,7 @@ void SceneTree::PerformStaticBatching() {
         staticBatches[shader][vertexAttributes].push_back(node);
     }
 
+    //////////////////////////////////////////////////////////////////////////////////
     // Construct the actual static batches.
     // Because there can be more than one texture per surface, we sort by textures now and
     // attribute a unique id which depends of the combination of textures used
@@ -231,7 +234,9 @@ void SceneTree::PerformStaticBatching() {
                     int presentVertexAttributes;
                     size_t stride;
 
+                    //////////////////////////////////////////////////////////////////////////////////
                     // Pre-transform surface
+                    //////////////////////////////////////////////////////////////////////////////////
                     SurfaceTriangles_t* transformedSurface = new SurfaceTriangles_t;
                     transformedSurface->numVertices = surface->numVertices;
                     transformedSurface->numNormals = surface->numNormals;
@@ -271,6 +276,9 @@ void SceneTree::PerformStaticBatching() {
 
                     PackSurfaceTriangleVertices(transformedSurface, attributesFromIndex, vertexData, presentVertexAttributes, stride);
 
+                    //////////////////////////////////////////////////////////////////////////////////
+                    // Append data into arrays, as much as possible in a single one
+                    //////////////////////////////////////////////////////////////////////////////////
                     bool foundValidBuffer = false;
                     for (size_t k = 0; k < bufferData.size(); k++) {
                         VertexAttributesPair_t& bufferObjectData = bufferData[k];
@@ -326,7 +334,9 @@ void SceneTree::PerformStaticBatching() {
                 }
             }
 
+            //////////////////////////////////////////////////////////////////////////////////
             // Actually create the buffer object
+            //////////////////////////////////////////////////////////////////////////////////
             TexturesToBufferDataMap_t::iterator ttb_it = texturesToBufferData.begin();
             for (; ttb_it != texturesToBufferData.end(); ++ttb_it) {
                 size_t textureId = ttb_it->first;

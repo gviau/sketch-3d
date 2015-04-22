@@ -1,5 +1,6 @@
 float4x4 viewProjection;
 float4x4 view;
+float4x4 transInvView;
 
 struct VS_INPUT {
     float3 in_vertex : POSITION;
@@ -15,11 +16,11 @@ struct VS_OUTPUT {
 VS_OUTPUT main(VS_INPUT input) {
     VS_OUTPUT output = (VS_OUTPUT)0;
 
-    output.normal = mul( (float3x3)view, input.in_normal );
+    output.normal = mul( (float3x3)transInvView, input.in_normal );
 
     float3 pos = mul(view, float4(input.in_vertex, 1.0)).xyz;
     output.light_dir = mul(view, float4(1.0, 1.0, -3.0, 1.0)).xyz - pos;
     output.position = mul(viewProjection, float4(input.in_vertex, 1.0));
 
     return output;
-};
+}

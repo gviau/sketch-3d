@@ -224,6 +224,7 @@ void RenderQueue::Render() {
 
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
+    const Matrix4x4& transposedInverseViewMatrix = view.Inverse().Transpose();
 
     for (size_t i = 0; i < renderCommands.size(); i++) {
         RenderCommand_t renderCommand = renderCommands[i].first;
@@ -237,6 +238,7 @@ void RenderQueue::Render() {
                 Renderer::GetInstance()->BindShader(currentShader);
                 currentShader->SetUniformMatrix4x4("view", view);
                 currentShader->SetUniformMatrix4x4("viewProjection", viewProjection);
+                currentShader->SetUniformMatrix4x4("transInvView", transposedInverseViewMatrix);
 
                 // Material's textures
                 currentMaterialTextures = &(currentMaterial->GetTextures());
@@ -266,10 +268,12 @@ void RenderQueue::Render() {
                 // Setup the transformation matrix for the next sets of buffer objects
                 currentModelMatrix = static_cast<Matrix4x4*>(renderCommands[i].second);
 
+                // ((V * M) ^ -1) T = ( M ^-1 * V ^-1 ) T = (V^-1)T * (M^-1)T
                 // Set the uniform matrices
                 currentShader->SetUniformMatrix4x4("modelViewProjection", viewProjection * (*currentModelMatrix));
                 currentShader->SetUniformMatrix4x4("modelView", view * (*currentModelMatrix));
                 currentShader->SetUniformMatrix4x4("model", (*currentModelMatrix));
+                currentShader->SetUniformMatrix4x4("transInvModelView", transposedInverseViewMatrix * currentModelMatrix->Inverse().Transpose());
                 break;
 
             case RENDER_COMMAND_RENDER_BUFFER_OBJECTS:
