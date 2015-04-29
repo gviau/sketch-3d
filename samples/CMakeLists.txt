@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 
 include (${PROJECT_SOURCE_DIR}/CMakeModules/Macros.cmake)
 
+add_subdirectory(Bokeh)
 add_subdirectory(BurningPaper)
 add_subdirectory(CelShading)
 add_subdirectory(DeferredShading)

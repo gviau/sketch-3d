@@ -1,0 +1,11 @@
+newmtl ground
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ns 1
+d 0
+Tr 0
+map_Kd ./ground_diff.dds
+map_bump ./ground_norm.dds
+bump ./ground_norm.dds
+
