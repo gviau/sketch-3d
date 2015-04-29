@@ -91,6 +91,7 @@ Node::~Node() {
 void Node::Render() {
 	Shader* shader = material_->GetShader();
 
+    const Matrix4x4& projection = Renderer::GetInstance()->GetProjectionMatrix();
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
 
@@ -104,7 +105,8 @@ void Node::Render() {
     shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
     shader->SetUniformMatrix4x4("modelView", modelView);
     shader->SetUniformMatrix4x4("model", model);
-    shader->SetUniformMatrix4x4("view", Renderer::GetInstance()->GetViewMatrix());
+    shader->SetUniformMatrix4x4("view", view);
+    shader->SetUniformMatrix4x4("projection", projection);
 
     // Get the rendering data
     BufferObject** bufferObjects;
