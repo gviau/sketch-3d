@@ -62,6 +62,21 @@ bool Texture2DDirect3D9::Create() {
             bpp = 4;
             break;
 
+        case TEXTURE_FORMAT_R16F:
+            format = D3DFMT_R16F;
+            bpp = 1;
+            break;
+
+        case TEXTURE_FORMAT_RG16F:
+            format = D3DFMT_G16R16F;
+            bpp = 2;
+            break;
+
+        case TEXTURE_FORMAT_RGBA16F:
+            format = D3DFMT_A16B16G16R16F;
+            bpp = 4;
+            break;
+
         case TEXTURE_FORMAT_DEPTH:
             format = D3DFMT_D32;
             bpp = 0;

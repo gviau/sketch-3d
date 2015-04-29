@@ -29,20 +29,21 @@ bool Texture2DOpenGL::Create() {
     GLuint format, components, type, bpp;
     GetOpenglTextureFormat(format_, format, components, type, bpp);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+
     if (format_ == TEXTURE_FORMAT_DEPTH) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
     }
     glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, components, type, data_);
 
     if (generateMipmaps_) {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
     return true;
 }
@@ -143,6 +144,27 @@ void Texture2DOpenGL::GetOpenglTextureFormat(TextureFormat_t textureFormat, GLui
 
         case TEXTURE_FORMAT_RGBA32F:
             internalFormat = GL_RGBA32F;
+            format = GL_RGBA;
+            type = GL_FLOAT;
+            bpp = 4;
+            break;
+
+        case TEXTURE_FORMAT_R16F:
+            internalFormat = GL_R16F;
+            format = GL_R;
+            type = GL_FLOAT;
+            bpp = 1;
+            break;
+
+        case TEXTURE_FORMAT_RG16F:
+            internalFormat = GL_RG16F;
+            format = GL_RG;
+            type = GL_FLOAT;
+            bpp = 2;
+            break;
+
+        case TEXTURE_FORMAT_RGBA16F:
+            internalFormat = GL_RGBA16F;
             format = GL_RGBA;
             type = GL_FLOAT;
             bpp = 4;
