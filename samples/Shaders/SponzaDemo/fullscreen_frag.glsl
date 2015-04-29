@@ -61,9 +61,14 @@ void main() {
 	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
 	shadow *= 0.25;
 
-	vec3 L0 = normalize( (modelView * vec4(lightPosition0, 1.0)).xyz - pos);
+	vec3 L0 = normalize( (mat3(view) * lightPosition0) - pos);
 	float lambert0 = max(dot(N, L0), 0.0);
-	color.rgb += lambert0 * lightColor0 * shadow;
+	vec3 diffuse = lightColor0 / 3.14159;
+
+	float specular_power = 3.0;
+	vec3 H0 = normalize(V + L0);
+	vec3 specular = pow( max(dot(H0, N), 0.0), specular_power ) * (8 * specular_power / 25.13272) * lightColor0;
+	color.rgb += (diffuse + specular) * lambert0 * shadow;
 
 	/*
 	///////////////////////////////////////////////////////////////////////////
