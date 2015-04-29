@@ -78,9 +78,19 @@ bool Texture2D::Load(const string& filename) {
 
     filterMode_ = FILTER_MODE_NEAREST;
     wrapMode_ = WRAP_MODE_REPEAT;
-    format_ = (bpp == 24) ? TEXTURE_FORMAT_RGB24 : TEXTURE_FORMAT_RGBA32;
 
-    size_t bytesPerPixel = (format_ == TEXTURE_FORMAT_RGB24) ? 3 : 4;
+    size_t bytesPerPixel = 0;
+    if (bpp == 8) {
+        format_ = TEXTURE_FORMAT_GRAYSCALE;
+        bytesPerPixel = 1;
+    } else if (bpp == 24) {
+        format_ = TEXTURE_FORMAT_RGB24;
+        bytesPerPixel = 3;
+    } else if (bpp == 32) {
+        format_ = TEXTURE_FORMAT_RGBA32;
+        bytesPerPixel = 4;
+    }
+
     size_t size = height_ * pitch;
     unsigned char* data = (unsigned char*)malloc(size);
     FreeImage_ConvertToRawBits(data, dib, pitch, bpp, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, FALSE);
