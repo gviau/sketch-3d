@@ -222,6 +222,7 @@ void RenderQueue::Render() {
     vector<Matrix4x4> accumulatedInstances;
     bool flushAccumulatedInstances = false;
 
+    const Matrix4x4& projection = Renderer::GetInstance()->GetProjectionMatrix();
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& view = Renderer::GetInstance()->GetViewMatrix();
     const Matrix4x4& transposedInverseViewMatrix = view.Inverse().Transpose();
@@ -239,6 +240,7 @@ void RenderQueue::Render() {
                 currentShader->SetUniformMatrix4x4("view", view);
                 currentShader->SetUniformMatrix4x4("viewProjection", viewProjection);
                 currentShader->SetUniformMatrix4x4("transInvView", transposedInverseViewMatrix);
+                currentShader->SetUniformMatrix4x4("projection", projection);
 
                 // Material's textures
                 currentMaterialTextures = &(currentMaterial->GetTextures());
