@@ -234,38 +234,34 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                     surface->numTextures = material->GetTextureCount(aiTextureType_DIFFUSE) +
                                            material->GetTextureCount(aiTextureType_NORMALS) +
                                            material->GetTextureCount(aiTextureType_SPECULAR);
+
+                    // It seems that sometime the normal map may be stored in the height map
+                    if (material->GetTextureCount(aiTextureType_NORMALS) == 0) {
+                        surface->numTextures += material->GetTextureCount(aiTextureType_HEIGHT);
+                    }
+
                     surface->textures = new Texture2D* [surface->numTextures];
                     vector<string> texturesFilename;
 
                     size_t textureIdx = 0;
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
+                    aiTextureType textureTypes[] = { aiTextureType_DIFFUSE, aiTextureType_NORMALS, aiTextureType_SPECULAR };
+                    size_t numTextureTypes = sizeof(textureTypes) / sizeof(aiTextureType);
 
-                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                        surface->textures[textureIdx++] = texture;
+                    for (size_t type = 0; type < numTextureTypes; type++) {
+                        aiTextureType textureType = textureTypes[type];
+                        if (textureType == aiTextureType_NORMALS && material->GetTextureCount(textureType) == 0) {
+                            textureType = aiTextureType_HEIGHT;
+                        }
 
-                        texturesFilename.push_back(textureName.C_Str());
-                    }
+                        for (size_t j = 0; j < material->GetTextureCount(textureType); j++) {
+                            aiString textureName;
+                            material->GetTexture(textureType, j, &textureName);
 
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_NORMALS, j, &textureName);
+                            Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
+                            surface->textures[textureIdx++] = texture;
 
-                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                        surface->textures[textureIdx++] = texture;
-
-                        texturesFilename.push_back(textureName.C_Str());
-                    }
-
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
-
-                        Texture2D* texture = Renderer::GetInstance()->CreateTexture2DFromFile(meshPath + textureName.C_Str(), true);
-                        surface->textures[textureIdx++] = texture;
-
-                        texturesFilename.push_back(textureName.C_Str());
+                            texturesFilename.push_back(textureName.C_Str());
+                        }
                     }
 
                     textureSet.insert(mesh->mMaterialIndex);
@@ -279,23 +275,26 @@ void Mesh::Load(const string& filename, const VertexAttributesMap_t& vertexAttri
                                            material->GetTextureCount(aiTextureType_NORMALS) +
                                            material->GetTextureCount(aiTextureType_SPECULAR);
 
+                    // It seems that sometime the normal map may be stored in the height map
+                    if (material->GetTextureCount(aiTextureType_NORMALS) == 0) {
+                        surface->numTextures += material->GetTextureCount(aiTextureType_HEIGHT);
+                    }
+
                     size_t textureIdx = 0;
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_DIFFUSE); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_DIFFUSE, j, &textureName);
-                        texturesFilename.push_back(textureName.C_Str());
-                    }
+                    aiTextureType textureTypes[] = { aiTextureType_DIFFUSE, aiTextureType_NORMALS, aiTextureType_SPECULAR };
+                    size_t numTextureTypes = sizeof(textureTypes) / sizeof(aiTextureType);
 
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_NORMALS); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_NORMALS, j, &textureName);
-                        texturesFilename.push_back(textureName.C_Str());
-                    }
+                    for (size_t type = 0; type < numTextureTypes; type++) {
+                        aiTextureType textureType = textureTypes[type];
+                        if (textureType == aiTextureType_NORMALS && material->GetTextureCount(textureType) == 0) {
+                            textureType = aiTextureType_HEIGHT;
+                        }
 
-                    for (size_t j = 0; j < material->GetTextureCount(aiTextureType_SPECULAR); j++) {
-                        aiString textureName;
-                        material->GetTexture(aiTextureType_SPECULAR, j, &textureName);
-                        texturesFilename.push_back(textureName.C_Str());
+                        for (size_t j = 0; j < material->GetTextureCount(textureType); j++) {
+                            aiString textureName;
+                            material->GetTexture(textureType, j, &textureName);
+                            texturesFilename.push_back(textureName.C_Str());
+                        }
                     }
 
                     surface->textures = TextureManager::GetInstance()->LoadTextureSetFromCache(texturesFilename);
