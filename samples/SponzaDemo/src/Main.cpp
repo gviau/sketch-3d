@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
     ////////////////////////////////////////////////////////////////////////////
     // Shadow maps creation
     ////////////////////////////////////////////////////////////////////////////
-    RenderTexture* shadowMap0 = Renderer::GetInstance()->CreateRenderTexture(2048, 2048, TEXTURE_FORMAT_DEPTH);
+    RenderTexture* shadowMap0 = Renderer::GetInstance()->CreateRenderTexture(4096, 4096, TEXTURE_FORMAT_DEPTH);
     Texture2D* shadowMapTexture0 = shadowMap0->CreateDepthBufferTexture();
 
     if (!shadowMap0->AttachTextureToDepthBuffer(shadowMapTexture0)) {

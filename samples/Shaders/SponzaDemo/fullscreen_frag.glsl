@@ -42,7 +42,7 @@ void main() {
 	vec3 worldPos = (inverse(view) * vec4(pos, 1.0)).xyz;
 
 	vec3 V = normalize(-pos);
-	vec3 N = normalize(texture2D(normals, uv).xyz);
+	vec3 N = texture2D(normals, uv).xyz;
 	color.rgb = ambientLight;
 
 	///////////////////////////////////////////////////////////////////////////
@@ -55,11 +55,19 @@ void main() {
 
 	float shadow = 0.0;
 
-	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
-	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 0,  0)).r < shadowCoord0.z ? 0.0 : 1.0;
+
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 0,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
 	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1,  0)).r < shadowCoord0.z ? 0.0 : 1.0;
+
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1,  1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1,  0)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2(-1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
+	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 0, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
 	shadow += textureOffset(shadowMap0, shadowCoord0.xy, ivec2( 1, -1)).r < shadowCoord0.z ? 0.0 : 1.0;
-	shadow *= 0.25;
+
+	shadow /= 9.0;
 
 	vec3 L0 = normalize( (mat3(view) * lightPosition0) - pos);
 	float lambert0 = max(dot(N, L0), 0.0);
@@ -67,7 +75,7 @@ void main() {
 
 	float specular_power = 3.0;
 	vec3 H0 = normalize(V + L0);
-	vec3 specular = pow( max(dot(H0, N), 0.0), specular_power ) * (8 * specular_power / 25.13272) * lightColor0;
+	vec3 specular = pow( max(dot(H0, N), 0.0), specular_power ) * ((8 + specular_power) / 25.13272) * lightColor0;
 	color.rgb += (diffuse + specular) * lambert0 * shadow;
 
 	/*
@@ -83,9 +91,9 @@ void main() {
 	float lambert2 = max(dot(N, L2), 0.0);
 	color.rgb += lambert2 * lightColor0;
 	*/
-	vec3 albedo = texture2D(albedos, uv).rgb;
+	vec3 albedo = pow( texture2D(albedos, uv).rgb, vec3(2.2) );
 
 	// Gamma correction
-	color.rgb = pow(color.rgb, vec3(1.0 / 2.2)) * albedo;
+	color.rgb = pow(color.rgb * albedo, vec3(1.0 / 2.2) );
 	color.a = 1.0;
 }
