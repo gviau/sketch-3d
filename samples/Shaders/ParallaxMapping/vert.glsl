@@ -28,7 +28,7 @@ void main() {
 	));
 
 	vec3 pos = (modelView * vec4(in_vertex, 1.0)).xyz;
-	light_dir = normalize( tbn * ( (view * vec4(2.0, 2.0, -6.0, 1.0)).xyz - pos) );
+	light_dir = normalize( tbn * ( (mat3(view) * vec3(2.0, 2.0, -6.0)).xyz - pos) );
 	eye = tbn * normalize(-pos);
 
 	normal = norm;

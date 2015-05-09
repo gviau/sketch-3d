@@ -145,6 +145,7 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->CameraLookAt(Vector3(posX, posY, posZ), Vector3::LOOK);
 
         Renderer::GetInstance()->Clear();
+        Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
 

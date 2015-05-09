@@ -20,11 +20,11 @@ void main() {
 	vec3 V = normalize(eye);
 	vec3 N = normalize(normal);
 
-	// Steep relief mapping
-	float numLayers = mix(35, 10, abs(dot(N, V)));
+	// From http://sunandblackcat.com/tipFullView.php?topicid=28
+	float numLayers = mix(35, 10, abs(dot(vec3(0.0, 0.0, 1.0), V)));
 	float layerHeight = 1.0 / numLayers;
 	float currentLayerHeight = 0.0;
-	vec2 dtex = 0.1 * V.xy / numLayers;
+	vec2 dtex = 0.1 * V.xy / V.z / numLayers;
 	vec2 currentTexCoords = uv;
 	float heightFromTexture = texture(heightTexture, currentTexCoords).x;
 
@@ -43,7 +43,7 @@ void main() {
 	vec2 newTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 
 	// Get the new normal from the normal map
-	N = normalize(texture(normalTexture, newTexCoords).xyz);
+	N = normalize(texture(normalTexture, newTexCoords).xyz * 2.0 - 1.0);
 
 	// Compute the diffuse and specular colors
 	vec3 light = vec3(0.0);
