@@ -87,7 +87,11 @@ bool Texture2DDirect3D9::Create() {
             return false;
     }
 
-    D3DXCreateTexture(device_, width_, height_, (generateMipmaps_) ? 0 : 1, 0, format, D3DPOOL_MANAGED, &texture_);
+    DWORD flags = 0;
+    if (generateMipmaps_ && format_ != TEXTURE_FORMAT_DEPTH) {
+        flags = D3DUSAGE_AUTOGENMIPMAP;
+    }
+    D3DXCreateTexture(device_, width_, height_, flags, 0, format, D3DPOOL_MANAGED, &texture_);
 
     if (texture_ == nullptr) {
         Logger::GetInstance()->Error("Couldn't create texture");
@@ -125,6 +129,10 @@ bool Texture2DDirect3D9::Create() {
 
             texture_->UnlockRect(0);
         }
+    }
+
+    if (generateMipmaps_) {
+        texture_->GenerateMipSubLevels();
     }
     
     return true;

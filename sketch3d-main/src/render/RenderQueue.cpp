@@ -270,7 +270,6 @@ void RenderQueue::Render() {
                 // Setup the transformation matrix for the next sets of buffer objects
                 currentModelMatrix = static_cast<Matrix4x4*>(renderCommands[i].second);
 
-                // ((V * M) ^ -1) T = ( M ^-1 * V ^-1 ) T = (V^-1)T * (M^-1)T
                 // Set the uniform matrices
                 currentShader->SetUniformMatrix4x4("modelViewProjection", viewProjection * (*currentModelMatrix));
                 currentShader->SetUniformMatrix4x4("modelView", view * (*currentModelMatrix));
