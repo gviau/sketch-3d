@@ -61,7 +61,7 @@ bool ShaderDirect3D9::SetSourceFile(const string& vertexFilename, const string& 
         return false;
     }
 
-    device_->CreateVertexShader((DWORD*)shader->GetBufferPointer(), &vertexShader_);
+    hr = device_->CreateVertexShader((DWORD*)shader->GetBufferPointer(), &vertexShader_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create vertex shader : " + (vertexFilename + ".hlsl"));
 
@@ -96,7 +96,7 @@ bool ShaderDirect3D9::SetSourceFile(const string& vertexFilename, const string& 
         return false;
     }
 
-    device_->CreatePixelShader((DWORD*)shader->GetBufferPointer(), &fragmentShader_);
+    hr = device_->CreatePixelShader((DWORD*)shader->GetBufferPointer(), &fragmentShader_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create fragment shader : " + (fragmentFilename + ".hlsl"));
 
@@ -274,6 +274,36 @@ bool ShaderDirect3D9::SetUniformVector3(const string& uniformName, const Vector3
     return true;
 }
 
+bool ShaderDirect3D9::SetUniformVector3Array(const string& uniformName, const Vector3* values, int arraySize) {
+    D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
+    ID3DXConstantTable* constantTable = nullptr;
+
+    if (uniformHandle == 0) {
+        uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
+
+        if (uniformHandle == 0) {
+            Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
+            return false;
+        }
+
+        constantTable = fragmentConstants_;
+    } else {
+        constantTable = vertexConstants_;
+    }
+
+    vector<float> floatValues;
+    floatValues.reserve(3 * arraySize);
+    for (int i = 0; i < arraySize; i++) {
+        floatValues.push_back(values[i].x);
+        floatValues.push_back(values[i].y);
+        floatValues.push_back(values[i].z);
+    }
+
+    constantTable->SetFloatArray(device_, uniformHandle, &floatValues[0], floatValues.size());
+
+    return true;
+}
+
 bool ShaderDirect3D9::SetUniformVector4(const string& uniformName, const Vector4& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
@@ -296,6 +326,8 @@ bool ShaderDirect3D9::SetUniformVector4(const string& uniformName, const Vector4
 
 bool ShaderDirect3D9::SetUniformMatrix3x3(const string& uniformName, const Matrix3x3& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
+    ID3DXConstantTable* constantTable = nullptr;
+
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
 
@@ -304,20 +336,22 @@ bool ShaderDirect3D9::SetUniformMatrix3x3(const string& uniformName, const Matri
             return false;
 	    }
 
-        float mat[9];
-        value.Transpose().GetData(mat);
-        fragmentConstants_->SetFloatArray(device_, uniformHandle, mat, 9);
+        constantTable = fragmentConstants_;
     } else {
-        float mat[9];
-        value.Transpose().GetData(mat);
-        vertexConstants_->SetFloatArray(device_, uniformHandle, mat, 9);
+        constantTable = vertexConstants_;
     }
+
+    float mat[9];
+    value.Transpose().GetData(mat);
+    constantTable->SetFloatArray(device_, uniformHandle, mat, 9);
 
     return true;
 }
 
 bool ShaderDirect3D9::SetUniformMatrix4x4(const string& uniformName, const Matrix4x4& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
+    ID3DXConstantTable* constantTable = nullptr;
+
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
 
@@ -326,14 +360,48 @@ bool ShaderDirect3D9::SetUniformMatrix4x4(const string& uniformName, const Matri
             return false;
 	    }
 
-        float mat[16];
-        value.Transpose().GetData(mat);
-        fragmentConstants_->SetFloatArray(device_, uniformHandle, mat, 16);
+        constantTable = fragmentConstants_;
     } else {
-        float mat[16];
-        value.Transpose().GetData(mat);
-        vertexConstants_->SetFloatArray(device_, uniformHandle, mat, 16);
+        constantTable = vertexConstants_;
     }
+
+    float mat[16];
+    value.Transpose().GetData(mat);
+    constantTable->SetFloatArray(device_, uniformHandle, mat, 16);
+
+    return true;
+}
+
+bool ShaderDirect3D9::SetUniformMatrix4x4Array(const string& uniformName, const Matrix4x4* values, int arraySize) {
+    D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
+    ID3DXConstantTable* constantTable = nullptr;
+
+    if (uniformHandle == 0) {
+        uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
+
+        if (uniformHandle == 0) {
+            Logger::GetInstance()->Debug("Couldn't find uniform location of name " + uniformName + " in shader #" + to_string(id_));
+            return false;
+        }
+
+        constantTable = fragmentConstants_;
+    } else {
+        constantTable = vertexConstants_;
+    }
+
+    vector<float> floatValues;
+    floatValues.reserve(16 * arraySize);
+
+    for (int i = 0; i < arraySize; i++) {
+        float mat[16];
+        values[i].Transpose().GetData(mat);
+
+        for (size_t j = 0; j < 16; j++) {
+            floatValues.push_back(mat[j]);
+        }
+    }
+
+    constantTable->SetFloatArray(device_, uniformHandle, &floatValues[0], floatValues.size());
 
     return true;
 }
