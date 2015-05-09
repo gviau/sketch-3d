@@ -35,6 +35,8 @@ VS_OUTPUT main(VS_INPUT input) {
 
     // shadowMatrix convertex from model coordinates to shadow map coordinates
     output.shadow_coord = mul( mul(shadowMatrix, model), float4(input.in_vertex, 1.0));
+    //output.shadow_coord.x =  output.shadow_coord.x * 0.5 + 0.5 * output.shadow_coord.w;
+    //output.shadow_coord.y =  output.shadow_coord.y * 0.5 + 0.5 * output.shadow_coord.w;
 
     return output;
 }

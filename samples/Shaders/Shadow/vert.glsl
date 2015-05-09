@@ -30,4 +30,5 @@ void main() {
 
 	// shadowMatrix converts from model coordinates to shadow map coordinates
 	shadow_coord = shadowMatrix * model * vec4(in_vertex, 1.0);
+	shadow_coord.xyz = shadow_coord.xyz * 0.5 + vec3(0.5) * shadow_coord.w;
 }

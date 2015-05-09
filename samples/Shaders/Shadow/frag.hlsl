@@ -34,8 +34,10 @@ float4 main(PS_INPUT input) : COLOR {
 
     // Apply Percentage Close Filtering (PCF) on the shadow
     float3 shadowCoord = input.shadow_coord.xyz;
-    shadowCoord.y = 1.0 - shadowCoord.y;
+    //shadowCoord.y = 1.0 - shadowCoord.y;
     shadowCoord /= input.shadow_coord.w;
+    shadowCoord.x =  shadowCoord.x * 0.5 + 0.5;
+    shadowCoord.y = -shadowCoord.y * 0.5 + 0.5;
     
     /*
     shadow += tex2D(shadowMap, shadowCoord.xy + float2(-shadowMapTexelStep.x, -shadowMapTexelStep.y)).x < shadowCoord.z ? 0.0f : 1.0f;
@@ -48,5 +50,5 @@ float4 main(PS_INPUT input) : COLOR {
 
     // Gamma correction
     float3 textureColor = pow(tex2D(texture0, input.uv).xyz, float3(1.0/2.2, 1.0/2.2, 1.0/2.2));
-    return float4( pow( textureColor * light * shadow + float3(0.1, 0.1, 0.1), float3(2.2, 2.2, 2.2)), 10);
+    return float4( pow( textureColor * light * shadow + float3(0.1, 0.1, 0.1), float3(2.2, 2.2, 2.2)), 1.0);
 }

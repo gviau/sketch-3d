@@ -146,11 +146,6 @@ int main(int argc, char** argv) {
     lightColors[2] = Vector4(0.0f, 0.8f, 0.0f, 100.0f);
     lightColors[3] = Vector4(0.0f, 0.0f, 0.8f, 100.0f);
 
-    Matrix4x4 biasMatrix(0.5f, 0.0f, 0.0f, 0.5f,
-                         0.0f, 0.5f, 0.0f, 0.5f,
-                         0.0f, 0.0f, 0.5f, 0.5f,
-                         0.0f, 0.0f, 0.0f, 1.0f);
-
     Renderer::GetInstance()->SetBlendingFactor(BLENDING_FACTOR_ONE, BLENDING_FACTOR_ONE);
 
     double t = 0.0;
@@ -233,7 +228,7 @@ int main(int argc, char** argv) {
 
             Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(newLightPositions[i], Vector3::ZERO, Vector3::UP);
-            Matrix4x4 shadowMatrix = biasMatrix * Renderer::GetInstance()->GetViewProjectionMatrix();
+            Matrix4x4 shadowMatrix = Renderer::GetInstance()->GetViewProjectionMatrix();
             shader->SetUniformMatrix4x4("shadowMatrix", shadowMatrix);
             shader->SetUniformVector3("light_position", newLightPositions[i]);
             shader->SetUniformVector4("light_color", lightColors[i]);

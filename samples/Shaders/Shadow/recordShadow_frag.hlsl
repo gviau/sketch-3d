@@ -10,6 +10,6 @@ struct PS_OUTPUT {
 
 PS_OUTPUT main(PS_INPUT input) {
     PS_OUTPUT output = (PS_OUTPUT)0;
-    output.depth = input.depth;
+    output.depth = input.depth.x;
     return output;
 }
