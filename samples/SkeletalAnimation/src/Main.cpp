@@ -106,6 +106,7 @@ int main(int argc, char** argv) {
         }
 
         Renderer::GetInstance()->Clear();
+        Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
         Renderer::GetInstance()->EndRender();
 

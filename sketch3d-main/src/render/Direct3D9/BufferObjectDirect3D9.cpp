@@ -3,6 +3,7 @@
 #include "math/Matrix4x4.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
+#include "math/Vector4.h"
 
 #include <vector>
 using namespace std;
@@ -76,11 +77,15 @@ BufferObjectError_t BufferObjectDirect3D9::SetVertexData(const vector<float>& ve
     bool hasNormals = ((presentVertexAttributes & VERTEX_ATTRIBUTES_NORMAL) > 0);
     bool hasTexCoords = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TEX_COORDS) > 0);
     bool hasTangents = ((presentVertexAttributes & VERTEX_ATTRIBUTES_TANGENT) > 0);
+    bool hasBones = ((presentVertexAttributes & VERTEX_ATTRIBUTES_BONES) > 0);
+    bool hasWeights = ((presentVertexAttributes & VERTEX_ATTRIBUTES_WEIGHTS) > 0);
 
     stride_ = sizeof(Vector3) +
                 ((hasNormals) ? sizeof(Vector3) : 0) +
                 ((hasTexCoords) ? sizeof(Vector2) : 0) +
-                ((hasTangents) ? sizeof(Vector3) : 0);
+                ((hasTangents) ? sizeof(Vector3) : 0) +
+                ((hasBones) ? sizeof(Vector4) : 0) +
+                ((hasWeights) ? sizeof(Vector4) : 0);
 
     if ( (vertexData.size() / (stride_ / sizeof(float))) > 65535) {
         return BUFFER_OBJECT_ERROR_NOT_ENOUGH_SPACE;
@@ -101,45 +106,80 @@ BufferObjectError_t BufferObjectDirect3D9::SetVertexData(const vector<float>& ve
 
     vector<D3DVERTEXELEMENT9> vertexElements;
     map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+    size_t offset = 0;
     for (; v_it != attributesFromIndex.end(); ++v_it) {
-        size_t offset = 0;
+        size_t size = 0;
         _D3DDECLTYPE type;
         _D3DDECLUSAGE usage;
 
         switch (v_it->second) {
             case VERTEX_ATTRIBUTES_POSITION:
-                offset = sizeof(Vector3);
+                size = sizeof(Vector3);
                 type = D3DDECLTYPE_FLOAT3;
                 usage = D3DDECLUSAGE_POSITION;
                 break;
 
             case VERTEX_ATTRIBUTES_NORMAL:
-                offset = sizeof(Vector3);
+                if (!hasNormals) {
+                    continue;
+                }
+
+                size = sizeof(Vector3);
                 type = D3DDECLTYPE_FLOAT3;
                 usage = D3DDECLUSAGE_NORMAL;
                 break;
 
             case VERTEX_ATTRIBUTES_TEX_COORDS:
-                offset = sizeof(Vector2);
+                if (!hasTexCoords) {
+                    continue;
+                }
+
+                size = sizeof(Vector2);
                 type = D3DDECLTYPE_FLOAT2;
                 usage = D3DDECLUSAGE_TEXCOORD;
                 break;
 
             case VERTEX_ATTRIBUTES_TANGENT:
-                offset = sizeof(Vector3);
+                if (!hasTangents) {
+                    continue;
+                }
+
+                size = sizeof(Vector3);
                 type = D3DDECLTYPE_FLOAT3;
                 usage = D3DDECLUSAGE_TANGENT;
+                break;
+
+            case VERTEX_ATTRIBUTES_BONES:
+                if (!hasBones) {
+                    continue;
+                }
+
+                size = sizeof(Vector4);
+                type = D3DDECLTYPE_FLOAT4;
+                usage = D3DDECLUSAGE_BLENDINDICES;
+                break;
+
+            case VERTEX_ATTRIBUTES_WEIGHTS:
+                if (!hasWeights) {
+                    continue;
+                }
+
+                size = sizeof(Vector4);
+                type = D3DDECLTYPE_FLOAT4;
+                usage = D3DDECLUSAGE_BLENDWEIGHT;
                 break;
         }
 
         D3DVERTEXELEMENT9 vertexElement;
         vertexElement.Stream = 0;
-        vertexElement.Offset = stride_;
+        vertexElement.Offset = offset;
         vertexElement.Type = type;
         vertexElement.Usage = usage;
         vertexElement.Method = D3DDECLMETHOD_DEFAULT;
         vertexElement.UsageIndex = 0;
         vertexElements.push_back(vertexElement);
+
+        offset += size;
     }
 
     D3DVERTEXELEMENT9 endVertexElement = D3DDECL_END();
@@ -155,7 +195,8 @@ BufferObjectError_t BufferObjectDirect3D9::SetVertexData(const vector<float>& ve
     }
 
     DWORD usage = (usage_ == BUFFER_USAGE_STATIC) ? D3DUSAGE_WRITEONLY : D3DUSAGE_DYNAMIC;
-    device_->CreateVertexBuffer(vertexCount_ * stride_, usage, 0, D3DPOOL_MANAGED, &vertexBuffer_, nullptr);
+    D3DPOOL pool = (usage_ == BUFFER_USAGE_STATIC) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
+    device_->CreateVertexBuffer(vertexCount_ * stride_, usage, 0, pool, &vertexBuffer_, nullptr);
 
     void* data;
     size_t bufferSize = vertexData.size() * sizeof(float);
