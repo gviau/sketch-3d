@@ -28,7 +28,7 @@ void main() {
 
 	// Transform the light and eye directions from camera space to tangent sapce
 	vec3 pos = (modelView * vec4(in_vertex, 1.0)).xyz;
-	light_dir = normalize(tbn * ( (mat3(view) * vec3(-10.0, 3.0, 5.0)).xyz - pos));
+	light_dir = normalize(tbn * ( (mat3(view) * vec3(-10.0, 3.0, -5.0)).xyz - pos));
 	eye = tbn * normalize(-pos);
 
 	uv = in_uv;

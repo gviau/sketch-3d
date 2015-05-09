@@ -10,7 +10,7 @@ struct PS_INPUT {
 
 float4 main(PS_INPUT input) : COLOR {
     // The new normal is from the normal map. Since it's stored in tangent space, we can directly use it
-    float3 N = normalize(tex2D(normalTexture, input.uv).xyz);
+    float3 N = normalize(tex2D(normalTexture, input.uv).xyz * 2.0 - 1.0);
     float3 L = normalize(input.light_dir);
     float3 V = normalize(input.eye);
 

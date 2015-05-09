@@ -33,7 +33,7 @@ VS_OUTPUT main(VS_INPUT input) {
 
     // Transform the light and eye directions from camera space to tangent space
     float3 pos = mul(modelView, float4(input.in_vertex, 1.0)).xyz;
-    output.light_dir = normalize(mul(tbn, ( mul(view, float4(-10.0, 3.0, -5.0, 1.0)).xyz - pos)));
+    output.light_dir = normalize(mul(tbn, ( mul((float3x3)view, float3(10.0, 3.0, -5.0)).xyz - pos)));
     output.eye = mul(tbn, normalize(-pos));
     
     output.uv = input.in_uv;

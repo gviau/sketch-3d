@@ -11,7 +11,7 @@ out vec4 color;
 
 void main() {
 	// The new normal is from the normal map. Since it's stored in tangent space, we can directly use it.
-	vec3 N = normalize(texture(normalTexture, uv).xyz);
+	vec3 N = normalize(texture(normalTexture, uv).xyz * 2.0 - 1.0);
 	vec3 L = normalize(light_dir);
 	vec3 V = normalize(eye);
 
