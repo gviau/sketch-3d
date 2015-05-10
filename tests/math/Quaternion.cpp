@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_quaternion_add_rotation)
     Vector4 v = Vector4::ONE;
     Matrix4x4 m;
     k.ToRotationMatrix(m);
-    v *= m;
+    v = m * v;
 
     BOOST_REQUIRE(v == Vector4(-0.737208f, 0.686816f, -1.40883f));
 }

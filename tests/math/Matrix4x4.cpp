@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_4x4_multiple_rotations)
     Matrix4x4 rot = m * n * o;
 
     Vector4 v = Vector4::ONE;
-    Vector4 w = v * rot;
+    Vector4 w = rot * v;
 
     BOOST_REQUIRE(w == Vector4(-0.737208f, 0.686816f, -1.40883f));
 }

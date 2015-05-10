@@ -70,12 +70,12 @@ BOOST_AUTO_TEST_CASE(test_vector4_matrix_multiply)
 
     v *= m;
 
-    BOOST_REQUIRE(v == Vector4(16.0f, 1.0f, 1.0f));
+    BOOST_REQUIRE(v == Vector4(1.0f, 6.0f, 11.0f));
 
     m[2][1] = 10.0f;
 
     v *= m;
 
-    BOOST_REQUIRE(v == Vector4(31.0f, 1.0f, 11.0f));
+    BOOST_REQUIRE(v == Vector4(1.0f, 121.0f, 21.0f));
 }
 

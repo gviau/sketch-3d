@@ -40,47 +40,7 @@ Vector3::Vector3(const Vector3& src)
 
 float Vector3::Length() const
 {
-    float f;
-    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
-        f = sqrtf(x*x + y*y + z*z);
-    } else {
-#if	PLATFORM == PLATFORM_WIN32
-		float* pf = &f;
-
-		__asm {
-			mov		ecx, pf
-			mov		esi, this
-			movups	xmm0, [esi]
-			mulps	xmm0, xmm0
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 4Eh
-			addps	xmm0, xmm1
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 11h
-			addps	xmm0, xmm1
-			sqrtss	xmm0, xmm0
-			movss	[ecx], xmm0
-		}
-#elif PLATFORM == PLATFORM_LINUX
-		f = sqrtf(x*x + y*y + z*z);
-#endif
-		/*
-        __m128 u = {x, y, z, 0.0f};
-        __m128 v;
-
-        u = _mm_mul_ps(u, u);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x0000004e);
-        u = _mm_add_ps(u, v);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x00000011);
-        u = _mm_add_ps(u, v);
-        u = _mm_sqrt_ss(u);
-        _mm_store_ss(&f, u);
-		*/
-    }
-    
-    return f;
+    return sqrtf(x*x + y*y + z*z);
 }
 
 float Vector3::SquaredLength() const
@@ -91,136 +51,22 @@ float Vector3::SquaredLength() const
 Vector3 Vector3::Normalized() const
 {
     Vector3 result;
-    float length;
-    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
-        length = Length();
-        if (length != 0.0f) {
-            result.x = x / length;
-            result.y = y / length;
-            result.z = z / length;
-        }
-    } else {
-#if	PLATFORM == PLATFORM_WIN32
-		Vector3* pV = &result;
-
-		__asm {
-			mov		ecx, pV
-			mov		esi, this
-			movups	xmm0, [esi]
-			movaps	xmm2, xmm0
-			mulps	xmm0, xmm0
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 4Eh
-			addps	xmm0, xmm1
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 11h
-			addps	xmm0, xmm1
-
-			rsqrtps	xmm0, xmm0
-			mulps	xmm2, xmm0
-			movups	[ecx], xmm2
-		}
-#elif PLATFORM == PLATFORM_LINUX
-		length = sqrtf(x*x + y*y + z*z);
-        if (length != 0.0f) {
-            result.x = x / length;
-            result.y = y / length;
-            result.z = z / length;
-        }
-#endif
-	/*
-        __m128 u = {x, y, z, 0.0f};
-        __m128 v;
-        __m128 w = u;
-
-        u = _mm_mul_ps(u, u);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x0000004e);
-        u = _mm_add_ps(u, v);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x00000011);
-        u = _mm_add_ps(u, v);
-
-        u = _mm_rsqrt_ps(u);
-        w = _mm_mul_ps(u, w);
-
-#if COMPILER == COMPILER_MSVC
-        SIMD_ALIGNED_DECL(float, f[4]);
-#elif COMPILER == COMPILER_GNUC
-        float f[4];
-#endif
-        _mm_store_ps(f, w);
-
-        result.x = f[0];
-        result.y = f[1];
-        result.z = f[2];
-		*/
+    float length = Length();
+    if (length != 0.0f) {
+        result.x = x / length;
+        result.y = y / length;
+        result.z = z / length;
     }
-
     return result;
 }
 
 void Vector3::Normalize()
 {
-    float length;
-    if (!PlatformInformation::HasCpuFeature(PlatformInformation::SSE2)) {
-        length = Length();
-        if (length != 0.0f) {
-            x /= length;
-            y /= length;
-            z /= length;
-        }
-    } else {
-#if	PLATFORM == PLATFORM_WIN32
-		__asm {
-			mov		esi, this
-			movups	xmm0, [esi]
-			movaps	xmm2, xmm0
-			mulps	xmm0, xmm0
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 4Eh
-			addps	xmm0, xmm1
-			movaps	xmm1, xmm0
-			shufps	xmm1, xmm1, 11h
-			addps	xmm0, xmm1
-
-			rsqrtps	xmm0, xmm0
-			mulps	xmm2, xmm0
-			movups	[esi], xmm2
-		}
-#elif PLATFORM == PLATFORM_LINUX
-		length = sqrtf(x*x + y*y + z*z);
+    float length = Length();
+    if (length != 0.0f) {
         x /= length;
         y /= length;
         z /= length;
-#endif
-/*
-        __m128 u = {x, y, z, 0.0f};
-        __m128 v;
-        __m128 w = u;
-
-        u = _mm_mul_ps(u, u);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x0000004e);
-        u = _mm_add_ps(u, v);
-        v = u;
-        v = _mm_shuffle_ps(v, v, 0x00000011);
-        u = _mm_add_ps(u, v);
-
-        u = _mm_rsqrt_ps(u);
-        w = _mm_mul_ps(u, w);
-
-#if COMPILER == COMPILER_MSVC
-        SIMD_ALIGNED_DECL(float, f[4]);
-#elif COMPILER == COMPILER_GNUC
-        float f[4];
-#endif
-        _mm_store_ps(f, w);
-
-        x = f[0];
-        y = f[1];
-        z = f[2];
-*/
     }
 }
 
