@@ -38,6 +38,8 @@ class BufferObjectDirect3D9 : public BufferObject {
         bool                            instanceDataPrepared_;
 
         void                            GenerateBuffers();
+        void                            CreateVertexDeclaration(bool hasNormals, bool hasTexCoords, bool hasTangents,
+                                                                bool hasBones, bool hasWeights);
 };
 
 }

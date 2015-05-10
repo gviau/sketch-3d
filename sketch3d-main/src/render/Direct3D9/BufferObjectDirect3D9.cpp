@@ -93,110 +93,21 @@ BufferObjectError_t BufferObjectDirect3D9::SetVertexData(const vector<float>& ve
         return BUFFER_OBJECT_ERROR_INVALID_VERTEX_ATTRIBUTES;
     }
 
-    if (vertexDeclaration_ != nullptr) {
-        vertexDeclaration_->Release();
-        vertexDeclaration_ = nullptr;
-    }
+    CreateVertexDeclaration(hasNormals, hasTexCoords, hasTangents, hasBones, hasWeights);
 
-    map<size_t, VertexAttributes_t> attributesFromIndex;
-    VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
-    for (; it != vertexAttributes_.end(); ++it) {
-        attributesFromIndex[it->second] = it->first;
-    }
+    size_t newVertexCount = vertexData.size() / (stride_ / sizeof(float));
 
-    vector<D3DVERTEXELEMENT9> vertexElements;
-    map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
-    size_t offset = 0;
-    for (; v_it != attributesFromIndex.end(); ++v_it) {
-        size_t size = 0;
-        _D3DDECLTYPE type;
-        _D3DDECLUSAGE usage;
-
-        switch (v_it->second) {
-            case VERTEX_ATTRIBUTES_POSITION:
-                size = sizeof(Vector3);
-                type = D3DDECLTYPE_FLOAT3;
-                usage = D3DDECLUSAGE_POSITION;
-                break;
-
-            case VERTEX_ATTRIBUTES_NORMAL:
-                if (!hasNormals) {
-                    continue;
-                }
-
-                size = sizeof(Vector3);
-                type = D3DDECLTYPE_FLOAT3;
-                usage = D3DDECLUSAGE_NORMAL;
-                break;
-
-            case VERTEX_ATTRIBUTES_TEX_COORDS:
-                if (!hasTexCoords) {
-                    continue;
-                }
-
-                size = sizeof(Vector2);
-                type = D3DDECLTYPE_FLOAT2;
-                usage = D3DDECLUSAGE_TEXCOORD;
-                break;
-
-            case VERTEX_ATTRIBUTES_TANGENT:
-                if (!hasTangents) {
-                    continue;
-                }
-
-                size = sizeof(Vector3);
-                type = D3DDECLTYPE_FLOAT3;
-                usage = D3DDECLUSAGE_TANGENT;
-                break;
-
-            case VERTEX_ATTRIBUTES_BONES:
-                if (!hasBones) {
-                    continue;
-                }
-
-                size = sizeof(Vector4);
-                type = D3DDECLTYPE_FLOAT4;
-                usage = D3DDECLUSAGE_BLENDINDICES;
-                break;
-
-            case VERTEX_ATTRIBUTES_WEIGHTS:
-                if (!hasWeights) {
-                    continue;
-                }
-
-                size = sizeof(Vector4);
-                type = D3DDECLTYPE_FLOAT4;
-                usage = D3DDECLUSAGE_BLENDWEIGHT;
-                break;
-        }
-
-        D3DVERTEXELEMENT9 vertexElement;
-        vertexElement.Stream = 0;
-        vertexElement.Offset = offset;
-        vertexElement.Type = type;
-        vertexElement.Usage = usage;
-        vertexElement.Method = D3DDECLMETHOD_DEFAULT;
-        vertexElement.UsageIndex = 0;
-        vertexElements.push_back(vertexElement);
-
-        offset += size;
-    }
-
-    D3DVERTEXELEMENT9 endVertexElement = D3DDECL_END();
-    vertexElements.push_back(endVertexElement);
-
-    device_->CreateVertexDeclaration(&vertexElements[0], &vertexDeclaration_);
-
-    vertexCount_ = vertexData.size() / (stride_ / sizeof(float));
-
-    if (vertexBuffer_ != nullptr) {
+    if (vertexBuffer_ != nullptr && newVertexCount != vertexCount_) {
         vertexBuffer_->Release();
         vertexBuffer_ = nullptr;
     }
 
-    DWORD usage = (usage_ == BUFFER_USAGE_STATIC) ? D3DUSAGE_WRITEONLY : D3DUSAGE_DYNAMIC;
-    D3DPOOL pool = (usage_ == BUFFER_USAGE_STATIC) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
-    device_->CreateVertexBuffer(vertexCount_ * stride_, usage, 0, pool, &vertexBuffer_, nullptr);
+    if (newVertexCount != vertexCount_) {
+        DWORD usage = (usage_ == BUFFER_USAGE_STATIC) ? D3DUSAGE_WRITEONLY : D3DUSAGE_DYNAMIC;
+        D3DPOOL pool = (usage_ == BUFFER_USAGE_STATIC) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
+        device_->CreateVertexBuffer(newVertexCount * stride_, usage, 0, pool, &vertexBuffer_, nullptr);
+    }
+    vertexCount_ = newVertexCount;
 
     void* data;
     size_t bufferSize = vertexData.size() * sizeof(float);
@@ -374,6 +285,101 @@ void BufferObjectDirect3D9::GenerateBuffers() {
 
     if (indexBuffer_ == nullptr) {
         device_->CreateIndexBuffer(0, D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_MANAGED, &indexBuffer_, nullptr);
+    }
+}
+
+void BufferObjectDirect3D9::CreateVertexDeclaration(bool hasNormals, bool hasTexCoords, bool hasTangents,
+                                                    bool hasBones, bool hasWeights)
+{
+    if (vertexDeclaration_ == nullptr) {
+        map<size_t, VertexAttributes_t> attributesFromIndex;
+        VertexAttributesMap_t::iterator it = vertexAttributes_.begin();
+        for (; it != vertexAttributes_.end(); ++it) {
+            attributesFromIndex[it->second] = it->first;
+        }
+
+        vector<D3DVERTEXELEMENT9> vertexElements;
+        map<size_t, VertexAttributes_t>::iterator v_it = attributesFromIndex.begin();
+        size_t offset = 0;
+        for (; v_it != attributesFromIndex.end(); ++v_it) {
+            size_t size = 0;
+            _D3DDECLTYPE type;
+            _D3DDECLUSAGE usage;
+
+            switch (v_it->second) {
+            case VERTEX_ATTRIBUTES_POSITION:
+                size = sizeof(Vector3);
+                type = D3DDECLTYPE_FLOAT3;
+                usage = D3DDECLUSAGE_POSITION;
+                break;
+
+            case VERTEX_ATTRIBUTES_NORMAL:
+                if (!hasNormals) {
+                    continue;
+                }
+
+                size = sizeof(Vector3);
+                type = D3DDECLTYPE_FLOAT3;
+                usage = D3DDECLUSAGE_NORMAL;
+                break;
+
+            case VERTEX_ATTRIBUTES_TEX_COORDS:
+                if (!hasTexCoords) {
+                    continue;
+                }
+
+                size = sizeof(Vector2);
+                type = D3DDECLTYPE_FLOAT2;
+                usage = D3DDECLUSAGE_TEXCOORD;
+                break;
+
+            case VERTEX_ATTRIBUTES_TANGENT:
+                if (!hasTangents) {
+                    continue;
+                }
+
+                size = sizeof(Vector3);
+                type = D3DDECLTYPE_FLOAT3;
+                usage = D3DDECLUSAGE_TANGENT;
+                break;
+
+            case VERTEX_ATTRIBUTES_BONES:
+                if (!hasBones) {
+                    continue;
+                }
+
+                size = sizeof(Vector4);
+                type = D3DDECLTYPE_FLOAT4;
+                usage = D3DDECLUSAGE_BLENDINDICES;
+                break;
+
+            case VERTEX_ATTRIBUTES_WEIGHTS:
+                if (!hasWeights) {
+                    continue;
+                }
+
+                size = sizeof(Vector4);
+                type = D3DDECLTYPE_FLOAT4;
+                usage = D3DDECLUSAGE_BLENDWEIGHT;
+                break;
+            }
+
+            D3DVERTEXELEMENT9 vertexElement;
+            vertexElement.Stream = 0;
+            vertexElement.Offset = offset;
+            vertexElement.Type = type;
+            vertexElement.Usage = usage;
+            vertexElement.Method = D3DDECLMETHOD_DEFAULT;
+            vertexElement.UsageIndex = 0;
+            vertexElements.push_back(vertexElement);
+
+            offset += size;
+        }
+
+        D3DVERTEXELEMENT9 endVertexElement = D3DDECL_END();
+        vertexElements.push_back(endVertexElement);
+
+        device_->CreateVertexDeclaration(&vertexElements[0], &vertexDeclaration_);
     }
 }
 
