@@ -146,7 +146,7 @@ void Text::Write(const string& text, size_t x, size_t y) {
         return;
     }
 
-    FT_Vector pen = { x, y };
+    FT_Vector pen = { (long int)x, (long int)y };
     FT_GlyphSlot slot = currentFont_->glyph;
     FT_Error error;
 

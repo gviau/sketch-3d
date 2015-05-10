@@ -81,7 +81,12 @@ int main(int argc, char** argv) {
     float t = 0.0f;
     clock_t begin, end;
 
+#if PLATFORM == PLATFORM_WIN32
     Text::GetInstance()->SetTextFont("C:/Windows/Fonts/Arial.ttf");
+#elif PLATFORM == PLATFORM_LINUX
+    Text::GetInstance()->SetTextFont("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
+#endif
+
     Text::GetInstance()->SetTextSize(24, 24);
     
     float fps = 0;
