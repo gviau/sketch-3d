@@ -100,7 +100,7 @@ if (WIN32)
 	endif ()
 endif ()
 
-find_package (FREETYPE)
+find_package (Freetype)
 
 message (STATUS "FreeType found? ${FREETYPE_FOUND}")
 if (FREETYPE_FOUND)
