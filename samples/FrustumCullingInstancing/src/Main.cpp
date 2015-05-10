@@ -4,6 +4,7 @@
 #include <render/Renderer.h>
 #include <render/SceneTree.h>
 #include <render/Shader.h>
+#include <render/Text.h>
 
 #include <system/Logger.h>
 #include <system/Window.h>
@@ -29,21 +30,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 int main(int argc, char** argv) {
 #endif
 
+    /*
     ConfigFileAttributes_t configFileAttributes;;
     if (!ParseConfigFile("init.cfg", configFileAttributes)) {
         Logger::GetInstance()->Error("Error while reading config file");
         return 1;
     }
-
+    
     RenderParameters_t renderParameters;
     renderParameters.width = configFileAttributes.width;
     renderParameters.height = configFileAttributes.height;
     renderParameters.displayFormat = configFileAttributes.displayFormat;
     renderParameters.depthStencilBits = configFileAttributes.depthStencilBits;
     renderParameters.refreshRate = configFileAttributes.refreshRate;
+    */
 
-    Window window("Sample_FrustumCullingInstancing", renderParameters.width, renderParameters.height, configFileAttributes.windowed);
-    Renderer::GetInstance()->Initialize(configFileAttributes.renderSystem, window, renderParameters);
+    RenderParameters_t renderParameters;
+    renderParameters.width = 1024;
+    renderParameters.height = 768;
+    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
+    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+    renderParameters.refreshRate = 0;
+    Window window("Sample_FrustumCullingInstancing", 1024, 768, true);
+    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     VertexAttributesMap_t vertexAttributes;
@@ -112,6 +121,17 @@ int main(int argc, char** argv) {
     float moveSpeed = 5.0f;
     float mouseSpeed = 4.0f;
 
+#if PLATFORM == PLATFORM_WIN32
+    Text::GetInstance()->SetTextFont("C:/Windows/Fonts/Arial.ttf");
+#elif PLATFORM == PLATFORM_LINUX
+    Text::GetInstance()->SetTextFont("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
+#endif
+
+    Text::GetInstance()->SetTextSize(24, 24);
+
+    float fps = 0;
+    float t = 0.0f;
+    size_t numFrames = 0;
     double dt = 0.0;
     clock_t begin;
     clock_t end;
@@ -196,12 +216,23 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
+
+        Text::GetInstance()->Write("FPS: " + to_string(fps), 5, 5);
+
         Renderer::GetInstance()->EndRender();
 
         Renderer::GetInstance()->PresentFrame();
 
         end = clock();
         dt = double(end - begin) / CLOCKS_PER_SEC;
+        t += float(end - begin) / CLOCKS_PER_SEC;
+
+        numFrames += 1;
+        if (t >= 0.25f) {
+            fps = (float)numFrames / t;
+            numFrames = 0;
+            t -= 0.25f;
+        }
     }
 
     delete[] nodes;
