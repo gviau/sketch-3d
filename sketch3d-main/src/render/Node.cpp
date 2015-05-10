@@ -102,11 +102,11 @@ void Node::Render() {
 
     // Set the uniform matrices
     Renderer::GetInstance()->BindShader(shader);
-    shader->SetUniformMatrix4x4("modelViewProjection", modelViewProjection);
-    shader->SetUniformMatrix4x4("modelView", modelView);
-    shader->SetUniformMatrix4x4("model", model);
-    shader->SetUniformMatrix4x4("view", view);
-    shader->SetUniformMatrix4x4("projection", projection);
+    shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW_PROJECTION), modelViewProjection );
+    shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW), modelView );
+    shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL), model );
+    shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::VIEW), view );
+    shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::PROJECTION), projection );
 
     // Get the rendering data
     BufferObject** bufferObjects;
@@ -129,7 +129,8 @@ void Node::Render() {
         for (size_t j = 0; j < surfaces[i]->numTextures; j++) {
             Texture2D* texture = surfaces[i]->textures[j];
             if (texture != nullptr) {
-                shader->SetUniformTexture("texture" + to_string(j), texture);
+                BuiltinUniform_t builtinUniformTexture = (BuiltinUniform_t)((size_t)BuiltinUniform_t::TEXTURE_0 + j);
+                shader->SetUniformTexture( GetBuiltinUniformName(builtinUniformTexture), texture );
             }
         }
 

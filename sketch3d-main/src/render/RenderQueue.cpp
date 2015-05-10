@@ -237,10 +237,10 @@ void RenderQueue::Render() {
 
                 // Bind the current shader for all the following draw calls
                 Renderer::GetInstance()->BindShader(currentShader);
-                currentShader->SetUniformMatrix4x4("view", view);
-                currentShader->SetUniformMatrix4x4("viewProjection", viewProjection);
-                currentShader->SetUniformMatrix4x4("transInvView", transposedInverseViewMatrix);
-                currentShader->SetUniformMatrix4x4("projection", projection);
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::VIEW), view );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::VIEW_PROJECTION), viewProjection );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::TRANS_INV_VIEW), transposedInverseViewMatrix );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::PROJECTION), projection );
 
                 // Material's textures
                 currentMaterialTextures = &(currentMaterial->GetTextures());
@@ -261,7 +261,8 @@ void RenderQueue::Render() {
                 for (size_t j = 0; j < currentTextures->numTextures; j++) {
                     Texture2D* texture = currentTextures->textures[j];
                     if (texture != nullptr) {
-                        currentShader->SetUniformTexture("texture" + to_string(j), texture);
+                        BuiltinUniform_t builtinUniformTexture = (BuiltinUniform_t)((size_t)BuiltinUniform_t::TEXTURE_0 + j);
+                        currentShader->SetUniformTexture( GetBuiltinUniformName(builtinUniformTexture), texture );
                     }
                 }
                 break;
@@ -271,10 +272,11 @@ void RenderQueue::Render() {
                 currentModelMatrix = static_cast<Matrix4x4*>(renderCommands[i].second);
 
                 // Set the uniform matrices
-                currentShader->SetUniformMatrix4x4("modelViewProjection", viewProjection * (*currentModelMatrix));
-                currentShader->SetUniformMatrix4x4("modelView", view * (*currentModelMatrix));
-                currentShader->SetUniformMatrix4x4("model", (*currentModelMatrix));
-                currentShader->SetUniformMatrix4x4("transInvModelView", transposedInverseViewMatrix * currentModelMatrix->Inverse().Transpose());
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW_PROJECTION), viewProjection * (*currentModelMatrix) );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW), view * (*currentModelMatrix) );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL), (*currentModelMatrix) );
+                currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::TRANS_INV_MODEL_VIEW),
+                                                    transposedInverseViewMatrix * currentModelMatrix->Inverse().Transpose() );
                 break;
 
             case RENDER_COMMAND_RENDER_BUFFER_OBJECTS:

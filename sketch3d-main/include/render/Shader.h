@@ -20,6 +20,28 @@ class Vector4;
 class Texture;
 
 /**
+ * @enum BuiltinUniform_t
+ * Enumerates the different builtin uniform passed when rendering an object
+ */
+enum BuiltinUniform_t {
+    MODEL,
+    VIEW,
+    TRANS_INV_VIEW,
+    PROJECTION,
+    MODEL_VIEW,
+    TRANS_INV_MODEL_VIEW,
+    VIEW_PROJECTION,
+    MODEL_VIEW_PROJECTION,
+
+    TEXTURE_0,
+    TEXTURE_1,
+    TEXTURE_2,
+    TEXTURE_3,
+
+    NUM_BUILTIN_UNIFORMS
+};
+
+/**
  * @enum ShaderType_t
  * Shows the possible shaders
  */
@@ -81,6 +103,11 @@ class SKETCH_3D_API Shader {
 
         static uint16_t     nextAvailableId_;
 };
+
+extern "C" {
+    SKETCH_3D_API void SetBuiltinUniformName(BuiltinUniform_t builtinUniform, const string& uniformName);
+    SKETCH_3D_API const string& GetBuiltinUniformName(BuiltinUniform_t builtinUniform);
+}
 
 }
 
