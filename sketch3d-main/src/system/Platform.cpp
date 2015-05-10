@@ -276,8 +276,8 @@ namespace Sketch3D
 
     bool PlatformInformation::HasCpuFeature(CpuFeatures feature)
     {
-        //return (GetCpuFeatures() & feature) != 0;
-		return false;
+        return (GetCpuFeatures() & feature) != 0;
+		//return false;
     }
 
 #endif
