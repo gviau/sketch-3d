@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     surface.normals = new Vector3[surface.numNormals];
 
     for (int i = 0; i < 4; i++) {
-        homogenousCorners[i] *= inverseProjection;
+        homogenousCorners[i] = inverseProjection * homogenousCorners[i];
         homogenousCorners[i] /= homogenousCorners[i].w;
 
         // Z-normalize
@@ -326,8 +326,8 @@ int main(int argc, char** argv) {
 
                 Matrix3x3 yaw;
                 yaw.RotateAroundAxis(Vector3::UP, angleY);
-                right *= yaw;
-                look *= yaw;
+                right = yaw * right;
+                look = yaw * look;
             }
 
             float angleX = 0.0f;
@@ -340,8 +340,8 @@ int main(int argc, char** argv) {
             
                 Matrix3x3 pitch;
                 pitch.RotateAroundAxis(right, angleX);
-                up *= pitch;
-                look *= pitch;
+                up = pitch * up;
+                look = pitch * look;
             }
         }
 #endif
