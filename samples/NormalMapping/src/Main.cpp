@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
     // Add the diffuse and normal texture
     Texture2D* diffuseTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall.jpg");
     Texture2D* normalTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall_normal.jpg");
-    sphereMaterial.AddTexture("diffuseTexture", diffuseTexture);
-    sphereMaterial.AddTexture("normalTexture", normalTexture);
+    sphereMaterial.SetUniformTexture("diffuseTexture", diffuseTexture);
+    sphereMaterial.SetUniformTexture("normalTexture", normalTexture);
 
     // Create the sphere node
     Node sphereNode;

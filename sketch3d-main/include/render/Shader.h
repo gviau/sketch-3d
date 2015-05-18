@@ -1,11 +1,18 @@
 #ifndef SKETCH_3D_SHADER_H
 #define SKETCH_3D_SHADER_H
 
+#include "math/Matrix3x3.h"
+#include "math/Matrix4x4.h"
+#include "math/Vector2.h"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
+
 #include "system/Platform.h"
 
 #include <map>
 #include <stdint.h>
 #include <string>
+#include <vector>
 using namespace std;
 
 namespace Sketch3D {
@@ -13,10 +20,6 @@ namespace Sketch3D {
 #define MAX_SHADER_ID 4096  // 12 bits max
 
 // Forward declarations
-class Matrix3x3;
-class Matrix4x4;
-class Vector3;
-class Vector4;
 class Texture;
 
 /**
@@ -57,16 +60,19 @@ enum ShaderType_t {
  * for the DirectX and OpenGL type of shaders
  */
 class SKETCH_3D_API Shader {
+    typedef pair<const Vector3*, int> Vector3Array_t;
+    typedef pair<const Matrix4x4*, int> Matrix4x4Array_t;
+
 	public:
 		/**
 		 * Constructor
 		 */
-		                    Shader();
+		                                Shader();
 
         /**
          * Destructor
          */
-        virtual            ~Shader();
+        virtual                        ~Shader();
 
         /**
          * Set the source of the shader using text files
@@ -74,7 +80,7 @@ class SKETCH_3D_API Shader {
          * @param fragmentFilename The name of the fragment shader file
          * @return true if the shaders were succesfully created, false otherwise
          */
-        virtual bool        SetSourceFile(const string& vertexFilename, const string& fragmentFilename) = 0;
+        virtual bool                    SetSourceFile(const string& vertexFilename, const string& fragmentFilename) = 0;
 
         /**
          * Set the source of the shader using in-memory source
@@ -82,26 +88,48 @@ class SKETCH_3D_API Shader {
          * @param fragmentSource The source code of the fragment shader
          * @return true if the shaders were succesfully created, false otherwise
          */
-        virtual bool        SetSource(const string& vertexSource, const string& fragmentSource) = 0;
+        virtual bool                    SetSource(const string& vertexSource, const string& fragmentSource) = 0;
 
 		// UNIFORM SETTERS
-		virtual bool	    SetUniformInt(const string& uniform, int value) = 0;
-		virtual bool	    SetUniformFloat(const string& uniform, float value) = 0;
-		virtual bool	    SetUniformVector2(const string& uniform, float value1, float value2) = 0;
-		virtual bool	    SetUniformVector3(const string& uniform, const Vector3& value) = 0;
-        virtual bool        SetUniformVector3Array(const string& uniform, const Vector3* values, int arraySize) = 0;
-		virtual bool	    SetUniformVector4(const string& uniform, const Vector4& value) = 0;
-		virtual bool	    SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value) = 0;
-		virtual bool	    SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value) = 0;
-        virtual bool        SetUniformMatrix4x4Array(const string& uniform, const Matrix4x4* values, int arraySize) = 0;
-		virtual bool	    SetUniformTexture(const string& uniform, const Texture* texture) = 0;
+        bool	                        SetUniformInt(const string& uniform, int value);
+        bool	                        SetUniformFloat(const string& uniform, float value);
+        bool	                        SetUniformVector2(const string& uniform, float value1, float value2);
+        bool	                        SetUniformVector3(const string& uniform, const Vector3& value);
+        bool                            SetUniformVector3Array(const string& uniform, const Vector3* values, int arraySize);
+        bool	                        SetUniformVector4(const string& uniform, const Vector4& value);
+        bool	                        SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
+        bool	                        SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
+        bool                            SetUniformMatrix4x4Array(const string& uniform, const Matrix4x4* values, int arraySize);
+        bool	                        SetUniformTexture(const string& uniform, const Texture* texture);
 
-        uint16_t            GetId() const { return id_; }
+        uint16_t                        GetId() const { return id_; }
 
 	protected:
-        uint16_t            id_;                /**< Id of the shader */
+        uint16_t                        id_;                /**< Id of the shader */
 
-        static uint16_t     nextAvailableId_;
+        map<string, int>                intUniforms_;
+        map<string, float>              floatUniforms_;
+        map<string, Vector2>            vector2Uniforms_;
+        map<string, Vector3>            vector3Uniforms_;
+        map<string, Vector3Array_t>     vector3ArrayUniforms_;
+        map<string, Vector4>            vector4Uniforms_;
+        map<string, Matrix3x3>          matrix3x3Uniforms_;
+        map<string, Matrix4x4>          matrix4x4Uniforms_;
+        map<string, Matrix4x4Array_t>   matrix4x4ArrayUniforms_;
+        map<string, const Texture*>     textureUniforms_;
+
+        static uint16_t                 nextAvailableId_;
+
+        virtual bool	                SetUniformIntImpl(const string& uniform, int value) = 0;
+        virtual bool	                SetUniformFloatImpl(const string& uniform, float value) = 0;
+        virtual bool	                SetUniformVector2Impl(const string& uniform, float value1, float value2) = 0;
+        virtual bool	                SetUniformVector3Impl(const string& uniform, const Vector3& value) = 0;
+        virtual bool                    SetUniformVector3ArrayImpl(const string& uniform, const Vector3* values, int arraySize) = 0;
+        virtual bool	                SetUniformVector4Impl(const string& uniform, const Vector4& value) = 0;
+        virtual bool	                SetUniformMatrix3x3Impl(const string& uniform, const Matrix3x3& value) = 0;
+        virtual bool	                SetUniformMatrix4x4Impl(const string& uniform, const Matrix4x4& value) = 0;
+        virtual bool                    SetUniformMatrix4x4ArrayImpl(const string& uniform, const Matrix4x4* values, int arraySize) = 0;
+        virtual bool	                SetUniformTextureImpl(const string& uniform, const Texture* texture) = 0;
 };
 
 extern "C" {

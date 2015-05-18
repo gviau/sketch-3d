@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
             vector<Matrix4x4> boneTransformationMatrices;
             if (mesh.Animate(deltaTime.count(), boneTransformationMatrices)) {
                 // Send the matrices to the GPU
-                shader->SetUniformMatrix4x4Array("boneTransformationMatrices", &boneTransformationMatrices[0], boneTransformationMatrices.size());
+                material.SetUniformMatrix4x4Array("boneTransformationMatrices", boneTransformationMatrices);
             }
 
             deltaTime = chrono::duration<double>::zero();

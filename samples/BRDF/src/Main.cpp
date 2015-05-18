@@ -63,8 +63,8 @@ int main(int argc, char** argv) {
     // Add the diffuse and normal texture for the sphere
     Texture2D* diffuseTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall.jpg");
     Texture2D* normalTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall_normal.jpg");
-    normalMappedMaterial.AddTexture("diffuseTexture", diffuseTexture);
-    normalMappedMaterial.AddTexture("normalTexture", normalTexture);
+    normalMappedMaterial.SetUniformTexture("diffuseTexture", diffuseTexture);
+    normalMappedMaterial.SetUniformTexture("normalTexture", normalTexture);
 
     // Create the actual nodes
     Node sphereNode;
@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     fullscreenQuadShader->SetSourceFile("Shaders/BRDF/fullscreenQuad_vert", "Shaders/BRDF/fullscreenQuad_frag");
 
     Material fullscreenQuadMaterial(fullscreenQuadShader);
-    fullscreenQuadMaterial.AddTexture("hdrTexture", hdrTexture);
+    fullscreenQuadMaterial.SetUniformTexture("hdrTexture", hdrTexture);
 
     Node fullscreenQuadNode;
     fullscreenQuadNode.SetMaterial(&fullscreenQuadMaterial);

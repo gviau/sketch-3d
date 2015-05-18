@@ -162,9 +162,9 @@ int main(int argc, char** argv) {
     fullscreenQuadShader->SetSourceFile("Shaders/SponzaDemo/fullscreen_vert", "Shaders/SponzaDemo/fullscreen_frag");
     Material fullscreenQuadMaterial(fullscreenQuadShader);
 
-    fullscreenQuadMaterial.AddTexture("normals", normalsTexture);
-    fullscreenQuadMaterial.AddTexture("albedos", albedosTexture);
-    fullscreenQuadMaterial.AddTexture("depth", depthTexture);
+    fullscreenQuadMaterial.SetUniformTexture("normals", normalsTexture);
+    fullscreenQuadMaterial.SetUniformTexture("albedos", albedosTexture);
+    fullscreenQuadMaterial.SetUniformTexture("depth", depthTexture);
 
     // Create the fullscreen quad node
     Node fullscreenQuad;
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    fullscreenQuadMaterial.AddTexture("shadowMap0", shadowMapTexture0);
+    fullscreenQuadMaterial.SetUniformTexture("shadowMap0", shadowMapTexture0);
 
     // Create the shader used to record the shadows
     Shader* sponzaRecordShadowShader = Renderer::GetInstance()->CreateShader();

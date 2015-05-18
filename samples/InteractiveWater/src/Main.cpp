@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 
     Material waterMaterial(waterShader);
     Texture2D* waterTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/water.jpg");
-    waterMaterial.AddTexture("waterTexture", waterTexture);
+    waterMaterial.SetUniformTexture("waterTexture", waterTexture);
 
     // Water node
     Node waterNode;

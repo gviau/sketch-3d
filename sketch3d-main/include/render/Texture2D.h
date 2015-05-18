@@ -5,14 +5,11 @@
 
 #include "system/Platform.h"
 
-#include <stdint.h>
 #include <string>
 #include <vector>
 using namespace std;
 
 namespace Sketch3D {
-
-#define MAX_TEXTURE_ID 1048576  // 20 bits max
 
 // Forward declaration
 class RenderSystemOpenGL;
@@ -86,17 +83,13 @@ class SKETCH_3D_API Texture2D : public Texture {
         string                  GetFilename() const { return filename_; }
 
         virtual const void*     GetData() const = 0;
-        uint32_t                GetId() const { return id_; }
 
         virtual TextureType_t   GetType() const { return TEXTURE_TYPE_2D; }
 
 	protected:
         string                  filename_;  /**< The name of the loaded file */
 		void*	                data_;		/**< The actual texture data */
-        uint32_t                id_;        /**< Id of the texture */
         bool                    fromCache_; /**< Set to true if the texture is cached, false otherwise */
-
-        static uint32_t         nextAvailableId_;
 
         virtual void            SetFilterModeImpl() const = 0;
         virtual void            SetWrapModeImpl() const = 0;

@@ -11,24 +11,14 @@ namespace Sketch3D {
 
 uint32_t Texture2D::nextAvailableId_ = 0;
 
-Texture2D::Texture2D(bool generateMipmaps) : Texture(generateMipmaps), data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false) {
-    if (nextAvailableId_ == MAX_TEXTURE_ID) {
-        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
-    } else {
-        id_ = nextAvailableId_++;
-    }
+Texture2D::Texture2D(bool generateMipmaps) : Texture(generateMipmaps), data_(nullptr), fromCache_(false) {
 }
 
 Texture2D::Texture2D(unsigned int width, unsigned int height, bool generateMipmaps,
 					 FilterMode_t filterMode, WrapMode_t wrapMode,
 					 TextureFormat_t format) : Texture(width, height, generateMipmaps, filterMode, wrapMode, format),
-											   data_(nullptr), id_(MAX_TEXTURE_ID), fromCache_(false)
+											   data_(nullptr), fromCache_(false)
 {
-    if (nextAvailableId_ == MAX_TEXTURE_ID) {
-        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
-    } else {
-        id_ = nextAvailableId_++;
-    }
 }
 
 Texture2D::~Texture2D() {

@@ -198,7 +198,7 @@ bool ShaderDirect3D9::SetSource(const string& vertexSource, const string& fragme
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformInt(const string& uniformName, int value) {
+bool ShaderDirect3D9::SetUniformIntImpl(const string& uniformName, int value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
@@ -216,7 +216,7 @@ bool ShaderDirect3D9::SetUniformInt(const string& uniformName, int value) {
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformFloat(const string& uniformName, float value) {
+bool ShaderDirect3D9::SetUniformFloatImpl(const string& uniformName, float value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
@@ -234,7 +234,7 @@ bool ShaderDirect3D9::SetUniformFloat(const string& uniformName, float value) {
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformVector2(const string& uniformName, float value1, float value2) {
+bool ShaderDirect3D9::SetUniformVector2Impl(const string& uniformName, float value1, float value2) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
@@ -254,7 +254,7 @@ bool ShaderDirect3D9::SetUniformVector2(const string& uniformName, float value1,
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformVector3(const string& uniformName, const Vector3& value) {
+bool ShaderDirect3D9::SetUniformVector3Impl(const string& uniformName, const Vector3& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
@@ -274,7 +274,7 @@ bool ShaderDirect3D9::SetUniformVector3(const string& uniformName, const Vector3
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformVector3Array(const string& uniformName, const Vector3* values, int arraySize) {
+bool ShaderDirect3D9::SetUniformVector3ArrayImpl(const string& uniformName, const Vector3* values, int arraySize) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     ID3DXConstantTable* constantTable = nullptr;
 
@@ -304,7 +304,7 @@ bool ShaderDirect3D9::SetUniformVector3Array(const string& uniformName, const Ve
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformVector4(const string& uniformName, const Vector4& value) {
+bool ShaderDirect3D9::SetUniformVector4Impl(const string& uniformName, const Vector4& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     if (uniformHandle == 0) {
         uniformHandle = fragmentConstants_->GetConstantByName(0, uniformName.c_str());
@@ -324,7 +324,7 @@ bool ShaderDirect3D9::SetUniformVector4(const string& uniformName, const Vector4
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformMatrix3x3(const string& uniformName, const Matrix3x3& value) {
+bool ShaderDirect3D9::SetUniformMatrix3x3Impl(const string& uniformName, const Matrix3x3& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     ID3DXConstantTable* constantTable = nullptr;
 
@@ -348,7 +348,7 @@ bool ShaderDirect3D9::SetUniformMatrix3x3(const string& uniformName, const Matri
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformMatrix4x4(const string& uniformName, const Matrix4x4& value) {
+bool ShaderDirect3D9::SetUniformMatrix4x4Impl(const string& uniformName, const Matrix4x4& value) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     ID3DXConstantTable* constantTable = nullptr;
 
@@ -372,7 +372,7 @@ bool ShaderDirect3D9::SetUniformMatrix4x4(const string& uniformName, const Matri
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformMatrix4x4Array(const string& uniformName, const Matrix4x4* values, int arraySize) {
+bool ShaderDirect3D9::SetUniformMatrix4x4ArrayImpl(const string& uniformName, const Matrix4x4* values, int arraySize) {
     D3DXHANDLE uniformHandle = vertexConstants_->GetConstantByName(0, uniformName.c_str());
     ID3DXConstantTable* constantTable = nullptr;
 
@@ -406,7 +406,7 @@ bool ShaderDirect3D9::SetUniformMatrix4x4Array(const string& uniformName, const 
     return true;
 }
 
-bool ShaderDirect3D9::SetUniformTexture(const string& uniform, const Texture* texture) {
+bool ShaderDirect3D9::SetUniformTextureImpl(const string& uniform, const Texture* texture) {
     bool fromVertexShader = true;
     D3DXHANDLE uniformHandle = 0;
 

@@ -117,15 +117,7 @@ void Node::Render() {
     vector<SurfaceTriangles_t*> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
-    // Material's textures
-    const map<string, Texture*>& materialTextures = material_->GetTextures();
-    map<string, Texture*>::const_iterator it = materialTextures.begin();
-
-    for (; it != materialTextures.end(); ++it) {
-        if (it->second != nullptr) {
-            shader->SetUniformTexture(it->first, it->second);
-        }
-    }
+    material_->ApplyMaterial();
 
     // Render the mesh
     for (size_t i = 0; i < surfaces.size(); i++) {

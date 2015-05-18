@@ -2,21 +2,34 @@
 
 #include "render/Renderer.h"
 
+#include "system/Logger.h"
+
 namespace Sketch3D {
 
-Texture::Texture(bool generateMipmaps) : width_(0), height_(0), generateMipmaps_(generateMipmaps), filterMode_(FILTER_MODE_NEAREST),
+Texture::Texture(bool generateMipmaps) : id_(MAX_TEXTURE_ID), width_(0), height_(0), generateMipmaps_(generateMipmaps), filterMode_(FILTER_MODE_NEAREST),
 					 wrapMode_(WRAP_MODE_CLAMP), format_(TEXTURE_FORMAT_RGB24)
 {
+    if (nextAvailableId_ == MAX_TEXTURE_ID) {
+        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
+    } else {
+        id_ = nextAvailableId_++;
+    }
 }
 
 Texture::Texture(unsigned int width, unsigned int height, bool generateMipmaps,
-                 FilterMode_t filterMode, WrapMode_t wrapMode, TextureFormat_t format) : width_(width),
+                 FilterMode_t filterMode, WrapMode_t wrapMode, TextureFormat_t format) : id_(MAX_TEXTURE_ID),
+                                                                                         width_(width),
 																                         height_(height),
                                                                                          generateMipmaps_(generateMipmaps),
 																                         filterMode_(filterMode),
 																                         wrapMode_(wrapMode),
                                                                                          format_(format)
 {
+    if (nextAvailableId_ == MAX_TEXTURE_ID) {
+        Logger::GetInstance()->Error("Maximum number of textures created (" + to_string(MAX_TEXTURE_ID) + ")");
+    } else {
+        id_ = nextAvailableId_++;
+    }
 }
 
 Texture::~Texture() {

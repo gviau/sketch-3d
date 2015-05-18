@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
             shader->SetUniformVector3("light_position", newLightPositions[i]);
             shader->SetUniformVector4("light_color", lightColors[i]);
             shader->SetUniformVector2("shadowMapTexelStep", 1.0f / shadowMapTextures[i]->GetWidth(), 1.0f / shadowMapTextures[i]->GetHeight());
-            material.AddTexture("shadowMap", shadowMapTextures[i]);
+            material.SetUniformTexture("shadowMap", shadowMapTextures[i]);
 
             Renderer::GetInstance()->PerspectiveProjection(45.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(cameraPosition, Vector3::ZERO, Vector3::UP);

@@ -215,11 +215,11 @@ void Ocean::EvaluateWaves(double t) {
 
 void Ocean::PrepareForRender() {
     oceanMesh_.UpdateMeshData();
-    oceanShader_->SetUniformVector3("light_position", Vector3(0.0f, 10.0f, -16.0f));
-    oceanShader_->SetUniformVector3("ambient_color", Vector3(0.0f, 0.65f, 0.75f));
-    oceanShader_->SetUniformVector3("diffuse_color", Vector3(0.5f, 0.65f, 0.75f));
-    oceanShader_->SetUniformVector4("specular_color", Vector4(1.0f, 0.25f, 0.0f, 120.0f));
-    oceanShader_->SetUniformVector3("light_contribution", Vector3(0.3f, 1.80f, 0.3f));
+    oceanMaterial_->SetUniformVector3("light_position", Vector3(0.0f, 10.0f, -16.0f));
+    oceanMaterial_->SetUniformVector3("ambient_color", Vector3(0.0f, 0.65f, 0.75f));
+    oceanMaterial_->SetUniformVector3("diffuse_color", Vector3(0.5f, 0.65f, 0.75f));
+    oceanMaterial_->SetUniformVector4("specular_color", Vector4(1.0f, 0.25f, 0.0f, 120.0f));
+    oceanMaterial_->SetUniformVector3("light_contribution", Vector3(0.3f, 1.80f, 0.3f));
 }
 
 Complex Ocean::ComputeHTilde0(int i, int j) const {

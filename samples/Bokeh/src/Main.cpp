@@ -125,9 +125,9 @@ int main(int argc, char** argv) {
         Logger::GetInstance()->Error("Couldn't attach texture to depth buffer");
         return 1;
     }
-    tankMaterial.AddTexture("shadowMap", shadowMap);
-    groundMaterial.AddTexture("shadowMap", shadowMap);
-    barricadeMaterial.AddTexture("shadowMap", shadowMap);
+    tankMaterial.SetUniformTexture("shadowMap", shadowMap);
+    groundMaterial.SetUniformTexture("shadowMap", shadowMap);
+    barricadeMaterial.SetUniformTexture("shadowMap", shadowMap);
 
     //////////////////////////////////////////////////////////////////////////
     // Fullscale HDR sample
@@ -188,23 +188,23 @@ int main(int argc, char** argv) {
     Shader* downSampleShader = Renderer::GetInstance()->CreateShader();
     downSampleShader->SetSourceFile("Shaders/Bokeh/quarterQuad", "Shaders/Bokeh/HDR/downSample");
     Material downSampleMaterial(downSampleShader);
-    downSampleMaterial.AddTexture("fullSample", hdrTexture);
+    downSampleMaterial.SetUniformTexture("fullSample", hdrTexture);
 
     Shader* blurXShader = Renderer::GetInstance()->CreateShader();
     blurXShader->SetSourceFile("Shaders/Bokeh/quarterQuad", "Shaders/Bokeh/HDR/blurX");
     Material blurXMaterial(blurXShader);
-    blurXMaterial.AddTexture("sampleToBlur", downSample);
+    blurXMaterial.SetUniformTexture("sampleToBlur", downSample);
 
     Shader* blurYShader = Renderer::GetInstance()->CreateShader();
     blurYShader->SetSourceFile("Shaders/Bokeh/quarterQuad", "Shaders/Bokeh/HDR/blurY");
     Material blurYMaterial(blurYShader);
-    blurYMaterial.AddTexture("sampleToBlur", horizontalBlur);
+    blurYMaterial.SetUniformTexture("sampleToBlur", horizontalBlur);
 
     Shader* toneMappingShader = Renderer::GetInstance()->CreateShader();
     toneMappingShader->SetSourceFile("Shaders/Bokeh/fullscreenQuad", "Shaders/Bokeh/HDR/toneMapping");
     Material toneMappingMaterial(toneMappingShader);
-    toneMappingMaterial.AddTexture("HDRTexture", hdrTexture);
-    toneMappingMaterial.AddTexture("bluredHDR", verticalBlur);
+    toneMappingMaterial.SetUniformTexture("HDRTexture", hdrTexture);
+    toneMappingMaterial.SetUniformTexture("bluredHDR", verticalBlur);
 
     //////////////////////////////////////////////////////////////////////////
     // Load the baked H-basis coefficients for the 3 models
@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
     }
     
     bakedCoef.seekg(0, ios::end);
-    size_t coefSize = bakedCoef.tellg();
+    size_t coefSize = (size_t)bakedCoef.tellg();
     coefSize -= 4;
     bakedCoef.seekg(4, ios::beg);
     vector<unsigned char> tankBakedCoefficients;
@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
     }
 
     bakedCoef.seekg(0, ios::end);
-    coefSize = bakedCoef.tellg();
+    coefSize = (size_t)bakedCoef.tellg();
     coefSize -= 4;
     bakedCoef.seekg(4, ios::beg);
     vector<unsigned char> groundBakedCoefficients;
@@ -251,7 +251,7 @@ int main(int argc, char** argv) {
     }
 
     bakedCoef.seekg(0, ios::end);
-    coefSize = bakedCoef.tellg();
+    coefSize = (size_t)bakedCoef.tellg();
     coefSize -= 4;
     bakedCoef.seekg(4, ios::beg);
     vector<unsigned char> barricadeBakedCoefficients;
@@ -320,9 +320,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    tankMaterial.AddTexture("baked_coeffs", tankCoefficients);
-    groundMaterial.AddTexture("baked_coeffs", groundCoefficients);
-    barricadeMaterial.AddTexture("baked_coeffs", barricadeCoefficients);
+    tankMaterial.SetUniformTexture("baked_coeffs", tankCoefficients);
+    groundMaterial.SetUniformTexture("baked_coeffs", groundCoefficients);
+    barricadeMaterial.SetUniformTexture("baked_coeffs", barricadeCoefficients);
     //////////////////////////////////////////////////////////////////////////
     // Misc stuff
     //////////////////////////////////////////////////////////////////////////

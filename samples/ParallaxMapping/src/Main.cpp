@@ -76,9 +76,9 @@ int main(int argc, char** argv) {
     Texture2D* diffuseTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall.jpg");
     Texture2D* normalTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall_normal.jpg");
     Texture2D* heightTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/rock_wall_height.jpg");
-    sphereMaterial.AddTexture("diffuseTexture", diffuseTexture);
-    sphereMaterial.AddTexture("normalTexture", normalTexture);
-    sphereMaterial.AddTexture("heightTexture", heightTexture);
+    sphereMaterial.SetUniformTexture("diffuseTexture", diffuseTexture);
+    sphereMaterial.SetUniformTexture("normalTexture", normalTexture);
+    sphereMaterial.SetUniformTexture("heightTexture", heightTexture);
 
     // Create the sphere node
     Node sphereNode;

@@ -3,7 +3,11 @@
 
 #include "system/Platform.h"
 
+#include <stdint.h>
+
 namespace Sketch3D {
+
+#define MAX_TEXTURE_ID 1048576  // 20 bits max
 
 /**
  * @enum FilterMode_t
@@ -111,6 +115,7 @@ class SKETCH_3D_API Texture {
 		void			        SetWrapMode(WrapMode_t mode);
         void		            SetTextureFormat(TextureFormat_t format);
 
+        uint32_t                GetId() const { return id_; }
 		unsigned int	        GetWidth() const;
 		unsigned int	        GetHeight() const;
         bool                    GetGenerateMipmaps() const;
@@ -121,12 +126,15 @@ class SKETCH_3D_API Texture {
         virtual TextureType_t   GetType() const = 0;
 
 	protected:
+        uint32_t                id_;        /**< Id of the texture */
 		unsigned int	        width_;	/**< The width of the texture */
 		unsigned int	        height_;	/**< The height of the texture */
         bool                    generateMipmaps_;   /**< Should we generate mipmaps for this texture */
 		FilterMode_t	        filterMode_;	/**< The filter mode of the texture */
 		WrapMode_t		        wrapMode_;	/**< The wrap mode of the texture */
         TextureFormat_t         format_;    /**< The texture format */
+
+        static uint32_t         nextAvailableId_;
 
         virtual void            SetFilterModeImpl() const = 0;
         virtual void            SetWrapModeImpl() const = 0;

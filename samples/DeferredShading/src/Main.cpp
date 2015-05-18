@@ -105,9 +105,9 @@ int main(int argc, char** argv) {
     }
 
     // Attach the GBuffer texture to the material that is being used to render on the fullscreen quad
-    material.AddTexture("positions", positionsTexture);
-    material.AddTexture("normals", normalsTexture);
-    material.AddTexture("albedos", albedosTexture);
+    material.SetUniformTexture("positions", positionsTexture);
+    material.SetUniformTexture("normals", normalsTexture);
+    material.SetUniformTexture("albedos", albedosTexture);
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;

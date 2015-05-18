@@ -65,8 +65,8 @@ int main(int argc, char** argv) {
 
     Texture2D* paperTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/paper.jpg");
     Texture2D* noiseTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/noise.jpg");
-    paperMaterial.AddTexture("paper", paperTexture);
-    paperMaterial.AddTexture("noise", noiseTexture);
+    paperMaterial.SetUniformTexture("paper", paperTexture);
+    paperMaterial.SetUniformTexture("noise", noiseTexture);
 
     // Create the paper node
     Node paperNode;

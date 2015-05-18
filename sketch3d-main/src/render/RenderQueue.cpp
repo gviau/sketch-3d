@@ -242,16 +242,6 @@ void RenderQueue::Render() {
                 currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::TRANS_INV_VIEW), transposedInverseViewMatrix );
                 currentShader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::PROJECTION), projection );
 
-                // Material's textures
-                currentMaterialTextures = &(currentMaterial->GetTextures());
-                mt_it = currentMaterialTextures->begin();
-
-                for (; mt_it != currentMaterialTextures->end(); ++mt_it) {
-                    if (mt_it->second != nullptr) {
-                        currentShader->SetUniformTexture(mt_it->first, mt_it->second);
-                    }
-                }
-
                 break;
 
             case RENDER_COMMAND_BIND_TEXTURES:
@@ -281,6 +271,7 @@ void RenderQueue::Render() {
 
             case RENDER_COMMAND_RENDER_BUFFER_OBJECTS:
                 // Draw a buffer object
+                currentMaterial->ApplyMaterial();
                 currentBufferObject = static_cast<BufferObject*>(renderCommands[i].second);
                 currentBufferObject->Render();
                 break;
@@ -298,6 +289,7 @@ void RenderQueue::Render() {
 
             case RENDER_COMMAND_DRAW_ACCUMULATED_INSTANCES:
                 // Draw several instances of the same buffer object
+                currentMaterial->ApplyMaterial();
                 currentBufferObject = static_cast<BufferObject*>(renderCommands[i].second);
                 currentBufferObject->RenderInstances(accumulatedInstances);
                 flushAccumulatedInstances = true;

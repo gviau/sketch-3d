@@ -111,9 +111,9 @@ int main(int argc, char** argv) {
     Shader* ssaoShader = Renderer::GetInstance()->CreateShader();
     ssaoShader->SetSourceFile("Shaders/SSAO/vert", "Shaders/SSAO/ssao");
     Material ssaoMaterial(ssaoShader);
-    ssaoMaterial.AddTexture("positions", positionsTexture);
-    ssaoMaterial.AddTexture("normals", normalsTexture);
-    ssaoMaterial.AddTexture("depthTexture", depthTexture);
+    ssaoMaterial.SetUniformTexture("positions", positionsTexture);
+    ssaoMaterial.SetUniformTexture("normals", normalsTexture);
+    ssaoMaterial.SetUniformTexture("depthTexture", depthTexture);
 
     //////////////////////////////////////////////////////////////////////////////////
     /// SSAO STUFF - following the implementation presented at http://john-chapman-graphics.blogspot.ca/2013/01/ssao-tutorial.html
@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
         noiseData[i + 2] = 0;
     }
     noise->SetPixelDataBytes(noiseData, 4, 4);
-    ssaoMaterial.AddTexture("noise", noise);
+    ssaoMaterial.SetUniformTexture("noise", noise);
 
     // Now we need 1 more render texture for the ssao occlusion factor
     RenderTexture* ssaoOcclusionFactor = Renderer::GetInstance()->CreateRenderTexture(1024, 768, TEXTURE_FORMAT_RGBA32F);
@@ -169,9 +169,9 @@ int main(int argc, char** argv) {
     }
 
     // Attach the G buffer textures and ssao texture to the fullscreen quad material
-    fullscreenQuadMaterial.AddTexture("positions", positionsTexture);
-    fullscreenQuadMaterial.AddTexture("normals", normalsTexture);
-    fullscreenQuadMaterial.AddTexture("ssao", ssaoTexture);
+    fullscreenQuadMaterial.SetUniformTexture("positions", positionsTexture);
+    fullscreenQuadMaterial.SetUniformTexture("normals", normalsTexture);
+    fullscreenQuadMaterial.SetUniformTexture("ssao", ssaoTexture);
 
     Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, 150.0f), Vector3::LOOK);
 
