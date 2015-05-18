@@ -48,6 +48,7 @@ set(RENDER_SOURCE_FILES
 	src/render/Renderer_Common.cpp
 	src/render/RenderQueue.cpp
 	src/render/RenderQueueItem.cpp
+	src/render/RenderStateCache.cpp
     src/render/RenderSystem.cpp
 	src/render/RenderTexture.cpp
 	src/render/SceneTree.cpp
@@ -74,6 +75,8 @@ set(RENDER_HEADER_FILES
 	include/render/Renderer_Common.h
 	include/render/RenderQueue.h
 	include/render/RenderQueueItem.h
+	include/render/RenderState.h
+	include/render/RenderStateCache.h
 	include/render/RenderSystem.h
 	include/render/RenderTexture.h
 	include/render/SceneTree.h
@@ -92,6 +95,7 @@ source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
 set(RENDER_OPENGL_SOURCE_FILES
 	src/render/OpenGL/BufferObjectManagerOpenGL.cpp
 	src/render/OpenGL/BufferObjectOpenGL.cpp
+	src/render/OpenGL/RenderStateCacheOpenGL.cpp
 	src/render/OpenGL/RenderSystemOpenGL.cpp
 	src/render/OpenGL/RenderTextureOpenGL.cpp
 	src/render/OpenGL/ShaderOpenGL.cpp
@@ -104,6 +108,7 @@ set(RENDER_OPENGL_HEADER_FILES
 	include/render/OpenGL/BufferObjectManagerOpenGL.h
 	include/render/OpenGL/BufferObjectOpenGL.h
 	include/render/OpenGL/RenderContextOpenGL.h
+	include/render/OpenGL/RenderStateCacheOpenGL.h
 	include/render/OpenGL/RenderSystemOpenGL.h
 	include/render/OpenGL/RenderTextureOpenGL.h
 	include/render/OpenGL/ShaderOpenGL.h
@@ -126,6 +131,7 @@ if (WIN32)
 		src/render/Direct3D9/BufferObjectDirect3D9.cpp
 		src/render/Direct3D9/BufferObjectManagerDirect3D9.cpp
 		src/render/Direct3D9/RenderContextDirect3D9.cpp
+		src/render/Direct3D9/RenderStateCacheDirect3D9.cpp
 		src/render/Direct3D9/RenderSystemDirect3D9.cpp
 		src/render/Direct3D9/RenderTextureDirect3D9.cpp
 		src/render/Direct3D9/ShaderDirect3D9.cpp
@@ -137,6 +143,7 @@ if (WIN32)
 		include/render/Direct3D9/BufferObjectDirect3D9.h
 		include/render/Direct3D9/BufferObjectManagerDirect3D9.h
 		include/render/Direct3D9/RenderContextDirect3D9.h
+		include/render/Direct3D9/RenderStateCacheDirect3D9.h
 		include/render/Direct3D9/RenderSystemDirect3D9.h
 		include/render/Direct3D9/RenderTextureDirect3D9.h
 		include/render/Direct3D9/ShaderDirect3D9.h

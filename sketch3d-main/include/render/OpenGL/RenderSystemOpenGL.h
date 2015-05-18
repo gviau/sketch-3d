@@ -26,21 +26,12 @@ class RenderSystemOpenGL : public RenderSystem {
         virtual void PresentFrame();
         virtual Matrix4x4 OrthoProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
         virtual Matrix4x4 PerspectiveProjection(float left, float right, float top, float bottom, float nearPlane, float farPlane) const;
-		virtual void SetRenderFillMode(RenderMode_t mode) const;
         virtual void SetViewport(size_t x, size_t y, size_t width, size_t height);
-        virtual void EnableDepthTest(bool val) const;
-        virtual void EnableDepthWrite(bool val) const;
-        virtual void EnableColorWrite(bool val) const;
-        virtual void SetDepthComparisonFunc(DepthFunc_t comparison) const;
-        virtual void SetCullingMethod(CullingMethod_t cullingMethod) const;
         virtual Shader* CreateShader();
         virtual Texture2D* CreateTexture2D() const;
         virtual Texture3D* CreateTexture3D() const;
         virtual RenderTexture* CreateRenderTexture(unsigned int width, unsigned int height, TextureFormat_t format);
         virtual void BindScreenBuffer() const;
-        virtual void EnableBlending(bool val) const;
-        virtual void SetBlendingEquation(BlendingEquation_t equation) const;
-        virtual void SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const;
         virtual size_t BindTexture(const Texture* texture);
         virtual void BindShader(const Shader* shader);
         virtual FrustumPlanes_t ExtractViewFrustumPlanes(const Matrix4x4& viewProjection) const;
@@ -67,7 +58,6 @@ class RenderSystemOpenGL : public RenderSystem {
         TextureUnitNode_t*      tail_;                  /**< Tail of the double linked list */
         TextureCache_t          textureCache_;          /**< Texture pointers refer directly to a cache element for faster lookup */
 
-        unsigned int GetBlendingFactor(BlendingFactor_t factor) const;
         virtual void QueryDeviceCapabilities();
         virtual void CreateTextShader();
 };

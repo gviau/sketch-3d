@@ -12,6 +12,7 @@
 #include "render/Direct3D9/RenderSystemDirect3D9.h"
 #endif
 
+#include "render/RenderStateCache.h"
 #include "render/Texture2D.h"
 #include "render/TextureManager.h"
 
@@ -74,6 +75,7 @@ void Renderer::SetClearColor(float red, float green, float blue, float alpha) co
 }
 
 void Renderer::Clear(int buffer) const {
+    renderSystem_->GetRenderStateCache()->ApplyClearStateChanges();
 	renderSystem_->Clear(buffer);
 }
 
@@ -86,6 +88,10 @@ void Renderer::EndRender() {
 }
 
 void Renderer::Render() {
+    // Commit the state changes
+    RenderStateCache* renderStateCache = renderSystem_->GetRenderStateCache();
+    renderStateCache->ApplyRenderStateChanges();
+
     // Draw the static batches first
     sceneTree_.RenderStaticBatches();
 
@@ -101,10 +107,13 @@ void Renderer::Render() {
     opaqueRenderQueue_.Render();
 
     if (!transparentRenderQueue_.IsEmpty()) {
-        SetBlendingEquation(BLENDING_EQUATION_ADD);
-        EnableBlending(true);
+        renderStateCache->SetBlendingEquation(BLENDING_EQUATION_ADD);
+        renderStateCache->EnableBlending(true);
+        renderStateCache->ApplyRenderStateChanges();
+
         transparentRenderQueue_.Render();
-        EnableBlending(false);
+
+        renderStateCache->EnableBlending(false);
     }
 }
 
@@ -283,7 +292,13 @@ void Renderer::EnableFrustumCulling(bool val) {
 }
 
 void Renderer::DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor) {
+    RenderStateCache* renderStateCache = renderSystem_->GetRenderStateCache();
+    renderStateCache->EnableDepthTest(false);
+    renderStateCache->ApplyRenderStateChanges();
+
     renderSystem_->DrawTextBuffer(bufferObject, fontAtlas, textColor);
+
+    renderStateCache->EnableDepthTest(true);
 }
 
 const Matrix4x4& Renderer::GetProjectionMatrix() const {
@@ -318,6 +333,10 @@ BufferObjectManager* Renderer::GetBufferObjectManager() const {
     return renderSystem_->GetBufferObjectManager();
 }
 
+RenderStateCache* Renderer::GetRenderStateCache() const {
+    return renderSystem_->GetRenderStateCache();
+}
+
 size_t Renderer::GetScreenWidth() const {
     return renderSystem_->GetWidth();
 }
@@ -336,9 +355,6 @@ void Renderer::SetDefaultRenderingValues() {
     CameraLookAt(Vector3::ZERO, Vector3::LOOK);
 
     SetCullingMethod(CULLING_METHOD_BACK_FACE);
-    EnableDepthTest(true);
-    SetDepthComparisonFunc(DEPTH_FUNC_LESS);
-    SetRenderFillMode(RENDER_MODE_FILL);
 }
 
 bool FrustumPlanes_t::IsSphereOutside(const Sphere& sphere) const {

@@ -448,10 +448,7 @@ int main(int argc, char** argv) {
 
         fullscreenQuadNode.Render();
 
-        // Needed because otherwise the depth test fails against the full screen quad
-        Renderer::GetInstance()->EnableDepthTest(false);
         Text::GetInstance()->Write("FPS: " + to_string(fps), 5, 5);
-        Renderer::GetInstance()->EnableDepthTest(true);
 
         Renderer::GetInstance()->EndRender();
         Renderer::GetInstance()->PresentFrame();

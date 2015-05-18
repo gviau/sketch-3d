@@ -6,6 +6,7 @@
 #include "math/Vector4.h"
 
 #include "render/BufferObjectManager.h"
+#include "render/RenderStateCache.h"
 #include "render/RenderTexture.h"
 #include "render/Shader.h"
 
@@ -21,6 +22,42 @@ RenderSystem::RenderSystem(Window& window) : window_(window), boundShader_(nullp
 }
 
 RenderSystem::~RenderSystem() {
+}
+
+void RenderSystem::SetRenderFillMode(RenderMode_t mode) {
+    renderStateCache_->SetRenderFillMode(mode);
+}
+
+void RenderSystem::EnableDepthTest(bool val) {
+    renderStateCache_->EnableDepthTest(val);
+}
+
+void RenderSystem::EnableDepthWrite(bool val) {
+    renderStateCache_->EnableDepthWrite(val);
+}
+
+void RenderSystem::EnableColorWrite(bool val) {
+    renderStateCache_->EnableColorWrite(val);
+}
+
+void RenderSystem::SetDepthComparisonFunc(DepthFunc_t func) {
+    renderStateCache_->SetDepthComparisonFunc(func);
+}
+
+void RenderSystem::SetCullingMethod(CullingMethod_t method) {
+    renderStateCache_->SetCullingMethod(method);
+}
+
+void RenderSystem::EnableBlending(bool val) {
+    renderStateCache_->EnableBlending(val);
+}
+
+void RenderSystem::SetBlendingEquation(BlendingEquation_t equation) {
+    renderStateCache_->SetBlendingEquation(equation);
+}
+
+void RenderSystem::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) {
+    renderStateCache_->SetBlendingFactor(srcFactor, dstFactor);
 }
 
 Vector3 RenderSystem::ScreenToWorldPoint(const Matrix4x4& inversedViewProjection, const Vector2& point) const {
@@ -44,6 +81,10 @@ BufferObjectManager* RenderSystem::GetBufferObjectManager() const {
     return bufferObjectManager_;
 }
 
+RenderStateCache* RenderSystem::GetRenderStateCache() const {
+    return renderStateCache_;
+}
+
 void RenderSystem::FreeRenderSystem() {
     for (size_t i = 0; i < shaders_.size(); i++) {
         delete shaders_[i];
@@ -54,6 +95,7 @@ void RenderSystem::FreeRenderSystem() {
     }
 
     delete bufferObjectManager_;
+    delete renderStateCache_;
 }
 
 }

@@ -6,6 +6,7 @@
 #include "render/ModelManager.h"
 #include "render/Renderer.h"
 #include "render/RenderQueue.h"
+#include "render/RenderStateCache.h"
 #include "render/Shader.h"
 #include "render/SkinnedMesh.h"
 #include "render/Texture2D.h"
@@ -89,6 +90,9 @@ Node::~Node() {
 }
 
 void Node::Render() {
+    // Commit state changes
+    Renderer::GetInstance()->GetRenderStateCache()->ApplyRenderStateChanges();
+
 	Shader* shader = material_->GetShader();
 
     const Matrix4x4& projection = Renderer::GetInstance()->GetProjectionMatrix();

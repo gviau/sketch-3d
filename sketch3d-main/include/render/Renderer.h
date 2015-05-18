@@ -7,6 +7,7 @@
 
 #include "render/Renderer_Common.h"
 #include "render/RenderQueue.h"
+#include "render/RenderState.h"
 #include "render/SceneTree.h"
 #include "render/Texture.h"
 
@@ -19,6 +20,7 @@ namespace Sketch3D {
 
 // Forward class declaration
 class BufferObjectManager;
+class RenderStateCache;
 class RenderSystem;
 class RenderTexture;
 class Shader;
@@ -301,6 +303,7 @@ class SKETCH_3D_API Renderer {
 		SceneTree&			    GetSceneTree();
 
         BufferObjectManager*    GetBufferObjectManager() const;
+        RenderStateCache*       GetRenderStateCache() const;
 
         size_t                  GetScreenWidth() const;
         size_t                  GetScreenHeight() const;

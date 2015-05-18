@@ -5,6 +5,7 @@
 
 #include "render/OpenGL/BufferObjectManagerOpenGL.h"
 #include "render/OpenGL/BufferObjectOpenGL.h"
+#include "render/OpenGL/RenderStateCacheOpenGL.h"
 #include "render/OpenGL/RenderTextureOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/Texture2DOpenGL.h"
@@ -59,6 +60,7 @@ bool RenderSystemOpenGL::Initialize(const RenderParameters_t& renderParameters) 
     glEnable(GL_TEXTURE_2D);
 
     bufferObjectManager_ = new BufferObjectManagerOpenGL;
+    renderStateCache_ = new RenderStateCacheOpenGL;
 
     // Construct the texture cache
     head_ = new TextureUnitNode_t;
@@ -144,85 +146,8 @@ Matrix4x4 RenderSystemOpenGL::PerspectiveProjection(float left, float right, flo
     return projection;
 }
 
-void RenderSystemOpenGL::SetRenderFillMode(RenderMode_t mode) const {
-	switch (mode) {
-		case RENDER_MODE_FILL:
-			glPolygonMode(GL_FRONT, GL_FILL);
-			break;
-		case RENDER_MODE_WIREFRAME:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			break;
-		case RENDER_MODE_POINT:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-			break;
-	}
-}
-
 void RenderSystemOpenGL::SetViewport(size_t x, size_t y, size_t width, size_t height) {
     glViewport(x, y, width, height);
-}
-
-void RenderSystemOpenGL::EnableDepthTest(bool val) const {
-    if (val) {
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        glDisable(GL_DEPTH_TEST);
-    }
-}
-
-void RenderSystemOpenGL::EnableDepthWrite(bool val) const {
-    glDepthMask( (val) ? GL_TRUE : GL_FALSE );
-}
-
-void RenderSystemOpenGL::EnableColorWrite(bool val) const {
-    if (val) {
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    } else {
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    }
-}
-
-void RenderSystemOpenGL::SetDepthComparisonFunc(DepthFunc_t comparison) const {
-    GLenum depthFunc;
-    switch (comparison) {
-        case DEPTH_FUNC_NEVER:
-            depthFunc = GL_NEVER;
-            break;
-        case DEPTH_FUNC_ALWAYS:
-            depthFunc = GL_ALWAYS;
-            break;
-        case DEPTH_FUNC_LESS:
-            depthFunc = GL_LESS;
-            break;
-        case DEPTH_FUNC_LEQUAL:
-            depthFunc = GL_LEQUAL;
-            break;
-        case DEPTH_FUNC_EQUAL:
-            depthFunc = GL_EQUAL;
-            break;
-        case DEPTH_FUNC_GEQUAL:
-            depthFunc = GL_GEQUAL;
-            break;
-        case DEPTH_FUNC_GREATER:
-            depthFunc = GL_GREATER;
-            break;
-        case DEPTH_FUNC_NOTEQUAL:
-            depthFunc = GL_NOTEQUAL;
-            break;
-    }
-
-    glDepthFunc(depthFunc);
-}
-
-void RenderSystemOpenGL::SetCullingMethod(CullingMethod_t cullingMethod) const {
-    switch (cullingMethod) {
-        case CULLING_METHOD_FRONT_FACE:
-            glCullFace(GL_FRONT);
-            break;
-        case CULLING_METHOD_BACK_FACE:
-            glCullFace(GL_BACK);
-            break;
-    }
 }
 
 Shader* RenderSystemOpenGL::CreateShader() {
@@ -246,41 +171,6 @@ RenderTexture* RenderSystemOpenGL::CreateRenderTexture(unsigned int width, unsig
 void RenderSystemOpenGL::BindScreenBuffer() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     Renderer::GetInstance()->SetViewport(0, 0, width_, height_);
-}
-
-void RenderSystemOpenGL::EnableBlending(bool val) const {
-    if (val) {
-        glEnable(GL_BLEND);
-    } else {
-        glDisable(GL_BLEND);
-    }
-}
-
-void RenderSystemOpenGL::SetBlendingEquation(BlendingEquation_t equation) const {
-    GLenum blendingEquation;
-    switch (equation) {
-        case BLENDING_EQUATION_ADD:
-            blendingEquation = GL_FUNC_ADD;
-            break;
-        case BLENDING_EQUATION_SUBTRACT:
-            blendingEquation = GL_FUNC_SUBTRACT;
-            break;
-        case BLENDING_EQUATION_REVERSE_SUBTRACT:
-            blendingEquation = GL_FUNC_REVERSE_SUBTRACT;
-            break;
-        case BLENDING_EQUATION_MIN:
-            blendingEquation = GL_MIN;
-            break;
-        case BLENDING_EQUATION_MAX:
-            blendingEquation = GL_MAX;
-            break;
-    }
-
-    glBlendEquation(blendingEquation);
-}
-
-void RenderSystemOpenGL::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const {
-    glBlendFunc(GetBlendingFactor(srcFactor), GetBlendingFactor(dstFactor));
 }
 
 size_t RenderSystemOpenGL::BindTexture(const Texture* texture) {
@@ -386,47 +276,6 @@ FrustumPlanes_t RenderSystemOpenGL::ExtractViewFrustumPlanes(const Matrix4x4& vi
 
 void RenderSystemOpenGL::QueryDeviceCapabilities() {
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &deviceCapabilities_.maxActiveTextures_);
-}
-
-unsigned int RenderSystemOpenGL::GetBlendingFactor(BlendingFactor_t factor) const {
-    unsigned int blendingFactor;
-    switch (factor) {
-        case BLENDING_FACTOR_ZERO:
-            blendingFactor = GL_ZERO;
-            break;
-        case BLENDING_FACTOR_ONE:
-            blendingFactor = GL_ONE;
-            break;
-        case BLENDING_FACTOR_SRC_COLOR:
-            blendingFactor = GL_SRC_COLOR;
-            break;
-        case BLENDING_FACTOR_ONE_MINUS_SRC_COLOR:
-            blendingFactor = GL_ONE_MINUS_SRC_COLOR;
-            break;
-        case BLENDING_FACTOR_DST_COLOR:
-            blendingFactor = GL_DST_COLOR;
-            break;
-        case BLENDING_FACTOR_ONE_MINUS_DST_COLOR:
-            blendingFactor = GL_ONE_MINUS_DST_COLOR;
-            break;
-        case BLENDING_FACTOR_SRC_ALPHA:
-            blendingFactor = GL_SRC_ALPHA;
-            break;
-        case BLENDING_FACTOR_ONE_MINUS_SRC_ALPHA:
-            blendingFactor = GL_ONE_MINUS_SRC_ALPHA;
-            break;
-        case BLENDING_FACTOR_DST_ALPHA:
-            blendingFactor = GL_DST_ALPHA;
-            break;
-        case BLENDING_FACTOR_ONE_MINUS_DST_ALPHA:
-            blendingFactor = GL_ONE_MINUS_DST_ALPHA;
-            break;
-        case BLENDING_FACTOR_SRC_ALPHA_SATURATE:
-            blendingFactor = GL_SRC_ALPHA_SATURATE;
-            break;
-    }
-
-    return blendingFactor;
 }
 
 void RenderSystemOpenGL::CreateTextShader() {

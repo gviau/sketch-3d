@@ -19,6 +19,7 @@ namespace Sketch3D {
 // Forward declaration
 class BufferObjectManager;
 class RenderQueue;
+class RenderStateCache;
 class RenderTexture;
 class Shader;
 class Texture2D;
@@ -119,7 +120,7 @@ class SKETCH_3D_API RenderSystem {
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		virtual void					    SetRenderFillMode(RenderMode_t mode) const = 0;
+		void					            SetRenderFillMode(RenderMode_t mode);
 
         /**
          * Sets the camera viewport dimension
@@ -134,31 +135,31 @@ class SKETCH_3D_API RenderSystem {
          * Enable or disable depth testing
          * @param val Enabled if true, disabled otherwise
          */
-        virtual void                        EnableDepthTest(bool val) const = 0;
+        void                                EnableDepthTest(bool val);
 
         /**
          * Enable or disable depth writing. This will only work if depth testing is enabled
          * @param val Enabled if true, disabled otherwise
          */
-        virtual void                        EnableDepthWrite(bool val) const = 0;
+        void                                EnableDepthWrite(bool val);
 
         /**
          * Enable or disable color writing.
          * @param val Enabled if true, disabled otherwise
          */
-        virtual void                        EnableColorWrite(bool val) const = 0;
+        void                                EnableColorWrite(bool val);
 
         /**
          * Sets the depth compare function to use
          * @param comparison The comparison function to use
          */
-        virtual void                        SetDepthComparisonFunc(DepthFunc_t comparison) const = 0;
+        void                                SetDepthComparisonFunc(DepthFunc_t comparison);
 
         /**
          * Select the culling method
          * @param cullingMethod The culling method to use
          */
-        virtual void                        SetCullingMethod(CullingMethod_t cullingMethod) const = 0;
+        void                                SetCullingMethod(CullingMethod_t cullingMethod);
 
         /**
          * Create an empty shader
@@ -196,19 +197,19 @@ class SKETCH_3D_API RenderSystem {
          * Enable blending
          * @param val if true, enables blending, deactivate it otherwise
          */
-        virtual void                        EnableBlending(bool val) const = 0;
+        void                                EnableBlending(bool val);
 
         /**
          * Specifies the blending equation to use
          */
-        virtual void                        SetBlendingEquation(BlendingEquation_t equation) const = 0;
+        void                                SetBlendingEquation(BlendingEquation_t equation);
 
         /**
          * Specifies the blending factor to use
          * @param srcFactor The factor to use for the source pixel (the pixel being processed)
          * @param dstFactor the factor to use for the destination pixel (the pixel already present in the framebuffer)
          */
-        virtual void                        SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor) const = 0;
+        void                                SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor);
 
         /**
          * Convert a point in screen space into world space. This function uses the current perspective and view matrix
@@ -249,6 +250,7 @@ class SKETCH_3D_API RenderSystem {
         size_t                              GetHeight() const { return height_; }
         const DeviceCapabilities_t* const   GetDeviceCapabilities() const { return &deviceCapabilities_; }
         BufferObjectManager*                GetBufferObjectManager() const;
+        RenderStateCache*                   GetRenderStateCache() const;
 
 	protected:
         Window&							    window_;        /**< The window */
@@ -263,6 +265,7 @@ class SKETCH_3D_API RenderSystem {
 
         DeviceCapabilities_t                deviceCapabilities_;
         BufferObjectManager*                bufferObjectManager_;
+        RenderStateCache*                   renderStateCache_;
 
         Shader*                             textShader_;    /**< Shader used to draw text on screen */
 
