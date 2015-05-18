@@ -205,7 +205,10 @@ int main(int argc, char** argv) {
             Renderer::GetInstance()->PerspectiveProjection(65.0f, 1024.0f/768.0f, 1.0f, 1000.0f);
             Renderer::GetInstance()->CameraLookAt(newLightPositions[i], Vector3::ZERO, Vector3::UP);
             Renderer::GetInstance()->Clear();
-            Renderer::GetInstance()->Render();
+            
+            // Only render shadow casters
+            jeepNode1.Render();
+            jeepNode2.Render();
         }
 
         // Then we use the shadow maps to render the scene normally from the camera's perspective
