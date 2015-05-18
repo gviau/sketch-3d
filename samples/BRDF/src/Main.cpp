@@ -195,6 +195,10 @@ int main(int argc, char** argv) {
     while (window.IsOpen()) {
         begin = clock();
 
+        WindowEvent windowEvent;
+        if (window.PollEvents(windowEvent)) {
+        }
+
 #ifdef OIS_AVAILABLE
         keyboard->capture();
         if (keyboard->isKeyDown(OIS::KC_ESCAPE)) {
@@ -305,22 +309,24 @@ int main(int argc, char** argv) {
 
             fullscreenQuadNode.Render();
 
-            Renderer::GetInstance()->EnableDepthTest(false);
         }
 
-        Text::GetInstance()->Write(to_string(fps), 5, 5);
-        Text::GetInstance()->Write(brdfNames[brdfIndex], 5, 25);
+        Text::GetInstance()->BeginTextGroup();
 
-        if (brdfIndex == 2) {
-            Text::GetInstance()->Write("Roughness (m): " + to_string(roughness), 5, 45);
-            Text::GetInstance()->Write("Fresnel reference (R0): " + to_string(R0), 5, 65);
+            Text::GetInstance()->Write(to_string(fps), 5, 5);
+            Text::GetInstance()->Write(brdfNames[brdfIndex], 5, 25);
 
-            Renderer::GetInstance()->EnableDepthTest(true);
-        } else {
-            Text::GetInstance()->Write("Specular power: " + to_string(specularPower), 5, 45);
-            Text::GetInstance()->Write("x: " + to_string(x), 5, 65);
-            Text::GetInstance()->Write("y: " + to_string(y), 6, 85);
-        }
+            if (brdfIndex == 2) {
+                Text::GetInstance()->Write("Roughness (m): " + to_string(roughness), 5, 45);
+                Text::GetInstance()->Write("Fresnel reference (R0): " + to_string(R0), 5, 65);
+
+            } else {
+                Text::GetInstance()->Write("Specular power: " + to_string(specularPower), 5, 45);
+                Text::GetInstance()->Write("x: " + to_string(x), 5, 65);
+                Text::GetInstance()->Write("y: " + to_string(y), 6, 85);
+            }
+
+        Text::GetInstance()->EndTextGroup();
 
         Renderer::GetInstance()->EndRender();
 
