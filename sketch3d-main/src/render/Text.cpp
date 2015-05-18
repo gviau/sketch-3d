@@ -46,7 +46,7 @@ bool Text::SetTextFont(const string& fontName) {
         VertexAttributesMap_t vertexAttributes;
         vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
         vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 1;
-        bufferObject_ = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes);
+        bufferObject_ = Renderer::GetInstance()->GetBufferObjectManager()->CreateBufferObject(vertexAttributes, BUFFER_USAGE_DYNAMIC);
     }
 
     map<string, TextureAtlas_t>::iterator it = textureAtlas_.find(fontName);
