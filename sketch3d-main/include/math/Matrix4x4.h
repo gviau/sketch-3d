@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_MATRIX_4X4_H
 #define SKETCH_3D_MATRIX_4X4_H
 
+#include "math/Vector3.h"
+
 #include "system/Common.h"
 
 namespace Sketch3D
@@ -8,7 +10,6 @@ namespace Sketch3D
 
 // Forward dependencies
 class Matrix3x3;
-class Vector3;
 class Vector4;
 
 /**
@@ -147,6 +148,10 @@ class SKETCH_3D_API Matrix4x4
 		 * @param The returned array
 		 */
 		INLINE void				GetData(float* data) const;
+        
+        INLINE void             GetTranslation(Vector3& vec) const;
+
+        INLINE void             SetTranslation(const Vector3& vec);
 
     private:
 		float                   data_[4][4];	/**< The matrix represented as 2d array */
@@ -335,6 +340,18 @@ INLINE void Matrix4x4::GetData(float* data) const {
 			data[idx++] = data_[j][i];
 		}
 	}
+}
+
+INLINE void Matrix4x4::GetTranslation(Vector3& vec) const {
+    vec.x = data_[0][3];
+    vec.y = data_[1][3];
+    vec.z = data_[2][3];
+}
+
+INLINE void Matrix4x4::SetTranslation(const Vector3& vec) {
+    data_[0][3] = vec.x;
+    data_[1][3] = vec.y;
+    data_[2][3] = vec.z;
 }
 
 }

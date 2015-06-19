@@ -160,10 +160,9 @@ Matrix4x4 Matrix4x4::Inverse() const {
 }
 
 void Matrix4x4::Translate(const Vector3& translation) {
-    *this = Matrix4x4::IDENTITY;
-    data_[0][3] = translation.x;
-    data_[1][3] = translation.y;
-    data_[2][3] = translation.z;
+    data_[0][3] += translation.x;
+    data_[1][3] += translation.y;
+    data_[2][3] += translation.z;
 }
 
 void Matrix4x4::RotationAroundX(float angle)
