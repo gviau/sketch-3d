@@ -15,7 +15,7 @@ namespace Sketch3D {
 
 /**
  * @class ShaderOpenGL
- * Implement an OpenGL shader object
+ * ement an OpenGL shader object
  */
 class ShaderOpenGL : public Shader {
     friend class RenderSystemOpenGL;
@@ -26,18 +26,16 @@ class ShaderOpenGL : public Shader {
 
         virtual bool SetSourceFile(const string& vertexFilename, const string& fragmentFilename);
         virtual bool SetSource(const string& vertexSource, const string& fragmentSource);
-
-    protected:
-        virtual bool SetUniformIntImpl(const string& uniform, int value);
-        virtual bool SetUniformFloatImpl(const string& uniform, float value);
-        virtual bool SetUniformVector2Impl(const string& uniform, float value1, float value2);
-        virtual bool SetUniformVector3Impl(const string& uniform, const Vector3& value);
-        virtual bool SetUniformVector3ArrayImpl(const string& uniform, const Vector3* values, int arraySize);
-        virtual bool SetUniformVector4Impl(const string& uniform, const Vector4& value);
-        virtual bool SetUniformMatrix3x3Impl(const string& uniform, const Matrix3x3& value);
-        virtual bool SetUniformMatrix4x4Impl(const string& uniform, const Matrix4x4& value);
-        virtual bool SetUniformMatrix4x4ArrayImpl(const string& uniform, const Matrix4x4* values, int arraySize);
-        virtual bool SetUniformTextureImpl(const string& uniform, const Texture* texture);
+        virtual bool SetUniformInt(const string& uniform, int value);
+        virtual bool SetUniformFloat(const string& uniform, float value);
+        virtual bool SetUniformVector2(const string& uniform, float value1, float value2);
+        virtual bool SetUniformVector3(const string& uniform, const Vector3& value);
+        virtual bool SetUniformVector3Array(const string& uniform, const Vector3* values, int arraySize);
+        virtual bool SetUniformVector4(const string& uniform, const Vector4& value);
+        virtual bool SetUniformMatrix3x3(const string& uniform, const Matrix3x3& value);
+        virtual bool SetUniformMatrix4x4(const string& uniform, const Matrix4x4& value);
+        virtual bool SetUniformMatrix4x4Array(const string& uniform, const Matrix4x4* values, int arraySize);
+        virtual bool SetUniformTexture(const string& uniform, const Texture* texture);
 
 	private:
         GLuint                          vertex_;    /**< Represents the vertex shader */

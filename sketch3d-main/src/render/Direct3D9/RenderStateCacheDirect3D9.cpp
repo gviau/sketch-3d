@@ -30,7 +30,12 @@ void RenderStateCacheDirect3D9::EnableDepthWriteImpl() {
 }
 
 void RenderStateCacheDirect3D9::EnableColorWriteImpl() {
-    device_->SetRenderState(D3DRS_COLORWRITEENABLE, (isColorWriteEnabled_) ? TRUE : FALSE);
+    DWORD colorWrite = 0;
+    if (isColorWriteEnabled_) {
+        colorWrite = D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE;
+    }
+
+    device_->SetRenderState(D3DRS_COLORWRITEENABLE, colorWrite);
 }
 
 void RenderStateCacheDirect3D9::EnableBlendingImpl() {
