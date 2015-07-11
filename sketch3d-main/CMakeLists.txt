@@ -109,40 +109,18 @@ source_group("Source Files\\render" FILES ${RENDER_SOURCE_FILES})
 source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
 
 set(RENDER_OPENGL_SOURCE_FILES
-	src/render/OpenGL/BufferObjectManagerOpenGL.cpp
-	src/render/OpenGL/BufferObjectOpenGL.cpp
-	src/render/OpenGL/RenderDeviceOpenGL.cpp
-	src/render/OpenGL/RenderStateCacheOpenGL.cpp
-	src/render/OpenGL/RenderSystemOpenGL.cpp
-	src/render/OpenGL/RenderTextureOpenGL.cpp
-	src/render/OpenGL/ShaderOpenGL.cpp
-	src/render/OpenGL/Texture2DOpenGL.cpp
-	src/render/OpenGL/Texture3DOpenGL.cpp
-	src/render/OpenGL/glew.c
 )
 
 set(RENDER_OPENGL_HEADER_FILES
-	include/render/OpenGL/BufferObjectManagerOpenGL.h
-	include/render/OpenGL/BufferObjectOpenGL.h
-	include/render/OpenGL/RenderContextOpenGL.h
-	include/render/OpenGL/RenderDeviceOpenGL.h
-	include/render/OpenGL/RenderStateCacheOpenGL.h
-	include/render/OpenGL/RenderSystemOpenGL.h
-	include/render/OpenGL/RenderTextureOpenGL.h
-	include/render/OpenGL/ShaderOpenGL.h
-	include/render/OpenGL/Texture2DOpenGL.h
-	include/render/OpenGL/Texture3DOpenGL.h
 )
 
 if (WIN32)
 	set(RENDER_OPENGL_SOURCE_FILES
 		${RENDER_OPENGL_SOURCE_FILES}
-		src/render/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
 	set(RENDER_OPENGL_HEADER_FILES
 		${RENDER_OPENGL_HEADER_FILES}
-		include/render/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
 	set(RENDER_DIRECT3D11_SOURCE_FILES
@@ -166,12 +144,10 @@ if (WIN32)
 elseif (UNIX)
     set(RENDER_OPENGL_SOURCE_FILES
         ${RENDER_OPENGL_SOURCE_FILES}
-        src/render/OpenGL/Unix/RenderContextOpenGLUnix.cpp
     )
 
     set(RENDER_OPENGL_HEADER_FILES
         ${RENDER_OPENGL_HEADER_FILES}
-        include/render/OpenGL/Unix/RenderContextOpenGLUnix.h
     )
 endif ()
 source_group("Source Files\\render\\OpenGL" FILES ${RENDER_OPENGL_SOURCE_FILES})
