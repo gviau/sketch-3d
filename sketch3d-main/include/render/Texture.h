@@ -1,144 +1,75 @@
 #ifndef SKETCH_3D_TEXTURE_H
 #define SKETCH_3D_TEXTURE_H
 
-#include "system/Platform.h"
-
-#include <stdint.h>
+#include "render/HardwareResource.h"
 
 namespace Sketch3D {
 
-#define MAX_TEXTURE_ID 1048576  // 20 bits max
-
-/**
- * @enum FilterMode_t
- * The filter mode of the texture
- */
-enum FilterMode_t {
-	FILTER_MODE_NEAREST,
-    FILTER_MODE_LINEAR
-};
-
-/**
- * @enum WrapMode_t
- * The wrap mode of the texture
- */
-enum WrapMode_t {
-	WRAP_MODE_CLAMP,
-	WRAP_MODE_REPEAT,
-    WRAP_MODE_CLAMP_TO_BORDER
-};
+// Forward class declarations
+class TextureMap;
 
 /**
  * @enum TextureFormat_t
  * The format of the texture, describing how to interpret the bytes
  */
 enum TextureFormat_t {
-    TEXTURE_FORMAT_GRAYSCALE,
+    GRAYSCALE,
 
-	TEXTURE_FORMAT_RGB24,
-	TEXTURE_FORMAT_RGBA32,
-    TEXTURE_FORMAT_BGR24,
-    TEXTURE_FORMAT_BGRA32,
+	RGB24,
+	RGBA32,
 
     // There should be a separation between byte texture format and floating point texture format
-    TEXTURE_FORMAT_R32F,
-    TEXTURE_FORMAT_RG32F,
-    TEXTURE_FORMAT_RGBA32F,
-    TEXTURE_FORMAT_R16F,
-    TEXTURE_FORMAT_RG16F,
-    TEXTURE_FORMAT_RGBA16F,
+    R32F,
+    RG32F,
+    RGBA32F,
+    R16F,
+    RG16F,
+    RGBA16F,
 
     // Special texture formats
-    TEXTURE_FORMAT_DEPTH
-};
-
-/**
- * @enum TextureType_t
- * Type of the texture (2D or 3D)
- */
-enum TextureType_t {
-    TEXTURE_TYPE_2D,
-    TEXTURE_TYPE_3D
+    DEPTH
 };
 
 /**
  * @class Texture
- * This class serves as a base class to other classes that act as textures,
- * such as the Texture2D and RenderTexture classes.
+ * This class serves as a base class to other classes that act as textures
  */
-class SKETCH_3D_API Texture {
-	public:
-		/**
-		 * Constructor. Initializes the width and height to 0, the filter mode
-		 * to FILTER_MODE_POINT and the wrap mode to WRAP_MODE_CLAMP and the texture
-		 * format is set to TEXTURE_FORMAT_RGB24
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
-		 */
-                                Texture(bool generateMipmaps=false);
-
-		/**
-		 * Constructor. Initializes the filter mode to FILTER_MODE_POINT and
-		 * the wrap mode to WRAP_MODE_CLAMP by default.
-		 * @param width The width of the texture
-		 * @param height The height of the texture
-         * @param generateMipmaps If set to true, generate mipmaps for this texture
-		 * @param filterMode The filter mode to use
-		 * @param wrapMode The wrap mode to use
-         * @param format The format to use
-		 */
-						        Texture(unsigned int width, unsigned int height, bool generateMipmaps=false,
-								        FilterMode_t filterMode=FILTER_MODE_LINEAR,
-								        WrapMode_t wrapMode=WRAP_MODE_REPEAT,
-								        TextureFormat_t format=TEXTURE_FORMAT_RGB24);
-
+class SKETCH_3D_API Texture : public HardwareResource {
+    public:
         /**
-         * Destructor
+         * Constructor
+         * @param textureMap The texture map to use to construct the texture
+         * @param textureFormat The format to use for this texture i.e. how to interpret the data in the texture map
+         * @param dynamic Set to true if the texture can be modified on the CPU
+         * @param immutable Set to true if the texture cannot be modified on the CPU. Will reside on the GPU
          */
-        virtual                ~Texture();
+                        Texture(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
 
-        /**
-         * Create the actual texture handle
-         * @return true if the texture was created correctly
-         */
-        virtual bool            Create() = 0;
+        TextureMap*     GetTextureMap() const;
+        TextureFormat_t GetTextureFormat() const;
 
-        /**
-         * Activate the texture
-         * @return The texture unit on which the texture was bound
-         */
-        unsigned int            Bind() const;
-
-		void			        SetWidth(unsigned int width);
-		void			        SetHeight(unsigned int height);
-        void                    SetGenerateMipmaps(bool generateMipmaps);
-		void			        SetFilterMode(FilterMode_t mode);
-		void			        SetWrapMode(WrapMode_t mode);
-        void		            SetTextureFormat(TextureFormat_t format);
-
-        uint32_t                GetId() const { return id_; }
-		unsigned int	        GetWidth() const;
-		unsigned int	        GetHeight() const;
-        bool                    GetGenerateMipmaps() const;
-		FilterMode_t	        GetFilterMode() const;
-		WrapMode_t		        GetWrapMode() const;
-        TextureFormat_t	        GetTextureFormat() const;
-
-        virtual TextureType_t   GetType() const = 0;
-
-	protected:
-        uint32_t                id_;        /**< Id of the texture */
-		unsigned int	        width_;	/**< The width of the texture */
-		unsigned int	        height_;	/**< The height of the texture */
-        bool                    generateMipmaps_;   /**< Should we generate mipmaps for this texture */
-		FilterMode_t	        filterMode_;	/**< The filter mode of the texture */
-		WrapMode_t		        wrapMode_;	/**< The wrap mode of the texture */
-        TextureFormat_t         format_;    /**< The texture format */
-
-        static uint32_t         nextAvailableId_;
-
-        virtual void            SetFilterModeImpl() const = 0;
-        virtual void            SetWrapModeImpl() const = 0;
+    protected:
+        TextureMap*     textureMap_;
+        TextureFormat_t textureFormat_;
 };
+
+class SKETCH_3D_API Texture1D : public Texture {
+    public:
+        Texture1D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+};
+
+class SKETCH_3D_API Texture2D : public Texture {
+    public:
+        Texture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+};
+
+class SKETCH_3D_API Texture3D : public Texture {
+    public:
+        Texture3D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+};
+
+size_t GetRowPitch(size_t width, TextureFormat_t textureFormat);
+size_t Get2DSlicePitch(size_t width, size_t height, TextureFormat_t textureFormat);
 
 }
 

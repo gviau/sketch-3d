@@ -45,6 +45,7 @@ set(RENDER_SOURCE_FILES
 	src/render/Resource.cpp
 	src/render/Shader.cpp
 	src/render/Texture.cpp
+	src/render/TextureMap.cpp
 	src/render/VertexFormat.cpp
 )
 
@@ -61,6 +62,7 @@ set(RENDER_HEADER_FILES
 	include/render/Resource.h
 	include/render/Shader.h
 	include/render/Texture.h
+	include/render/TextureMap.h
 	include/render/VertexFormat.h
 )
 source_group("Source Files\\render" FILES ${RENDER_SOURCE_FILES})
@@ -87,6 +89,7 @@ if (WIN32)
 		src/render/Direct3D11/RenderContextDirect3D11.cpp
 		src/render/Direct3D11/RenderDeviceDirect3D11.cpp
 		src/render/Direct3D11/ShaderDirect3D11.cpp
+		src/render/Direct3D11/TextureDirect3D11.cpp
 	)
 	
 	set(RENDER_DIRECT3D11_HEADER_FILES
@@ -95,6 +98,7 @@ if (WIN32)
 		include/render/Direct3D11/RenderContextDirect3D11.h
 		include/render/Direct3D11/RenderDeviceDirect3D11.h
 		include/render/Direct3D11/ShaderDirect3D11.h
+		include/render/Direct3D11/TextureDirect3D11.h
 	)
 	
 	source_group("Source Files\\render\\Direct3D11" FILES ${RENDER_DIRECT3D11_SOURCE_FILES})

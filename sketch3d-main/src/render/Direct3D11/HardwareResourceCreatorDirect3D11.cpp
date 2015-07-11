@@ -2,6 +2,9 @@
 
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/ShaderDirect3D11.h"
+#include "render/Direct3D11/TextureDirect3D11.h"
+
+#include "system/Logger.h"
 
 #pragma warning( disable : 4005 )
 
@@ -26,6 +29,16 @@ shared_ptr<IndexBuffer> HardwareResourceCreatorDirect3D11::CreateIndexBuffer(voi
 shared_ptr<FragmentShader> HardwareResourceCreatorDirect3D11::CreateFragmentShader() {
     FragmentShader* fragmentShader = new FragmentShaderDirect3D11(device_);
     return shared_ptr<FragmentShader>(fragmentShader);
+}
+
+shared_ptr<Texture2D> HardwareResourceCreatorDirect3D11::CreateTexture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {
+    if (textureMap == nullptr) {
+        Logger::GetInstance()->Error("Invalid texture map passed for 2D texture creation");
+        return nullptr;
+    }
+
+    Texture2D* texture2D = new Texture2DDirect3D11(device_, textureMap, textureFormat, dynamic, immutable);
+    return shared_ptr<Texture2D>(texture2D);
 }
 
 shared_ptr<VertexBuffer> HardwareResourceCreatorDirect3D11::CreateVertexBuffer(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) {
