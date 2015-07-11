@@ -40,7 +40,7 @@ function (sketch3d_add_sample target)
 		set (WIN32_EXECUTABLE "WIN32")
 		set (LIBRARIES
 			 ${LIBRARIES}
-			 ${DirectX_LIBRARIES}
+			 ${DirectX_D3D11_LIBRARIES}
 		)
 	else (WIN32)
 		set (WIN32_EXEUTABLE "")

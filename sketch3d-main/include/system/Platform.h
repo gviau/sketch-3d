@@ -48,6 +48,17 @@ namespace Sketch3D
 #   define CPU CPU_X86
 #endif
 
+// Aligned types
+#if defined(_MSC_VER)
+#define ALIGNED_(x) __declspec(align(x))
+#else
+#if defined(__GNUC__)
+#define ALIGNED_(x) __attribute__ ((aligned(x)))
+#endif
+#endif
+
+#define ALIGNED_TYPE(t,x) typedef t ALIGNED_(x)
+
 // How to declare aligned variable
 #if COMPILER == COMPILER_MSVC
 #   define ALIGNED_DECL(type, var, alignment) __declspec(align(alignment)) type var

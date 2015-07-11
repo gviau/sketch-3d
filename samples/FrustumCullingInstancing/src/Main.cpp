@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
     renderParameters.refreshRate = 0;
     Window window("Sample_FrustumCullingInstancing", 1024, 768, true);
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
+    Renderer::GetInstance()->Initialize(RenderSystem_t::OPENGL, window, renderParameters);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     VertexAttributesMap_t vertexAttributes;

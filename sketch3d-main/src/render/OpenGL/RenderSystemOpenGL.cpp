@@ -151,8 +151,9 @@ void RenderSystemOpenGL::SetViewport(size_t x, size_t y, size_t width, size_t he
 }
 
 Shader* RenderSystemOpenGL::CreateShader() {
-    shaders_.push_back(new ShaderOpenGL);
-    return shaders_[shaders_.size() - 1];
+//    shaders_.push_back(new ShaderOpenGL);
+   // return shaders_[shaders_.size() - 1];
+    return nullptr;
 }
 
 Texture2D* RenderSystemOpenGL::CreateTexture2D() const {
@@ -230,8 +231,8 @@ void RenderSystemOpenGL::BindShader(const Shader* shader) {
         if (shader == nullptr) {
             glUseProgram(0);
         } else {
-            const ShaderOpenGL* shaderOpengl = static_cast<const ShaderOpenGL*>(shader);
-            glUseProgram(shaderOpengl->program_);
+         //   const ShaderOpenGL* shaderOpengl = static_cast<const ShaderOpenGL*>(shader);
+//            glUseProgram(shaderOpengl->program_);
         }
 
         boundShader_ = shader;
@@ -313,9 +314,9 @@ void RenderSystemOpenGL::CreateTextShader() {
     ;
 
     textShader_ = Renderer::GetInstance()->CreateShader();
-    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
-        Logger::GetInstance()->Error("Couldn't create text shader");
-    }
+//    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
+ //       Logger::GetInstance()->Error("Couldn't create text shader");
+ //   }
 }
 
 }

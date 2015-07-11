@@ -54,6 +54,7 @@ void SceneTree::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCull
 }
 
 void SceneTree::RenderStaticBatches() const {
+    /*
     const Matrix4x4& viewProjectionMatrix = Renderer::GetInstance()->GetViewProjectionMatrix();
     const Matrix4x4& viewMatrix = Renderer::GetInstance()->GetViewMatrix();
     const Matrix4x4& transposedInverseViewMatrix = viewMatrix.Inverse().Transpose();
@@ -61,7 +62,7 @@ void SceneTree::RenderStaticBatches() const {
     StaticBatches_t::const_iterator it = staticBatches_.begin();
     for (; it != staticBatches_.end(); ++it) {
         TexturesToBuffersMap_t::const_iterator ttb_it = it->second.begin();
-
+        
         // Bind the shader for the following render
         Shader* shader = it->first;
         Renderer::GetInstance()->BindShader(shader);
@@ -88,6 +89,7 @@ void SceneTree::RenderStaticBatches() const {
             }
         }
     }
+    */
 }
 
 bool SceneTree::AddNode(Node* node) {
@@ -134,19 +136,19 @@ void SceneTree::PerformStaticBatching() {
     map<Shader*, map<size_t, vector<Node*>>> staticBatches;
     for (size_t i = 0; i < staticNodes.size(); i++) {
         Node* node = staticNodes[i];
-        Shader* shader = node->GetMaterial()->GetShader();
+//        Shader* shader = node->GetMaterial()->GetShader();
         Mesh* mesh = node->GetMesh();
 
-        if (staticBatches.find(shader) == staticBatches.end()) {
-            staticBatches[shader] = map<size_t, vector<Node*>>();
-        }
+    //    if (staticBatches.find(shader) == staticBatches.end()) {
+    //        staticBatches[shader] = map<size_t, vector<Node*>>();
+   //     }
 
-        size_t vertexAttributes = mesh->GetVertexAttributesBitField();
-        if (staticBatches[shader].find(vertexAttributes) == staticBatches[shader].end()) {
-            staticBatches[shader][vertexAttributes] = vector<Node*>();
-        }
+      //  size_t vertexAttributes = mesh->GetVertexAttributesBitField();
+     //   if (staticBatches[shader].find(vertexAttributes) == staticBatches[shader].end()) {
+     //       staticBatches[shader][vertexAttributes] = vector<Node*>();
+     //   }
 
-        staticBatches[shader][vertexAttributes].push_back(node);
+     //   staticBatches[shader][vertexAttributes].push_back(node);
     }
 
     //////////////////////////////////////////////////////////////////////////////////

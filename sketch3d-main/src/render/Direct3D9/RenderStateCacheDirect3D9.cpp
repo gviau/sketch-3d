@@ -83,9 +83,9 @@ void RenderStateCacheDirect3D9::SetDepthComparisonFuncImpl() {
 
 void RenderStateCacheDirect3D9::SetCullingMethodImpl() {
     DWORD cullMode;
-    if (cullingMethod_ == CULLING_METHOD_BACK_FACE) {
+    if (cullingMethod_ == CullingMethod_t::BACK_FACE) {
         cullMode = D3DCULL_CW;
-    } else if (cullingMethod_ == CULLING_METHOD_FRONT_FACE) {
+    } else if (cullingMethod_ == CullingMethod_t::FRONT_FACE) {
         cullMode = D3DCULL_CCW;
     }
 
@@ -130,15 +130,11 @@ void RenderStateCacheDirect3D9::SetBlendingFactorImpl() {
 void RenderStateCacheDirect3D9::SetRenderFillModeImpl() {
     DWORD renderMode;
     switch (renderMode_) {
-        case RENDER_MODE_FILL:
+        case FillMode_t::FILL:
             renderMode = D3DFILL_SOLID;
             break;
 
-        case RENDER_MODE_POINT:
-            renderMode = D3DFILL_POINT;
-            break;
-
-        case RENDER_MODE_WIREFRAME:
+        case FillMode_t::WIREFRAME:
             renderMode = D3DFILL_WIREFRAME;
             break;
     }

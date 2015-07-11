@@ -87,16 +87,10 @@ endif ()
 if (WIN32)
 	find_package (DirectX)
 	
-	message(STATUS "DirectX found? ${DirectX_FOUND}")
+	message(STATUS "DirectX found? ${DirectX_D3D11_FOUND}")
 	if (DirectX_FOUND)
 		message (STATUS "DirectX include: ${DirectX_INCLUDE_DIR}")
-		message (STATUS "DirectX libs: ${DirectX_LIBRARY} ${DirectX_D3DX9_LIBRARY}")
-		
-		# We only want d3d9 and d3dx9
-		set(DirectX_LIBRARIES
-			${DirectX_LIBRARY}
-			${DirectX_D3DX9_LIBRARY}
-		)
+		message (STATUS "DirectX libs: ${DirectX_D3D11_LIBRARIES}")
 	endif ()
 endif ()
 

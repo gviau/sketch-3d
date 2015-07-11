@@ -149,7 +149,7 @@ class SKETCH_3D_API Renderer {
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		void				    SetRenderFillMode(RenderMode_t mode) const;
+		void				    SetRenderFillMode(FillMode_t mode) const;
 
         /**
          * Sets the camera viewport dimension
@@ -324,8 +324,8 @@ class SKETCH_3D_API Renderer {
 
         BufferObjectManager*    bufferObjectManager_;   /**< Buffer object manager used to create the buffer objects */
 
-        RenderQueue             opaqueRenderQueue_;     /**< The render queue used for drawing opaque objects */
-        RenderQueue             transparentRenderQueue_;/**< The render queue used for drawing transparent objects */
+        //RenderQueue             opaqueRenderQueue_;     /**< The render queue used for drawing opaque objects */
+        //RenderQueue             transparentRenderQueue_;/**< The render queue used for drawing transparent objects */
         bool                    useFrustumCulling_;     /**< If set to true, frustum culling will be used */
         RenderParameters_t      renderParamters_;       /**< The rendering parameters used when creating the rendering context */
 

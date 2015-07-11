@@ -46,8 +46,8 @@ enum ClearBuffer_t {
  * Determines if the culling should be for front face or back face
  */
 enum CullingMethod_t {
-    CULLING_METHOD_FRONT_FACE,
-    CULLING_METHOD_BACK_FACE
+    FRONT_FACE,
+    BACK_FACE
 };
 
 /**
@@ -66,13 +66,12 @@ enum DepthFunc_t {
 };
 
 /**
- * @enum RenderMode
+ * @enum FillMode_t
  * Enum that give the possible rendering mode
  */
-enum RenderMode_t {
-	RENDER_MODE_FILL,
-	RENDER_MODE_WIREFRAME,
-	RENDER_MODE_POINT
+enum FillMode_t {
+	FILL,
+	WIREFRAME
 };
 
 }

@@ -120,7 +120,7 @@ class SKETCH_3D_API RenderSystem {
 		 * Set the renderer's fill mode
 		 * @param mode The mode to use for rendering the geometry
 		 */
-		void					            SetRenderFillMode(RenderMode_t mode);
+		void					            SetRenderFillMode(FillMode_t mode);
 
         /**
          * Sets the camera viewport dimension

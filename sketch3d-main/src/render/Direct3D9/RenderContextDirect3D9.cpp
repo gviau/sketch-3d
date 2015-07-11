@@ -39,22 +39,18 @@ bool RenderContextDirect3D9::Initialize(Window& window, const RenderParameters_t
     HWND hWnd = reinterpret_cast<HWND>(window.GetHandle());
     D3DFORMAT format;
     switch (renderParameters.displayFormat) {
-        case DISPLAY_FORMAT_A1R5G5B5:       format = D3DFMT_A1R5G5B5; break;
-        case DISPLAY_FORMAT_A2R10G10B10:    format = D3DFMT_A2R10G10B10; break;
-        case DISPLAY_FORMAT_A8R8G8B8:       format = D3DFMT_A8R8G8B8; break;
-        case DISPLAY_FORMAT_R5G6B5:         format = D3DFMT_R5G6B5; break;
-        case DISPLAY_FORMAT_X1R5G5B5:       format = D3DFMT_X1R5G5B5; break;
-        case DISPLAY_FORMAT_X8R8G8B8:       format = D3DFMT_X8R8G8B8; break;
+        case DisplayFormat_t::A1R5G5B5:       format = D3DFMT_A1R5G5B5; break;
+        case DisplayFormat_t::A2R10G10B10:    format = D3DFMT_A2R10G10B10; break;
+        case DisplayFormat_t::A8R8G8B8:       format = D3DFMT_A8R8G8B8; break;
+        case DisplayFormat_t::R5G6B5:         format = D3DFMT_R5G6B5; break;
+        case DisplayFormat_t::X8R8G8B8:       format = D3DFMT_X8R8G8B8; break;
     }
 
     D3DFORMAT depthStencilFormat;
     switch (renderParameters.depthStencilBits) {
-        case DEPTH_STENCIL_BITS_D15S1:      depthStencilFormat = D3DFMT_D15S1; break;
-        case DEPTH_STENCIL_BITS_D16:        depthStencilFormat = D3DFMT_D16; break;
-        case DEPTH_STENCIL_BITS_D24S8:      depthStencilFormat = D3DFMT_D24S8; break;
-        case DEPTH_STENCIL_BITS_D24X4S4:    depthStencilFormat = D3DFMT_D24X4S4; break;
-        case DEPTH_STENCIL_BITS_D24X8:      depthStencilFormat = D3DFMT_D24X8; break;
-        case DEPTH_STENCIL_BITS_D32:        depthStencilFormat = D3DFMT_D32; break;
+        case DepthStencilBits_t::D16:        depthStencilFormat = D3DFMT_D16; break;
+        case DepthStencilBits_t::D24S8:      depthStencilFormat = D3DFMT_D24S8; break;
+        case DepthStencilBits_t::D32:        depthStencilFormat = D3DFMT_D32; break;
     }
 
     D3DPRESENT_PARAMETERS presentParameters;
@@ -103,7 +99,6 @@ void RenderContextDirect3D9::QueryAdapterSupportedDisplayFormats() {
         D3DFMT_A2R10G10B10,
         D3DFMT_A8R8G8B8,
         D3DFMT_R5G6B5,
-        D3DFMT_X1R5G5B5,
         D3DFMT_X8R8G8B8
     };
     size_t numberFormats = sizeof(formats) / sizeof(D3DFORMAT);
@@ -121,12 +116,11 @@ void RenderContextDirect3D9::QueryAdapterSupportedDisplayFormats() {
 
                 DisplayFormat_t displayFormat;
                 switch (mode.Format) {
-                    case D3DFMT_A1R5G5B5:       displayFormat = DISPLAY_FORMAT_A1R5G5B5; break;
-                    case D3DFMT_A2R10G10B10:    displayFormat = DISPLAY_FORMAT_A2R10G10B10; break;
-                    case D3DFMT_A8R8G8B8:       displayFormat = DISPLAY_FORMAT_A8R8G8B8; break;
-                    case D3DFMT_R5G6B5:         displayFormat = DISPLAY_FORMAT_R5G6B5; break;
-                    case D3DFMT_X1R5G5B5:       displayFormat = DISPLAY_FORMAT_X1R5G5B5; break;
-                    case D3DFMT_X8R8G8B8:       displayFormat = DISPLAY_FORMAT_X8R8G8B8; break;
+                    case D3DFMT_A1R5G5B5:       displayFormat = DisplayFormat_t::A1R5G5B5; break;
+                    case D3DFMT_A2R10G10B10:    displayFormat = DisplayFormat_t::A2R10G10B10; break;
+                    case D3DFMT_A8R8G8B8:       displayFormat = DisplayFormat_t::A8R8G8B8; break;
+                    case D3DFMT_R5G6B5:         displayFormat = DisplayFormat_t::R5G6B5; break;
+                    case D3DFMT_X8R8G8B8:       displayFormat = DisplayFormat_t::X8R8G8B8; break;
                 }
                 displayMode.displayFormat = displayFormat;
 

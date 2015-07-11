@@ -24,7 +24,7 @@ RenderSystem::RenderSystem(Window& window) : window_(window), boundShader_(nullp
 RenderSystem::~RenderSystem() {
 }
 
-void RenderSystem::SetRenderFillMode(RenderMode_t mode) {
+void RenderSystem::SetRenderFillMode(FillMode_t mode) {
     renderStateCache_->SetRenderFillMode(mode);
 }
 
@@ -72,8 +72,8 @@ size_t RenderSystem::BindTexture(const Texture* texture) {
 
 void RenderSystem::DrawTextBuffer(BufferObject* bufferObject, Texture2D* fontAtlas, const Vector3& textColor) {
     Renderer::GetInstance()->BindShader(textShader_);
-    textShader_->SetUniformTexture("fontAtlas", fontAtlas);
-    textShader_->SetUniformVector3("textColor", textColor);
+    //textShader_->SetUniformTexture("fontAtlas", fontAtlas);
+    //textShader_->SetUniformVector3("textColor", textColor);
     bufferObject->Render();
 }
 

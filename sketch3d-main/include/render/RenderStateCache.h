@@ -31,7 +31,7 @@ class SKETCH_3D_API RenderStateCache {
         void                SetCullingMethod(CullingMethod_t cullingMethod);
         void                SetBlendingEquation(BlendingEquation_t equation);
         void                SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFactor_t dstFactor);
-        void                SetRenderFillMode(RenderMode_t mode);
+        void                SetRenderFillMode(FillMode_t mode);
 
     protected:
         // Current render state values
@@ -44,7 +44,7 @@ class SKETCH_3D_API RenderStateCache {
         BlendingEquation_t  blendingEquation_;
         BlendingFactor_t    sourceBlendingFactor_;
         BlendingFactor_t    destinationBlendingFactor_;
-        RenderMode_t        renderMode_;
+        FillMode_t          renderMode_;
 
         // Old render state values
         bool                oldIsDepthTestEnabled_;
@@ -56,7 +56,7 @@ class SKETCH_3D_API RenderStateCache {
         BlendingEquation_t  oldBlendingEquation_;
         BlendingFactor_t    oldSourceBlendingFactor_;
         BlendingFactor_t    oldDestinationBlendingFactor_;
-        RenderMode_t        oldRenderMode_;
+        FillMode_t          oldRenderMode_;
 
         virtual void        EnableDepthTestImpl() = 0;
         virtual void        EnableDepthWriteImpl() = 0;

@@ -2,9 +2,11 @@
 #define SKETCH_3D_RENDER_CONTEXT_H
 
 #include "render/Renderer_Common.h"
+#include "render/RenderDevice_Common.h"
 
 #include "system/Platform.h"
 
+#include <memory>
 #include <vector>
 using namespace std;
 
@@ -49,6 +51,9 @@ class SKETCH_3D_API RenderContext {
          */
         bool                    AreRenderParametersSupported(const RenderParameters_t& renderParameters) const;
 };
+
+// Helper to create the proper render context
+shared_ptr<RenderContext> SKETCH_3D_API CreateRenderContext(RenderSystem_t renderSystem);
 
 }
 

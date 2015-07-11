@@ -45,20 +45,17 @@ bool Renderer::Initialize(RenderSystem_t renderSystem,
 {
     renderParamters_ = renderParameters;
 
-	switch (renderSystem) {
-		case RENDER_SYSTEM_OPENGL:
-			renderSystem_ = new RenderSystemOpenGL(window);
-			break;
-
 #if PLATFORM == PLATFORM_WIN32
-		case RENDER_SYSTEM_DIRECT3D9:
-            renderSystem_ = new RenderSystemDirect3D9(window);			
-			break;
-#endif
+	switch (renderSystem) {
+		case OPENGL:    renderSystem_ = new RenderSystemOpenGL(window); break;
+		case DIRECT3D9: renderSystem_ = new RenderSystemDirect3D9(window); break;
 		default:
 			Logger::GetInstance()->Error("Unknown render system");
 			break;
 	}
+#elif PLATFORM == PLATFORM_LINUX
+    renderSystem_ = new RenderSystemOpenGL(window);
+#endif
 
 	if (!renderSystem_->Initialize(renderParamters_)) {
         Logger::GetInstance()->Error("Couldn't initialize render system properly");
@@ -88,6 +85,7 @@ void Renderer::EndRender() {
 }
 
 void Renderer::Render() {
+    /*
     // Commit the state changes
     RenderStateCache* renderStateCache = renderSystem_->GetRenderStateCache();
     renderStateCache->ApplyRenderStateChanges();
@@ -115,6 +113,7 @@ void Renderer::Render() {
 
         renderStateCache->EnableBlending(false);
     }
+    */
 }
 
 void Renderer::PresentFrame() {
@@ -186,7 +185,7 @@ void Renderer::SetViewMatrix(const Vector3& right, const Vector3& up, const Vect
     viewProjection_ = projection_ * view_;
 }
 
-void Renderer::SetRenderFillMode(RenderMode_t mode) const {
+void Renderer::SetRenderFillMode(FillMode_t mode) const {
 	renderSystem_->SetRenderFillMode(mode);
 }
 
@@ -354,7 +353,7 @@ void Renderer::SetDefaultRenderingValues() {
     PerspectiveProjection(45.0f, (float)renderParamters_.width / (float)renderParamters_.height, 1.0f, 1000.0f);
     CameraLookAt(Vector3::ZERO, Vector3::LOOK);
 
-    SetCullingMethod(CULLING_METHOD_BACK_FACE);
+    SetCullingMethod(CullingMethod_t::BACK_FACE);
 }
 
 bool FrustumPlanes_t::IsSphereOutside(const Sphere& sphere) const {

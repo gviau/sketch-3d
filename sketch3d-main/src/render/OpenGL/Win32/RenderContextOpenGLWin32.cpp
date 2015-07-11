@@ -30,67 +30,48 @@ bool RenderContextOpenGLWin32::Initialize(Window& window, const RenderParameters
     size_t alphaBits = 0;
     size_t stencilBits = 0;
     switch (renderParameters.displayFormat) {
-        case DISPLAY_FORMAT_A1R5G5B5:
+        case DisplayFormat_t::A1R5G5B5:
             colorBits = 16;
             alphaBits = 1;
             redBits = blueBits = 5;
             greenBits = 6;
             break;
 
-        case DISPLAY_FORMAT_A2R10G10B10:
+        case DisplayFormat_t::A2R10G10B10:
             colorBits = 24;
             alphaBits = 2;
             redBits = greenBits = blueBits = 10;
             break;
 
-        case DISPLAY_FORMAT_A8R8G8B8:
+        case DisplayFormat_t::A8R8G8B8:
             colorBits = 24;
             alphaBits = 8;
             redBits = greenBits = blueBits = 8;
             break;
 
-        case DISPLAY_FORMAT_R5G6B5:
+        case DisplayFormat_t::R5G6B5:
             colorBits = 16;
             redBits = blueBits = 5;
             greenBits = 6;
             break;
 
-        case DISPLAY_FORMAT_X1R5G5B5:
-            colorBits = 16;
-            redBits = greenBits = blueBits = 5;
-            break;
-
-        case DISPLAY_FORMAT_X8R8G8B8:
+        case DisplayFormat_t::X8R8G8B8:
             colorBits = 24;
             redBits = greenBits = blueBits = 8;
             break;
     }
 
     switch (renderParameters.depthStencilBits) {
-        case DEPTH_STENCIL_BITS_D15S1:
-            depthBits = 15;
-            stencilBits = 1;
-            break;
-
-        case DEPTH_STENCIL_BITS_D16:
+        case DepthStencilBits_t::D16:
             depthBits = 16;
             break;
 
-        case DEPTH_STENCIL_BITS_D24S8:
+        case DepthStencilBits_t::D24S8:
             depthBits = 24;
             stencilBits = 8;
             break;
 
-        case DEPTH_STENCIL_BITS_D24X4S4:
-            depthBits = 24;
-            stencilBits = 4;
-            break;
-
-        case DEPTH_STENCIL_BITS_D24X8:
-            depthBits = 24;
-            break;
-
-        case DEPTH_STENCIL_BITS_D32:
+        case DepthStencilBits_t::D32:
             depthBits = 32;
             break;
     }

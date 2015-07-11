@@ -82,10 +82,10 @@ void RenderStateCacheOpenGL::SetDepthComparisonFuncImpl() {
 
 void RenderStateCacheOpenGL::SetCullingMethodImpl() {
     switch (cullingMethod_) {
-        case CULLING_METHOD_FRONT_FACE:
+        case CullingMethod_t::FRONT_FACE:
             glCullFace(GL_FRONT);
             break;
-        case CULLING_METHOD_BACK_FACE:
+        case CullingMethod_t::BACK_FACE:
             glCullFace(GL_BACK);
             break;
     }
@@ -120,14 +120,11 @@ void RenderStateCacheOpenGL::SetBlendingFactorImpl() {
 
 void RenderStateCacheOpenGL::SetRenderFillModeImpl() {
     switch (renderMode_) {
-        case RENDER_MODE_FILL:
+        case FillMode_t::FILL:
             glPolygonMode(GL_FRONT, GL_FILL);
             break;
-        case RENDER_MODE_WIREFRAME:
+        case FillMode_t::WIREFRAME:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            break;
-        case RENDER_MODE_POINT:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
             break;
     }
 }

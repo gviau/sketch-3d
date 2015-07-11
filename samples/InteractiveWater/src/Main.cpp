@@ -1,13 +1,13 @@
-#include <math/Vector2.h>
-#include <math/Vector3.h>
+#include <math/Matrix4x4.h>
+#include <math/Vector4.h>
 
-#include <render/Material.h>
-#include <render/Mesh.h>
-#include <render/Node.h>
-#include <render/Renderer.h>
-#include <render/SceneTree.h>
+#include <render/Buffer.h>
+#include <render/ConstantBuffers.h>
+#include <render/HardwareResourceCreator.h>
+#include <render/RenderContext.h>
+#include <render/RenderDevice.h>
 #include <render/Shader.h>
-#include <render/Texture2D.h>
+#include <render/VertexFormat.h>
 
 #include <system/Window.h>
 #include <system/WindowEvent.h>
@@ -17,10 +17,6 @@ using namespace Sketch3D;
 #include <vector>
 using namespace std;
 
-#ifdef OIS_AVAILABLE
-#include <OIS.h>
-#endif
-
 #if PLATFORM == PLATFORM_WIN32
 #include <Windows.h>
 
@@ -28,197 +24,121 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #else
 int main(int argc, char** argv) {
 #endif
-    Window window("Sample_InteractiveWater", 1024, 768, true);
+    Window window("Test", 1024, 768, true);
+
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;
     renderParameters.height = 768;
-    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
+    renderParameters.displayFormat = DisplayFormat_t::A8R8G8B8;
+    renderParameters.depthStencilBits = DepthStencilBits_t::D32;
     renderParameters.refreshRate = 0;
-    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
 
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
-    Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
+    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
+    renderContext->Initialize(window, renderParameters);
 
-    // Water surface creation
-    const int NUM_VERTICES = 64;
-    SurfaceTriangles_t surface;
-    surface.numVertices = NUM_VERTICES * NUM_VERTICES;
-    surface.numNormals = NUM_VERTICES * NUM_VERTICES;
-    surface.numTexCoords = NUM_VERTICES * NUM_VERTICES;
-    surface.vertices = new Vector3[surface.numVertices];
-    surface.normals = new Vector3[surface.numNormals];
-    surface.texCoords = new Vector2[surface.numTexCoords];
+    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::DIRECT3D11);
+    renderDevice->Initialize(renderContext);
 
-    Vector3* buffer = new Vector3[surface.numVertices];
-    Vector3* buffer2 = surface.vertices;
+    HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
 
-    size_t idx = 0;
-    const int NUM_CELLS = NUM_VERTICES - 1;
-    float step = 2.0f / NUM_CELLS;
-    float uvStep = 1.0f / NUM_VERTICES;
+    Vertex_Pos_Color_t vertices[] = {
+        { Vector3(-1.0f, -1.0f, -1.0f), Vector3(1.0f, 0.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f, -1.0f), Vector3(0.0f, 1.0f, 0.0f) },
+        { Vector3( 1.0f,  1.0f, -1.0f), Vector3(0.0f, 0.0f, 1.0f) },
+        { Vector3( 1.0f, -1.0f, -1.0f), Vector3(1.0f, 0.0f, 1.0f) },
+        { Vector3(-1.0f, -1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
+        { Vector3( 1.0f,  1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
+        { Vector3( 1.0f, -1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) }
+    };
+    size_t numVertices = _countof(vertices);
 
-    for (size_t i = 0; i < NUM_VERTICES; i++) {
-        for (size_t j = 0; j < NUM_VERTICES; j++) {
-            idx = i * NUM_VERTICES + j;
-            buffer[idx] = surface.vertices[idx] = Vector3(j * step - 1.0f, i * step - 1.0f, 0.0f);
-            surface.normals[idx] = -Vector3::LOOK;
-            surface.texCoords[idx] = Vector2(uvStep * j, uvStep * i);
-        }
-    }
+    VertexFormat_Pos_Color vertexFormat;
+    shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer((void*)vertices, false, false, &vertexFormat, numVertices);
 
-    surface.numIndices = NUM_CELLS * NUM_CELLS * 6;
-    surface.indices = new unsigned short[surface.numIndices];
-    idx = 0;
+    unsigned short indices[] = {
+		0, 1, 2, 0, 2, 3,
+        3, 2, 6, 3, 6, 7,
+        7, 6, 5, 7, 5, 4,
+        4, 5, 1, 4, 1, 0,
+        1, 5, 6, 1, 6, 2,
+        4, 0, 3, 4, 3, 7
+    };
+    size_t numIndices = _countof(indices);
 
-    for (size_t i = 0; i < NUM_CELLS; i++) {
-        for (size_t j = 0; j < NUM_CELLS; j++) {
-            surface.indices[idx++] = i * NUM_VERTICES + j;
-            surface.indices[idx++] = (i + 1) * NUM_VERTICES + j;
-            surface.indices[idx++] = (i + 1) * NUM_VERTICES + j + 1;
+    shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
 
-            surface.indices[idx++] = i * NUM_VERTICES + j;
-            surface.indices[idx++] = (i + 1) * NUM_VERTICES + j + 1;
-            surface.indices[idx++] = i * NUM_VERTICES + j + 1;
-        }
-    }
+	float height = tan(60.0f * DEG_2_RAD_OVER_2);
+	float width = height * 1024.0f / 768.0f;
+    float right = width;
+    float left = -width;
+    float top = height;
+    float bottom = -height;
+    float nearPlane = 1.0f;
+    float farPlane = 1000.0f;
 
-    Mesh waterMesh(MESH_TYPE_DYNAMIC);
-    waterMesh.AddSurface(&surface);
+    float w = right - left;
+    float h = top - bottom;
+    float dz = nearPlane - farPlane;
+    float z2 = 2.0f * nearPlane;
 
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
-    waterMesh.Initialize(vertexAttributes);
+    Matrix4x4 projection;
+    projection[0][0] = z2 / w;
+    projection[1][1] = z2 / h;
+    projection[2][2] = farPlane / dz;
+    projection[3][2] = -1.0f;
+    projection[2][3] = nearPlane * farPlane / dz;
+    projection[3][3] = 0.0f;
 
-    // Material surface
-    Shader* waterShader = Renderer::GetInstance()->CreateShader();
-    waterShader->SetSourceFile("Shaders/vert", "Shaders/frag");
+    Matrix4x4 view;
+    view[2][3] = -5.0f;
 
-    Material waterMaterial(waterShader);
-    Texture2D* waterTexture = Renderer::GetInstance()->CreateTexture2DFromFile("Media/water.jpg");
-    waterMaterial.SetUniformTexture("waterTexture", waterTexture);
+    PassConstants_t initialPassConstants;
+    initialPassConstants.projectionMatrix = projection.Transpose();
+    shared_ptr<ConstantBuffer> constantBuffer = hardwareResourceCreator->CreateConstantBuffer((void*)&initialPassConstants, true, false, sizeof(PassConstants_t));
 
-    // Water node
-    Node waterNode;
-    waterNode.SetMaterial(&waterMaterial);
-    waterNode.SetMesh(&waterMesh);
-    Renderer::GetInstance()->GetSceneTree().AddNode(&waterNode);
+    shared_ptr<FragmentShader> fragmentShader = hardwareResourceCreator->CreateFragmentShader();
+    bool init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.hlsl");
 
-    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 0.0f, -3.5f), Vector3::ZERO);
+    shared_ptr<VertexShader> vertexShader = hardwareResourceCreator->CreateVertexShader();
+    init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.hlsl");
+    init = vertexShader->CreateInputLayout(&vertexFormat);
 
-    // Create the OIS system if present
-#ifdef OIS_AVAILABLE
+    renderDevice->SetFragmentShader(fragmentShader);
+    renderDevice->SetVertexShader(vertexShader);
 
-    size_t windowHandle = (size_t)window.GetHandle();
-
-    OIS::ParamList paramList;
-    paramList.insert(pair<string, string>("WINDOW", to_string(windowHandle)));
-
-#if defined OIS_WIN32_PLATFORM
-    paramList.insert(pair<string, string>("w32_mouse", "DISCL_FOREGROUND"));
-    paramList.insert(pair<string, string>("w32_mouse", "DISCL_NONEXCLUSIVE"));
-#elif defined OIS_LINUX_PLATFORM
-    paramList.insert(pair<string, string>("x11_mouse_grab", "false"));
-    paramList.insert(pair<string, string>("x11_mouse_hide", "false"));
-#endif
-
-    OIS::InputManager* inputManager = OIS::InputManager::createInputSystem(paramList);
-
-    OIS::Keyboard* keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
-    OIS::Mouse* mouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, false));
-
-    const OIS::MouseState& ms = mouse->getMouseState();
-    ms.width = window.GetWidth();
-    ms.height = window.GetHeight();
-#endif
-
-    //Renderer::GetInstance()->SetRenderFillMode(RENDER_MODE_WIREFRAME);
-    float splashForce = 0.1f;
-    float damping = 0.999f;
-    float maxHeight = 0.15f;
+    PassConstants_t* passConstants;
+    Matrix4x4 modelMatrix;
+    float angle = 0.0f;
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
 
-        // Poll the mouse if OIS is present
-#ifdef OIS_AVAILABLE
-        keyboard->capture();
+        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+        
+        void* data = constantBuffer->Map(MapFlag_t::WRITE_DISCARD);
 
-        if (keyboard->isKeyDown(OIS::KC_ESCAPE)) {
-            break;
-        }
+        passConstants = (PassConstants_t*)data;
+        passConstants->projectionMatrix = projection.Transpose();
+        passConstants->viewMatrix = view.Transpose();
+        passConstants->modelMatrix = modelMatrix.Transpose();
 
-        mouse->capture();
+        constantBuffer->Unmap();
 
-        // If we clicked on the surface, get the point on the water plane and send it to the shader
-        // for it to compute the ripples
+        Matrix4x4 rotX, rotY;
+        rotX.RotationAroundX(angle);
+        rotY.RotationAroundY(angle);
+        modelMatrix = rotX * rotY;
+        angle += 0.001f;
 
-        if (mouse->getMouseState().buttonDown(OIS::MB_Left)) {
-            Vector3 pos = Renderer::GetInstance()->ScreenToWorldPoint(Vector2((float)mouse->getMouseState().X.abs, (float)mouse->getMouseState().Y.abs));
+        renderDevice->SetVertexShaderConstantBuffer(constantBuffer);
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
 
-            // Transform the position into the range [0, 1] so that we can map it as texture coordinates of the water plane
-            // Because the water plane ranges from (-1, -1) to (1, 1), the transformation is trivial
-            Vector2 point;
-            point.y = pos.x / 2.0f + 0.5f;
-            point.x = pos.y / 2.0f + 0.5f;
-
-            if (point.x >= 0.0f && point.y >= 0.0f && point.x <= 1.0f && point.y <= 1.0f) {
-                //waterShader->SetUniformVector2("disturbancePoint", pos.x, pos.y);
-                /*
-                size_t i = (size_t) min(maxf(point.x * NUM_VERTICES, 1), NUM_VERTICES - 1);
-                size_t j = (size_t) minsf(maxf(point.y * NUM_VERTICES, 1), NUM_VERTICES - 1);
-                size_t idx = i * NUM_VERTICES + j;
-
-                buffer[idx].z = splashForce;
-                buffer[idx + 1].z = splashForce;
-                buffer[idx - 1].z = splashForce;
-                buffer[(i + 1) * NUM_VERTICES + j].z = splashForce;
-                buffer[(i - 1) * NUM_VERTICES + j].z = splashForce;
-                buffer[(i + 1) * NUM_VERTICES + j + 1].z = splashForce;
-                buffer[(i + 1) * NUM_VERTICES + j - 1].z = splashForce;
-                buffer[(i - 1) * NUM_VERTICES + j + 1].z = splashForce;
-                buffer[(i - 1) * NUM_VERTICES + j - 1].z = splashForce;
-                */
-            } else {
-                //waterShader->SetUniformVector2("disturbancePoint", -1.0f, -1.0f);
-            }
-        }
-#endif
-        for (size_t i = 1; i < NUM_VERTICES - 1; i++) {
-            for (size_t j = 1; j < NUM_VERTICES - 1; j++) {
-                idx = i * NUM_VERTICES + j;
-
-                buffer[idx].z = (buffer2[idx - 1].z + buffer2[idx + 1].z +
-                                 buffer2[(i - 1) * NUM_VERTICES + j].z +
-                                 buffer2[(i + 1) * NUM_VERTICES + j].z) / 2.0f - buffer[idx].z;
-                buffer[idx].z *= damping;
-            }
-        }
-
-        for (size_t i = 1; i < NUM_VERTICES - 1; i++) {
-            for (size_t j = 1; j < NUM_VERTICES - 1; j++) {
-                idx = i * NUM_VERTICES + j;
-
-                surface.normals[idx] = (buffer[idx + 1] - buffer[idx - 1]).Normalized();
-            }
-        }
-
-        buffer2 = surface.vertices;
-        surface.vertices = buffer;
-        buffer = buffer2;
-        waterMesh.UpdateMeshData();
-
-        Renderer::GetInstance()->Clear();
-        Renderer::GetInstance()->Render();
-        Renderer::GetInstance()->EndRender();
-
-        Renderer::GetInstance()->PresentFrame();
+        renderContext->SwapBuffers();
     }
-
-    delete[] buffer;
 
     return 0;
 }

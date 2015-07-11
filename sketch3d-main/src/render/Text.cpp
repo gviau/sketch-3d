@@ -193,10 +193,10 @@ void Text::Write(const string& text, size_t x, size_t y) {
 
         unsigned short idx = 0;
         if (!textIndices_.empty()) {
-            idx = textIndices_.back() + ((Renderer::GetInstance()->GetCullingMethod() == CULLING_METHOD_BACK_FACE) ? 2 : 1);
+            idx = textIndices_.back() + ((Renderer::GetInstance()->GetCullingMethod() == CullingMethod_t::BACK_FACE) ? 2 : 1);
         }
 
-        if (Renderer::GetInstance()->GetCullingMethod() == CULLING_METHOD_BACK_FACE) {
+        if (Renderer::GetInstance()->GetCullingMethod() == CullingMethod_t::BACK_FACE) {
             textIndices_.push_back(idx); textIndices_.push_back(idx + 2); textIndices_.push_back(idx + 1);
             textIndices_.push_back(idx); textIndices_.push_back(idx + 3); textIndices_.push_back(idx + 2);
         } else {

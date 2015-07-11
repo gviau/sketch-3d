@@ -10,15 +10,6 @@ namespace Sketch3D {
 class Sphere;
 
 /**
- * @enum RenderSystem_t
- * Enum that give the possible render system that one can use
- */
-enum RenderSystem_t {
-	RENDER_SYSTEM_OPENGL,
-	RENDER_SYSTEM_DIRECT3D9
-};
-
-/**
  * @struct FrustumPlanes_t
  * Struct containing the 6 planes of the view frustum
  */
@@ -37,16 +28,24 @@ struct SKETCH_3D_API FrustumPlanes_t {
 };
 
 /**
+ * @enum RenderSystem_t
+ * Enum that give the possible render system that one can use
+ */
+enum RenderSystem_t {
+	OPENGL,
+	DIRECT3D9,
+    DIRECT3D10,
+    DIRECT3D11
+};
+
+/**
  * @enum DepthStencilBits_t
  * Number of allocated bits for the depth and stencil components per pixel
  */
 enum DepthStencilBits_t {
-    DEPTH_STENCIL_BITS_D16,
-    DEPTH_STENCIL_BITS_D15S1,
-    DEPTH_STENCIL_BITS_D24S8,
-    DEPTH_STENCIL_BITS_D24X8,
-    DEPTH_STENCIL_BITS_D24X4S4,
-    DEPTH_STENCIL_BITS_D32
+    D16,
+    D24S8,
+    D32
 };
 
 /**
@@ -54,12 +53,11 @@ enum DepthStencilBits_t {
  * Specifies the supported format of a display adapter.
  */
 enum DisplayFormat_t {
-    DISPLAY_FORMAT_A1R5G5B5,
-    DISPLAY_FORMAT_A2R10G10B10,
-    DISPLAY_FORMAT_A8R8G8B8,
-    DISPLAY_FORMAT_R5G6B5,
-    DISPLAY_FORMAT_X1R5G5B5,
-    DISPLAY_FORMAT_X8R8G8B8
+    A1R5G5B5,
+    A2R10G10B10,
+    A8R8G8B8,
+    R5G6B5,
+    X8R8G8B8
 };
 
 /**

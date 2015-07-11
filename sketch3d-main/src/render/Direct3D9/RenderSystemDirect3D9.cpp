@@ -130,8 +130,9 @@ void RenderSystemDirect3D9::SetViewport(size_t x, size_t y, size_t width, size_t
 }
 
 Shader* RenderSystemDirect3D9::CreateShader() {
-    shaders_.push_back(new ShaderDirect3D9(device_));
-    return shaders_.back();
+    //shaders_.push_back(new ShaderDirect3D9(device_));
+    //return shaders_.back();
+    return nullptr;
 }
 
 Texture2D* RenderSystemDirect3D9::CreateTexture2D() const {
@@ -163,9 +164,11 @@ void RenderSystemDirect3D9::BindShader(const Shader* shader) {
             device_->SetVertexShader(nullptr);
             device_->SetPixelShader(nullptr);
         } else {
+            /*
             const ShaderDirect3D9* shaderDirect3D9 = static_cast<const ShaderDirect3D9*>(shader);
             device_->SetVertexShader(shaderDirect3D9->vertexShader_);
             device_->SetPixelShader(shaderDirect3D9->fragmentShader_);
+            */
         }
 
         boundShader_ = shader;
@@ -254,10 +257,10 @@ void RenderSystemDirect3D9::CreateTextShader() {
         "}"
     ;
 
-    textShader_ = Renderer::GetInstance()->CreateShader();
-    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
-        Logger::GetInstance()->Error("Couldn't create text shader");
-    }
+    //textShader_ = Renderer::GetInstance()->CreateShader();
+//    if (!textShader_->SetSource(textVertexShaderSource, textFragmentShaderSource)) {
+   //     Logger::GetInstance()->Error("Couldn't create text shader");
+   // }
 }
 
 }

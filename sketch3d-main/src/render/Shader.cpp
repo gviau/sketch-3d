@@ -1,45 +1,26 @@
 #include "render/Shader.h"
 
-#include "render/Texture.h"
-
 #include "system/Logger.h"
 
+#include <fstream>
+using namespace std;
+
 namespace Sketch3D {
-
-string builtUniformNames[] = {
-    "model",
-    "view",
-    "transInvView",
-    "projection",
-    "modelView",
-    "transInvModelView",
-    "viewProjection",
-    "modelViewProjection",
-    "texture0",
-    "texture1",
-    "texture2",
-    "texture3",
-};
-
-uint16_t Shader::nextAvailableId_ = 0;
-
-Shader::Shader() : id_(MAX_SHADER_ID) {
-    if (nextAvailableId_ == MAX_SHADER_ID) {
-        Logger::GetInstance()->Error("Maximum number of shaders created (" + to_string(MAX_SHADER_ID) + ")");
-    } else {
-        id_ = nextAvailableId_++;
+bool Shader::InitializeFromFile(const string& filename) {
+    ifstream shaderFile(filename);
+    if (!shaderFile.is_open()) {
+        Logger::GetInstance()->Error("Couldn't open shader file: " + filename);
+        return false;
     }
-}
 
-Shader::~Shader() {
-}
+    string source;
+    shaderFile.seekg(0, std::ios::end);
+    source.resize((size_t) shaderFile.tellg());
+    shaderFile.seekg(0, std::ios::beg);
 
-void SetBuiltinUniformName(BuiltinUniform_t builtinUniform, const string& uniformName) {
-    builtUniformNames[builtinUniform] = uniformName;
-}
+    shaderFile.read(&source[0], source.length());
 
-const string& GetBuiltinUniformName(BuiltinUniform_t builtinUniform) {
-    return builtUniformNames[builtinUniform];
+    return InitializeFromSource(source);
 }
 
 }

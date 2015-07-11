@@ -91,9 +91,9 @@ Node::~Node() {
 
 void Node::Render() {
     // Commit state changes
-    Renderer::GetInstance()->GetRenderStateCache()->ApplyRenderStateChanges();
+    //Renderer::GetInstance()->GetRenderStateCache()->ApplyRenderStateChanges();
 
-	Shader* shader = material_->GetShader();
+	//Shader* shader = material_->GetShader();
 
     const Matrix4x4& projection = Renderer::GetInstance()->GetProjectionMatrix();
     const Matrix4x4& viewProjection = Renderer::GetInstance()->GetViewProjectionMatrix();
@@ -105,19 +105,20 @@ void Node::Render() {
     Matrix4x4 modelView(view * model);
 
     // Set the uniform matrices
+    /*
     Renderer::GetInstance()->BindShader(shader);
     shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW_PROJECTION), modelViewProjection );
     shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL_VIEW), modelView );
     shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::MODEL), model );
     shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::VIEW), view );
     shader->SetUniformMatrix4x4( GetBuiltinUniformName(BuiltinUniform_t::PROJECTION), projection );
-
+    */
     // Get the rendering data
     BufferObject** bufferObjects;
     vector<SurfaceTriangles_t*> surfaces;
     mesh_->GetRenderInfo(bufferObjects, surfaces);
 
-    material_->ApplyMaterial();
+    //material_->ApplyMaterial();
 
     // Render the mesh
     for (size_t i = 0; i < surfaces.size(); i++) {
@@ -125,8 +126,8 @@ void Node::Render() {
         for (size_t j = 0; j < surfaces[i]->numTextures; j++) {
             Texture2D* texture = surfaces[i]->textures[j];
             if (texture != nullptr) {
-                BuiltinUniform_t builtinUniformTexture = (BuiltinUniform_t)((size_t)BuiltinUniform_t::TEXTURE_0 + j);
-                shader->SetUniformTexture( GetBuiltinUniformName(builtinUniformTexture), texture );
+                //BuiltinUniform_t builtinUniformTexture = (BuiltinUniform_t)((size_t)BuiltinUniform_t::TEXTURE_0 + j);
+                //shader->SetUniformTexture( GetBuiltinUniformName(builtinUniformTexture), texture );
             }
         }
 
@@ -328,7 +329,7 @@ void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, 
                 addMeshToRenderQueue = false;
             }
         }
-
+        /*
         if (addMeshToRenderQueue) {
             if (material_->GetTransluencyType() == TRANSLUENCY_TYPE_OPAQUE) {
                 opaqueRenderQueue.AddNode(this);
@@ -336,6 +337,7 @@ void Node::Render(const FrustumPlanes_t& frustumPlanes, bool useFrustumCulling, 
                 transparentRenderQueue.AddNode(this);
             }
         }
+        */
     }
 
 	map<string, Node*>::const_iterator it = children_.begin();

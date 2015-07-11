@@ -37,13 +37,17 @@ source_group("Header Files\\math" FILES ${MATH_HEADER_FILES})
 # Render files
 set(RENDER_SOURCE_FILES
 	src/render/AnimationState.cpp
+	src/render/Buffer.cpp
 	src/render/BufferObject.cpp
 	src/render/BufferObjectManager.cpp
+	src/render/HardwareResource.cpp
+	src/render/HardwareResourceCreator.cpp
 	src/render/Material.cpp
 	src/render/Mesh.cpp
 	src/render/ModelManager.cpp
 	src/render/Node.cpp
 	src/render/RenderContext.cpp
+	src/render/RenderDevice.cpp
 	src/render/Renderer.cpp
 	src/render/Renderer_Common.cpp
 	src/render/RenderQueue.cpp
@@ -51,26 +55,35 @@ set(RENDER_SOURCE_FILES
 	src/render/RenderStateCache.cpp
     src/render/RenderSystem.cpp
 	src/render/RenderTexture.cpp
+	src/render/Resource.cpp
 	src/render/SceneTree.cpp
 	src/render/Shader.cpp
 	src/render/Skeleton.cpp
 	src/render/SkinnedMesh.cpp
+	src/render/SubMesh.cpp
 	src/render/Text.cpp
 	src/render/Texture.cpp
 	src/render/Texture2D.cpp
 	src/render/Texture3D.cpp
 	src/render/TextureManager.cpp
+	src/render/VertexFormat.cpp
 )
 
 set(RENDER_HEADER_FILES
 	include/render/AnimationState.h
+	include/render/Buffer.h
 	include/render/BufferObject.h
 	include/render/BufferObjectManager.h
+	include/render/ConstantBuffers.h
+	include/render/HardwareResource.h
+	include/render/HardwareResourceCreator.h
 	include/render/Material.h
 	include/render/Mesh.h
 	include/render/ModelManager.h
 	include/render/Node.h
 	include/render/RenderContext.h
+	include/render/RenderDevice.h
+	include/render/RenderDevice_Common.h
 	include/render/Renderer.h
 	include/render/Renderer_Common.h
 	include/render/RenderQueue.h
@@ -79,15 +92,18 @@ set(RENDER_HEADER_FILES
 	include/render/RenderStateCache.h
 	include/render/RenderSystem.h
 	include/render/RenderTexture.h
+	include/render/Resource.h
 	include/render/SceneTree.h
 	include/render/Shader.h
 	include/render/Skeleton.h
 	include/render/SkinnedMesh.h
+	include/render/SubMesh.h
 	include/render/Text.h
 	include/render/Texture.h
 	include/render/Texture2D.h
 	include/render/Texture3D.h
 	include/render/TextureManager.h
+	include/render/VertexFormat.h
 )
 source_group("Source Files\\render" FILES ${RENDER_SOURCE_FILES})
 source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
@@ -95,6 +111,7 @@ source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
 set(RENDER_OPENGL_SOURCE_FILES
 	src/render/OpenGL/BufferObjectManagerOpenGL.cpp
 	src/render/OpenGL/BufferObjectOpenGL.cpp
+	src/render/OpenGL/RenderDeviceOpenGL.cpp
 	src/render/OpenGL/RenderStateCacheOpenGL.cpp
 	src/render/OpenGL/RenderSystemOpenGL.cpp
 	src/render/OpenGL/RenderTextureOpenGL.cpp
@@ -108,6 +125,7 @@ set(RENDER_OPENGL_HEADER_FILES
 	include/render/OpenGL/BufferObjectManagerOpenGL.h
 	include/render/OpenGL/BufferObjectOpenGL.h
 	include/render/OpenGL/RenderContextOpenGL.h
+	include/render/OpenGL/RenderDeviceOpenGL.h
 	include/render/OpenGL/RenderStateCacheOpenGL.h
 	include/render/OpenGL/RenderSystemOpenGL.h
 	include/render/OpenGL/RenderTextureOpenGL.h
@@ -131,6 +149,7 @@ if (WIN32)
 		src/render/Direct3D9/BufferObjectDirect3D9.cpp
 		src/render/Direct3D9/BufferObjectManagerDirect3D9.cpp
 		src/render/Direct3D9/RenderContextDirect3D9.cpp
+		src/render/Direct3D9/RenderDeviceDirect3D9.cpp
 		src/render/Direct3D9/RenderStateCacheDirect3D9.cpp
 		src/render/Direct3D9/RenderSystemDirect3D9.cpp
 		src/render/Direct3D9/RenderTextureDirect3D9.cpp
@@ -143,6 +162,7 @@ if (WIN32)
 		include/render/Direct3D9/BufferObjectDirect3D9.h
 		include/render/Direct3D9/BufferObjectManagerDirect3D9.h
 		include/render/Direct3D9/RenderContextDirect3D9.h
+		include/render/Direct3D9/RenderDeviceDirect3D9.h
 		include/render/Direct3D9/RenderStateCacheDirect3D9.h
 		include/render/Direct3D9/RenderSystemDirect3D9.h
 		include/render/Direct3D9/RenderTextureDirect3D9.h
@@ -151,8 +171,27 @@ if (WIN32)
 		include/render/Direct3D9/Texture3DDirect3D9.h
 	)
 	
+	set(RENDER_DIRECT3D11_SOURCE_FILES
+		src/render/Direct3D11/BufferDirect3D11.cpp
+		src/render/Direct3D11/HardwareResourceCreatorDirect3D11.cpp
+		src/render/Direct3D11/RenderContextDirect3D11.cpp
+		src/render/Direct3D11/RenderDeviceDirect3D11.cpp
+		src/render/Direct3D11/ShaderDirect3D11.cpp
+	)
+	
+	set(RENDER_DIRECT3D11_HEADER_FILES
+		include/render/Direct3D11/BufferDirect3D11.h
+		include/render/Direct3D11/HardwareResourceCreatorDirect3D11.h
+		include/render/Direct3D11/RenderContextDirect3D11.h
+		include/render/Direct3D11/RenderDeviceDirect3D11.h
+		include/render/Direct3D11/ShaderDirect3D11.h
+	)
+	
 	source_group("Source Files\\render\\Direct3D9" FILES ${RENDER_DIRECT3D9_SOURCE_FILES})
 	source_group("Header Files\\render\\Direct3D9" FILES ${RENDER_DIRECT3D9_HEADER_FILES})
+	
+	source_group("Source Files\\render\\Direct3D11" FILES ${RENDER_DIRECT3D11_SOURCE_FILES})
+	source_group("Header Files\\render\\Direct3D11" FILES ${RENDER_DIRECT3D11_HEADER_FILES})
 elseif (UNIX)
     set(RENDER_OPENGL_SOURCE_FILES
         ${RENDER_OPENGL_SOURCE_FILES}
@@ -243,6 +282,7 @@ add_library(
 	${RENDER_SOURCE_FILES}
 	${RENDER_OPENGL_SOURCE_FILES}
 	${RENDER_DIRECT3D9_SOURCE_FILES}
+	${RENDER_DIRECT3D11_SOURCE_FILES}
 	
 	${SYSTEM_SOURCE_FILES}
 	${SYSTEM_PLATFORM_SOURCE_FILES}
@@ -252,6 +292,7 @@ add_library(
 	${RENDER_HEADER_FILES}
 	${RENDER_OPENGL_HEADER_FILES}
 	${RENDER_DIRECT3D9_HEADER_FILES}
+	${RENDER_DIRECT3D11_HEADER_FILES}
 	
 	${SYSTEM_HEADER_FILES}
 	${SYSTEM_PLATFORM_HEADER_FILES}

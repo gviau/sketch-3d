@@ -2,10 +2,10 @@
 
 namespace Sketch3D {
 RenderStateCache::RenderStateCache() {
-    oldCullingMethod_ = cullingMethod_ = CULLING_METHOD_BACK_FACE;
+    oldCullingMethod_ = cullingMethod_ = CullingMethod_t::BACK_FACE;
     oldIsDepthTestEnabled_ = isDepthTestEnabled_ = true;
     oldDepthComparisonFunction_ = depthComparisonFunction_ = DEPTH_FUNC_LESS;
-    oldRenderMode_ = renderMode_ = RENDER_MODE_FILL;
+    oldRenderMode_ = renderMode_ = FillMode_t::FILL;
 
     oldIsDepthWriteEnabled_ = isDepthWriteEnabled_ = true;
     oldIsColorWriteEnabled_ = isColorWriteEnabled_ = true;
@@ -105,7 +105,7 @@ void RenderStateCache::SetBlendingFactor(BlendingFactor_t srcFactor, BlendingFac
     destinationBlendingFactor_ = dstFactor;
 }
 
-void RenderStateCache::SetRenderFillMode(RenderMode_t mode) {
+void RenderStateCache::SetRenderFillMode(FillMode_t mode) {
     renderMode_ = mode;
 }
 

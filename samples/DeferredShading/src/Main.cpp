@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     renderParameters.refreshRate = 0;
     renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
 
-    Renderer::GetInstance()->Initialize(RENDER_SYSTEM_OPENGL, window, renderParameters);
+    Renderer::GetInstance()->Initialize(RenderSystem_t::OPENGL, window, renderParameters);
     Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
 
     // Load the meshes
