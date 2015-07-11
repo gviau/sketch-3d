@@ -145,32 +145,6 @@ if (WIN32)
 		include/render/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
-	set(RENDER_DIRECT3D9_SOURCE_FILES
-		src/render/Direct3D9/BufferObjectDirect3D9.cpp
-		src/render/Direct3D9/BufferObjectManagerDirect3D9.cpp
-		src/render/Direct3D9/RenderContextDirect3D9.cpp
-		src/render/Direct3D9/RenderDeviceDirect3D9.cpp
-		src/render/Direct3D9/RenderStateCacheDirect3D9.cpp
-		src/render/Direct3D9/RenderSystemDirect3D9.cpp
-		src/render/Direct3D9/RenderTextureDirect3D9.cpp
-		src/render/Direct3D9/ShaderDirect3D9.cpp
-		src/render/Direct3D9/Texture2DDirect3D9.cpp
-		src/render/Direct3D9/Texture3DDirect3D9.cpp
-	)
-	
-	set(RENDER_DIRECT3D9_HEADER_FILES
-		include/render/Direct3D9/BufferObjectDirect3D9.h
-		include/render/Direct3D9/BufferObjectManagerDirect3D9.h
-		include/render/Direct3D9/RenderContextDirect3D9.h
-		include/render/Direct3D9/RenderDeviceDirect3D9.h
-		include/render/Direct3D9/RenderStateCacheDirect3D9.h
-		include/render/Direct3D9/RenderSystemDirect3D9.h
-		include/render/Direct3D9/RenderTextureDirect3D9.h
-		include/render/Direct3D9/ShaderDirect3D9.h
-		include/render/Direct3D9/Texture2DDirect3D9.h
-		include/render/Direct3D9/Texture3DDirect3D9.h
-	)
-	
 	set(RENDER_DIRECT3D11_SOURCE_FILES
 		src/render/Direct3D11/BufferDirect3D11.cpp
 		src/render/Direct3D11/HardwareResourceCreatorDirect3D11.cpp
@@ -186,9 +160,6 @@ if (WIN32)
 		include/render/Direct3D11/RenderDeviceDirect3D11.h
 		include/render/Direct3D11/ShaderDirect3D11.h
 	)
-	
-	source_group("Source Files\\render\\Direct3D9" FILES ${RENDER_DIRECT3D9_SOURCE_FILES})
-	source_group("Header Files\\render\\Direct3D9" FILES ${RENDER_DIRECT3D9_HEADER_FILES})
 	
 	source_group("Source Files\\render\\Direct3D11" FILES ${RENDER_DIRECT3D11_SOURCE_FILES})
 	source_group("Header Files\\render\\Direct3D11" FILES ${RENDER_DIRECT3D11_HEADER_FILES})
@@ -281,7 +252,6 @@ add_library(
 	
 	${RENDER_SOURCE_FILES}
 	${RENDER_OPENGL_SOURCE_FILES}
-	${RENDER_DIRECT3D9_SOURCE_FILES}
 	${RENDER_DIRECT3D11_SOURCE_FILES}
 	
 	${SYSTEM_SOURCE_FILES}
