@@ -36,73 +36,31 @@ source_group("Header Files\\math" FILES ${MATH_HEADER_FILES})
 
 # Render files
 set(RENDER_SOURCE_FILES
-	src/render/AnimationState.cpp
 	src/render/Buffer.cpp
-	src/render/BufferObject.cpp
-	src/render/BufferObjectManager.cpp
 	src/render/HardwareResource.cpp
 	src/render/HardwareResourceCreator.cpp
-	src/render/Material.cpp
-	src/render/Mesh.cpp
-	src/render/ModelManager.cpp
-	src/render/Node.cpp
 	src/render/RenderContext.cpp
 	src/render/RenderDevice.cpp
-	src/render/Renderer.cpp
 	src/render/Renderer_Common.cpp
-	src/render/RenderQueue.cpp
-	src/render/RenderQueueItem.cpp
-	src/render/RenderStateCache.cpp
-    src/render/RenderSystem.cpp
-	src/render/RenderTexture.cpp
 	src/render/Resource.cpp
-	src/render/SceneTree.cpp
 	src/render/Shader.cpp
-	src/render/Skeleton.cpp
-	src/render/SkinnedMesh.cpp
-	src/render/SubMesh.cpp
-	src/render/Text.cpp
 	src/render/Texture.cpp
-	src/render/Texture2D.cpp
-	src/render/Texture3D.cpp
-	src/render/TextureManager.cpp
 	src/render/VertexFormat.cpp
 )
 
 set(RENDER_HEADER_FILES
-	include/render/AnimationState.h
 	include/render/Buffer.h
-	include/render/BufferObject.h
-	include/render/BufferObjectManager.h
 	include/render/ConstantBuffers.h
 	include/render/HardwareResource.h
 	include/render/HardwareResourceCreator.h
-	include/render/Material.h
-	include/render/Mesh.h
-	include/render/ModelManager.h
-	include/render/Node.h
 	include/render/RenderContext.h
 	include/render/RenderDevice.h
 	include/render/RenderDevice_Common.h
-	include/render/Renderer.h
 	include/render/Renderer_Common.h
-	include/render/RenderQueue.h
-	include/render/RenderQueueItem.h
 	include/render/RenderState.h
-	include/render/RenderStateCache.h
-	include/render/RenderSystem.h
-	include/render/RenderTexture.h
 	include/render/Resource.h
-	include/render/SceneTree.h
 	include/render/Shader.h
-	include/render/Skeleton.h
-	include/render/SkinnedMesh.h
-	include/render/SubMesh.h
-	include/render/Text.h
 	include/render/Texture.h
-	include/render/Texture2D.h
-	include/render/Texture3D.h
-	include/render/TextureManager.h
 	include/render/VertexFormat.h
 )
 source_group("Source Files\\render" FILES ${RENDER_SOURCE_FILES})
