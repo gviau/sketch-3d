@@ -8,6 +8,12 @@ namespace Sketch3D {
 BufferDirect3D11::BufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : context_(context), buffer_(nullptr) {
 }
 
+BufferDirect3D11::~BufferDirect3D11() {
+    if (buffer_ != nullptr) {
+        buffer_->Release();
+    }
+}
+
 ID3D11Buffer* const BufferDirect3D11::GetBuffer() const {
     return buffer_;
 }
