@@ -26,6 +26,9 @@ class RenderContext;
 class RenderTarget;
 class SamplerState;
 class Texture;
+class Texture1D;
+class Texture2D;
+class Texture3D;
 class VertexBuffer;
 class VertexFormat;
 class VertexShader;
@@ -53,15 +56,19 @@ class SKETCH_3D_API RenderDevice {
         // SHADERS STUFF
         virtual shared_ptr<FragmentShader>& GetFragmentShader() = 0;
         virtual void SetFragmentShader(shared_ptr<FragmentShader> fragmentShader) = 0;
-        virtual void SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
+        virtual bool SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
         virtual void SetFragmentShaderSamplerState(SamplerState* samplerState, unsigned int slot) = 0;
-        virtual void SetFragmentShaderTexture(Texture* texture, unsigned int slot) = 0;
+        virtual bool SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
+        virtual bool SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
+        virtual bool SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;
 
         virtual shared_ptr<VertexShader>& GetVertexShader() = 0;
         virtual void SetVertexShader(shared_ptr<VertexShader> vertexShader) = 0;
-        virtual void SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
+        virtual bool SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
         virtual void SetVertexShaderSamplerState(SamplerState* samplerState, unsigned int slot) = 0;
-        virtual void SetVertexShaderTexture(Texture* texture, unsigned int slot) = 0;
+        virtual bool SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
+        virtual bool SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
+        virtual bool SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;
 
         // DRAWING STUFF
         virtual bool Draw(PrimitiveTopology_t primitiveTopology, const shared_ptr<VertexBuffer>& vertexBuffer, size_t startVertexLocation) = 0;

@@ -5,7 +5,49 @@
 #include "system/Logger.h"
 
 namespace Sketch3D {
-TextureDirect3D11::TextureDirect3D11(ID3D11Device* device) {
+TextureDirect3D11::TextureDirect3D11(ID3D11Device* device) : device_(device), shaderResourceView_(nullptr) {
+}
+
+TextureDirect3D11::~TextureDirect3D11() {
+    if (shaderResourceView_ != nullptr) {
+        shaderResourceView_->Release();
+    }
+}
+
+ID3D11ShaderResourceView* TextureDirect3D11::GetShaderResourceView() const {
+    return shaderResourceView_;
+}
+
+bool TextureDirect3D11::CreateShaderResourceView(ID3D11Resource* resource, TextureFormat_t format, TextureType_t textureType) {
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+    resourceViewDesc.Format = GetD3DTextureFormat(format);
+    
+    switch (textureType) {
+        case TextureType_t::TYPE_1D:
+            resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+            resourceViewDesc.Texture1D.MipLevels = 1;
+            resourceViewDesc.Texture1D.MostDetailedMip = 0;
+            break;
+
+        case TextureType_t::TYPE_2D:
+            resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            resourceViewDesc.Texture2D.MipLevels = 1;
+            resourceViewDesc.Texture2D.MostDetailedMip = 0;
+            break;
+
+        case TextureType_t::TYPE_3D:
+            resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+            resourceViewDesc.Texture3D.MipLevels = 1;
+            resourceViewDesc.Texture3D.MostDetailedMip = 0;
+            break;
+    }
+
+    HRESULT hr = device_->CreateShaderResourceView(resource, &resourceViewDesc, &shaderResourceView_);
+    if (FAILED(hr)) {
+        return false;
+    }
+
+    return true;
 }
 
 Texture1DDirect3D11::Texture1DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) :
@@ -59,6 +101,8 @@ Texture2DDirect3D11::Texture2DDirect3D11(ID3D11Device* device, TextureMap* textu
     HRESULT hr = device->CreateTexture2D(&textureDesc, &initialData, &texture_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create 2D texture with ID: " + to_string(resourceId_));
+    } else if (!CreateShaderResourceView(texture_, textureFormat_, TextureType_t::TYPE_2D)) {
+        Logger::GetInstance()->Error("Couldn't create the shader resource view from resource with ID: " + to_string(resourceId_));
     }
 }
 

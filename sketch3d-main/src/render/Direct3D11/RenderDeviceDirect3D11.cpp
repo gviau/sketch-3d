@@ -7,6 +7,7 @@
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/RenderContextDirect3D11.h"
 #include "render/Direct3D11/ShaderDirect3D11.h"
+#include "render/Direct3D11/TextureDirect3D11.h"
 
 #pragma warning( disable : 4005 )
 
@@ -102,21 +103,59 @@ void RenderDeviceDirect3D11::SetFragmentShader(shared_ptr<FragmentShader> fragme
     context_->PSSetShader(shader->GetShader(), nullptr, 0);
 }
 
-void RenderDeviceDirect3D11::SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) {
+bool RenderDeviceDirect3D11::SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) {
     if (fragmentShader_ == nullptr || constantBuffer == nullptr) {
-        return;
+        return false;
     }
 
     ConstantBufferDirect3D11* d3dConstantBuffer = static_cast<ConstantBufferDirect3D11*>(constantBuffer.get());
 
     ID3D11Buffer* const buffer = d3dConstantBuffer->GetBuffer();
     context_->PSSetConstantBuffers(0, 1, &buffer);
+
+    return true;
 }
 
 void RenderDeviceDirect3D11::SetFragmentShaderSamplerState(SamplerState* state, unsigned int slot) {
 }
 
-void RenderDeviceDirect3D11::SetFragmentShaderTexture(Texture* texture, unsigned int slot) {
+bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture1DDirect3D11* d3dTexture = static_cast<Texture1DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->PSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
+bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture2DDirect3D11* d3dTexture = static_cast<Texture2DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->PSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
+bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture3DDirect3D11* d3dTexture = static_cast<Texture3DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->PSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
 }
 
 shared_ptr<VertexShader>& RenderDeviceDirect3D11::GetVertexShader() {
@@ -136,21 +175,59 @@ void RenderDeviceDirect3D11::SetVertexShader(shared_ptr<VertexShader> vertexShad
     context_->VSSetShader(shader->GetShader(), nullptr, 0);
 }
 
-void RenderDeviceDirect3D11::SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) {
+bool RenderDeviceDirect3D11::SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) {
     if (vertexShader_ == nullptr || constantBuffer == nullptr) {
-        return;
+        return false;
     }
 
     ConstantBufferDirect3D11* d3dConstantBuffer = static_cast<ConstantBufferDirect3D11*>(constantBuffer.get());
 
     ID3D11Buffer* const buffer = d3dConstantBuffer->GetBuffer();
     context_->VSSetConstantBuffers(0, 1, &buffer);
+
+    return true;
 }
 
 void RenderDeviceDirect3D11::SetVertexShaderSamplerState(SamplerState* state, unsigned int slot) {
 }
 
-void RenderDeviceDirect3D11::SetVertexShaderTexture(Texture* texture, unsigned int slot) {
+bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture1DDirect3D11* d3dTexture = static_cast<Texture1DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->VSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
+bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture2DDirect3D11* d3dTexture = static_cast<Texture2DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->VSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
+bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    Texture3DDirect3D11* d3dTexture = static_cast<Texture3DDirect3D11*>(texture.get());
+
+    ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->VSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
 }
 
 bool RenderDeviceDirect3D11::Draw(PrimitiveTopology_t primitiveTopology, const shared_ptr<VertexBuffer>& vertexBuffer, size_t startVertexLocation) {

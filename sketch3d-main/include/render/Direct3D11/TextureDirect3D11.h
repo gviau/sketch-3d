@@ -12,7 +12,16 @@
 namespace Sketch3D {
 class SKETCH_3D_API TextureDirect3D11 {
     public:
-        TextureDirect3D11(ID3D11Device* device);
+                                    TextureDirect3D11(ID3D11Device* device);
+                                   ~TextureDirect3D11();
+
+        ID3D11ShaderResourceView*   GetShaderResourceView() const;
+
+    protected:
+        ID3D11Device*               device_;
+        ID3D11ShaderResourceView*   shaderResourceView_;
+
+        bool                        CreateShaderResourceView(ID3D11Resource* resource, TextureFormat_t format, TextureType_t textureType);
 };
 
 class SKETCH_3D_API Texture1DDirect3D11 : public Texture1D, public TextureDirect3D11 {
