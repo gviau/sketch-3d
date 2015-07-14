@@ -8,7 +8,7 @@
 
 namespace Sketch3D {
 // Constant buffers should be aligned to 16 bytes boundaries for performance reason
-ALIGNED_TYPE(struct, 16) PassConstants_t {
+struct ALIGNED_(16) PassConstants_t {
     Matrix4x4 projectionMatrix;
     Matrix4x4 viewMatrix;
     Matrix4x4 modelMatrix;
