@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
     renderDevice->SetFragmentShader(fragmentShader);
     renderDevice->SetVertexShader(vertexShader);
 
-    shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState(FilterMode_t::LINEAR, AddressMode_t::CLAMP, AddressMode_t::CLAMP,
+    shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP,
                                                                                         AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
 
     unsigned char data[] = {
