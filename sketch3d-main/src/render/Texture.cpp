@@ -33,9 +33,12 @@ size_t GetRowPitch(size_t width, TextureFormat_t textureFormat) {
             break;
 
         case TextureFormat_t::RGB24:
-        case TextureFormat_t::RGBA32:
             bytesPerPixel = 3;
             padding = 1;
+            break;
+
+        case TextureFormat_t::RGBA32:
+            bytesPerPixel = 4;
             break;
 
         case TextureFormat_t::R32F:
@@ -67,7 +70,7 @@ size_t GetRowPitch(size_t width, TextureFormat_t textureFormat) {
             break;
     }
 
-    return bytesPerPixel * width;
+    return (bytesPerPixel + padding) * width;
 }
 
 size_t Get2DSlicePitch(size_t width, size_t height, TextureFormat_t textureFormat) {

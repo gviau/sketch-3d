@@ -57,7 +57,7 @@ class SKETCH_3D_API RenderDevice {
         virtual shared_ptr<FragmentShader>& GetFragmentShader() = 0;
         virtual void SetFragmentShader(shared_ptr<FragmentShader> fragmentShader) = 0;
         virtual bool SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
-        virtual void SetFragmentShaderSamplerState(SamplerState* samplerState, unsigned int slot) = 0;
+        virtual bool SetFragmentShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;
@@ -65,7 +65,7 @@ class SKETCH_3D_API RenderDevice {
         virtual shared_ptr<VertexShader>& GetVertexShader() = 0;
         virtual void SetVertexShader(shared_ptr<VertexShader> vertexShader) = 0;
         virtual bool SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
-        virtual void SetVertexShaderSamplerState(SamplerState* samplerState, unsigned int slot) = 0;
+        virtual bool SetVertexShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;

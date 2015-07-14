@@ -26,7 +26,7 @@ struct Vertex_Pos_Color_t {
 
 struct Vertex_Pos_UV_t {
     Vector3 position;
-    Vector3 uv;
+    Vector2 uv;
 };
 
 struct Vertex_Pos_Normal_t {

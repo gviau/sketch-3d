@@ -1,5 +1,5 @@
-#ifndef SKETCH_3D_TEXTURE_MAP
-#define SKETCH_3D_TEXTURE_MAP
+#ifndef SKETCH_3D_TEXTURE_MAP_H
+#define SKETCH_3D_TEXTURE_MAP_H
 
 #include "render/Resource.h"
 
@@ -10,7 +10,7 @@ namespace Sketch3D {
  */
 class SKETCH_3D_API TextureMap : public Resource {
     public:
-                        TextureMap(size_t width, size_t height, size_t depth=0);
+                        TextureMap(unsigned char* data, size_t width, size_t height, size_t depth=0);
         unsigned char*  GetData() const;
         unsigned char*& GetData();
 

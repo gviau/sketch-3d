@@ -134,9 +134,9 @@ ID3D11Texture3D* Texture3DDirect3D11::GetTexture() const {
 DXGI_FORMAT GetD3DTextureFormat(TextureFormat_t textureFormat) {
     DXGI_FORMAT format;
     switch (textureFormat) {
-        case TextureFormat_t::GRAYSCALE:    format = DXGI_FORMAT_R8_UINT; break;
-        case TextureFormat_t::RGB24:        format = DXGI_FORMAT_R8G8B8A8_UINT; break;
-        case TextureFormat_t::RGBA32:       format = DXGI_FORMAT_R8G8B8A8_UINT; break;
+        case TextureFormat_t::GRAYSCALE:    format = DXGI_FORMAT_R8_UNORM; break;
+        case TextureFormat_t::RGB24:        format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
+        case TextureFormat_t::RGBA32:       format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
         case TextureFormat_t::R32F:         format = DXGI_FORMAT_R32_FLOAT; break;
         case TextureFormat_t::RG32F:        format = DXGI_FORMAT_R32G32_FLOAT; break;
         case TextureFormat_t::RGBA32F:      format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;

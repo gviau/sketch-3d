@@ -1,4 +1,5 @@
 #include <math/Matrix4x4.h>
+#include <math/Vector2.h>
 #include <math/Vector4.h>
 
 #include <render/Buffer.h>
@@ -6,7 +7,10 @@
 #include <render/HardwareResourceCreator.h>
 #include <render/RenderContext.h>
 #include <render/RenderDevice.h>
+#include <render/SamplerState.h>
 #include <render/Shader.h>
+#include <render/Texture.h>
+#include <render/TextureMap.h>
 #include <render/VertexFormat.h>
 
 #include <system/Window.h>
@@ -41,19 +45,19 @@ int main(int argc, char** argv) {
 
     HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
 
-    Vertex_Pos_Color_t vertices[] = {
-        { Vector3(-1.0f, -1.0f, -1.0f), Vector3(1.0f, 0.0f, 0.0f) },
-        { Vector3(-1.0f,  1.0f, -1.0f), Vector3(0.0f, 1.0f, 0.0f) },
-        { Vector3( 1.0f,  1.0f, -1.0f), Vector3(0.0f, 0.0f, 1.0f) },
-        { Vector3( 1.0f, -1.0f, -1.0f), Vector3(1.0f, 0.0f, 1.0f) },
-        { Vector3(-1.0f, -1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
-        { Vector3(-1.0f,  1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
-        { Vector3( 1.0f,  1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) },
-        { Vector3( 1.0f, -1.0f,  1.0f), Vector3(0.0f, 0.0f, 0.0f) }
+    Vertex_Pos_UV_t vertices[] = {
+        { Vector3(-1.0f, -1.0f, -1.0f), Vector2(0.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f, -1.0f), Vector2(0.0f, 1.0f) },
+        { Vector3( 1.0f,  1.0f, -1.0f), Vector2(1.0f, 1.0f) },
+        { Vector3( 1.0f, -1.0f, -1.0f), Vector2(1.0f, 0.0f) },
+        { Vector3(-1.0f, -1.0f,  1.0f), Vector2(0.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f,  1.0f), Vector2(0.0f, 1.0f) },
+        { Vector3( 1.0f,  1.0f,  1.0f), Vector2(1.0f, 1.0f) },
+        { Vector3( 1.0f, -1.0f,  1.0f), Vector2(1.0f, 0.0f) }
     };
     size_t numVertices = _countof(vertices);
 
-    VertexFormat_Pos_Color vertexFormat;
+    VertexFormat_Pos_UV vertexFormat;
     shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer((void*)vertices, false, false, &vertexFormat, numVertices);
 
     unsigned short indices[] = {
@@ -106,6 +110,20 @@ int main(int argc, char** argv) {
 
     renderDevice->SetFragmentShader(fragmentShader);
     renderDevice->SetVertexShader(vertexShader);
+
+    shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState(FilterMode_t::LINEAR, AddressMode_t::CLAMP, AddressMode_t::CLAMP,
+                                                                                        AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
+
+    unsigned char data[] = {
+        255, 255, 255, 255, 0, 0, 0, 0,
+        0, 0, 0, 0, 255, 255, 255, 255
+    };
+    TextureMap textureMap(data, 2, 2);
+
+    shared_ptr<Texture2D> texture = hardwareResourceCreator->CreateTexture2D(&textureMap, TextureFormat_t::RGBA32, false, false);
+
+    renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+    renderDevice->SetFragmentShaderTexture(texture, 0);
 
     PassConstants_t* passConstants;
     Matrix4x4 modelMatrix;

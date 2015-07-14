@@ -19,6 +19,8 @@ class SKETCH_3D_API HardwareResourceCreatorDirect3D11 : public HardwareResourceC
         virtual shared_ptr<ConstantBuffer>  CreateConstantBuffer(void* initialData, bool dynamic, bool immutable, size_t dataSize) override;
         virtual shared_ptr<IndexBuffer>     CreateIndexBuffer(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) override;
         virtual shared_ptr<FragmentShader>  CreateFragmentShader() override;
+        virtual shared_ptr<SamplerState>    CreateSamplerState(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV, AddressMode_t addressModeW,
+                                                               ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO) override;
         virtual shared_ptr<Texture2D>       CreateTexture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) override;
         virtual shared_ptr<VertexBuffer>    CreateVertexBuffer(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) override;
         virtual shared_ptr<VertexShader>    CreateVertexShader() override;

@@ -2,6 +2,7 @@
 
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/ShaderDirect3D11.h"
+#include "render/Direct3D11/SamplerStateDirect3D11.h"
 #include "render/Direct3D11/TextureDirect3D11.h"
 
 #include "system/Logger.h"
@@ -29,6 +30,13 @@ shared_ptr<IndexBuffer> HardwareResourceCreatorDirect3D11::CreateIndexBuffer(voi
 shared_ptr<FragmentShader> HardwareResourceCreatorDirect3D11::CreateFragmentShader() {
     FragmentShader* fragmentShader = new FragmentShaderDirect3D11(device_);
     return shared_ptr<FragmentShader>(fragmentShader);
+}
+
+shared_ptr<SamplerState> HardwareResourceCreatorDirect3D11::CreateSamplerState(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
+        AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor)
+{
+    SamplerState* samplerState = new SamplerStateDirect3D11(device_, filterMode, addressModeU, addressModeV, addressModeW, comparisonFunction, borderColor);
+    return shared_ptr<SamplerState>(samplerState);
 }
 
 shared_ptr<Texture2D> HardwareResourceCreatorDirect3D11::CreateTexture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {

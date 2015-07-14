@@ -1,7 +1,7 @@
 #include "render/TextureMap.h"
 
 namespace Sketch3D {
-TextureMap::TextureMap(size_t width, size_t height, size_t depth) : data_(nullptr), width_(width), height_(height), depth_(depth) {
+TextureMap::TextureMap(unsigned char* data, size_t width, size_t height, size_t depth) : data_(data), width_(width), height_(height), depth_(depth) {
 }
 
 unsigned char* TextureMap::GetData() const {

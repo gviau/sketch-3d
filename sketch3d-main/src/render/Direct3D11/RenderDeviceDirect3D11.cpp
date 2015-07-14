@@ -6,6 +6,7 @@
 
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/RenderContextDirect3D11.h"
+#include "render/Direct3D11/SamplerStateDirect3D11.h"
 #include "render/Direct3D11/ShaderDirect3D11.h"
 #include "render/Direct3D11/TextureDirect3D11.h"
 
@@ -116,7 +117,17 @@ bool RenderDeviceDirect3D11::SetFragmentShaderConstantBuffer(const shared_ptr<Co
     return true;
 }
 
-void RenderDeviceDirect3D11::SetFragmentShaderSamplerState(SamplerState* state, unsigned int slot) {
+bool RenderDeviceDirect3D11::SetFragmentShaderSamplerState(const shared_ptr<SamplerState>& state, unsigned int slot) {
+    if (fragmentShader_ == nullptr || state == nullptr) {
+        return false;
+    }
+
+    SamplerStateDirect3D11* d3dSamplerState = static_cast<SamplerStateDirect3D11*>(state.get());
+
+    ID3D11SamplerState* const samplerState = d3dSamplerState->GetSamplerState();
+    context_->PSSetSamplers(slot, 1, &samplerState);
+
+    return true;
 }
 
 bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) {
@@ -188,7 +199,17 @@ bool RenderDeviceDirect3D11::SetVertexShaderConstantBuffer(const shared_ptr<Cons
     return true;
 }
 
-void RenderDeviceDirect3D11::SetVertexShaderSamplerState(SamplerState* state, unsigned int slot) {
+bool RenderDeviceDirect3D11::SetVertexShaderSamplerState(const shared_ptr<SamplerState>& state, unsigned int slot) {
+    if (vertexShader_ == nullptr || state == nullptr) {
+        return false;
+    }
+
+    SamplerStateDirect3D11* d3dSamplerState = static_cast<SamplerStateDirect3D11*>(state.get());
+
+    ID3D11SamplerState* const samplerState = d3dSamplerState->GetSamplerState();
+    context_->VSSetSamplers(slot, 1, &samplerState);
+
+    return true;
 }
 
 bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) {

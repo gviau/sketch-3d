@@ -12,12 +12,12 @@ cbuffer PassConstants_t {
 
 struct VS_INPUT {
     float3 position : POSITION;
-    float3 color : COLOR;
+    float2 uv : TEXCOORD;
 };
 
 struct VS_OUTPUT {
     float4 position : SV_POSITION;
-    float3 color : COLOR;
+    float2 uv : TEXCOORD;
 };
 
 VS_OUTPUT main(VS_INPUT input) {
@@ -25,7 +25,7 @@ VS_OUTPUT main(VS_INPUT input) {
 
     float4x4 modelViewProjection = mul(projectionMatrix, mul(viewMatrix, modelMatrix));
     output.position = mul(modelViewProjection, float4(input.position, 1.0));
-    output.color = input.color;
+    output.uv = input.uv;
 
     return output;
 }
