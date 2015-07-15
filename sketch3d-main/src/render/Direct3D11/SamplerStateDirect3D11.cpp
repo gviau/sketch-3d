@@ -17,7 +17,7 @@ SamplerStateDirect3D11::SamplerStateDirect3D11(ID3D11Device* device, FilterMode_
     samplerDesc.BorderColor[2] = borderColor_.z;
     samplerDesc.BorderColor[3] = borderColor_.w;
     samplerDesc.ComparisonFunc = GetD3DComparisonFunction(comparisonFunction_);
-    samplerDesc.MaxAnisotropy = 1.0f;
+    samplerDesc.MaxAnisotropy = 1;
     samplerDesc.MaxLOD = FLT_MAX;
     samplerDesc.MinLOD = 0.0f;
     samplerDesc.MipLODBias = 0.0f;
