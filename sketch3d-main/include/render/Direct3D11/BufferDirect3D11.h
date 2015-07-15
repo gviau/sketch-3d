@@ -14,7 +14,7 @@ namespace Sketch3D {
 class SKETCH_3D_API BufferDirect3D11 {
     public:
                                 BufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context);
-                               ~BufferDirect3D11();
+        virtual                ~BufferDirect3D11();
 
         ID3D11Buffer* const     GetBuffer() const;
 

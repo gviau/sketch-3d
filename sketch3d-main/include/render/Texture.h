@@ -50,6 +50,7 @@ class SKETCH_3D_API Texture : public HardwareResource {
          * @param immutable Set to true if the texture cannot be modified on the CPU. Will reside on the GPU
          */
                         Texture(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+        virtual        ~Texture() {}
 
         TextureMap*     GetTextureMap() const;
         TextureFormat_t GetTextureFormat() const;

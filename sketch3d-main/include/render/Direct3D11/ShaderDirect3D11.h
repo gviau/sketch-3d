@@ -18,6 +18,7 @@ class VertexFormat;
 class SKETCH_3D_API ShaderDirect3D11 {
     public:
                         ShaderDirect3D11(ID3D11Device* device);
+        virtual        ~ShaderDirect3D11();
 
         ID3D10Blob*     GetShaderBlob() const;
 
@@ -29,6 +30,7 @@ class SKETCH_3D_API ShaderDirect3D11 {
 class SKETCH_3D_API FragmentShaderDirect3D11 : public FragmentShader, public ShaderDirect3D11 {
     public:
                             FragmentShaderDirect3D11(ID3D11Device* device);
+        virtual            ~FragmentShaderDirect3D11();
 
         virtual bool        InitializeFromSource(const string& source) override;
 
@@ -41,6 +43,7 @@ class SKETCH_3D_API FragmentShaderDirect3D11 : public FragmentShader, public Sha
 class SKETCH_3D_API VertexShaderDirect3D11 : public VertexShader, public ShaderDirect3D11 {
     public:
                             VertexShaderDirect3D11(ID3D11Device* device);
+        virtual            ~VertexShaderDirect3D11();
 
         virtual bool        InitializeFromSource(const string& source) override;
         virtual bool        CreateInputLayout(VertexFormat* vertexFormat) override;

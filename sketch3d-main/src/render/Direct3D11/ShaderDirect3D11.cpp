@@ -19,11 +19,23 @@ namespace Sketch3D {
 ShaderDirect3D11::ShaderDirect3D11(ID3D11Device* device) : device_(device), shaderBlob_(nullptr) {
 }
 
+ShaderDirect3D11::~ShaderDirect3D11() {
+    if (shaderBlob_ != nullptr) {
+        shaderBlob_->Release();
+    }
+}
+
 ID3D10Blob* ShaderDirect3D11::GetShaderBlob() const {
     return shaderBlob_;
 }
 
 FragmentShaderDirect3D11::FragmentShaderDirect3D11(ID3D11Device* device) : ShaderDirect3D11(device) {
+}
+
+FragmentShaderDirect3D11::~FragmentShaderDirect3D11() {
+    if (shader_ != nullptr) {
+        shader_->Release();
+    }
 }
 
 bool FragmentShaderDirect3D11::InitializeFromSource(const string& source) {
@@ -63,6 +75,12 @@ ID3D11PixelShader* FragmentShaderDirect3D11::GetShader() const {
 }
 
 VertexShaderDirect3D11::VertexShaderDirect3D11(ID3D11Device* device) : ShaderDirect3D11(device) {
+}
+
+VertexShaderDirect3D11::~VertexShaderDirect3D11() {
+    if (shader_ != nullptr) {
+        shader_->Release();
+    }
 }
 
 bool VertexShaderDirect3D11::InitializeFromSource(const string& source) {

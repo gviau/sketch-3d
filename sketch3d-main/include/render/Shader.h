@@ -17,6 +17,7 @@ class VertexFormat;
  */
 class SKETCH_3D_API Shader : public HardwareResource {
     public:
+        virtual        ~Shader() {}
         bool            InitializeFromFile(const string& filename);
         virtual bool    InitializeFromSource(const string& source) = 0;
 };

@@ -14,7 +14,7 @@ class SKETCH_3D_API SamplerStateDirect3D11 : public SamplerState {
     public:
                             SamplerStateDirect3D11(ID3D11Device* device, FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
                                                    AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO);
-                           ~SamplerStateDirect3D11();
+        virtual            ~SamplerStateDirect3D11();
 
         ID3D11SamplerState* GetSamplerState() const;
 

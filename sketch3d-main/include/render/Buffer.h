@@ -19,6 +19,7 @@ class SKETCH_3D_API Buffer : public HardwareResource {
          * @param isImmutable Is the buffer immutable?
          */
                         Buffer(void* initialData, bool dynamic, bool immutable);
+        virtual        ~Buffer() {}
 
         virtual void*   Map(MapFlag_t mapFlag) const = 0;
         virtual void    Unmap() const = 0;
