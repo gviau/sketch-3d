@@ -7,6 +7,7 @@
 #include <render/HardwareResourceCreator.h>
 #include <render/RenderContext.h>
 #include <render/RenderDevice.h>
+#include <render/RenderTarget.h>
 #include <render/SamplerState.h>
 #include <render/Shader.h>
 #include <render/Texture.h>
@@ -72,6 +73,23 @@ int main(int argc, char** argv) {
 
     shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
 
+    Vertex_Pos_t fullscreenQuadVertices[] = {
+        { Vector3(-1.0f, -1.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f, 0.0f) },
+        { Vector3( 1.0f,  1.0f, 0.0f) },
+        { Vector3( 1.0f, -1.0f, 0.0f) }
+    };
+
+    VertexFormat_Pos fullscreenQuadVertexFormat;
+    shared_ptr<VertexBuffer> fullscreenQuadVB = hardwareResourceCreator->CreateVertexBuffer((void*)fullscreenQuadVertices, false, false, &fullscreenQuadVertexFormat, 4);
+
+    unsigned short fullscreenQuadIndices[] = {
+        0, 2, 1,
+        0, 3, 2
+    };
+
+    shared_ptr<IndexBuffer> fullscreenQuadIB = hardwareResourceCreator->CreateIndexBuffer((void*)fullscreenQuadIndices, false, false, IndexFormat_t::INT_2_BYTES, 6);
+
 	float height = tan(60.0f * DEG_2_RAD_OVER_2);
 	float width = height * 1024.0f / 768.0f;
     float right = width;
@@ -108,8 +126,12 @@ int main(int argc, char** argv) {
     init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.hlsl");
     init = vertexShader->CreateInputLayout(&vertexFormat);
 
-    renderDevice->SetFragmentShader(fragmentShader);
-    renderDevice->SetVertexShader(vertexShader);
+    shared_ptr<FragmentShader> fullscreenQuadFragmentShader = hardwareResourceCreator->CreateFragmentShader();
+    init = fullscreenQuadFragmentShader->InitializeFromFile("InteractiveWater/Shaders/fullscreenQuadFrag.hlsl");
+
+    shared_ptr<VertexShader> fullscreenQuadVertexShader = hardwareResourceCreator->CreateVertexShader();
+    init = fullscreenQuadVertexShader->InitializeFromFile("InteractiveWater/Shaders/fullscreenQuadVert.hlsl");
+    init = fullscreenQuadVertexShader->CreateInputLayout(&fullscreenQuadVertexFormat);
 
     shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP,
                                                                                         AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
@@ -121,21 +143,25 @@ int main(int argc, char** argv) {
     TextureMap textureMap(data, 2, 2);
 
     shared_ptr<Texture2D> texture = hardwareResourceCreator->CreateTexture2D(&textureMap, TextureFormat_t::RGBA32, false, false);
+    
+    shared_ptr<RenderTarget> renderTarget = hardwareResourceCreator->CreateRenderTarget(1024, 768, TextureFormat_t::RGBA32);
+    vector<shared_ptr<RenderTarget>> renderTargets;
+    renderTargets.push_back(renderTarget);
 
-    renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
-    renderDevice->SetFragmentShaderTexture(texture, 0);
+    shared_ptr<DepthStencilTarget> depthStencilTarget = hardwareResourceCreator->CreateDepthStencilTarget(1024, 768, DepthStencilBits_t::D32);
 
     PassConstants_t* passConstants;
     Matrix4x4 modelMatrix;
     float angle = 0.0f;
 
+    renderDevice->SetFragmentShader(fragmentShader);
+    renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+    renderDevice->SetVertexShader(vertexShader);
+
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
-
-        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
-        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
         
         void* data = constantBuffer->Map(MapFlag_t::WRITE_DISCARD);
 
@@ -152,9 +178,36 @@ int main(int argc, char** argv) {
         modelMatrix = rotX * rotY;
         angle += 0.001f;
 
+        ///////////////////////////////////////////////////////////////////////
+        // Render into render target
+        renderDevice->SetRenderTargets(renderTargets, nullptr);
+        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->SetFragmentShaderTexture(texture, 0);
+
         renderDevice->SetVertexShaderConstantBuffer(constantBuffer);
         renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
 
+        ///////////////////////////////////////////////////////////////////////
+        // Render into default render target
+        renderDevice->SetDefaultRenderTarget();
+        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->SetFragmentShaderTexture(renderTarget, 0);
+
+        renderDevice->SetVertexShaderConstantBuffer(constantBuffer);
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+
+        /*
+        renderDevice->SetFragmentShader(fullscreenQuadFragmentShader);
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(renderTarget, 0);
+
+        renderDevice->SetVertexShader(fullscreenQuadVertexShader);
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVB, fullscreenQuadIB, 0, 0);
+        */
         renderContext->SwapBuffers();
     }
 

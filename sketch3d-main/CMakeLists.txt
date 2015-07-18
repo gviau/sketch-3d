@@ -44,6 +44,7 @@ set(RENDER_SOURCE_FILES
 	src/render/Renderer_Common.cpp
 	src/render/Resource.cpp
 	src/render/SamplerState.cpp
+	src/render/RenderTarget.cpp
 	src/render/Shader.cpp
 	src/render/Texture.cpp
 	src/render/TextureMap.cpp
@@ -60,6 +61,7 @@ set(RENDER_HEADER_FILES
 	include/render/RenderDevice_Common.h
 	include/render/Renderer_Common.h
 	include/render/RenderState.h
+	include/render/RenderTarget.h
 	include/render/Resource.h
 	include/render/SamplerState.h
 	include/render/Shader.h
@@ -90,6 +92,7 @@ if (WIN32)
 		src/render/Direct3D11/HardwareResourceCreatorDirect3D11.cpp
 		src/render/Direct3D11/RenderContextDirect3D11.cpp
 		src/render/Direct3D11/RenderDeviceDirect3D11.cpp
+		src/render/Direct3D11/RenderTargetDirect3D11.cpp
 		src/render/Direct3D11/SamplerStateDirect3D11.cpp
 		src/render/Direct3D11/ShaderDirect3D11.cpp
 		src/render/Direct3D11/TextureDirect3D11.cpp
@@ -100,6 +103,7 @@ if (WIN32)
 		include/render/Direct3D11/HardwareResourceCreatorDirect3D11.h
 		include/render/Direct3D11/RenderContextDirect3D11.h
 		include/render/Direct3D11/RenderDeviceDirect3D11.h
+		include/render/Direct3D11/RenderTargetDirect3D11.h
 		include/render/Direct3D11/SamplerStateDirect3D11.h
 		include/render/Direct3D11/ShaderDirect3D11.h
 		include/render/Direct3D11/TextureDirect3D11.h

@@ -45,7 +45,8 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
 
 		virtual void                        ClearRenderTargets(const Vector4& color) override;
         virtual void                        ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) override;
-        virtual void                        SetRenderTargets(const vector<RenderTarget*>& renderTargets, DepthStencilTarget* depthStencilTarget=nullptr) override;
+        virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
+        virtual void                        SetDefaultRenderTarget() override;
 
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;
@@ -57,6 +58,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
         virtual bool                        SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) override;
         virtual bool                        SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) override;
         virtual bool                        SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) override;
+        virtual bool                        SetFragmentShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) override;
 
         virtual shared_ptr<VertexShader>&   GetVertexShader() override;
         virtual void                        SetVertexShader(shared_ptr<VertexShader> vertexShader) override;
@@ -65,6 +67,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
         virtual bool                        SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) override;
         virtual bool                        SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) override;
         virtual bool                        SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) override;
+        virtual bool                        SetVertexShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) override;
 
         virtual bool                        Draw(PrimitiveTopology_t primitiveTopology, const shared_ptr<VertexBuffer>& vertexBuffer, size_t startVertexLocation) override;
         virtual bool                        DrawIndexed(PrimitiveTopology_t primitiveTopology, const shared_ptr<VertexBuffer>& vertexBuffer,

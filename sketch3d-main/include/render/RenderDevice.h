@@ -47,7 +47,8 @@ class SKETCH_3D_API RenderDevice {
         // RENDER TARGET STUFF
 		virtual void ClearRenderTargets(const Vector4& color) = 0;
         virtual void ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) = 0;
-        virtual void SetRenderTargets(const vector<RenderTarget*>& renderTargets, DepthStencilTarget* depthStencilTarget=nullptr) = 0;
+        virtual void SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
+        virtual void SetDefaultRenderTarget() = 0;
 
         // RENDER STATE STUFF
         virtual void SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) = 0;
@@ -61,6 +62,7 @@ class SKETCH_3D_API RenderDevice {
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;
+        virtual bool SetFragmentShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) = 0;
 
         virtual shared_ptr<VertexShader>& GetVertexShader() = 0;
         virtual void SetVertexShader(shared_ptr<VertexShader> vertexShader) = 0;
@@ -69,6 +71,7 @@ class SKETCH_3D_API RenderDevice {
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) = 0;
+        virtual bool SetVertexShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) = 0;
 
         // DRAWING STUFF
         virtual bool Draw(PrimitiveTopology_t primitiveTopology, const shared_ptr<VertexBuffer>& vertexBuffer, size_t startVertexLocation) = 0;

@@ -6,6 +6,7 @@
 
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/RenderContextDirect3D11.h"
+#include "render/Direct3D11/RenderTargetDirect3D11.h"
 #include "render/Direct3D11/SamplerStateDirect3D11.h"
 #include "render/Direct3D11/ShaderDirect3D11.h"
 #include "render/Direct3D11/TextureDirect3D11.h"
@@ -55,7 +56,31 @@ void RenderDeviceDirect3D11::ClearDepthStencil(bool clearDepth, bool clearStenci
     context_->ClearDepthStencilView(currentDepthStencilBuffer_, clearFlags, depthValue, stencilValue);
 }
 
-void RenderDeviceDirect3D11::SetRenderTargets(const vector<RenderTarget*>& renderTargets, DepthStencilTarget* depthStencilTarget) {
+void RenderDeviceDirect3D11::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) {
+    vector<ID3D11RenderTargetView*> targets;
+    for (const shared_ptr<RenderTarget>& renderTarget : renderTargets) {
+        RenderTarget* target = renderTarget.get();
+
+        if (target != nullptr) {
+            RenderTargetDirect3D11* d3dRenderTarget = static_cast<RenderTargetDirect3D11*>(target);
+            targets.push_back(d3dRenderTarget->GetRenderTargetView());
+        }
+    }
+
+    ID3D11DepthStencilView* depthStencilView = nullptr;
+    DepthStencilTarget* depthStencil = depthStencilTarget.get();
+    if (depthStencil != nullptr) {
+        DepthStencilTargetDirect3D11* d3dDepthStencilTarget = static_cast<DepthStencilTargetDirect3D11*>(depthStencil);
+        depthStencilView = d3dDepthStencilTarget->GetDepthStencilView();
+    } else {
+        depthStencilView = currentDepthStencilBuffer_;
+    }
+
+    context_->OMSetRenderTargets(renderTargets.size(), &targets[0], depthStencilView);
+}
+
+void RenderDeviceDirect3D11::SetDefaultRenderTarget() {
+    context_->OMSetRenderTargets(1, &currentBackbuffer_, currentDepthStencilBuffer_);
 }
 
 void RenderDeviceDirect3D11::SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) {
@@ -169,6 +194,19 @@ bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<Texture3D
     return true;
 }
 
+bool RenderDeviceDirect3D11::SetFragmentShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) {
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    RenderTargetDirect3D11* renderTarget = static_cast<RenderTargetDirect3D11*>(texture.get());
+    
+    ID3D11ShaderResourceView* const resourceView = renderTarget->GetResourceView();
+    context_->PSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
 shared_ptr<VertexShader>& RenderDeviceDirect3D11::GetVertexShader() {
     return vertexShader_;
 }
@@ -213,7 +251,7 @@ bool RenderDeviceDirect3D11::SetVertexShaderSamplerState(const shared_ptr<Sample
 }
 
 bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) {
-    if (fragmentShader_ == nullptr || texture == nullptr) {
+    if (vertexShader_ == nullptr || texture == nullptr) {
         return false;
     }
 
@@ -226,7 +264,7 @@ bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture1D>&
 }
 
 bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) {
-    if (fragmentShader_ == nullptr || texture == nullptr) {
+    if (vertexShader_ == nullptr || texture == nullptr) {
         return false;
     }
 
@@ -239,13 +277,26 @@ bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture2D>&
 }
 
 bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot) {
-    if (fragmentShader_ == nullptr || texture == nullptr) {
+    if (vertexShader_ == nullptr || texture == nullptr) {
         return false;
     }
 
     Texture3DDirect3D11* d3dTexture = static_cast<Texture3DDirect3D11*>(texture.get());
 
     ID3D11ShaderResourceView* const resourceView = d3dTexture->GetShaderResourceView();
+    context_->VSSetShaderResources(slot, 1, &resourceView);
+
+    return true;
+}
+
+bool RenderDeviceDirect3D11::SetVertexShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot) {
+    if (vertexShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    RenderTargetDirect3D11* renderTarget = static_cast<RenderTargetDirect3D11*>(texture.get());
+    
+    ID3D11ShaderResourceView* const resourceView = renderTarget->GetResourceView();
     context_->VSSetShaderResources(slot, 1, &resourceView);
 
     return true;
