@@ -3,8 +3,6 @@
 
 #include "render/RenderTarget.h"
 
-#include "render/Renderer_Common.h"
-
 #pragma warning( disable : 4005 )
 
 #include <d3d11.h>
@@ -20,15 +18,16 @@ class SKETCH_3D_API RenderViewDirect3D11 {
         ID3D11ShaderResourceView*   GetResourceView() const;
 
     protected:
+        ID3D11Device*               device_;
         ID3D11ShaderResourceView*   resourceView_;
 };
 
 class SKETCH_3D_API RenderTargetDirect3D11 : public RenderTarget, public RenderViewDirect3D11 {
     public:
-                                RenderTargetDirect3D11(ID3D11Device* device, size_t width, size_t height, TextureFormat_t textureFormat);
+                                RenderTargetDirect3D11(ID3D11Device* device);
         virtual                ~RenderTargetDirect3D11();
 
-        virtual bool            Initialize() override;
+        virtual bool            Initialize(size_t width, size_t height, TextureFormat_t textureFormat) override;
         ID3D11RenderTargetView* GetRenderTargetView() const;
 
     private:
@@ -37,10 +36,10 @@ class SKETCH_3D_API RenderTargetDirect3D11 : public RenderTarget, public RenderV
 
 class SKETCH_3D_API DepthStencilTargetDirect3D11 : public DepthStencilTarget, public RenderViewDirect3D11 {
     public:
-                                DepthStencilTargetDirect3D11(ID3D11Device* device, size_t width, size_t height, DepthStencilBits_t depthStencilBits);
+                                DepthStencilTargetDirect3D11(ID3D11Device* device);
         virtual                ~DepthStencilTargetDirect3D11();
 
-        virtual bool            Initialize() override;
+        virtual bool            Initialize(size_t width, size_t height, DepthStencilBits_t depthStencilBits) override;
         ID3D11DepthStencilView* GetDepthStencilView() const;
 
     private:

@@ -50,9 +50,7 @@ bool TextureDirect3D11::CreateShaderResourceView(ID3D11Resource* resource, Textu
     return true;
 }
 
-Texture1DDirect3D11::Texture1DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) :
-        Texture1D(textureMap, textureFormat, dynamic, immutable), TextureDirect3D11(device), texture_(nullptr)
-{
+Texture1DDirect3D11::Texture1DDirect3D11(ID3D11Device* device) : TextureDirect3D11(device), texture_(nullptr) {
 }
 
 Texture1DDirect3D11::~Texture1DDirect3D11() {
@@ -61,13 +59,35 @@ Texture1DDirect3D11::~Texture1DDirect3D11() {
     }
 }
 
+bool Texture1DDirect3D11::Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {
+    return false;
+}
+
 ID3D11Texture1D* Texture1DDirect3D11::GetTexture() const {
     return texture_;
 }
 
-Texture2DDirect3D11::Texture2DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) :
-        Texture2D(textureMap, textureFormat, dynamic, immutable), TextureDirect3D11(device), texture_(nullptr)
-{
+Texture2DDirect3D11::Texture2DDirect3D11(ID3D11Device* device) : TextureDirect3D11(device), texture_(nullptr) {
+}
+
+Texture2DDirect3D11::~Texture2DDirect3D11() {
+    if (texture_ != nullptr) {
+        texture_->Release();
+    }
+}
+
+bool Texture2DDirect3D11::Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {
+    if (texture_ != nullptr) {
+        Logger::GetInstance()->Warning("Texture2D with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    } else if (textureMap == nullptr) {
+        Logger::GetInstance()->Error("Invalid texture map passed unpon initialization of Texture2D");
+        return false;
+    }
+
+    textureMap_ = textureMap;
+    textureFormat_ = textureFormat;
+
     D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
     if (immutable) {
         usage = D3D11_USAGE_IMMUTABLE;
@@ -98,33 +118,35 @@ Texture2DDirect3D11::Texture2DDirect3D11(ID3D11Device* device, TextureMap* textu
     initialData.SysMemPitch = rowPitch;
     initialData.SysMemSlicePitch = rowPitch * height;
 
-    HRESULT hr = device->CreateTexture2D(&textureDesc, &initialData, &texture_);
+    HRESULT hr = device_->CreateTexture2D(&textureDesc, &initialData, &texture_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create 2D texture with ID: " + to_string(resourceId_));
-    } else if (!CreateShaderResourceView(texture_, textureFormat_, TextureType_t::TYPE_2D)) {
+        return false;
+    }
+    
+    if (!CreateShaderResourceView(texture_, textureFormat_, TextureType_t::TYPE_2D)) {
         Logger::GetInstance()->Error("Couldn't create the shader resource view from resource with ID: " + to_string(resourceId_));
+        return false;
     }
-}
 
-Texture2DDirect3D11::~Texture2DDirect3D11() {
-    if (texture_ != nullptr) {
-        texture_->Release();
-    }
+    return true;
 }
 
 ID3D11Texture2D* Texture2DDirect3D11::GetTexture() const {
     return texture_;
 }
 
-Texture3DDirect3D11::Texture3DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) :
-        Texture3D(textureMap, textureFormat, dynamic, immutable), TextureDirect3D11(device), texture_(nullptr)
-{
+Texture3DDirect3D11::Texture3DDirect3D11(ID3D11Device* device) : TextureDirect3D11(device), texture_(nullptr) {
 }
 
 Texture3DDirect3D11::~Texture3DDirect3D11() {
     if (texture_ != nullptr) {
         texture_->Release();
     }
+}
+
+bool Texture3DDirect3D11::Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {
+    return false;
 }
 
 ID3D11Texture3D* Texture3DDirect3D11::GetTexture() const {

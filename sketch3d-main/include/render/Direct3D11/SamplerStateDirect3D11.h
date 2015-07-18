@@ -12,13 +12,16 @@
 namespace Sketch3D {
 class SKETCH_3D_API SamplerStateDirect3D11 : public SamplerState {
     public:
-                            SamplerStateDirect3D11(ID3D11Device* device, FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
-                                                   AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO);
+                            SamplerStateDirect3D11(ID3D11Device* device);
         virtual            ~SamplerStateDirect3D11();
+
+        virtual bool        Initialize(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV, AddressMode_t addressModeW,
+                                       ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO) override;
 
         ID3D11SamplerState* GetSamplerState() const;
 
     private:
+        ID3D11Device* device_;
         ID3D11SamplerState* samplerState_;
 };
 

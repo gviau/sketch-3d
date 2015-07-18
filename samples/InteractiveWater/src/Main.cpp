@@ -59,7 +59,8 @@ int main(int argc, char** argv) {
     size_t numVertices = _countof(vertices);
 
     VertexFormat_Pos_UV vertexFormat;
-    shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer((void*)vertices, false, false, &vertexFormat, numVertices);
+    shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer();
+    bool init = vertexBuffer->Initialize((void*)vertices, false, false, &vertexFormat, numVertices);
 
     unsigned short indices[] = {
 		0, 1, 2, 0, 2, 3,
@@ -71,7 +72,8 @@ int main(int argc, char** argv) {
     };
     size_t numIndices = _countof(indices);
 
-    shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
+    shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer();
+    init = indexBuffer->Initialize((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
 
     Vertex_Pos_t fullscreenQuadVertices[] = {
         { Vector3(-1.0f, -1.0f, 0.0f) },
@@ -79,16 +81,6 @@ int main(int argc, char** argv) {
         { Vector3( 1.0f,  1.0f, 0.0f) },
         { Vector3( 1.0f, -1.0f, 0.0f) }
     };
-
-    VertexFormat_Pos fullscreenQuadVertexFormat;
-    shared_ptr<VertexBuffer> fullscreenQuadVB = hardwareResourceCreator->CreateVertexBuffer((void*)fullscreenQuadVertices, false, false, &fullscreenQuadVertexFormat, 4);
-
-    unsigned short fullscreenQuadIndices[] = {
-        0, 2, 1,
-        0, 3, 2
-    };
-
-    shared_ptr<IndexBuffer> fullscreenQuadIB = hardwareResourceCreator->CreateIndexBuffer((void*)fullscreenQuadIndices, false, false, IndexFormat_t::INT_2_BYTES, 6);
 
 	float height = tan(60.0f * DEG_2_RAD_OVER_2);
 	float width = height * 1024.0f / 768.0f;
@@ -117,24 +109,18 @@ int main(int argc, char** argv) {
 
     PassConstants_t initialPassConstants;
     initialPassConstants.projectionMatrix = projection.Transpose();
-    shared_ptr<ConstantBuffer> constantBuffer = hardwareResourceCreator->CreateConstantBuffer((void*)&initialPassConstants, true, false, sizeof(PassConstants_t));
+    shared_ptr<ConstantBuffer> constantBuffer = hardwareResourceCreator->CreateConstantBuffer();
+    init = constantBuffer->Initialize((void*)&initialPassConstants, true, false, sizeof(PassConstants_t));
 
     shared_ptr<FragmentShader> fragmentShader = hardwareResourceCreator->CreateFragmentShader();
-    bool init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.hlsl");
+    init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.hlsl");
 
     shared_ptr<VertexShader> vertexShader = hardwareResourceCreator->CreateVertexShader();
     init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.hlsl");
     init = vertexShader->CreateInputLayout(&vertexFormat);
 
-    shared_ptr<FragmentShader> fullscreenQuadFragmentShader = hardwareResourceCreator->CreateFragmentShader();
-    init = fullscreenQuadFragmentShader->InitializeFromFile("InteractiveWater/Shaders/fullscreenQuadFrag.hlsl");
-
-    shared_ptr<VertexShader> fullscreenQuadVertexShader = hardwareResourceCreator->CreateVertexShader();
-    init = fullscreenQuadVertexShader->InitializeFromFile("InteractiveWater/Shaders/fullscreenQuadVert.hlsl");
-    init = fullscreenQuadVertexShader->CreateInputLayout(&fullscreenQuadVertexFormat);
-
-    shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP,
-                                                                                        AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
+    shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState();
+    init = samplerState->Initialize(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP, AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
 
     unsigned char data[] = {
         255, 255, 255, 255, 0, 0, 0, 0,
@@ -142,13 +128,17 @@ int main(int argc, char** argv) {
     };
     TextureMap textureMap(data, 2, 2);
 
-    shared_ptr<Texture2D> texture = hardwareResourceCreator->CreateTexture2D(&textureMap, TextureFormat_t::RGBA32, false, false);
+    shared_ptr<Texture2D> texture = hardwareResourceCreator->CreateTexture2D();
+    init = texture->Initialize(&textureMap, TextureFormat_t::RGBA32, false, false);
     
-    shared_ptr<RenderTarget> renderTarget = hardwareResourceCreator->CreateRenderTarget(1024, 768, TextureFormat_t::RGBA32);
+    shared_ptr<RenderTarget> renderTarget = hardwareResourceCreator->CreateRenderTarget();
+    init = renderTarget->Initialize(1024, 768, TextureFormat_t::RGBA32);
+
     vector<shared_ptr<RenderTarget>> renderTargets;
     renderTargets.push_back(renderTarget);
 
-    shared_ptr<DepthStencilTarget> depthStencilTarget = hardwareResourceCreator->CreateDepthStencilTarget(1024, 768, DepthStencilBits_t::D32);
+    shared_ptr<DepthStencilTarget> depthStencilTarget = hardwareResourceCreator->CreateDepthStencilTarget();
+    init = depthStencilTarget->Initialize(1024, 768, DepthStencilBits_t::D32);
 
     PassConstants_t* passConstants;
     Matrix4x4 modelMatrix;

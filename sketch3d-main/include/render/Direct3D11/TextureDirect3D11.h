@@ -26,9 +26,10 @@ class SKETCH_3D_API TextureDirect3D11 {
 
 class SKETCH_3D_API Texture1DDirect3D11 : public Texture1D, public TextureDirect3D11 {
     public:
-                            Texture1DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+                            Texture1DDirect3D11(ID3D11Device* device);
         virtual            ~Texture1DDirect3D11();
 
+        virtual bool        Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false) override;
         ID3D11Texture1D*    GetTexture() const;
 
     private:
@@ -37,9 +38,10 @@ class SKETCH_3D_API Texture1DDirect3D11 : public Texture1D, public TextureDirect
 
 class SKETCH_3D_API Texture2DDirect3D11 : public Texture2D, public TextureDirect3D11 {
     public:
-                            Texture2DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+                            Texture2DDirect3D11(ID3D11Device* device);
         virtual            ~Texture2DDirect3D11();
 
+        virtual bool        Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false) override;
         ID3D11Texture2D*    GetTexture() const;
 
     private:
@@ -48,9 +50,10 @@ class SKETCH_3D_API Texture2DDirect3D11 : public Texture2D, public TextureDirect
 
 class SKETCH_3D_API Texture3DDirect3D11 : public Texture3D, public TextureDirect3D11 {
     public:
-                            Texture3DDirect3D11(ID3D11Device* device, TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false);
+                            Texture3DDirect3D11(ID3D11Device* device);
         virtual            ~Texture3DDirect3D11();
 
+        virtual bool        Initialize(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable=false) override;
         ID3D11Texture3D*    GetTexture() const;
 
     private:

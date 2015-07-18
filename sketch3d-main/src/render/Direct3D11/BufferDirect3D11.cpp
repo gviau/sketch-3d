@@ -5,7 +5,7 @@
 #include "system/Logger.h"
 
 namespace Sketch3D {
-BufferDirect3D11::BufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : context_(context), buffer_(nullptr) {
+BufferDirect3D11::BufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : device_(device), context_(context), buffer_(nullptr) {
 }
 
 BufferDirect3D11::~BufferDirect3D11() {
@@ -32,9 +32,18 @@ void BufferDirect3D11::InternalUnmap() const {
     context_->Unmap(buffer_, 0);
 }
 
-VertexBufferDirect3D11::VertexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context, void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) :
-        BufferDirect3D11(device, context), VertexBuffer(initialData, dynamic, immutable, vertexFormat, numVertices)
-{
+VertexBufferDirect3D11::VertexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : BufferDirect3D11(device, context) {
+}
+
+bool VertexBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) {
+    if (buffer_ != nullptr) {
+        Logger::GetInstance()->Warning("Vertex buffer with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    }
+
+    vertexFormat_ = vertexFormat;
+    numVertices_ = numVertices;
+
     D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
     if (immutable) {
         usage = D3D11_USAGE_IMMUTABLE;
@@ -54,7 +63,13 @@ VertexBufferDirect3D11::VertexBufferDirect3D11(ID3D11Device* device, ID3D11Devic
     data.SysMemPitch = 0;
     data.SysMemSlicePitch = 0;
 
-    device->CreateBuffer(&desc, &data, &buffer_);
+    HRESULT result = device_->CreateBuffer(&desc, &data, &buffer_);
+    if (FAILED(result)) {
+        Logger::GetInstance()->Error("Couldn't create vertex buffer");
+        return false;
+    }
+
+    return true;
 }
 
 void* VertexBufferDirect3D11::Map(MapFlag_t mapFlag) const {
@@ -65,9 +80,18 @@ void VertexBufferDirect3D11::Unmap() const {
     InternalUnmap();
 }
 
-IndexBufferDirect3D11::IndexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context, void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) :
-        BufferDirect3D11(device, context), IndexBuffer(initialData, dynamic, immutable, indexFormat, numIndices)
-{
+IndexBufferDirect3D11::IndexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : BufferDirect3D11(device, context) {
+}
+
+bool IndexBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) {
+    if (buffer_ != nullptr) {
+        Logger::GetInstance()->Warning("Index buffer with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    }
+
+    indexFormat_ = indexFormat;
+    numIndices_ = numIndices;
+
     D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
     if (immutable) {
         usage = D3D11_USAGE_IMMUTABLE;
@@ -89,7 +113,13 @@ IndexBufferDirect3D11::IndexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceC
     data.SysMemPitch = 0;
     data.SysMemSlicePitch = 0;
 
-    device->CreateBuffer(&desc, &data, &buffer_);
+    HRESULT result = device_->CreateBuffer(&desc, &data, &buffer_);
+    if (FAILED(result)) {
+        Logger::GetInstance()->Error("Couldn't create index buffer");
+        return false;
+    }
+
+    return true;
 }
 
 void* IndexBufferDirect3D11::Map(MapFlag_t mapFlag) const {
@@ -100,9 +130,15 @@ void IndexBufferDirect3D11::Unmap() const {
     InternalUnmap();
 }
 
-ConstantBufferDirect3D11::ConstantBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context, void* initialData, bool dynamic, bool immutable, size_t dataSize) : 
-        BufferDirect3D11(device, context), ConstantBuffer(initialData, dynamic, immutable, dataSize)
-{
+ConstantBufferDirect3D11::ConstantBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : BufferDirect3D11(device, context) {
+}
+
+bool ConstantBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool immutable, size_t dataSize) {
+    if (buffer_ != nullptr) {
+        Logger::GetInstance()->Warning("Constant buffer with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    }
+
     D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
     if (immutable) {
         usage = D3D11_USAGE_IMMUTABLE;
@@ -113,21 +149,28 @@ ConstantBufferDirect3D11::ConstantBufferDirect3D11(ID3D11Device* device, ID3D11D
     size_t sizeRoundedTo16Bytes = ((dataSize + 15) / 16) * 16;
     if (sizeRoundedTo16Bytes != dataSize) {
         Logger::GetInstance()->Error("Constant buffer structure size isn't rounded to 16 bytes boundary");
-    } else {
-        D3D11_BUFFER_DESC desc;
-        desc.Usage = usage;
-        desc.ByteWidth = dataSize;
-        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        desc.CPUAccessFlags = (dynamic) ? D3D11_CPU_ACCESS_WRITE : 0;
-        desc.MiscFlags = 0;
-
-        D3D11_SUBRESOURCE_DATA data;
-        data.pSysMem = initialData;
-        data.SysMemPitch = 0;
-        data.SysMemSlicePitch = 0;
-
-        device->CreateBuffer(&desc, &data, &buffer_);
+        return false;
     }
+
+    D3D11_BUFFER_DESC desc;
+    desc.Usage = usage;
+    desc.ByteWidth = dataSize;
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.CPUAccessFlags = (dynamic) ? D3D11_CPU_ACCESS_WRITE : 0;
+    desc.MiscFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA data;
+    data.pSysMem = initialData;
+    data.SysMemPitch = 0;
+    data.SysMemSlicePitch = 0;
+
+    HRESULT result = device_->CreateBuffer(&desc, &data, &buffer_);
+    if (FAILED(result)) {
+        Logger::GetInstance()->Error("Couldn't create constant buffer");
+        return false;
+    }
+
+    return true;
 }
 
 void* ConstantBufferDirect3D11::Map(MapFlag_t mapFlag) const {

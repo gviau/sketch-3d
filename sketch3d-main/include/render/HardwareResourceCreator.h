@@ -28,15 +28,14 @@ class VertexShader;
  */
 class SKETCH_3D_API HardwareResourceCreator {
     public:
-        virtual shared_ptr<ConstantBuffer>      CreateConstantBuffer(void* initialData, bool dynamic, bool immutable, size_t dataSize) = 0;
-        virtual shared_ptr<DepthStencilTarget>  CreateDepthStencilTarget(size_t width, size_t height, DepthStencilBits_t depthStencilBits) = 0;
-        virtual shared_ptr<IndexBuffer>         CreateIndexBuffer(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) = 0;
+        virtual shared_ptr<ConstantBuffer>      CreateConstantBuffer() = 0;
+        virtual shared_ptr<DepthStencilTarget>  CreateDepthStencilTarget() = 0;
+        virtual shared_ptr<IndexBuffer>         CreateIndexBuffer() = 0;
         virtual shared_ptr<FragmentShader>      CreateFragmentShader() = 0;
-        virtual shared_ptr<RenderTarget>        CreateRenderTarget(size_t width, size_t height, TextureFormat_t textureFormat) = 0;
-        virtual shared_ptr<SamplerState>        CreateSamplerState(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV, AddressMode_t addressModeW,
-                                                                   ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO) = 0;
-        virtual shared_ptr<Texture2D>           CreateTexture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) = 0;
-        virtual shared_ptr<VertexBuffer>        CreateVertexBuffer(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) = 0;
+        virtual shared_ptr<RenderTarget>        CreateRenderTarget() = 0;
+        virtual shared_ptr<SamplerState>        CreateSamplerState() = 0;
+        virtual shared_ptr<Texture2D>           CreateTexture2D() = 0;
+        virtual shared_ptr<VertexBuffer>        CreateVertexBuffer() = 0;
         virtual shared_ptr<VertexShader>        CreateVertexShader() = 0;
 };
 }

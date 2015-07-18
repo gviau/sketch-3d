@@ -66,11 +66,40 @@ bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_
     swapChainDesc.Windowed = window.IsWindowed();
 
     D3D_FEATURE_LEVEL featureLevel;
-    HRESULT result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &device_, &featureLevel, &context_);
+    HRESULT result;
+#ifdef _DEBUG
+    result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &swapChainDesc,
+                                           &swapChain_, &device_, &featureLevel, &context_);
+    if (FAILED(result)) {
+        Logger::GetInstance()->Error("Couldn't create render context and swap chain");
+        return false;
+    }
+#else
+    result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, nullptr, 0, D3D11_SDK_VERSION, &device_, &featureLevel, &context_);
     if (FAILED(result)) {
         Logger::GetInstance()->Error("Couldn't create the Direct3D11 context");
         return false;
     }
+
+    IDXGIDevice1* dxgiDevice = nullptr;
+    device_->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
+
+    IDXGIAdapter* dxgiAdapter = nullptr;
+    dxgiDevice->GetAdapter(&dxgiAdapter);
+
+    IDXGIFactory1* dxgiFactory = nullptr;
+    dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), (void**)&dxgiFactory);
+
+    result = dxgiFactory->CreateSwapChain(device_, &swapChainDesc, &swapChain_);
+    if (FAILED(result)) {
+        Logger::GetInstance()->Error("Couldn't create swap chain");
+        return false;
+    }
+
+    dxgiDevice->Release();
+    dxgiAdapter->Release();
+    dxgiFactory->Release();
+#endif
 
     string featureLevelStr = "";
     switch (featureLevel) {
@@ -92,25 +121,6 @@ bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_
 
     Logger::GetInstance()->Info("Direct3D11 context created");
     Logger::GetInstance()->Info("Feature Level = " + featureLevelStr);
-
-    IDXGIDevice1* dxgiDevice = nullptr;
-    device_->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
-
-    IDXGIAdapter* dxgiAdapter = nullptr;
-    dxgiDevice->GetAdapter(&dxgiAdapter);
-
-    IDXGIFactory1* dxgiFactory = nullptr;
-    dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), (void**)&dxgiFactory);
-
-    result = dxgiFactory->CreateSwapChain(device_, &swapChainDesc, &swapChain_);
-    if (FAILED(result)) {
-        Logger::GetInstance()->Error("Couldn't create swap chain");
-        return false;
-    }
-
-    dxgiDevice->Release();
-    dxgiAdapter->Release();
-    dxgiFactory->Release();
 
     // Create the default back buffer
     ID3D11Texture2D* backbuffer;

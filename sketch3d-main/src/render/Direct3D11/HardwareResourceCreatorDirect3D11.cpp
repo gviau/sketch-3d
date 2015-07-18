@@ -18,18 +18,18 @@ namespace Sketch3D {
 HardwareResourceCreatorDirect3D11::HardwareResourceCreatorDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : device_(device), context_(context) {
 }
 
-shared_ptr<ConstantBuffer> HardwareResourceCreatorDirect3D11::CreateConstantBuffer(void* initialData, bool dynamic, bool immutable, size_t dataSize)  {
-    ConstantBuffer* constantBuffer = new ConstantBufferDirect3D11(device_, context_, initialData, dynamic, immutable, dataSize);
+shared_ptr<ConstantBuffer> HardwareResourceCreatorDirect3D11::CreateConstantBuffer()  {
+    ConstantBuffer* constantBuffer = new ConstantBufferDirect3D11(device_, context_);
     return shared_ptr<ConstantBuffer>(constantBuffer);
 }
 
-shared_ptr<DepthStencilTarget> HardwareResourceCreatorDirect3D11::CreateDepthStencilTarget(size_t width, size_t height, DepthStencilBits_t depthStencilBits) {
-    DepthStencilTarget* depthStencilTarget = new DepthStencilTargetDirect3D11(device_, width, height, depthStencilBits);
+shared_ptr<DepthStencilTarget> HardwareResourceCreatorDirect3D11::CreateDepthStencilTarget() {
+    DepthStencilTarget* depthStencilTarget = new DepthStencilTargetDirect3D11(device_);
     return shared_ptr<DepthStencilTarget>(depthStencilTarget);
 }
 
-shared_ptr<IndexBuffer> HardwareResourceCreatorDirect3D11::CreateIndexBuffer(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) {
-    IndexBuffer* indexBuffer = new IndexBufferDirect3D11(device_, context_, initialData, dynamic, immutable, indexFormat, numIndices);
+shared_ptr<IndexBuffer> HardwareResourceCreatorDirect3D11::CreateIndexBuffer() {
+    IndexBuffer* indexBuffer = new IndexBufferDirect3D11(device_, context_);
     return shared_ptr<IndexBuffer>(indexBuffer);
 }
 
@@ -38,30 +38,23 @@ shared_ptr<FragmentShader> HardwareResourceCreatorDirect3D11::CreateFragmentShad
     return shared_ptr<FragmentShader>(fragmentShader);
 }
 
-shared_ptr<RenderTarget> HardwareResourceCreatorDirect3D11::CreateRenderTarget(size_t width, size_t height, TextureFormat_t format) {
-    RenderTarget* renderTarget = new RenderTargetDirect3D11(device_, width, height, format);
+shared_ptr<RenderTarget> HardwareResourceCreatorDirect3D11::CreateRenderTarget() {
+    RenderTarget* renderTarget = new RenderTargetDirect3D11(device_);
     return shared_ptr<RenderTarget>(renderTarget);
 }
 
-shared_ptr<SamplerState> HardwareResourceCreatorDirect3D11::CreateSamplerState(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
-        AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor)
-{
-    SamplerState* samplerState = new SamplerStateDirect3D11(device_, filterMode, addressModeU, addressModeV, addressModeW, comparisonFunction, borderColor);
+shared_ptr<SamplerState> HardwareResourceCreatorDirect3D11::CreateSamplerState() {
+    SamplerState* samplerState = new SamplerStateDirect3D11(device_);
     return shared_ptr<SamplerState>(samplerState);
 }
 
-shared_ptr<Texture2D> HardwareResourceCreatorDirect3D11::CreateTexture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) {
-    if (textureMap == nullptr) {
-        Logger::GetInstance()->Error("Invalid texture map passed for 2D texture creation");
-        return nullptr;
-    }
-
-    Texture2D* texture2D = new Texture2DDirect3D11(device_, textureMap, textureFormat, dynamic, immutable);
+shared_ptr<Texture2D> HardwareResourceCreatorDirect3D11::CreateTexture2D() {
+    Texture2D* texture2D = new Texture2DDirect3D11(device_);
     return shared_ptr<Texture2D>(texture2D);
 }
 
-shared_ptr<VertexBuffer> HardwareResourceCreatorDirect3D11::CreateVertexBuffer(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) {
-    VertexBuffer* vertexBuffer = new VertexBufferDirect3D11(device_, context_, initialData, dynamic, immutable, vertexFormat, numVertices);
+shared_ptr<VertexBuffer> HardwareResourceCreatorDirect3D11::CreateVertexBuffer() {
+    VertexBuffer* vertexBuffer = new VertexBufferDirect3D11(device_, context_);
     return shared_ptr<VertexBuffer>(vertexBuffer);
 }
 

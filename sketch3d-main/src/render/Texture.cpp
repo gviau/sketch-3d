@@ -3,24 +3,12 @@
 #include "system/Logger.h"
 
 namespace Sketch3D {
-Texture::Texture(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) : textureMap_(textureMap), textureFormat_(textureFormat) {
-}
-
 TextureMap* Texture::GetTextureMap() const {
     return textureMap_;
 }
 
 TextureFormat_t Texture::GetTextureFormat() const {
     return textureFormat_;
-}
-
-Texture1D::Texture1D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) : Texture(textureMap, textureFormat, dynamic, immutable) {
-}
-
-Texture2D::Texture2D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) : Texture(textureMap, textureFormat, dynamic, immutable) {
-}
-
-Texture3D::Texture3D(TextureMap* textureMap, TextureFormat_t textureFormat, bool dynamic, bool immutable) : Texture(textureMap, textureFormat, dynamic, immutable) {
 }
 
 size_t GetRowPitch(size_t width, TextureFormat_t textureFormat) {

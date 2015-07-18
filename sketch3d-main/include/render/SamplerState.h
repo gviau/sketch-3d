@@ -37,9 +37,10 @@ enum AddressMode_t {
  */
 class SKETCH_3D_API SamplerState {
     public:
-                                SamplerState(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV, AddressMode_t addressModeW,
-                                             ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO);
         virtual                ~SamplerState() {}
+
+        virtual bool            Initialize(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV, AddressMode_t addressModeW,
+                                           ComparisonFunction_t comparisonFunction, const Vector4& borderColor=Vector4::ZERO) = 0;
 
         FilterMode_t            GetFilterMode() const;
         AddressMode_t           GetAddressModeU() const;

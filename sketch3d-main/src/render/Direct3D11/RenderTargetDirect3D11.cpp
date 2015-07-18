@@ -3,7 +3,7 @@
 #include "system/Logger.h"
 
 namespace Sketch3D {
-RenderViewDirect3D11::RenderViewDirect3D11(ID3D11Device* device) : resourceView_(nullptr) {
+RenderViewDirect3D11::RenderViewDirect3D11(ID3D11Device* device) : device_(device), resourceView_(nullptr) {
 }
 
 RenderViewDirect3D11::~RenderViewDirect3D11() {
@@ -16,9 +16,25 @@ ID3D11ShaderResourceView* RenderViewDirect3D11::GetResourceView() const {
     return resourceView_;
 }
 
-RenderTargetDirect3D11::RenderTargetDirect3D11(ID3D11Device* device, size_t width, size_t height, TextureFormat_t format) :
-        RenderViewDirect3D11(device), RenderTarget(width, height, format), renderTargetView_(nullptr)
-{
+RenderTargetDirect3D11::RenderTargetDirect3D11(ID3D11Device* device) : RenderViewDirect3D11(device), renderTargetView_(nullptr) {
+}
+
+RenderTargetDirect3D11::~RenderTargetDirect3D11() {
+    if (renderTargetView_ != nullptr) {
+        renderTargetView_->Release();
+    }
+}
+
+bool RenderTargetDirect3D11::Initialize(size_t width, size_t height, TextureFormat_t format) {
+    if (renderTargetView_ != nullptr) {
+        Logger::GetInstance()->Warning("Render target with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    }
+
+    width_ = width;
+    height_ = height;
+    format_ = format;
+
     ID3D11Texture2D* texture;
     D3D11_TEXTURE2D_DESC textureDesc;
     ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -31,51 +47,63 @@ RenderTargetDirect3D11::RenderTargetDirect3D11(ID3D11Device* device, size_t widt
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
-    HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, &texture);
+    HRESULT hr = device_->CreateTexture2D(&textureDesc, nullptr, &texture);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create render target texture");
-    } else {
-
-        D3D11_RENDER_TARGET_VIEW_DESC renderTargetDesc;
-        renderTargetDesc.Format = textureDesc.Format;
-        renderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-        renderTargetDesc.Texture2D.MipSlice = 0;
-
-        hr = device->CreateRenderTargetView(texture, &renderTargetDesc, &renderTargetView_);
-        if (FAILED(hr)) {
-            Logger::GetInstance()->Error("Couldn't create render target");
-            texture->Release();
-        } else {
-
-            D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
-            resourceViewDesc.Format = textureDesc.Format;
-            resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            resourceViewDesc.Texture2D.MipLevels = 1;
-            resourceViewDesc.Texture2D.MostDetailedMip = 0;
-
-            hr = device->CreateShaderResourceView(texture, &resourceViewDesc, &resourceView_);
-            if (FAILED(hr)) {
-                Logger::GetInstance()->Error("Couldn't create shader resource view for render target");
-            }
-
-            texture->Release();
-        }
+        return false;
     }
-}
 
-RenderTargetDirect3D11::~RenderTargetDirect3D11() {
-    if (renderTargetView_ != nullptr) {
-        renderTargetView_->Release();
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetDesc;
+    renderTargetDesc.Format = textureDesc.Format;
+    renderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    renderTargetDesc.Texture2D.MipSlice = 0;
+
+    hr = device_->CreateRenderTargetView(texture, &renderTargetDesc, &renderTargetView_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create render target");
+        texture->Release();
+        return false;
     }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+    resourceViewDesc.Format = textureDesc.Format;
+    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resourceViewDesc.Texture2D.MipLevels = 1;
+    resourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+    hr = device_->CreateShaderResourceView(texture, &resourceViewDesc, &resourceView_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create shader resource view for render target");
+        texture->Release();
+        return false;
+    }
+
+    texture->Release();
+    return true;
 }
 
 ID3D11RenderTargetView* RenderTargetDirect3D11::GetRenderTargetView() const {
     return renderTargetView_;
 }
 
-DepthStencilTargetDirect3D11::DepthStencilTargetDirect3D11(ID3D11Device* device, size_t width, size_t height, DepthStencilBits_t depthStencilBits) :
-        RenderViewDirect3D11(device), DepthStencilTarget(width, height), depthStencilView_(nullptr)
-{
+DepthStencilTargetDirect3D11::DepthStencilTargetDirect3D11(ID3D11Device* device) : RenderViewDirect3D11(device), depthStencilView_(nullptr) {
+}
+
+DepthStencilTargetDirect3D11::~DepthStencilTargetDirect3D11() {
+    if (depthStencilView_ != nullptr) {
+        depthStencilView_->Release();
+    }
+}
+
+bool DepthStencilTargetDirect3D11::Initialize(size_t width, size_t height, DepthStencilBits_t depthStencilBits) {
+    if (depthStencilView_ != nullptr) {
+        Logger::GetInstance()->Warning("Depth stencil target with resource id # " + to_string(resourceId_) + " already created");
+        return false;
+    }
+
+    width_ = width;
+    height_ = height;
+
     ID3D11Texture2D* texture;
     D3D11_TEXTURE2D_DESC textureDesc;
     ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -88,43 +116,40 @@ DepthStencilTargetDirect3D11::DepthStencilTargetDirect3D11(ID3D11Device* device,
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
     
-    HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, &texture);
+    HRESULT hr = device_->CreateTexture2D(&textureDesc, nullptr, &texture);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create depth stencil target texture");
-    } else{
-
-        D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-        depthStencilViewDesc.Format = GetD3DDepthStencilViewFormat(depthStencilBits);
-        depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-        depthStencilViewDesc.Texture2D.MipSlice = 0;
-        depthStencilViewDesc.Flags = 0;
-
-        hr = device->CreateDepthStencilView(texture, &depthStencilViewDesc, &depthStencilView_);
-        if (FAILED(hr)) {
-            Logger::GetInstance()->Error("Couldn't create depth stencil target");
-            texture->Release();
-        } else {
-
-            D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
-            resourceViewDesc.Format = GetD3DDepthStencilTargetFormat(depthStencilBits);
-            resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            resourceViewDesc.Texture2D.MipLevels = 1;
-            resourceViewDesc.Texture2D.MostDetailedMip = 0;
-
-            hr = device->CreateShaderResourceView(texture, &resourceViewDesc, &resourceView_);
-            if (FAILED(hr)) {
-                Logger::GetInstance()->Error("Couldn't create shader resource view for depth stencil target");
-            }
-
-            texture->Release();
-        }
+        return false;
     }
-}
 
-DepthStencilTargetDirect3D11::~DepthStencilTargetDirect3D11() {
-    if (depthStencilView_ != nullptr) {
-        depthStencilView_->Release();
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+    depthStencilViewDesc.Format = GetD3DDepthStencilViewFormat(depthStencilBits);
+    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    depthStencilViewDesc.Texture2D.MipSlice = 0;
+    depthStencilViewDesc.Flags = 0;
+
+    hr = device_->CreateDepthStencilView(texture, &depthStencilViewDesc, &depthStencilView_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create depth stencil target");
+        texture->Release();
+        return false;
     }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+    resourceViewDesc.Format = GetD3DDepthStencilTargetFormat(depthStencilBits);
+    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resourceViewDesc.Texture2D.MipLevels = 1;
+    resourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+    hr = device_->CreateShaderResourceView(texture, &resourceViewDesc, &resourceView_);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create shader resource view for depth stencil target");
+        texture->Release();
+        return false;
+    }
+
+    texture->Release();
+    return true;
 }
 
 ID3D11DepthStencilView* DepthStencilTargetDirect3D11::GetDepthStencilView() const {

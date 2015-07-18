@@ -12,13 +12,6 @@ namespace Sketch3D {
  */
 class SKETCH_3D_API Buffer : public HardwareResource {
     public:
-        /**
-         * Constructor
-         * @param initialData Pointer to the buffer's initial data
-         * @param dynamic Is the buffer dynamic?
-         * @param isImmutable Is the buffer immutable?
-         */
-                        Buffer(void* initialData, bool dynamic, bool immutable);
         virtual        ~Buffer() {}
 
         virtual void*   Map(MapFlag_t mapFlag) const = 0;
@@ -27,8 +20,7 @@ class SKETCH_3D_API Buffer : public HardwareResource {
 
 class SKETCH_3D_API VertexBuffer : public Buffer {
     public:
-                        VertexBuffer(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices);
-
+        virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) = 0;
         VertexFormat*   GetVertexFormat() const;
         size_t          GetNumVertices() const;
 
@@ -39,8 +31,7 @@ class SKETCH_3D_API VertexBuffer : public Buffer {
 
 class SKETCH_3D_API IndexBuffer : public Buffer {
     public:
-                        IndexBuffer(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices);
-
+        virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) = 0;
         IndexFormat_t   GetIndexFormat() const;
         size_t          GetNumIndices() const;
 
@@ -51,7 +42,7 @@ class SKETCH_3D_API IndexBuffer : public Buffer {
 
 class SKETCH_3D_API ConstantBuffer : public Buffer {
     public:
-        ConstantBuffer(void* initialData, bool dynamic, bool immutable, size_t dataSize);
+        virtual bool Initialize(void* initialData, bool dynamic, bool immutable, size_t dataSize) = 0;
 };
 
 }

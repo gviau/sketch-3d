@@ -3,11 +3,14 @@
 
 #include "render/Texture.h"
 
+#include "render/Renderer_Common.h"
+
 namespace Sketch3D {
 class SKETCH_3D_API RenderTarget : public HardwareResource {
     public:
-                        RenderTarget(size_t width, size_t height, TextureFormat_t textureFormat);
         virtual        ~RenderTarget() {}
+
+        virtual bool    Initialize(size_t width, size_t height, TextureFormat_t textureFormat) = 0;
 
         size_t          GetWidth() const;
         size_t          GetHeight() const;
@@ -21,8 +24,9 @@ class SKETCH_3D_API RenderTarget : public HardwareResource {
 
 class SKETCH_3D_API DepthStencilTarget : public HardwareResource {
     public:
-                        DepthStencilTarget(size_t width, size_t height);
         virtual        ~DepthStencilTarget() {}
+
+        virtual bool    Initialize(size_t width, size_t height, DepthStencilBits_t depthStencilBits) = 0;
 
         size_t          GetWidth() const;
         size_t          GetHeight() const;

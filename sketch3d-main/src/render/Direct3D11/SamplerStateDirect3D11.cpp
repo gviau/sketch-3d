@@ -3,12 +3,32 @@
 #include "system/Logger.h"
 
 namespace Sketch3D {
-SamplerStateDirect3D11::SamplerStateDirect3D11(ID3D11Device* device, FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
-                                                AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor) :
-        SamplerState(filterMode, addressModeU, addressModeV, addressModeW, comparisonFunction, borderColor), samplerState_(nullptr)
+SamplerStateDirect3D11::SamplerStateDirect3D11(ID3D11Device* device) : device_(device), samplerState_(nullptr) {
+}
+
+SamplerStateDirect3D11::~SamplerStateDirect3D11() {
+    if (samplerState_ != nullptr) {
+        samplerState_->Release();
+    }
+}
+
+bool SamplerStateDirect3D11::Initialize(FilterMode_t filterMode, AddressMode_t addressModeU, AddressMode_t addressModeV,
+                                        AddressMode_t addressModeW, ComparisonFunction_t comparisonFunction, const Vector4& borderColor)
 {
+    if (samplerState_ != nullptr) {
+        Logger::GetInstance()->Warning("Sampler state already created");
+        return false;
+    }
+
+    filterMode_ = filterMode;
+    addressModeU_ = addressModeU;
+    addressModeV_ = addressModeV;
+    addressModeW_ = addressModeW;
+    comparisonFunction_ = comparisonFunction;
+    borderColor_ = borderColor;
+
     D3D11_SAMPLER_DESC samplerDesc;
-    samplerDesc.Filter = GetD3DFilterMode(filterMode);
+    samplerDesc.Filter = GetD3DFilterMode(filterMode_);
     samplerDesc.AddressU = GetD3DAddressMode(addressModeU_);
     samplerDesc.AddressV = GetD3DAddressMode(addressModeV_);
     samplerDesc.AddressW = GetD3DAddressMode(addressModeW_);
@@ -22,16 +42,13 @@ SamplerStateDirect3D11::SamplerStateDirect3D11(ID3D11Device* device, FilterMode_
     samplerDesc.MinLOD = 0.0f;
     samplerDesc.MipLODBias = 0.0f;
 
-    HRESULT hr = device->CreateSamplerState(&samplerDesc, &samplerState_);
+    HRESULT hr = device_->CreateSamplerState(&samplerDesc, &samplerState_);
     if (FAILED(hr)) {
         Logger::GetInstance()->Error("Couldn't create sampler state");
+        return false;
     }
-}
 
-SamplerStateDirect3D11::~SamplerStateDirect3D11() {
-    if (samplerState_ != nullptr) {
-        samplerState_->Release();
-    }
+    return true;
 }
 
 ID3D11SamplerState* SamplerStateDirect3D11::GetSamplerState() const {
