@@ -46,14 +46,17 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
 		virtual void                        ClearRenderTargets(const Vector4& color) override;
         virtual void                        ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) override;
         virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
+        virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetDefaultRenderTarget() override;
 
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;
+        virtual void                        SetDefaultDepthStencilState(unsigned int referenceMask) override;
+        virtual void                        SetDefaultRasterizerState() override;
 
         virtual shared_ptr<FragmentShader>& GetFragmentShader() override;
         virtual void                        SetFragmentShader(shared_ptr<FragmentShader> fragmentShader) override;
-        virtual bool                        SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) override;
+        virtual bool                        SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) override;
         virtual bool                        SetFragmentShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) override;
         virtual bool                        SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) override;
         virtual bool                        SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) override;
@@ -62,7 +65,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
 
         virtual shared_ptr<VertexShader>&   GetVertexShader() override;
         virtual void                        SetVertexShader(shared_ptr<VertexShader> vertexShader) override;
-        virtual bool                        SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) override;
+        virtual bool                        SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) override;
         virtual bool                        SetVertexShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) override;
         virtual bool                        SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) override;
         virtual bool                        SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) override;
@@ -87,15 +90,22 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
     private:
         ID3D11Device*                       device_;
         ID3D11DeviceContext*                context_;
-        ID3D11RenderTargetView*             currentBackbuffer_;
-        ID3D11DepthStencilView*             currentDepthStencilBuffer_;
+        ID3D11RenderTargetView*             defaultBackbuffer_;
+        ID3D11DepthStencilView*             defaultDepthStencilBuffer_;
 
-        vector<ID3D11RenderTargetView*>     renderTargets_;
+        // This stuff will move in the render state manager
+        vector<ID3D11RenderTargetView*>     currentRenderTargets_;
+        ID3D11DepthStencilView*             currentDepthStencilBuffer_;
+        ID3D11RasterizerState*              currentRasterizerState_;
+        ID3D11DepthStencilState*            currentDepthStencilState_;
 
         ID3D11PixelShader*                  currentPixelShader_;
         ID3D11VertexShader*                 currentVertexShader_;
 
         HardwareResourceCreatorDirect3D11*  hardwareResourceCreator_;
+
+        virtual bool                        CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) override;
+        virtual bool                        CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) override;
 };
 
 // UTILITY FUNCTIONS

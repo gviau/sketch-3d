@@ -10,7 +10,7 @@
 #pragma warning( default : 4005 )
 
 namespace Sketch3D {
-RenderContextDirect3D11::RenderContextDirect3D11() : context_(nullptr), swapChain_(nullptr), device_(nullptr), backbuffer_(nullptr), depthStencil_(nullptr), depthStencilBuffer_(nullptr) {
+RenderContextDirect3D11::RenderContextDirect3D11() : context_(nullptr), swapChain_(nullptr), device_(nullptr) {
 }
 
 RenderContextDirect3D11::~RenderContextDirect3D11() {
@@ -18,29 +18,31 @@ RenderContextDirect3D11::~RenderContextDirect3D11() {
         swapChain_->Release();
     }
 
-    if (backbuffer_ != nullptr) {
-        backbuffer_->Release();
+    if (context_ != nullptr) {
+        context_->Release();
     }
 
-    if (depthStencil_ != nullptr) {
-        depthStencil_->Release();
-    }
-    
-    if (depthStencilBuffer_ != nullptr) {
-        depthStencilBuffer_->Release();
-    }
+#if _DEBUG
+    ID3D11Debug* debug = nullptr;
+    device_->QueryInterface(IID_PPV_ARGS(&debug));
+#endif
 
     if (device_ != nullptr) {
         device_->Release();
     }
 
-    if (context_ != nullptr) {
-        context_->Release();
+#if _DEBUG
+    if (debug != nullptr) {
+        debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
     }
+#endif
+
+    Logger::GetInstance()->Info("Direct3D11 context destroyed");
 }
 
 bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_t& renderParameters) {
     Logger::GetInstance()->Debug("Initializing Direct3D11 context");
+    renderParameters_ = renderParameters;
 
     DXGI_FORMAT backbufferFormat;
     switch (renderParameters.displayFormat) {
@@ -122,53 +124,6 @@ bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_
     Logger::GetInstance()->Info("Direct3D11 context created");
     Logger::GetInstance()->Info("Feature Level = " + featureLevelStr);
 
-    // Create the default back buffer
-    ID3D11Texture2D* backbuffer;
-    result = swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
-    result = device_->CreateRenderTargetView(backbuffer, nullptr, &backbuffer_);
-    backbuffer->Release();
-
-    // Create the default depth stencil buffer
-    DXGI_FORMAT depthStencilFormat;
-    switch (renderParameters.depthStencilBits) {
-        case DepthStencilBits_t::D16:   depthStencilFormat = DXGI_FORMAT_D16_UNORM; break;
-        case DepthStencilBits_t::D24S8: depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
-        case DepthStencilBits_t::D32:   depthStencilFormat = DXGI_FORMAT_D32_FLOAT; break;
-    }
-
-    D3D11_TEXTURE2D_DESC depthStencilDesc;
-    depthStencilDesc.Width = renderParameters.width;
-    depthStencilDesc.Height = renderParameters.height;
-    depthStencilDesc.MipLevels = 1;
-    depthStencilDesc.ArraySize = 1;
-    depthStencilDesc.Format = depthStencilFormat;
-    depthStencilDesc.SampleDesc.Count = 1;
-    depthStencilDesc.SampleDesc.Quality = 0;
-    depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-    depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    depthStencilDesc.CPUAccessFlags = 0;
-    depthStencilDesc.MiscFlags = 0;
-
-    result = device_->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencil_);
-    result = device_->CreateDepthStencilView(depthStencil_, nullptr, &depthStencilBuffer_);
-
-    // Set the default rasterizer state
-    D3D11_RASTERIZER_DESC rasterizerDesc;
-	rasterizerDesc.AntialiasedLineEnable = false;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.DepthBias = 0;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.DepthClipEnable = true;
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.FrontCounterClockwise = true;
-	rasterizerDesc.MultisampleEnable = false;
-	rasterizerDesc.ScissorEnable = false;
-	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-
-    ID3D11RasterizerState* rasterizerState;
-    result = device_->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
-    context_->RSSetState(rasterizerState);
-
     // Set the default viewport
     D3D11_VIEWPORT viewport;
     viewport.TopLeftX = 0;
@@ -193,14 +148,6 @@ ID3D11Device* RenderContextDirect3D11::GetDevice() const {
 
 ID3D11DeviceContext* RenderContextDirect3D11::GetDeviceContext() const {
     return context_;
-}
-
-ID3D11RenderTargetView* RenderContextDirect3D11::GetBackBuffer() const {
-    return backbuffer_;
-}
-
-ID3D11DepthStencilView* RenderContextDirect3D11::GetDepthStencilBuffer() const {
-    return depthStencilBuffer_;
 }
 
 void RenderContextDirect3D11::QueryAdapterSupportedDisplayFormats() {

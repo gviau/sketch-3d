@@ -48,16 +48,19 @@ class SKETCH_3D_API RenderDevice {
 		virtual void ClearRenderTargets(const Vector4& color) = 0;
         virtual void ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) = 0;
         virtual void SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
+        virtual void SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
         virtual void SetDefaultRenderTarget() = 0;
 
         // RENDER STATE STUFF
         virtual void SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) = 0;
         virtual void SetRasterizerState(const RasterizerState_t& rasterizerState) = 0;
+        virtual void SetDefaultDepthStencilState(unsigned int referenceMask) = 0;
+        virtual void SetDefaultRasterizerState() = 0;
 
         // SHADERS STUFF
         virtual shared_ptr<FragmentShader>& GetFragmentShader() = 0;
         virtual void SetFragmentShader(shared_ptr<FragmentShader> fragmentShader) = 0;
-        virtual bool SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
+        virtual bool SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) = 0;
         virtual bool SetFragmentShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
@@ -66,7 +69,7 @@ class SKETCH_3D_API RenderDevice {
 
         virtual shared_ptr<VertexShader>& GetVertexShader() = 0;
         virtual void SetVertexShader(shared_ptr<VertexShader> vertexShader) = 0;
-        virtual bool SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer) = 0;
+        virtual bool SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) = 0;
         virtual bool SetVertexShaderSamplerState(const shared_ptr<SamplerState>& samplerState, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot) = 0;
         virtual bool SetVertexShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot) = 0;
@@ -86,9 +89,21 @@ class SKETCH_3D_API RenderDevice {
         virtual void CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) = 0;
         
         virtual HardwareResourceCreator* GetHardwareResourceCreator() const = 0;
+        const DepthStencilState_t& GetDefaultDepthStencilState() const { return defaultDepthStencilState_; }
+        DepthStencilState_t& GetDefaultDepthStencilState() { return defaultDepthStencilState_; }
+        const RasterizerState_t& GetDefaultRasterizerState() const { return defaultRasterizerState_; }
+        RasterizerState_t& GetDefaultRasterizerState() { return defaultRasterizerState_; }
+
     protected:
         shared_ptr<FragmentShader>  fragmentShader_;
         shared_ptr<VertexShader>    vertexShader_;
+        DepthStencilState_t         defaultDepthStencilState_;
+        RasterizerState_t           defaultRasterizerState_;
+        size_t                      width_;
+        size_t                      height_;
+
+        virtual bool CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) = 0;
+        virtual bool CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) = 0;
 };
 
 shared_ptr<RenderDevice> SKETCH_3D_API CreateRenderDevice(RenderSystem_t renderSystem);

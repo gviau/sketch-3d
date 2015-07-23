@@ -4,8 +4,6 @@
 
 #if PLATFORM == PLATFORM_WIN32
 #include "render/Direct3D11/RenderContextDirect3D11.h"
-#include "render/Direct3D9/RenderContextDirect3D9.h"
-#include "render/OpenGL/Win32/RenderContextOpenGLWin32.h"
 #elif PLATFORM == PLATFORM_LINUX
 #include "render/OpenGL/Unix/RenderContextOpenGLUnix.h"
 #endif
