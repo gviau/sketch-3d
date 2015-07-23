@@ -160,11 +160,17 @@ bool ConstantBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool 
     desc.MiscFlags = 0;
 
     D3D11_SUBRESOURCE_DATA data;
-    data.pSysMem = initialData;
-    data.SysMemPitch = 0;
-    data.SysMemSlicePitch = 0;
+    D3D11_SUBRESOURCE_DATA* pData = &data;
 
-    HRESULT result = device_->CreateBuffer(&desc, &data, &buffer_);
+    if (initialData != nullptr) {
+        pData->pSysMem = initialData;
+        pData->SysMemPitch = 0;
+        pData->SysMemSlicePitch = 0;
+    } else {
+        pData = nullptr;
+    }
+
+    HRESULT result = device_->CreateBuffer(&desc, pData, &buffer_);
     if (FAILED(result)) {
         Logger::GetInstance()->Error("Couldn't create constant buffer");
         return false;
