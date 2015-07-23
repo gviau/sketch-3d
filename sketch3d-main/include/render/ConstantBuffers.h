@@ -11,13 +11,20 @@ namespace Sketch3D {
 struct ALIGNED_(16) PassConstants_t {
     Matrix4x4 projectionMatrix;
     Matrix4x4 viewMatrix;
-    Matrix4x4 modelMatrix;
+};
 
+struct ALIGNED_(16) DrawConstants_t {
+    Matrix4x4 modelMatrix;
     Matrix4x4 modelViewProjectionMatrix;
     Matrix4x4 ViewProjectionMatrix;
     Matrix4x4 modelViewMatrix;
 
     Matrix4x4 inverseTransposeModelViewMatrix;
+};
+
+struct ALIGNED_(16) ShadowConstants_t {
+    Matrix4x4 lightViewMatrix;
+    Matrix4x4 lightProjectionMatrix;
 };
 
 }
