@@ -78,6 +78,10 @@ VertexShaderDirect3D11::VertexShaderDirect3D11(ID3D11Device* device) : ShaderDir
 }
 
 VertexShaderDirect3D11::~VertexShaderDirect3D11() {
+    if (inputLayout_ != nullptr) {
+        inputLayout_->Release();
+    }
+
     if (shader_ != nullptr) {
         shader_->Release();
     }
