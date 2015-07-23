@@ -75,12 +75,25 @@ int main(int argc, char** argv) {
     shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer();
     init = indexBuffer->Initialize((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
 
-    Vertex_Pos_t fullscreenQuadVertices[] = {
-        { Vector3(-1.0f, -1.0f, 0.0f) },
-        { Vector3(-1.0f,  1.0f, 0.0f) },
-        { Vector3( 1.0f,  1.0f, 0.0f) },
-        { Vector3( 1.0f, -1.0f, 0.0f) }
+    Vertex_Pos_UV_t planeVertices[] = {
+        { Vector3(-5.0f, 0.0f, -5.0f), Vector2(0.0f, 0.0f) },
+        { Vector3(-5.0f, 0.0f,  5.0f), Vector2(0.0f, 1.0f) },
+        { Vector3( 5.0f, 0.0f,  5.0f), Vector2(1.0f, 1.0f) },
+        { Vector3( 5.0f, 0.0f, -5.0f), Vector2(1.0f, 0.0f) }
     };
+    numVertices = _countof(planeVertices);
+
+    shared_ptr<VertexBuffer> planeVertexBuffer = hardwareResourceCreator->CreateVertexBuffer();
+    init = planeVertexBuffer->Initialize((void*)planeVertices, false, false, &vertexFormat, numVertices);
+
+    unsigned short planeIndices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+    numIndices = _countof(planeIndices);
+
+    shared_ptr<IndexBuffer> planeIndexBuffer = hardwareResourceCreator->CreateIndexBuffer();
+    init = planeIndexBuffer->Initialize((void*)planeIndices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
 
 	float height = tan(60.0f * DEG_2_RAD_OVER_2);
 	float width = height * 1024.0f / 768.0f;
@@ -104,13 +117,96 @@ int main(int argc, char** argv) {
     projection[2][3] = nearPlane * farPlane / dz;
     projection[3][3] = 0.0f;
 
+    Vector3 position(-4.0f, 2.0f, -4.0f);
+    Vector3 direction = Vector3::ZERO - position;
+	direction.Normalize();
+
+    Vector3 r = direction.Cross(Vector3::UP);
+	r.Normalize();
+
+	Vector3 u = r.Cross(direction);
+	u.Normalize();
+
     Matrix4x4 view;
-    view[2][3] = -5.0f;
+    view[0][0] = r.x;
+    view[0][1] = r.y;
+    view[0][2] = r.z;
+
+    view[1][0] = u.x;
+    view[1][1] = u.y;
+    view[1][2] = u.z;
+
+    view[2][0] = -direction.x;
+    view[2][1] = -direction.y;
+    view[2][2] = -direction.z;
+
+    view[0][3] = -position.Dot(r);
+    view[1][3] = -position.Dot(u);
+    view[2][3] =  position.Dot(direction);
+
+	height = tan(75.0f * DEG_2_RAD_OVER_2);
+	width = height * 1024.0f / 768.0f;
+    right = width;
+    left = -width;
+    top = height;
+    bottom = -height;
+    nearPlane = 1.0f;
+    farPlane = 1000.0f;
+
+    w = right - left;
+    h = top - bottom;
+    dz = nearPlane - farPlane;
+    z2 = 2.0f * nearPlane;
+
+    Matrix4x4 lightProjectionMatrix;
+    projection[0][0] = z2 / w;
+    projection[1][1] = z2 / h;
+    projection[2][2] = farPlane / dz;
+    projection[3][2] = -1.0f;
+    projection[2][3] = nearPlane * farPlane / dz;
+    projection[3][3] = 0.0f;
+
+    position = Vector3(0.0f, 5.0f, -10.0f);
+    direction = Vector3::ZERO - position;
+	direction.Normalize();
+
+    r = direction.Cross(Vector3::UP);
+	r.Normalize();
+
+	u = r.Cross(direction);
+	u.Normalize();
+
+    Matrix4x4 lightViewMatrix;
+    lightViewMatrix[0][0] = r.x;
+    lightViewMatrix[0][1] = r.y;
+    lightViewMatrix[0][2] = r.z;
+
+    lightViewMatrix[1][0] = u.x;
+    lightViewMatrix[1][1] = u.y;
+    lightViewMatrix[1][2] = u.z;
+
+    lightViewMatrix[2][0] = -direction.x;
+    lightViewMatrix[2][1] = -direction.y;
+    lightViewMatrix[2][2] = -direction.z;
+
+    lightViewMatrix[0][3] = -position.Dot(r);
+    lightViewMatrix[1][3] = -position.Dot(u);
+    lightViewMatrix[2][3] =  position.Dot(direction);
 
     PassConstants_t initialPassConstants;
     initialPassConstants.projectionMatrix = projection.Transpose();
+    initialPassConstants.viewMatrix = view.Transpose();
     shared_ptr<ConstantBuffer> constantBuffer = hardwareResourceCreator->CreateConstantBuffer();
     init = constantBuffer->Initialize((void*)&initialPassConstants, true, false, sizeof(PassConstants_t));
+
+    shared_ptr<ConstantBuffer> drawConstantBuffer = hardwareResourceCreator->CreateConstantBuffer();
+    init = drawConstantBuffer->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
+
+    ShadowConstants_t initialShadowConstants;
+    initialShadowConstants.lightProjectionMatrix = lightProjectionMatrix;
+    initialShadowConstants.lightViewMatrix = lightViewMatrix;
+    shared_ptr<ConstantBuffer> shadowConstantBuffer = hardwareResourceCreator->CreateConstantBuffer();
+    init = shadowConstantBuffer->Initialize((void*)&initialShadowConstants, true, false, sizeof(ShadowConstants_t));
 
     shared_ptr<FragmentShader> fragmentShader = hardwareResourceCreator->CreateFragmentShader();
     init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.hlsl");
@@ -119,17 +215,36 @@ int main(int argc, char** argv) {
     init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.hlsl");
     init = vertexShader->CreateInputLayout(&vertexFormat);
 
+    shared_ptr<VertexShader> drawShadowShader = hardwareResourceCreator->CreateVertexShader();
+    init = drawShadowShader->InitializeFromFile("InteractiveWater/Shaders/drawShadow.hlsl");
+    init = drawShadowShader->CreateInputLayout(&vertexFormat);
+
+    shared_ptr<FragmentShader> recordShadowShader = hardwareResourceCreator->CreateFragmentShader();
+    init = recordShadowShader->InitializeFromFile("InteractiveWater/Shaders/recordShadow.hlsl");
+
+    shared_ptr<FragmentShader> drawShadow = hardwareResourceCreator->CreateFragmentShader();
+    init = drawShadow->InitializeFromFile("InteractiveWater/Shaders/shadowFrag.hlsl");
+
     shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState();
     init = samplerState->Initialize(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP, AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
 
-    unsigned char data[] = {
+    unsigned char data1[] = {
         255, 255, 255, 255, 0, 0, 0, 0,
         0, 0, 0, 0, 255, 255, 255, 255
     };
-    TextureMap textureMap(data, 2, 2);
+    TextureMap textureMap1(data1, 2, 2);
 
-    shared_ptr<Texture2D> texture = hardwareResourceCreator->CreateTexture2D();
-    init = texture->Initialize(&textureMap, TextureFormat_t::RGBA32, false, false);
+    shared_ptr<Texture2D> squares = hardwareResourceCreator->CreateTexture2D();
+    init = squares->Initialize(&textureMap1, TextureFormat_t::RGBA32, false, false);
+
+    unsigned char data2[] = {
+        255, 255, 255, 255, 255, 255, 255, 255,
+        255, 255, 255, 255, 255, 255, 255, 255
+    };
+    TextureMap textureMap2(data2, 2, 2);
+
+    shared_ptr<Texture2D> white = hardwareResourceCreator->CreateTexture2D();
+    init = white->Initialize(&textureMap2, TextureFormat_t::RGBA32, false, false);
     
     shared_ptr<RenderTarget> renderTarget = hardwareResourceCreator->CreateRenderTarget();
     init = renderTarget->Initialize(1024, 768, TextureFormat_t::RGBA32);
@@ -140,64 +255,62 @@ int main(int argc, char** argv) {
     shared_ptr<DepthStencilTarget> depthStencilTarget = hardwareResourceCreator->CreateDepthStencilTarget();
     init = depthStencilTarget->Initialize(1024, 768, DepthStencilBits_t::D32);
 
-    PassConstants_t* passConstants;
+    DrawConstants_t* drawConstants;
     Matrix4x4 modelMatrix;
+    modelMatrix.SetTranslation(Vector3(2.0f, 1.0f, 1.0f));
     float angle = 0.0f;
 
-    renderDevice->SetFragmentShader(fragmentShader);
-    renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
-    renderDevice->SetVertexShader(vertexShader);
+    vector<shared_ptr<RenderTarget>> noRenderTargets;
+    /*
+    RasterizerState_t shadowRecordState;
+    shadowRecordState.cullingMethod = CullingMethod_t::FRONT_FACE;
+    shadowRecordState.
+    RasterizerState_t normalRecordState;
+    */
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
         
-        void* data = constantBuffer->Map(MapFlag_t::WRITE_DISCARD);
-
-        passConstants = (PassConstants_t*)data;
-        passConstants->projectionMatrix = projection.Transpose();
-        passConstants->viewMatrix = view.Transpose();
-        passConstants->modelMatrix = modelMatrix.Transpose();
-
-        constantBuffer->Unmap();
-
-        Matrix4x4 rotX, rotY;
-        rotX.RotationAroundX(angle);
-        rotY.RotationAroundY(angle);
-        modelMatrix = rotX * rotY;
-        angle += 0.001f;
-
         ///////////////////////////////////////////////////////////////////////
-        // Render into render target
-        renderDevice->SetRenderTargets(renderTargets, nullptr);
-        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
+        // Render in shadow map
+        ///////////////////////////////////////////////////////////////////////
+        void* data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
+
+        drawConstants = (DrawConstants_t*)data;
+        drawConstants->modelMatrix = modelMatrix.Transpose();
+
+        drawConstantBuffer->Unmap();
+
+        //renderDevice->SetRenderTargets(noRenderTargets, depthStencilTarget);
+        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f, 1.0f));
         renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
 
-        renderDevice->SetFragmentShaderTexture(texture, 0);
-
-        renderDevice->SetVertexShaderConstantBuffer(constantBuffer);
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
-
-        ///////////////////////////////////////////////////////////////////////
-        // Render into default render target
-        renderDevice->SetDefaultRenderTarget();
-        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
-        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
-
-        renderDevice->SetFragmentShaderTexture(renderTarget, 0);
-
-        renderDevice->SetVertexShaderConstantBuffer(constantBuffer);
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
-
-        /*
-        renderDevice->SetFragmentShader(fullscreenQuadFragmentShader);
+        renderDevice->SetFragmentShader(fragmentShader);
         renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
-        renderDevice->SetFragmentShaderTexture(renderTarget, 0);
+        renderDevice->SetFragmentShaderTexture(squares, 0);
 
-        renderDevice->SetVertexShader(fullscreenQuadVertexShader);
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVB, fullscreenQuadIB, 0, 0);
-        */
+        renderDevice->SetVertexShader(vertexShader);
+        renderDevice->SetVertexShaderConstantBuffer(constantBuffer, 0);
+        renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 1);
+
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+
+        data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
+
+        drawConstants = (DrawConstants_t*)data;
+        drawConstants->modelMatrix = Matrix4x4::IDENTITY;
+
+        drawConstantBuffer->Unmap();
+
+        renderDevice->SetFragmentShaderTexture(white, 0);
+        renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 1);
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, planeVertexBuffer, planeIndexBuffer, 0, 0);
+        ///////////////////////////////////////////////////////////////////////
+        // Render the normal scene
+        ///////////////////////////////////////////////////////////////////////
+
         renderContext->SwapBuffers();
     }
 
