@@ -37,7 +37,7 @@ RenderContextDirect3D11::~RenderContextDirect3D11() {
     }
 #endif
 
-    Logger::GetInstance()->Info("Direct3D11 context destroyed");
+    Logger::GetInstance()->Info("Direct3D context destroyed");
 }
 
 bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_t& renderParameters) {

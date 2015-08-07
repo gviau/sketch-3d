@@ -47,7 +47,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
         virtual void                        ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) override;
         virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
-        virtual void                        SetDefaultRenderTarget() override;
+        virtual void                        SetDefaultRenderTargetAndDepthStencilBuffer() override;
 
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;

@@ -28,7 +28,8 @@ RenderDeviceDirect3D11::RenderDeviceDirect3D11()
     , currentRasterizerState_(nullptr)
     , currentDepthStencilState_(nullptr)
     , currentDepthStencilBuffer_(nullptr)
-    , hardwareResourceCreator_(nullptr) {
+    , hardwareResourceCreator_(nullptr)
+{
 }
 
 RenderDeviceDirect3D11::~RenderDeviceDirect3D11() {
@@ -126,7 +127,7 @@ void RenderDeviceDirect3D11::SetDepthStencilTarget(const shared_ptr<DepthStencil
     context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
 }
 
-void RenderDeviceDirect3D11::SetDefaultRenderTarget() {
+void RenderDeviceDirect3D11::SetDefaultRenderTargetAndDepthStencilBuffer() {
     currentRenderTargets_.clear();
     currentRenderTargets_.push_back(defaultBackbuffer_);
     currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
@@ -135,6 +136,10 @@ void RenderDeviceDirect3D11::SetDefaultRenderTarget() {
 }
 
 void RenderDeviceDirect3D11::SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) {
+    if (currentDepthStencilState_ != nullptr) {
+        currentDepthStencilState_->Release();
+    }
+
     D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
     depthStencilDesc.DepthEnable = depthStencilState.depthEnable;
     depthStencilDesc.DepthWriteMask = (depthStencilState.depthWriteMask) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -149,6 +154,10 @@ void RenderDeviceDirect3D11::SetDepthStencilState(const DepthStencilState_t& dep
 }
 
 void RenderDeviceDirect3D11::SetRasterizerState(const RasterizerState_t& rasterizerState) {
+    if (currentRasterizerState_ != nullptr) {
+        currentRasterizerState_->Release();
+    }
+
     D3D11_RASTERIZER_DESC rasterizerDesc;
     rasterizerDesc.FillMode = GetD3DFillMode(rasterizerState.fillMode);
     rasterizerDesc.CullMode = GetD3DCullMode(rasterizerState.cullingMethod);
@@ -157,6 +166,8 @@ void RenderDeviceDirect3D11::SetRasterizerState(const RasterizerState_t& rasteri
     rasterizerDesc.ScissorEnable = rasterizerState.enableScissor;
     rasterizerDesc.MultisampleEnable = rasterizerState.enableMultisample;
     rasterizerDesc.AntialiasedLineEnable = rasterizerState.enableAntialiasedLine;
+    rasterizerDesc.DepthBias = 0;
+    rasterizerDesc.DepthBiasClamp = 0.0f;
 
     device_->CreateRasterizerState(&rasterizerDesc, &currentRasterizerState_);
 
@@ -164,18 +175,10 @@ void RenderDeviceDirect3D11::SetRasterizerState(const RasterizerState_t& rasteri
 }
 
 void RenderDeviceDirect3D11::SetDefaultDepthStencilState(unsigned int referenceMask) {
-    if (currentDepthStencilState_ != nullptr) {
-        currentDepthStencilState_->Release();
-    }
-
     SetDepthStencilState(defaultDepthStencilState_, referenceMask);
 }
 
 void RenderDeviceDirect3D11::SetDefaultRasterizerState() {
-    if (currentRasterizerState_ != nullptr) {
-        currentRasterizerState_->Release();
-    }
-
     SetRasterizerState(defaultRasterizerState_);
 }
 
@@ -480,19 +483,14 @@ bool RenderDeviceDirect3D11::CreateDefaultDepthStencilState(DepthStencilBits_t d
         return false;
     }
 
-    D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc;
-    depthStencilStateDesc.DepthEnable = true;
-    depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    depthStencilStateDesc.StencilEnable = false;
-    depthStencilStateDesc.StencilReadMask = 0;
-    depthStencilStateDesc.StencilWriteMask = 0;
+    defaultDepthStencilState_.depthEnable = true;
+    defaultDepthStencilState_.depthWriteMask = true;
+    defaultDepthStencilState_.comparisonFunction = ComparisonFunction_t::LESS;
+    defaultDepthStencilState_.stencilEnable = false;
+    defaultDepthStencilState_.stencilReadMask = 0;
+    defaultDepthStencilState_.stencilWriteMask = 0;
 
-    result = device_->CreateDepthStencilState(&depthStencilStateDesc, &currentDepthStencilState_);
-    if (FAILED(result)) {
-        Logger::GetInstance()->Error("Couldn't create the depth stencil state");
-        return false;
-    }
+    SetDepthStencilState(defaultDepthStencilState_, 0);
 
     return true;
 }
@@ -515,25 +513,15 @@ bool RenderDeviceDirect3D11::CreateDefaultRasterizerState(const shared_ptr<Rende
     backbuffer->Release();
 
     // Set the default rasterizer state
-    D3D11_RASTERIZER_DESC rasterizerDesc;
-	rasterizerDesc.AntialiasedLineEnable = false;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.DepthBias = 0;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.DepthClipEnable = true;
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.FrontCounterClockwise = true;
-	rasterizerDesc.MultisampleEnable = false;
-	rasterizerDesc.ScissorEnable = false;
-	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+    defaultRasterizerState_.enableAntialiasedLine = false;
+    defaultRasterizerState_.cullingMethod = CullingMethod_t::BACK_FACE;
+    defaultRasterizerState_.fillMode = FillMode_t::FILL;
+    defaultRasterizerState_.isFrontFaceCounterClockwise = true;
+    defaultRasterizerState_.enableScissor = false;
+    defaultRasterizerState_.enableMultisample = false;
+    defaultRasterizerState_.enableDepthClip = true;
 
-    result = device_->CreateRasterizerState(&rasterizerDesc, &currentRasterizerState_);
-    if (FAILED(result)) {
-        Logger::GetInstance()->Error("Couldn't create the default rasterizer state");
-        return false;
-    }
-
-    context_->RSSetState(currentRasterizerState_);
+    SetRasterizerState(defaultRasterizerState_);
     
     return true;
 }
