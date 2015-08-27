@@ -73,18 +73,36 @@ source_group("Source Files\\render" FILES ${RENDER_SOURCE_FILES})
 source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
 
 set(RENDER_OPENGL_SOURCE_FILES
+	src/render/OpenGL/BufferOpenGL.cpp
+	src/render/OpenGL/glew.cpp
+	src/render/OpenGL/HardwareResourceCreatorOpenGL.cpp
+	src/render/OpenGL/RenderDeviceOpenGL.cpp
+	src/render/OpenGL/RenderTargetOpenGL.cpp
+	src/render/OpenGL/SamplerStateOpenGL.cpp
+	src/render/OpenGL/ShaderOpenGL.cpp
+	src/render/OpenGL/TextureOpenGL.cpp
 )
 
 set(RENDER_OPENGL_HEADER_FILES
+	include/render/OpenGL/BufferOpenGL.h
+	include/render/OpenGL/HardwareResourceCreatorOpenGL.h
+	include/render/OpenGL/RenderContextOpenGL.h
+	include/render/OpenGL/RenderDeviceOpenGL.h
+	include/render/OpenGL/RenderTargetOpenGL.h
+	include/render/OpenGL/SamplerStateOpenGL.h
+	include/render/OpenGL/ShaderOpenGL.h
+	include/render/OpenGL/TextureOpenGL.h
 )
 
 if (WIN32)
 	set(RENDER_OPENGL_SOURCE_FILES
 		${RENDER_OPENGL_SOURCE_FILES}
+		src/render/OpenGL/Win32/RenderContextOpenGLWin32.cpp
 	)
 	
 	set(RENDER_OPENGL_HEADER_FILES
 		${RENDER_OPENGL_HEADER_FILES}
+		include/render/OpenGL/Win32/RenderContextOpenGLWin32.h
 	)
 	
 	set(RENDER_DIRECT3D11_SOURCE_FILES
@@ -114,10 +132,12 @@ if (WIN32)
 elseif (UNIX)
     set(RENDER_OPENGL_SOURCE_FILES
         ${RENDER_OPENGL_SOURCE_FILES}
+		src/render/OpenGL/Unix/RenderContextOpenGLUnix.cpp
     )
 
     set(RENDER_OPENGL_HEADER_FILES
         ${RENDER_OPENGL_HEADER_FILES}
+		include/render/OpenGL/Unix/RenderContextOpenGLUnix.h
     )
 endif ()
 source_group("Source Files\\render\\OpenGL" FILES ${RENDER_OPENGL_SOURCE_FILES})
@@ -193,7 +213,7 @@ add_library(
     sketch-3d
 	
     ${LIBRARY_TYPE}
-	
+
     ${MATH_SOURCE_FILES}
 	
 	${RENDER_SOURCE_FILES}
@@ -202,6 +222,7 @@ add_library(
 	
 	${SYSTEM_SOURCE_FILES}
 	${SYSTEM_PLATFORM_SOURCE_FILES}
+	
 	
     ${MATH_HEADER_FILES}
 	
