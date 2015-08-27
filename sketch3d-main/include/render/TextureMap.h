@@ -3,14 +3,22 @@
 
 #include "render/Resource.h"
 
-namespace Sketch3D {
+#include <memory>
+#include <string>
+using namespace std;
+
+namespace Sketch3D
+{
+
 /**
  * @class TextureMap
  * The texture map class holds a texture's data
  */
-class SKETCH_3D_API TextureMap : public Resource {
+class SKETCH_3D_API TextureMap : public Resource
+{
     public:
                         TextureMap(unsigned char* data, size_t width, size_t height, size_t depth=0);
+                       ~TextureMap();
         unsigned char*  GetData() const;
         unsigned char*& GetData();
 
@@ -24,6 +32,9 @@ class SKETCH_3D_API TextureMap : public Resource {
         size_t          height_;
         size_t          depth_;
 };
+
+bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& textureMap);
+
 }
 
 #endif

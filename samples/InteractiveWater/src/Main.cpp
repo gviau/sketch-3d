@@ -51,10 +51,10 @@ int main(int argc, char** argv) {
         { Vector3(-1.0f,  1.0f, -1.0f), Vector2(0.0f, 1.0f) },
         { Vector3( 1.0f,  1.0f, -1.0f), Vector2(1.0f, 1.0f) },
         { Vector3( 1.0f, -1.0f, -1.0f), Vector2(1.0f, 0.0f) },
-        { Vector3(-1.0f, -1.0f,  1.0f), Vector2(0.0f, 0.0f) },
-        { Vector3(-1.0f,  1.0f,  1.0f), Vector2(0.0f, 1.0f) },
-        { Vector3( 1.0f,  1.0f,  1.0f), Vector2(1.0f, 1.0f) },
-        { Vector3( 1.0f, -1.0f,  1.0f), Vector2(1.0f, 0.0f) }
+        { Vector3(-1.0f, -1.0f,  1.0f), Vector2(1.0f, 0.0f) },
+        { Vector3(-1.0f,  1.0f,  1.0f), Vector2(1.0f, 1.0f) },
+        { Vector3( 1.0f,  1.0f,  1.0f), Vector2(0.0f, 1.0f) },
+        { Vector3( 1.0f, -1.0f,  1.0f), Vector2(0.0f, 0.0f) }
     };
     size_t numVertices = _countof(vertices);
 
@@ -228,24 +228,29 @@ int main(int argc, char** argv) {
     shared_ptr<SamplerState> samplerState = hardwareResourceCreator->CreateSamplerState();
     init = samplerState->Initialize(FilterMode_t::NEAREST, AddressMode_t::CLAMP, AddressMode_t::CLAMP, AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
 
-    unsigned char data1[] = {
-        255, 255, 255, 255, 0, 0, 0, 0,
-        0, 0, 0, 0, 255, 255, 255, 255
-    };
+    unsigned char* data1 = new unsigned char[16];
+    data1[0] = 0xFFFFFFFF;
+    data1[4] = 0x00000000;
+    data1[8] = 0x00000000;
+    data1[12] = 0xFFFFFFFF;
     TextureMap textureMap1(data1, 2, 2);
 
     shared_ptr<Texture2D> squares = hardwareResourceCreator->CreateTexture2D();
     init = squares->Initialize(&textureMap1, TextureFormat_t::RGBA32, false, false);
 
-    unsigned char data2[] = {
-        255, 255, 255, 255, 255, 255, 255, 255,
-        255, 255, 255, 255, 255, 255, 255, 255
-    };
+    unsigned char* data2 = new unsigned char[16];
+    memset(data2, 255, 16);
     TextureMap textureMap2(data2, 2, 2);
 
     shared_ptr<Texture2D> white = hardwareResourceCreator->CreateTexture2D();
     init = white->Initialize(&textureMap2, TextureFormat_t::RGBA32, false, false);
-    
+
+    shared_ptr<TextureMap> loadedTextureMap;
+    init = LoadTextureMapFromFile("InteractiveWater/Media/water.jpg", loadedTextureMap);    
+
+    shared_ptr<Texture2D> loadedTexture = hardwareResourceCreator->CreateTexture2D();
+    init = loadedTexture->Initialize(loadedTextureMap.get(), TextureFormat_t::RGB24, false);
+
     shared_ptr<RenderTarget> renderTarget = hardwareResourceCreator->CreateRenderTarget();
     init = renderTarget->Initialize(1024, 768, TextureFormat_t::RGBA32);
 
@@ -261,55 +266,33 @@ int main(int argc, char** argv) {
     float angle = 0.0f;
 
     vector<shared_ptr<RenderTarget>> noRenderTargets;
-    /*
-    RasterizerState_t shadowRecordState;
+    RasterizerState_t shadowRecordState = renderDevice->GetDefaultRasterizerState();
     shadowRecordState.cullingMethod = CullingMethod_t::FRONT_FACE;
-    shadowRecordState.
-    RasterizerState_t normalRecordState;
-    */
+
+    Matrix4x4 modelViewProjection = projection * view * modelMatrix;
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
-        
-        ///////////////////////////////////////////////////////////////////////
-        // Render in shadow map
-        ///////////////////////////////////////////////////////////////////////
-        void* data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
 
-        drawConstants = (DrawConstants_t*)data;
-        drawConstants->modelMatrix = modelMatrix.Transpose();
-
-        drawConstantBuffer->Unmap();
-
-        //renderDevice->SetRenderTargets(noRenderTargets, depthStencilTarget);
         renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f, 1.0f));
         renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
 
-        renderDevice->SetFragmentShader(fragmentShader);
-        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
-        renderDevice->SetFragmentShaderTexture(squares, 0);
+        void* data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
+        drawConstants = (DrawConstants_t*)data;
+        drawConstants->modelMatrix = Matrix4x4::IDENTITY;
+        drawConstantBuffer->Unmap();
 
         renderDevice->SetVertexShader(vertexShader);
         renderDevice->SetVertexShaderConstantBuffer(constantBuffer, 0);
         renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 1);
 
+        renderDevice->SetFragmentShader(fragmentShader);
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(loadedTexture, 0);
+
         renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
-
-        data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
-
-        drawConstants = (DrawConstants_t*)data;
-        drawConstants->modelMatrix = Matrix4x4::IDENTITY;
-
-        drawConstantBuffer->Unmap();
-
-        renderDevice->SetFragmentShaderTexture(white, 0);
-        renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 1);
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, planeVertexBuffer, planeIndexBuffer, 0, 0);
-        ///////////////////////////////////////////////////////////////////////
-        // Render the normal scene
-        ///////////////////////////////////////////////////////////////////////
 
         renderContext->SwapBuffers();
     }
