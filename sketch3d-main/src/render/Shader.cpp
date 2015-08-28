@@ -20,7 +20,13 @@ bool Shader::InitializeFromFile(const string& filename) {
 
     shaderFile.read(&source[0], source.length());
 
-    return InitializeFromSource(source);
+    if (!InitializeFromSource(source))
+    {
+        Logger::GetInstance()->Error("Error while creating shader: " + filename);
+        return false;
+    }
+
+    return true;
 }
 
 }

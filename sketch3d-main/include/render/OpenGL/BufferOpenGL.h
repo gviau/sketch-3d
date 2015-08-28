@@ -3,7 +3,7 @@
 
 #include "render/Buffer.h"
 
-#include "render/OpenGL/gl/glew.h"
+#include "render/OpenGL/GL/glew.h"
 #include "render/OpenGL/GL/gl.h"
 
 namespace Sketch3D {
