@@ -24,7 +24,7 @@ class SKETCH_3D_API BufferOpenGL
         void                    InternalUnmap(GLenum target) const;
 };
 
-class SKETCH_3D_API VertexBufferOpengl : public VertexBuffer, public BufferOpenGL
+class SKETCH_3D_API VertexBufferOpenGL : public VertexBuffer, public BufferOpenGL
 {
     public:
         virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) override;

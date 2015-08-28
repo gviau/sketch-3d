@@ -43,7 +43,7 @@ void BufferOpenGL::InternalUnmap(GLenum target) const
     }
 }
 
-bool VertexBufferOpengl::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices)
+bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices)
 {
     if (buffer_ > 0)
     {
@@ -79,12 +79,12 @@ bool VertexBufferOpengl::Initialize(void* initialData, bool dynamic, bool immuta
     return true;
 }
 
-void* VertexBufferOpengl::Map(MapFlag_t mapFlag) const
+void* VertexBufferOpenGL::Map(MapFlag_t mapFlag) const
 {
     return InternalMap(GetOGLMapFlag(mapFlag), GL_ARRAY_BUFFER);
 }
 
-void VertexBufferOpengl::Unmap() const
+void VertexBufferOpenGL::Unmap() const
 {
     InternalUnmap(GL_ARRAY_BUFFER);
 }

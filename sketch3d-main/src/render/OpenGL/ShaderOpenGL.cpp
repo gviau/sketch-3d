@@ -1,6 +1,11 @@
 #include "render/OpenGL/ShaderOpenGL.h"
 
+#include "render/VertexFormat.h"
+
 #include "system/Logger.h"
+
+#include <vector>
+using namespace std;
 
 namespace Sketch3D {
 
@@ -15,6 +20,11 @@ ShaderOpenGL::~ShaderOpenGL()
     {
         glDeleteShader(shader_);
     }
+}
+
+GLuint ShaderOpenGL::GetShader() const
+{
+    return shader_;
 }
 
 bool ShaderOpenGL::ValidateShader() const
@@ -36,6 +46,30 @@ bool ShaderOpenGL::ValidateShader() const
     return true;
 }
 
+bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
+{
+    if (shader_ > 0)
+    {
+        Logger::GetInstance()->Warning("Trying to initialize an already initialized fragment shader");
+        return false;
+    }
+
+    const char* sourcePtr = source.c_str();
+    shader_ = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &sourcePtr);
+
+    if (!ValidateShader())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+VertexShaderOpenGL::VertexShaderOpenGL()
+    : vertexFormat_(nullptr)
+{
+}
+
 bool VertexShaderOpenGL::InitializeFromSource(const string& source)
 {
     if (shader_ > 0)
@@ -55,23 +89,21 @@ bool VertexShaderOpenGL::InitializeFromSource(const string& source)
     return true;
 }
 
-bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
+bool VertexShaderOpenGL::CreateInputLayout(VertexFormat* vertexFormat)
 {
-    if (shader_ > 0)
-    {
-        Logger::GetInstance()->Warning("Trying to initialize an already initialized fragment shader");
+    if (shader_ == 0) {
+        Logger::GetInstance()->Warning("You have to create the vertex shader before creating the input layout");
         return false;
     }
 
-    const char* sourcePtr = source.c_str();
-    shader_ = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &sourcePtr);
-
-    if (!ValidateShader())
-    {
-        return false;
-    }
+    vertexFormat_ = vertexFormat;
 
     return true;
+}
+
+VertexFormat* VertexShaderOpenGL::GetVertexFormat() const
+{
+    return vertexFormat_;
 }
 
 }

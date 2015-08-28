@@ -10,7 +10,8 @@
 #include <vector>
 using namespace std;
 
-
+#include "render/OpenGL/GL/glew.h"
+#include "render/OpenGL/GL/gl.h"
 
 namespace Sketch3D {
 
@@ -81,11 +82,19 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         virtual HardwareResourceCreator*    GetHardwareResourceCreator() const override;
 
     private:
+        // TEMP should reuse this / find a much better way
+        GLuint                              pipeline_;
+        GLuint                              vertexArrayObject_;
+
         HardwareResourceCreatorOpenGL*      hardwareResourceCreator_;
 
         virtual bool                        CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) override;
         virtual bool                        CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) override;
 };
+
+GLint GetFormatSize(InputFormat_t inputFormat);
+GLenum GetOGLFormat(InputFormat_t inputFormat);
+GLenum GetOGLTopology(PrimitiveTopology_t primitiveTopology);
 
 }
 
