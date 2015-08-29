@@ -32,14 +32,18 @@ void* BufferOpenGL::InternalMap(GLenum mapFlag, GLenum target) const
     }
 
     glBindBuffer(target, buffer_);
-    return glMapBufferRange(target, 0, bufferSizeInBytes_, mapFlag);
+    void* data = glMapBufferRange(target, 0, bufferSizeInBytes_, mapFlag);
+
+    return data;
 }
 
 void BufferOpenGL::InternalUnmap(GLenum target) const
 {
     if (bufferSizeInBytes_ > 0)
     {
+        glBindBuffer(target, buffer_);
         glFlushMappedBufferRange(target, 0, bufferSizeInBytes_);
+        glUnmapBuffer(target);
     }
 }
 

@@ -254,7 +254,7 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
     // This is not very nice :/ have to find a better way
     size_t idx = 0;
     for (InputLayout_t inputLayout : inputLayouts) {
-        glEnableVertexArrayAttrib(GL_ARRAY_BUFFER, idx);
+        glEnableVertexAttribArray(idx);
         glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset);
 
         idx += 1;
@@ -298,7 +298,7 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
     // This is not very nice :/ have to find a better way
     size_t idx = 0;
     for (InputLayout_t inputLayout : inputLayouts) {
-        glEnableVertexArrayAttrib(GL_ARRAY_BUFFER, idx);
+        glEnableVertexAttribArray(idx);
         glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset);
 
         idx += 1;
