@@ -2,6 +2,8 @@
 
 #include "render/VertexFormat.h"
 
+#include "render/OpenGL/ErrorCheckingOpenGL.h"
+
 #include "system/Logger.h"
 
 namespace Sketch3D {
@@ -15,7 +17,7 @@ BufferOpenGL::~BufferOpenGL()
 {
     if (buffer_ != 0)
     {
-        glDeleteBuffers(1, &buffer_);
+        GL_CALL( glDeleteBuffers(1, &buffer_) );
     }
 }
 
@@ -36,8 +38,9 @@ void* BufferOpenGL::InternalMap(GLenum mapFlag, GLenum target) const
         return nullptr;
     }
 
-    glBindBuffer(target, buffer_);
-    void* data = glMapBufferRange(target, 0, bufferSizeInBytes_, mapFlag);
+    GL_CALL( glBindBuffer(target, buffer_) );
+    void* data = nullptr;
+    GL_CALL( data = glMapBufferRange(target, 0, bufferSizeInBytes_, mapFlag) );
 
     return data;
 }
@@ -46,9 +49,9 @@ void BufferOpenGL::InternalUnmap(GLenum target) const
 {
     if (bufferSizeInBytes_ > 0)
     {
-        glBindBuffer(target, buffer_);
-        glFlushMappedBufferRange(target, 0, bufferSizeInBytes_);
-        glUnmapBuffer(target);
+        GL_CALL( glBindBuffer(target, buffer_) );
+        GL_CALL( glFlushMappedBufferRange(target, 0, bufferSizeInBytes_) );
+        GL_CALL( glUnmapBuffer(target) );
     }
 }
 
@@ -60,8 +63,8 @@ bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immuta
         return false;
     }
 
-    glGenBuffers(1, &buffer_);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_);
+    GL_CALL( glGenBuffers(1, &buffer_) ) ;
+    GL_CALL( glBindBuffer(GL_ARRAY_BUFFER, buffer_) );
 
     vertexFormat_ = vertexFormat;
     numVertices_ = numVertices;
@@ -78,11 +81,11 @@ bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immuta
         usage = GL_STATIC_DRAW;
     }
 
-    glBufferData(GL_ARRAY_BUFFER, bufferSizeInBytes_, nullptr, usage);
+    GL_CALL( glBufferData(GL_ARRAY_BUFFER, bufferSizeInBytes_, nullptr, usage) );
 
     if (initialData != nullptr)
     {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSizeInBytes_, initialData);
+        GL_CALL( glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSizeInBytes_, initialData) );
     }
 
     return true;
@@ -106,8 +109,8 @@ bool IndexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutab
         return false;
     }
 
-    glGenBuffers(1, &buffer_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_);
+    GL_CALL( glGenBuffers(1, &buffer_) );
+    GL_CALL( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_) );
 
     indexFormat_ = indexFormat;
     numIndices_ = numIndices;
@@ -124,11 +127,11 @@ bool IndexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutab
         usage = GL_STATIC_DRAW;
     }
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSizeInBytes_, nullptr, usage);
+    GL_CALL( glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferSizeInBytes_, nullptr, usage) );
 
     if (initialData != nullptr)
     {
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferSizeInBytes_, initialData);
+        GL_CALL( glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferSizeInBytes_, initialData) );
     }
 
     return true;
@@ -152,8 +155,8 @@ bool ConstantBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immu
         return false;
     }
 
-    glGenBuffers(1, &buffer_);
-    glBindBuffer(GL_UNIFORM_BUFFER, buffer_);
+    GL_CALL( glGenBuffers(1, &buffer_) );
+    GL_CALL( glBindBuffer(GL_UNIFORM_BUFFER, buffer_) );
 
     bufferSizeInBytes_ = dataSize;
 
@@ -167,11 +170,11 @@ bool ConstantBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immu
         usage = GL_STATIC_DRAW;
     }
 
-    glBufferData(GL_UNIFORM_BUFFER, bufferSizeInBytes_, nullptr, usage);
+    GL_CALL( glBufferData(GL_UNIFORM_BUFFER, bufferSizeInBytes_, nullptr, usage) );
 
     if (initialData != nullptr)
     {
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, bufferSizeInBytes_, initialData);
+        GL_CALL( glBufferSubData(GL_UNIFORM_BUFFER, 0, bufferSizeInBytes_, initialData) );
     }
 
     return true;

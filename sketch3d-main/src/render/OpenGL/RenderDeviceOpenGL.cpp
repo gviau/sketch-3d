@@ -3,6 +3,7 @@
 #include "math/Vector4.h"
 
 #include "render/OpenGL/BufferOpenGL.h"
+#include "render/OpenGL/ErrorCheckingOpenGL.h"
 #include "render/OpenGL/RenderContextOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 
@@ -17,6 +18,7 @@ RenderDeviceOpenGL::RenderDeviceOpenGL()
 
 RenderDeviceOpenGL::~RenderDeviceOpenGL()
 {
+    GL_CALL( glDeleteProgramPipelines(1, &pipeline_) );
     delete hardwareResourceCreator_;
 }
 
@@ -30,16 +32,16 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     CreateDefaultDepthStencilState(renderContext->GetRenderParameters().depthStencilBits);
     CreateDefaultRasterizerState(renderContext);
 
-    glGenProgramPipelines(1, &pipeline_);
-    glUseProgram(0);
+    GL_CALL( glGenProgramPipelines(1, &pipeline_) );
+    GL_CALL( glUseProgram(0) );
 
     return true;
 }
 
 void RenderDeviceOpenGL::ClearRenderTargets(const Vector4& color)
 {
-    glClearColor(color.x, color.y, color.z, color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+    GL_CALL( glClearColor(color.x, color.y, color.z, color.w) );
+    GL_CALL( glClear(GL_COLOR_BUFFER_BIT) );
 }
 
 void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue)
@@ -48,15 +50,13 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
 
     if (clearDepth)
     {
-        glClearDepth(depthValue);
+        GL_CALL( glClearDepth(depthValue) );
     }
 
     if (clearStencil)
     {
-        glClearStencil(stencilValue);
+        GL_CALL( glClearStencil(stencilValue) );
     }
-
-    glClear(clearFlags);
 }
 
 void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
@@ -104,9 +104,9 @@ void RenderDeviceOpenGL::SetFragmentShader(shared_ptr<FragmentShader> fragmentSh
 
     FragmentShaderOpenGL* fragmentShaderOGL = dynamic_cast<FragmentShaderOpenGL*>(fragmentShaderPtr);
     
-    glBindProgramPipeline(pipeline_);
-    glUseProgramStages(pipeline_, GL_FRAGMENT_SHADER_BIT, fragmentShaderOGL->GetShader());
-    glActiveShaderProgram(pipeline_, fragmentShaderOGL->GetShader());
+    GL_CALL( glBindProgramPipeline(pipeline_) );
+    GL_CALL( glUseProgramStages(pipeline_, GL_FRAGMENT_SHADER_BIT, fragmentShaderOGL->GetShader()) );
+    GL_CALL( glActiveShaderProgram(pipeline_, fragmentShaderOGL->GetShader()) );
 }
 
 bool RenderDeviceOpenGL::SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot)
@@ -123,10 +123,9 @@ bool RenderDeviceOpenGL::SetFragmentShaderConstantBuffer(const shared_ptr<Consta
         return false;
     }
     
-    FragmentShaderOpenGL* fragmentShaderOGL = dynamic_cast<FragmentShaderOpenGL*>(fragmentShaderPtr);
     ConstantBufferOpenGL* constantBufferOGL = dynamic_cast<ConstantBufferOpenGL*>(constantBufferPtr);
 
-    glUniformBlockBinding(fragmentShaderOGL->GetShader(), slot, constantBufferOGL->GetBuffer());
+    GL_CALL( glBindBufferRange(GL_UNIFORM_BUFFER, slot, constantBufferOGL->GetBuffer(), 0, constantBufferOGL->GetBufferSizeInBytes()) );
 
     return true;
 }
@@ -173,9 +172,9 @@ void RenderDeviceOpenGL::SetVertexShader(shared_ptr<VertexShader> vertexShader)
 
     VertexShaderOpenGL* vertexShaderOGL = dynamic_cast<VertexShaderOpenGL*>(vertexShaderPtr);
     
-    glBindProgramPipeline(pipeline_);
-    glUseProgramStages(pipeline_, GL_VERTEX_SHADER_BIT, vertexShaderOGL->GetShader());
-    glActiveShaderProgram(pipeline_, vertexShaderOGL->GetShader());
+    GL_CALL( glBindProgramPipeline(pipeline_) );
+    GL_CALL( glUseProgramStages(pipeline_, GL_VERTEX_SHADER_BIT, vertexShaderOGL->GetShader()) );
+    GL_CALL( glActiveShaderProgram(pipeline_, vertexShaderOGL->GetShader()) );
 }
 
 bool RenderDeviceOpenGL::SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot)
@@ -192,10 +191,9 @@ bool RenderDeviceOpenGL::SetVertexShaderConstantBuffer(const shared_ptr<Constant
         return false;
     }
     
-    VertexShaderOpenGL* vertexShaderOGL = dynamic_cast<VertexShaderOpenGL*>(vertexShaderPtr);
     ConstantBufferOpenGL* constantBufferOGL = dynamic_cast<ConstantBufferOpenGL*>(constantBufferPtr);
 
-    glBindBufferRange(GL_UNIFORM_BUFFER, slot, constantBufferOGL->GetBuffer(), 0, constantBufferOGL->GetBufferSizeInBytes());
+    GL_CALL( glBindBufferRange(GL_UNIFORM_BUFFER, slot, constantBufferOGL->GetBuffer(), 0, constantBufferOGL->GetBufferSizeInBytes()) );
 
     return true;
 }
@@ -234,14 +232,14 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
 
     if (vertexArrayObject_ == 0)
     {
-        glGenVertexArrays(1, &vertexArrayObject_);
+        GL_CALL( glGenVertexArrays(1, &vertexArrayObject_) );
     }
 
     VertexShaderOpenGL* vertexShader = dynamic_cast<VertexShaderOpenGL*>(vertexShader_.get());
     VertexFormat* vertexFormat = vertexShader->GetVertexFormat();
     const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
 
-    glBindVertexArray(vertexArrayObject_);
+    GL_CALL( glBindVertexArray(vertexArrayObject_) );
 
     VertexBufferOpenGL* vertexBufferOGL = dynamic_cast<VertexBufferOpenGL*>(vertexBuffer.get());
     if (vertexBufferOGL == nullptr)
@@ -250,20 +248,20 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
     }
 
     GLuint buffer = vertexBufferOGL->GetBuffer();
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    GL_CALL( glBindBuffer(GL_ARRAY_BUFFER, buffer) );
     
     // This is not very nice :/ have to find a better way
     size_t idx = 0;
     for (InputLayout_t inputLayout : inputLayouts) {
-        glEnableVertexAttribArray(idx);
-        glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset);
+        GL_CALL( glEnableVertexAttribArray(idx) );
+        GL_CALL( glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset) );
 
         idx += 1;
     }
 
     GLenum topology = GetOGLTopology(primitiveTopology);
 
-    glDrawArrays(topology, startVertexLocation, vertexBuffer->GetNumVertices());
+    GL_CALL( glDrawArrays(topology, startVertexLocation, vertexBuffer->GetNumVertices()) );
 
     return true;
 }
@@ -278,14 +276,14 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
 
     if (vertexArrayObject_ == 0)
     {
-        glGenVertexArrays(1, &vertexArrayObject_);
+        GL_CALL( glGenVertexArrays(1, &vertexArrayObject_) );
     }
 
     VertexShaderOpenGL* vertexShader = dynamic_cast<VertexShaderOpenGL*>(vertexShader_.get());
     VertexFormat* vertexFormat = vertexShader->GetVertexFormat();
     const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
 
-    glBindVertexArray(vertexArrayObject_);
+    GL_CALL( glBindVertexArray(vertexArrayObject_) );
 
     VertexBufferOpenGL* vertexBufferOGL = dynamic_cast<VertexBufferOpenGL*>(vertexBuffer.get());
     if (vertexBufferOGL == nullptr)
@@ -294,13 +292,13 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
     }
 
     GLuint buffer = vertexBufferOGL->GetBuffer();
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    GL_CALL( glBindBuffer(GL_ARRAY_BUFFER, buffer) );
     
     // This is not very nice :/ have to find a better way
     size_t idx = 0;
     for (InputLayout_t inputLayout : inputLayouts) {
-        glEnableVertexAttribArray(idx);
-        glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset);
+        GL_CALL( glEnableVertexAttribArray(idx) );
+        GL_CALL( glVertexAttribPointer(idx, GetFormatSize(inputLayout.format), GetOGLFormat(inputLayout.format), GL_FALSE, vertexFormat->GetSize(), (void*)inputLayout.byteOffset) );
 
         idx += 1;
     }
@@ -312,7 +310,7 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
     }
 
     buffer = indexBufferOGL->GetBuffer();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+    GL_CALL( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer) );
 
     GLenum topology = GetOGLTopology(primitiveTopology);
 
@@ -326,7 +324,7 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
         type = GL_UNSIGNED_INT;
     }
 
-    glDrawElements(topology, indexBuffer->GetNumIndices(), type, nullptr);
+    GL_CALL( glDrawElements(topology, indexBuffer->GetNumIndices(), type, nullptr) );
 
     return true;
 }

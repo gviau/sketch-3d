@@ -74,6 +74,7 @@ source_group("Header Files\\render" FILES ${RENDER_HEADER_FILES})
 
 set(RENDER_OPENGL_SOURCE_FILES
 	src/render/OpenGL/BufferOpenGL.cpp
+	src/render/OpenGL/ErrorCheckingOpenGL.cpp
 	src/render/OpenGL/glew.cpp
 	src/render/OpenGL/HardwareResourceCreatorOpenGL.cpp
 	src/render/OpenGL/RenderDeviceOpenGL.cpp
@@ -85,6 +86,7 @@ set(RENDER_OPENGL_SOURCE_FILES
 
 set(RENDER_OPENGL_HEADER_FILES
 	include/render/OpenGL/BufferOpenGL.h
+	include/render/OpenGL/ErrorCheckingOpenGL.h
 	include/render/OpenGL/HardwareResourceCreatorOpenGL.h
 	include/render/OpenGL/RenderContextOpenGL.h
 	include/render/OpenGL/RenderDeviceOpenGL.h

@@ -1,6 +1,7 @@
 #include "render/OpenGL/ShaderOpenGL.h"
 
 #include "render/VertexFormat.h"
+#include "render/OpenGL/ErrorCheckingOpenGL.h"
 
 #include "system/Logger.h"
 
@@ -18,7 +19,7 @@ ShaderOpenGL::~ShaderOpenGL()
 {
     if (shader_ > 0)
     {
-        glDeleteShader(shader_);
+        GL_CALL( glDeleteProgram(shader_) );
     }
 }
 
@@ -30,13 +31,13 @@ GLuint ShaderOpenGL::GetShader() const
 bool ShaderOpenGL::ValidateShader() const
 {
     GLint length = 0;
-    glGetProgramiv(shader_, GL_INFO_LOG_LENGTH, &length);
+    GL_CALL( glGetProgramiv(shader_, GL_INFO_LOG_LENGTH, &length) );
 
 	if (length > 1)
     {
 		char* infoLog = new char[length + 1];
 		int charsWritten = 0;
-		glGetProgramInfoLog(shader_, length, &charsWritten, infoLog);
+		GL_CALL( glGetProgramInfoLog(shader_, length, &charsWritten, infoLog) );
 		Logger::GetInstance()->Error(string(infoLog));
 		delete[] infoLog;
 
@@ -55,7 +56,7 @@ bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
     }
 
     const char* sourcePtr = source.c_str();
-    shader_ = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &sourcePtr);
+    GL_CALL( shader_ = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &sourcePtr) );
 
     if (!ValidateShader())
     {
@@ -80,7 +81,7 @@ bool VertexShaderOpenGL::InitializeFromSource(const string& source)
     }
 
     const char* sourcePtr = source.c_str();
-    shader_ = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &sourcePtr);
+    GL_CALL( shader_ = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &sourcePtr) );
 
     if (!ValidateShader())
     {
