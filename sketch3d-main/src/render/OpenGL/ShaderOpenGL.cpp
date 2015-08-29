@@ -29,14 +29,14 @@ GLuint ShaderOpenGL::GetShader() const
 
 bool ShaderOpenGL::ValidateShader() const
 {
-	int length = 0;
-	glGetShaderiv(shader_, GL_INFO_LOG_LENGTH, &length);
+    GLint length = 0;
+    glGetProgramiv(shader_, GL_INFO_LOG_LENGTH, &length);
 
 	if (length > 1)
     {
 		char* infoLog = new char[length + 1];
 		int charsWritten = 0;
-		glGetShaderInfoLog(shader_, length, &charsWritten, infoLog);
+		glGetProgramInfoLog(shader_, length, &charsWritten, infoLog);
 		Logger::GetInstance()->Error(string(infoLog));
 		delete[] infoLog;
 
@@ -59,6 +59,7 @@ bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
 
     if (!ValidateShader())
     {
+        Logger::GetInstance()->Error("Fragment shader creation failed");
         return false;
     }
 
@@ -83,6 +84,7 @@ bool VertexShaderOpenGL::InitializeFromSource(const string& source)
 
     if (!ValidateShader())
     {
+        Logger::GetInstance()->Error("Vertex shader creation failed");
         return false;
     }
 

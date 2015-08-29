@@ -15,6 +15,7 @@ class SKETCH_3D_API BufferOpenGL
         virtual                ~BufferOpenGL();
 
         GLuint                  GetBuffer() const;
+        size_t                  GetBufferSizeInBytes() const;
 
     protected:
         GLuint                  buffer_;

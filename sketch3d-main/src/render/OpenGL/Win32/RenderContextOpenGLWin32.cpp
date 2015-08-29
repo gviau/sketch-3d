@@ -183,7 +183,7 @@ bool RenderContextOpenGLWin32::Initialize(Window& window, const RenderParameters
 		return false;
 	}
 
-	Logger::GetInstance()->Debug("Render context created");
+	Logger::GetInstance()->Info("OpenGL render context created");
 	return true;
 }
 

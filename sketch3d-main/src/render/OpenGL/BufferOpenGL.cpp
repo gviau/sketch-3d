@@ -24,6 +24,11 @@ GLuint BufferOpenGL::GetBuffer() const
     return buffer_;
 }
 
+size_t BufferOpenGL::GetBufferSizeInBytes() const
+{
+    return bufferSizeInBytes_;
+}
+
 void* BufferOpenGL::InternalMap(GLenum mapFlag, GLenum target) const
 {
     if (bufferSizeInBytes_ == 0)
@@ -104,7 +109,7 @@ bool IndexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutab
     glGenBuffers(1, &buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_);
 
-    indexFormat_ = indexFormat_;
+    indexFormat_ = indexFormat;
     numIndices_ = numIndices;
 
     bufferSizeInBytes_ = numIndices_ * ( (indexFormat_ == IndexFormat_t::INT_2_BYTES) ? 2 : 4 );

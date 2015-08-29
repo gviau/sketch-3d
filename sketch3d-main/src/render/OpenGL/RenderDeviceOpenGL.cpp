@@ -31,6 +31,7 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     CreateDefaultRasterizerState(renderContext);
 
     glGenProgramPipelines(1, &pipeline_);
+    glUseProgram(0);
 
     return true;
 }
@@ -194,7 +195,7 @@ bool RenderDeviceOpenGL::SetVertexShaderConstantBuffer(const shared_ptr<Constant
     VertexShaderOpenGL* vertexShaderOGL = dynamic_cast<VertexShaderOpenGL*>(vertexShaderPtr);
     ConstantBufferOpenGL* constantBufferOGL = dynamic_cast<ConstantBufferOpenGL*>(constantBufferPtr);
 
-    glUniformBlockBinding(vertexShaderOGL->GetShader(), slot, constantBufferOGL->GetBuffer());
+    glBindBufferRange(GL_UNIFORM_BUFFER, slot, constantBufferOGL->GetBuffer(), 0, constantBufferOGL->GetBufferSizeInBytes());
 
     return true;
 }
