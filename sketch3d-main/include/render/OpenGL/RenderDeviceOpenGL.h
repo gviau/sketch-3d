@@ -92,6 +92,9 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         virtual bool                        CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) override;
 };
 
+GLenum GetOGLComparisonFunc(ComparisonFunction_t func);
+GLenum GetOGLFillMode(FillMode_t mode);
+GLenum GetOGLCullMode(CullingMethod_t method);
 GLint GetFormatSize(InputFormat_t inputFormat);
 GLenum GetOGLFormat(InputFormat_t inputFormat);
 GLenum GetOGLTopology(PrimitiveTopology_t primitiveTopology);

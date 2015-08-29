@@ -29,6 +29,8 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     width_ = renderContext->GetRenderParameters().width;
     height_ = renderContext->GetRenderParameters().height;
 
+    GL_CALL( glEnable(GL_CULL_FACE) );
+
     CreateDefaultDepthStencilState(renderContext->GetRenderParameters().depthStencilBits);
     CreateDefaultRasterizerState(renderContext);
 
@@ -57,6 +59,8 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
     {
         GL_CALL( glClearStencil(stencilValue) );
     }
+
+    GL_CALL( glClear(clearFlags) );
 }
 
 void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
@@ -73,10 +77,41 @@ void RenderDeviceOpenGL::SetDefaultRenderTargetAndDepthStencilBuffer()
 
 void RenderDeviceOpenGL::SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask)
 {
+    if (depthStencilState.depthEnable)
+    {
+        GL_CALL( glEnable(GL_DEPTH_TEST) );
+    }
+    else
+    {
+        GL_CALL( glDisable(GL_DEPTH_TEST) );
+    }
+
+    GL_CALL( glDepthMask( (depthStencilState.depthWriteMask) ? GL_TRUE : GL_FALSE ) );
+    GL_CALL( glDepthFunc( GetOGLComparisonFunc(depthStencilState.comparisonFunction) ) );
+
+    if (depthStencilState.stencilEnable)
+    {
+        GL_CALL( glEnable(GL_STENCIL_TEST) );
+    }
+    else
+    {
+        GL_CALL( glDisable(GL_STENCIL_TEST) );
+    }
 }
 
 void RenderDeviceOpenGL::SetRasterizerState(const RasterizerState_t& rasterizerState)
 {
+    GL_CALL( glPolygonMode(GL_FRONT_AND_BACK, GetOGLFillMode(rasterizerState.fillMode)) );
+    GL_CALL( glCullFace(GetOGLCullMode(rasterizerState.cullingMethod)) );
+    
+    if (rasterizerState.isFrontFaceCounterClockwise)
+    {
+        GL_CALL( glFrontFace(GL_CCW) );
+    }
+    else
+    {
+        GL_CALL( glFrontFace(GL_CW) );
+    }
 }
 
 void RenderDeviceOpenGL::SetDefaultDepthStencilState(unsigned int referenceMask)
@@ -355,12 +390,72 @@ HardwareResourceCreator* RenderDeviceOpenGL::GetHardwareResourceCreator() const
 
 bool RenderDeviceOpenGL::CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits)
 {
-    return false;
+    // Set the default depth stencil state
+    defaultDepthStencilState_.depthEnable = true;
+    defaultDepthStencilState_.depthWriteMask = true;
+    defaultDepthStencilState_.comparisonFunction = ComparisonFunction_t::LESS;
+    defaultDepthStencilState_.stencilEnable = false;
+    defaultDepthStencilState_.stencilReadMask = 0;
+    defaultDepthStencilState_.stencilWriteMask = 0;
+
+    SetDepthStencilState(defaultDepthStencilState_, 0);
+
+    return true;
 }
 
 bool RenderDeviceOpenGL::CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext)
 {
-    return false;
+    // Set the default rasterizer state
+    defaultRasterizerState_.enableAntialiasedLine = false;
+    defaultRasterizerState_.cullingMethod = CullingMethod_t::BACK_FACE;
+    defaultRasterizerState_.fillMode = FillMode_t::FILL;
+    defaultRasterizerState_.isFrontFaceCounterClockwise = true;
+    defaultRasterizerState_.enableScissor = false;
+    defaultRasterizerState_.enableMultisample = false;
+    defaultRasterizerState_.enableDepthClip = true;
+
+    SetRasterizerState(defaultRasterizerState_);
+
+    return true;
+}
+
+GLenum GetOGLComparisonFunc(ComparisonFunction_t func)
+{
+    GLenum comp;
+    switch (func) {
+        case ComparisonFunction_t::ALWAYS:          comp = GL_ALWAYS; break;
+        case ComparisonFunction_t::EQUAL:           comp = GL_EQUAL; break;
+        case ComparisonFunction_t::GREATER:         comp = GL_GREATER; break;
+        case ComparisonFunction_t::GREATER_EQUAL:   comp = GL_GEQUAL; break;
+        case ComparisonFunction_t::LESS:            comp = GL_LESS; break;
+        case ComparisonFunction_t::LESS_EQUAL:      comp = GL_LEQUAL; break;
+        case ComparisonFunction_t::NEVER:           comp = GL_NEVER; break;
+        case ComparisonFunction_t::NOT_EQUAL:       comp = GL_NOTEQUAL; break;
+    }
+
+    return comp;
+}
+
+GLenum GetOGLFillMode(FillMode_t mode)
+{
+    GLenum fillMode;
+    switch (mode) {
+        case FillMode_t::FILL:      fillMode = GL_FILL; break;
+        case FillMode_t::WIREFRAME: fillMode = GL_LINE; break;
+    }
+
+    return fillMode;
+}
+
+GLenum GetOGLCullMode(CullingMethod_t method)
+{
+    GLenum cullMode;
+    switch (method) {
+        case CullingMethod_t::BACK_FACE:    cullMode = GL_BACK; break;
+        case CullingMethod_t::FRONT_FACE:   cullMode = GL_FRONT; break;
+    }
+
+    return cullMode;
 }
 
 GLint GetFormatSize(InputFormat_t inputFormat)
