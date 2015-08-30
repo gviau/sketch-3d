@@ -1,3 +1,5 @@
+#include <framework/Mesh.h>
+
 #include <math/Matrix4x4.h>
 #include <math/Vector4.h>
 
@@ -32,58 +34,33 @@ int main(int argc, char** argv) {
     renderParameters.depthStencilBits = DepthStencilBits_t::D32;
     renderParameters.refreshRate = 0;
 
-    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::OPENGL);
+    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
     bool init = renderContext->Initialize(window, renderParameters);
 
-    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::OPENGL);
+    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::DIRECT3D11);
     init = renderDevice->Initialize(renderContext);
 
     HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
 
-    Vertex_Pos_UV_t vertices[] = {
-        { Vector3(-0.2f, -0.2f, 0.2f), Vector2(0.0f, 0.0f) },
-        { Vector3(-0.2f,  0.2f, 0.2f), Vector2(0.0f, 1.0f) },
-        { Vector3( 0.2f,  0.2f, 0.2f), Vector2(1.0f, 1.0f) },
-        { Vector3( 0.2f, -0.2f, 0.2f), Vector2(1.0f, 0.0f) },
-        { Vector3(-0.2f, -0.2f, 0.6f), Vector2(1.0f, 0.0f) },
-        { Vector3(-0.2f,  0.2f, 0.6f), Vector2(1.0f, 1.0f) },
-        { Vector3( 0.2f,  0.2f, 0.6f), Vector2(0.0f, 1.0f) },
-        { Vector3( 0.2f, -0.2f, 0.6f), Vector2(0.0f, 0.0f) }
-    };
-    size_t numVertices = _countof(vertices);
-
-    VertexFormat_Pos_UV vertexFormat;
-    shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer();
-    init = vertexBuffer->Initialize((void*)vertices, false, false, &vertexFormat, numVertices);
-
-    unsigned short indices[] = {
-		0, 1, 2, 0, 2, 3,
-        3, 2, 6, 3, 6, 7,
-        7, 6, 5, 7, 5, 4,
-        4, 5, 1, 4, 1, 0,
-        1, 5, 6, 1, 6, 2,
-        4, 0, 3, 4, 3, 7
-    };
-    size_t numIndices = _countof(indices);
-
-    shared_ptr<IndexBuffer> indexBuffer = hardwareResourceCreator->CreateIndexBuffer();
-    init = indexBuffer->Initialize((void*)indices, false, false, IndexFormat_t::INT_2_BYTES, numIndices);
+    shared_ptr<Mesh> spiderMesh;
+    init = LoadMeshFromFile("Media/spider.obj", hardwareResourceCreator, spiderMesh);
 
     shared_ptr<ConstantBuffer> drawConstantBuffer = hardwareResourceCreator->CreateConstantBuffer();
     init = drawConstantBuffer->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
 
     shared_ptr<FragmentShader> fragmentShader = hardwareResourceCreator->CreateFragmentShader();
-    init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.glsl");
+    init = fragmentShader->InitializeFromFile("InteractiveWater/Shaders/frag.hlsl");
 
     shared_ptr<VertexShader> vertexShader = hardwareResourceCreator->CreateVertexShader();
-    init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.glsl");
-    init = vertexShader->CreateInputLayout(&vertexFormat);
+    init = vertexShader->InitializeFromFile("InteractiveWater/Shaders/vert.hlsl");
 
     Matrix4x4 modelMatrix;
     float angle = 0.0f;
 
     renderDevice->SetFragmentShader(fragmentShader);
     renderDevice->SetVertexShader(vertexShader);
+
+    Matrix4x4 projectionMatrix = renderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
 
     while (window.IsOpen())
     {
@@ -95,21 +72,23 @@ int main(int argc, char** argv) {
         Matrix4x4 rotX, rotY;
         rotX.RotationAroundX(angle / 2.0f);
         rotY.RotationAroundY(angle);
-        modelMatrix = rotX * rotY;
-        angle += 0.001f;
-        modelMatrix = modelMatrix;
+        modelMatrix = rotY;
+        angle += 0.0005f;
+
+        Matrix4x4 translation;
+        translation.SetTranslation(Vector3(0.0f, 0.0f, -125.0f));
 
         void* data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
         DrawConstants_t* drawConstants = (DrawConstants_t*)data;
-        drawConstants->modelMatrix = modelMatrix;
+        drawConstants->modelMatrix = projectionMatrix * translation * modelMatrix;
         drawConstantBuffer->Unmap();
 
         renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f));
         renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
 
-        renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 0);
+        renderDevice->SetVertexShaderConstantBuffer(drawConstantBuffer, 1);
 
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+        spiderMesh->Draw(renderDevice);
 
         renderContext->SwapBuffers();
     }
