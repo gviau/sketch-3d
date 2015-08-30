@@ -4,6 +4,27 @@ project(sketch-3d)
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib/")
 
+# Framework files
+set (FRAMEWORK_SOURCE_FILES
+	src/framework/Camera.cpp
+	src/framework/Material.cpp
+	src/framework/Mesh.cpp
+	src/framework/SimpleObject.cpp
+	src/framework/SubMesh.cpp
+	src/framework/VisualNode.cpp
+)
+
+set (FRAMEWORK_HEADER_FILES
+	include/framework/Camera.h
+	include/framework/Material.h
+	include/framework/Mesh.h
+	include/framework/SimpleObject.h
+	include/framework/SubMesh.h
+	include/framework/VisualNode.h
+)
+source_group("Source Files\\framework" FILES ${FRAMEWORK_SOURCE_FILES})
+source_group("Header Files\\framework" FILES ${FRAMEWORK_HEADER_FILES})
+	
 # Math files
 set (MATH_SOURCE_FILES
 	src/math/Complex.cpp
@@ -215,6 +236,8 @@ add_library(
     sketch-3d
 	
     ${LIBRARY_TYPE}
+	
+	${FRAMEWORK_SOURCE_FILES}
 
     ${MATH_SOURCE_FILES}
 	
@@ -225,6 +248,7 @@ add_library(
 	${SYSTEM_SOURCE_FILES}
 	${SYSTEM_PLATFORM_SOURCE_FILES}
 	
+	${FRAMEWORK_HEADER_FILES}
 	
     ${MATH_HEADER_FILES}
 	
