@@ -87,12 +87,15 @@ class SKETCH_3D_API RenderDevice {
         // MISC STUFF
         virtual void GenerateMips(Texture* texture) = 0;
         virtual void CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) = 0;
         
         virtual HardwareResourceCreator* GetHardwareResourceCreator() const = 0;
         const DepthStencilState_t& GetDefaultDepthStencilState() const { return defaultDepthStencilState_; }
         DepthStencilState_t& GetDefaultDepthStencilState() { return defaultDepthStencilState_; }
         const RasterizerState_t& GetDefaultRasterizerState() const { return defaultRasterizerState_; }
         RasterizerState_t& GetDefaultRasterizerState() { return defaultRasterizerState_; }
+        const Matrix4x4& GetProjectionMatrix() const { return projection_; }
 
     protected:
         shared_ptr<FragmentShader>  fragmentShader_;
@@ -101,6 +104,8 @@ class SKETCH_3D_API RenderDevice {
         RasterizerState_t           defaultRasterizerState_;
         size_t                      width_;
         size_t                      height_;
+
+        Matrix4x4                   projection_;
 
         virtual bool CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) = 0;
         virtual bool CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) = 0;

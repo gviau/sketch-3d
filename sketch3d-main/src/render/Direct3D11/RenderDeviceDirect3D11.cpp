@@ -13,6 +13,8 @@
 
 #include "system/Logger.h"
 
+#include <math.h>
+
 #pragma warning( disable : 4005 )
 
 #include <d3d11.h>
@@ -440,6 +442,33 @@ void RenderDeviceDirect3D11::GenerateMips(Texture* texture) {
 }
 
 void RenderDeviceDirect3D11::CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) {
+}
+
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane)
+{
+    projection_[0][0] = 2.0f * nearPlane / width;
+    projection_[1][1] = 2.0f * nearPlane / height;
+    projection_[2][2] = farPlane / (nearPlane - farPlane);
+    projection_[2][3] = nearPlane * farPlane / (nearPlane - farPlane);
+    projection_[3][2] = -1.0f;
+    projection_[3][3] = 0.0f;
+
+    return projection_;
+}
+
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane)
+{
+    float yScale = 1.0f / tanf(fov / 2.0f);
+    float xScale = yScale / aspectRatio;
+
+    projection_[0][0] = xScale;
+    projection_[1][1] = yScale;
+    projection_[2][2] = farPlane / (nearPlane - farPlane);
+    projection_[2][3] = nearPlane * farPlane / (nearPlane - farPlane);
+    projection_[3][2] = -1.0f;
+    projection_[3][3] = 0.0f;
+
+    return projection_;
 }
 
 HardwareResourceCreator* RenderDeviceDirect3D11::GetHardwareResourceCreator() const {

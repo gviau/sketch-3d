@@ -81,6 +81,8 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
 
         virtual void                        GenerateMips(Texture* texture) override;
         virtual void                        CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) override;
 
         virtual HardwareResourceCreator*    GetHardwareResourceCreator() const override;
 
