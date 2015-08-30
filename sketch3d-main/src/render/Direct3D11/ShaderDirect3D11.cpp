@@ -78,10 +78,6 @@ VertexShaderDirect3D11::VertexShaderDirect3D11(ID3D11Device* device) : ShaderDir
 }
 
 VertexShaderDirect3D11::~VertexShaderDirect3D11() {
-    if (inputLayout_ != nullptr) {
-        inputLayout_->Release();
-    }
-
     if (shader_ != nullptr) {
         shader_->Release();
     }
@@ -125,43 +121,8 @@ bool VertexShaderDirect3D11::InitializeFromSource(const string& source) {
     return success;
 }
 
-bool VertexShaderDirect3D11::CreateInputLayout(VertexFormat* vertexFormat) {
-    if (shaderBlob_ == nullptr) {
-        Logger::GetInstance()->Warning("You have to create the vertex shader before creating the input layout");
-        return false;
-    }
-
-    const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
-    
-    vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
-    for (InputLayout_t inputLayout : inputLayouts) {
-        D3D11_INPUT_ELEMENT_DESC inputElement;
-        inputElement.SemanticName = GetD3DSemanticName(inputLayout.semanticName);
-        inputElement.SemanticIndex = inputLayout.semanticIndex;
-        inputElement.Format = GetD3DFormat(inputLayout.format);
-        inputElement.InputSlot = inputLayout.inputSlot;
-        inputElement.AlignedByteOffset = inputLayout.byteOffset;
-        inputElement.InputSlotClass = (inputLayout.isDataPerInstance) ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
-        inputElement.InstanceDataStepRate = inputLayout.instanceDataStepRate;
-
-        inputElements.push_back(inputElement);
-    }
-
-    HRESULT hr = device_->CreateInputLayout(&inputElements[0], inputElements.size(), shaderBlob_->GetBufferPointer(), shaderBlob_->GetBufferSize(), &inputLayout_);
-    if (FAILED(hr)) {
-        Logger::GetInstance()->Error("Couldn't create input layout");
-        return false;
-    }
-
-    return true;
-}
-
 ID3D11VertexShader* VertexShaderDirect3D11::GetShader() const {
     return shader_;
-}
-
-ID3D11InputLayout* VertexShaderDirect3D11::GetInputLayout() const {
-    return inputLayout_;
 }
 
 string GetD3DShaderVersion(D3D_FEATURE_LEVEL featureLevel) {

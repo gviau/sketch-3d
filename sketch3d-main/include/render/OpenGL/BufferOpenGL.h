@@ -28,7 +28,7 @@ class SKETCH_3D_API BufferOpenGL
 class SKETCH_3D_API VertexBufferOpenGL : public VertexBuffer, public BufferOpenGL
 {
     public:
-        virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) override;
+        virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, VertexFormatType_t vertexFormatType, size_t numVertices) override;
         virtual void*   Map(MapFlag_t mapFlag) const override;
         virtual void    Unmap() const override;
 };

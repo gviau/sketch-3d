@@ -10,7 +10,8 @@ namespace Sketch3D {
  * @class Buffer
  * Base class for the different buffers
  */
-class SKETCH_3D_API Buffer : public HardwareResource {
+class SKETCH_3D_API Buffer : public HardwareResource
+{
     public:
         virtual        ~Buffer() {}
 
@@ -18,18 +19,20 @@ class SKETCH_3D_API Buffer : public HardwareResource {
         virtual void    Unmap() const = 0;
 };
 
-class SKETCH_3D_API VertexBuffer : public Buffer {
+class SKETCH_3D_API VertexBuffer : public Buffer
+{
     public:
-        virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) = 0;
-        VertexFormat*   GetVertexFormat() const;
-        size_t          GetNumVertices() const;
+        virtual bool        Initialize(void* initialData, bool dynamic, bool immutable, VertexFormatType_t vertexFormatType, size_t numVertices) = 0;
+        VertexFormatType_t  GetVertexFormatType() const;
+        size_t              GetNumVertices() const;
 
     protected:
-        VertexFormat*   vertexFormat_;
-        size_t          numVertices_;
+        VertexFormatType_t  vertexFormatType_;
+        size_t              numVertices_;
 };
 
-class SKETCH_3D_API IndexBuffer : public Buffer {
+class SKETCH_3D_API IndexBuffer : public Buffer
+{
     public:
         virtual bool    Initialize(void* initialData, bool dynamic, bool immutable, IndexFormat_t indexFormat, size_t numIndices) = 0;
         IndexFormat_t   GetIndexFormat() const;
@@ -40,7 +43,8 @@ class SKETCH_3D_API IndexBuffer : public Buffer {
         size_t          numIndices_;
 };
 
-class SKETCH_3D_API ConstantBuffer : public Buffer {
+class SKETCH_3D_API ConstantBuffer : public Buffer
+{
     public:
         virtual bool Initialize(void* initialData, bool dynamic, bool immutable, size_t dataSize) = 0;
 };

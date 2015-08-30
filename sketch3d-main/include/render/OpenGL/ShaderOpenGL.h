@@ -14,8 +14,8 @@ class VertexFormat;
 
 class SKETCH_3D_API ShaderOpenGL {
     public:
-                ShaderOpenGL();
-               ~ShaderOpenGL();
+                 ShaderOpenGL();
+        virtual ~ShaderOpenGL();
 
         GLuint  GetShader() const;
 
@@ -32,15 +32,7 @@ class SKETCH_3D_API FragmentShaderOpenGL : public FragmentShader, public ShaderO
 
 class SKETCH_3D_API VertexShaderOpenGL : public VertexShader, public ShaderOpenGL {
     public:
-                            VertexShaderOpenGL();
-
         virtual bool        InitializeFromSource(const string& source) override;
-        virtual bool        CreateInputLayout(VertexFormat* vertexFormat) override;
-
-        VertexFormat*       GetVertexFormat() const;
-
-    private:
-        VertexFormat*       vertexFormat_;
 };  
 
 }

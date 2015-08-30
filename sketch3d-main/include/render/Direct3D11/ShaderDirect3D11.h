@@ -46,14 +46,11 @@ class SKETCH_3D_API VertexShaderDirect3D11 : public VertexShader, public ShaderD
         virtual            ~VertexShaderDirect3D11();
 
         virtual bool        InitializeFromSource(const string& source) override;
-        virtual bool        CreateInputLayout(VertexFormat* vertexFormat) override;
 
         ID3D11VertexShader* GetShader() const;
-        ID3D11InputLayout*  GetInputLayout() const;
 
     private:
         ID3D11VertexShader* shader_;
-        ID3D11InputLayout*  inputLayout_;
 };  
 
 string GetD3DShaderVersion(D3D_FEATURE_LEVEL featureLevel);

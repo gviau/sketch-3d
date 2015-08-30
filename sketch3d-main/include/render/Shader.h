@@ -27,7 +27,6 @@ class SKETCH_3D_API FragmentShader : public Shader {
 
 class SKETCH_3D_API VertexShader : public Shader {
     public:
-        virtual bool    CreateInputLayout(VertexFormat* vertexFormat) = 0;
 };
 
 }

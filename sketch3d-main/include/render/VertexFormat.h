@@ -78,6 +78,12 @@ struct Vertex_Pos_Normal_4_Bones_t {
     Vector4 weights;
 };
 
+struct Vertex_Pos_2_UV_t {
+    Vector3 position;
+    Vector2 uv1;
+    Vector2 uv2;
+};
+
 struct Vertex_Pos_2_UV_Normal_t {
     Vector3 position;
     Vector2 uv1;
@@ -125,6 +131,28 @@ struct Vertex_Pos_2_UV_4_Bones_t {
 ///////////////////////////////////////////////////////////////////////////////
 #define NEW_INPUT_LAYOUT(semanticName, semanticIndex, format, inputSlot, byteOffset, isDataPerInstance, instanceDataStepRate) \
     { semanticName, semanticIndex, format, inputSlot, byteOffset, isDataPerInstance, instanceDataStepRate }
+
+enum VertexFormatType_t
+{
+    Pos,
+    Pos_Color,
+    Pos_UV,
+    Pos_Normal,
+    Pos_UV_Normal,
+    Pos_UV_Normal_Tangent,
+    Pos_UV_Normal_4_Bones,
+    Pos_UV_Normal_Tangent_4_Bones,
+    Pos_UV_4_Bones,
+    Pos_Normal_4_Bones,
+    Pos_2_UV,
+    Pos_2_UV_Normal,
+    Pos_2_UV_Normal_Tangent,
+    Pos_2_UV_Normal_4_Bones,
+    Pos_2_UV_Normal_Tangent_4_Bones,
+    Pos_2_UV_4_Bones,
+
+    VertexFormatType_Max
+};
 
 /**
  * @class VertexFormat
@@ -199,6 +227,12 @@ class VertexFormat_Pos_Normal_4_Bones : public VertexFormat {
         virtual size_t GetSize() override { return sizeof(Vertex_Pos_Normal_4_Bones_t); }
 };
 
+class VertexFormat_Pos_2_UV : public VertexFormat {
+    public:
+        VertexFormat_Pos_2_UV();
+        virtual size_t GetSize() override { return sizeof(Vertex_Pos_2_UV_t); }
+};
+
 class VertexFormat_Pos_2_UV_Normal : public VertexFormat {
     public:
         VertexFormat_Pos_2_UV_Normal();
@@ -228,6 +262,14 @@ class VertexFormat_Pos_2_UV_4_Bones : public VertexFormat {
         VertexFormat_Pos_2_UV_4_Bones();
         virtual size_t GetSize() override { return sizeof(Vertex_Pos_2_UV_4_Bones_t); }
 };
+
+void GetVertexFormat(VertexFormatType_t vertexFormatType, VertexFormat*& vertexFormat);
+bool VertexFormatTypeContainsColor(VertexFormatType_t type);
+bool VertexFormatTypeContainsUV(VertexFormatType_t type);
+bool VertexFormatTypeContains2UVs(VertexFormatType_t type);
+bool VertexFormatTypeContainsNormals(VertexFormatType_t type);
+bool VertexFormatTypeContainsTangents(VertexFormatType_t type);
+bool VertexFormatTypeContainsBones(VertexFormatType_t type);
 
 }
 

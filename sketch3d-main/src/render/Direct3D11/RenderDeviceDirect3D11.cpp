@@ -2,8 +2,6 @@
 
 #include "math/Vector4.h"
 
-#include "render/VertexFormat.h"
-
 #include "render/Direct3D11/BufferDirect3D11.h"
 #include "render/Direct3D11/RenderContextDirect3D11.h"
 #include "render/Direct3D11/RenderTargetDirect3D11.h"
@@ -18,10 +16,15 @@
 #pragma warning( disable : 4005 )
 
 #include <d3d11.h>
+#include <d3dcompiler.h>
 
 #pragma warning( default : 4005 )
 
 namespace Sketch3D {
+
+// Used to not have to constantly create new input layouts
+ID3D11InputLayout* registeredInputLayouts[VertexFormatType_t::VertexFormatType_Max];
+
 RenderDeviceDirect3D11::RenderDeviceDirect3D11()
     : device_(nullptr)
     , context_(nullptr)
@@ -32,9 +35,21 @@ RenderDeviceDirect3D11::RenderDeviceDirect3D11()
     , currentDepthStencilBuffer_(nullptr)
     , hardwareResourceCreator_(nullptr)
 {
+    for (size_t i = 0; i < VertexFormatType_t::VertexFormatType_Max; i++)
+    {
+        registeredInputLayouts[i] = nullptr;
+    }
 }
 
 RenderDeviceDirect3D11::~RenderDeviceDirect3D11() {
+    for (size_t i = 0; i < VertexFormatType_t::VertexFormatType_Max; i++)
+    {
+        if (registeredInputLayouts[i] != nullptr)
+        {
+            registeredInputLayouts[i]->Release();
+        }
+    }
+
     delete hardwareResourceCreator_;
 
     if (defaultBackbuffer_ != nullptr) {
@@ -290,7 +305,6 @@ void RenderDeviceDirect3D11::SetVertexShader(shared_ptr<VertexShader> vertexShad
 
     VertexShaderDirect3D11* shader = static_cast<VertexShaderDirect3D11*>(vertexShader.get());
 
-    context_->IASetInputLayout(shader->GetInputLayout());
     context_->VSSetShader(shader->GetShader(), nullptr, 0);
 }
 
@@ -382,8 +396,15 @@ bool RenderDeviceDirect3D11::Draw(PrimitiveTopology_t primitiveTopology, const s
     }
 
     ID3D11Buffer* buffer = d3dVertexBuffer->GetBuffer();
-    size_t stride = vertexBuffer->GetVertexFormat()->GetSize();
+
+    VertexFormatType_t vertexFormatType = vertexBuffer->GetVertexFormatType();
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexFormatType, vertexFormat);
+
+    size_t stride = vertexFormat->GetSize();
     size_t offset = 0;
+
+    context_->IASetInputLayout(registeredInputLayouts[vertexFormatType]);
     context_->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
     context_->Draw(vertexBuffer->GetNumVertices(), startVertexLocation);
 
@@ -408,8 +429,14 @@ bool RenderDeviceDirect3D11::DrawIndexed(PrimitiveTopology_t primitiveTopology, 
     ID3D11Buffer* vBuffer = d3dVertexBuffer->GetBuffer();
     ID3D11Buffer* iBuffer = d3dIndexBuffer->GetBuffer();
 
-    size_t stride = vertexBuffer->GetVertexFormat()->GetSize();
+    VertexFormatType_t vertexFormatType = vertexBuffer->GetVertexFormatType();
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexFormatType, vertexFormat);
+
+    size_t stride = vertexFormat->GetSize();
     size_t offset = 0;
+
+    context_->IASetInputLayout(registeredInputLayouts[vertexFormatType]);
     context_->IASetVertexBuffers(0, 1, &vBuffer, &stride, &offset);
 
     DXGI_FORMAT format = DXGI_FORMAT_R32_UINT;
@@ -458,7 +485,7 @@ Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjection(float width, fl
 
 Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane)
 {
-    float yScale = 1.0f / tanf(fov / 2.0f);
+    float yScale = 1.0f / tanf( (fov / 2.0f) * DEG_2_RAD );
     float xScale = yScale / aspectRatio;
 
     projection_[0][0] = xScale;
@@ -602,6 +629,127 @@ D3D11_PRIMITIVE_TOPOLOGY GetD3DPrimitiveTopology(PrimitiveTopology_t primitiveTo
     }
     
     return d3dPrimitiveTopology;
+}
+
+bool RegisterVertexFormatType(ID3D11Device* device, VertexFormatType_t vertexFormatType, VertexFormat* vertexFormat)
+{
+    if (registeredInputLayouts[vertexFormatType] != nullptr)
+    {
+        return true;
+    }
+
+    // Create a dummy shader just to validate the input layout
+    string dummyShaderSource = "struct VS_INPUT {\nfloat3 position : POSITION;\n";
+
+    if (VertexFormatTypeContains2UVs(vertexFormatType))
+    {
+        dummyShaderSource += "float2 uv1 : TEXCOORD0;\nfloat2 uv2 : TEXCOORD1;\n";
+    }
+    else if (VertexFormatTypeContainsUV(vertexFormatType))
+    {
+        dummyShaderSource += "float2 uv : TEXCOORD0;\n";
+    }
+
+    if (VertexFormatTypeContainsNormals(vertexFormatType))
+    {
+        dummyShaderSource += "float3 normal : NORMAL;\n";
+    }
+
+    if (VertexFormatTypeContainsTangents(vertexFormatType))
+    {
+        dummyShaderSource += "float3 tangent : TANGENT;\n";
+    }
+
+    if (VertexFormatTypeContainsColor(vertexFormatType))
+    {
+        dummyShaderSource += "float3 color : COLOR;\n";
+    }
+
+    if (VertexFormatTypeContainsBones(vertexFormatType))
+    {
+        dummyShaderSource += "float4 bones : BLENDINDICES;\nfloat4 weights : BLENDWEIGHT;\n";
+    }
+    
+    dummyShaderSource += "};\n"
+
+        "struct VS_OUTPUT {\n"
+            "float4 position : SV_POSITION;\n"
+        "};\n"
+
+        "VS_OUTPUT main(VS_INPUT input) {\n"
+            "VS_OUTPUT output = (VS_OUTPUT)0;\n"
+            "output.position = float4(input.position, 1.0);\n"
+            "return output;\n"
+        "}\n";
+
+    ID3D10Blob* shaderBlob = nullptr;
+    ID3D10Blob* error = nullptr;
+
+    D3D_FEATURE_LEVEL featureLevel = device->GetFeatureLevel();
+    string shaderVersion = GetD3DShaderVersion(featureLevel);
+
+    string version = ("vs_" + shaderVersion);
+    unsigned int flags = 0;
+
+#ifdef _DEBUG
+    flags = D3DCOMPILE_DEBUG;
+#endif
+
+    HRESULT hr = D3DCompile(dummyShaderSource.c_str(), dummyShaderSource.size(), nullptr, nullptr, nullptr, "main", version.c_str(), flags, 0, &shaderBlob, &error);
+    if (FAILED(hr)) {
+        if (error != nullptr) {
+            char* errorMsg = (char*)error->GetBufferPointer();
+            Logger::GetInstance()->Error("Couldn't create Vertex Shader: " + string(errorMsg, error->GetBufferSize()));
+            error->Release();
+        }
+
+        return false;
+    }
+
+    ID3D11VertexShader* shader = nullptr;
+    bool success = true;
+    hr = device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Vertex Shader creation fialed");
+        success = false;
+    }
+    
+    if (error != nullptr) {
+        error->Release();
+    }
+
+    if (!success)
+    {
+        shader->Release();
+        return false;
+    }
+
+    const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
+    
+    vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
+    for (InputLayout_t inputLayout : inputLayouts) {
+        D3D11_INPUT_ELEMENT_DESC inputElement;
+        inputElement.SemanticName = GetD3DSemanticName(inputLayout.semanticName);
+        inputElement.SemanticIndex = inputLayout.semanticIndex;
+        inputElement.Format = GetD3DFormat(inputLayout.format);
+        inputElement.InputSlot = inputLayout.inputSlot;
+        inputElement.AlignedByteOffset = inputLayout.byteOffset;
+        inputElement.InputSlotClass = (inputLayout.isDataPerInstance) ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
+        inputElement.InstanceDataStepRate = inputLayout.instanceDataStepRate;
+
+        inputElements.push_back(inputElement);
+    }
+
+    hr = device->CreateInputLayout(&inputElements[0], inputElements.size(), shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &registeredInputLayouts[vertexFormatType]);
+    if (FAILED(hr)) {
+        Logger::GetInstance()->Error("Couldn't create input layout");
+        shader->Release();
+        return false;
+    }
+
+    shader->Release();
+
+    return true;
 }
 
 }

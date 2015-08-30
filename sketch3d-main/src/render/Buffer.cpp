@@ -1,19 +1,23 @@
 #include "render/Buffer.h"
 
 namespace Sketch3D {
-VertexFormat* VertexBuffer::GetVertexFormat() const {
-    return vertexFormat_;
+VertexFormatType_t VertexBuffer::GetVertexFormatType() const
+{
+    return vertexFormatType_;
 }
 
-size_t VertexBuffer::GetNumVertices() const {
+size_t VertexBuffer::GetNumVertices() const
+{
     return numVertices_;
 }
 
-IndexFormat_t IndexBuffer::GetIndexFormat() const {
+IndexFormat_t IndexBuffer::GetIndexFormat() const
+{
     return indexFormat_;
 }
 
-size_t IndexBuffer::GetNumIndices() const {
+size_t IndexBuffer::GetNumIndices() const
+{
     return numIndices_;
 }
 

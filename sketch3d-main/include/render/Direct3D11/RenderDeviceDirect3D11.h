@@ -4,6 +4,7 @@
 #include "render/RenderDevice.h"
 
 #include "render/RenderState.h"
+#include "render/VertexFormat.h"
 
 #include "render/Direct3D11/HardwareResourceCreatorDirect3D11.h"
 
@@ -29,7 +30,6 @@ class RenderTarget;
 class SamplerState;
 class Texture;
 class VertexBuffer;
-class VertexFormat;
 class VertexShader;
 
 /**
@@ -115,6 +115,8 @@ D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunction_t func);
 D3D11_FILL_MODE GetD3DFillMode(FillMode_t mode);
 D3D11_CULL_MODE GetD3DCullMode(CullingMethod_t method);
 D3D11_PRIMITIVE_TOPOLOGY GetD3DPrimitiveTopology(PrimitiveTopology_t primitiveTopology);
+
+bool RegisterVertexFormatType(ID3D11Device* device, VertexFormatType_t vertexFormatType, VertexFormat* vertexFormat);
 
 }
 

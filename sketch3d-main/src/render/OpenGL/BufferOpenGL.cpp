@@ -55,7 +55,7 @@ void BufferOpenGL::InternalUnmap(GLenum target) const
     }
 }
 
-bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices)
+bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormatType_t vertexFormatType, size_t numVertices)
 {
     if (buffer_ > 0)
     {
@@ -66,10 +66,13 @@ bool VertexBufferOpenGL::Initialize(void* initialData, bool dynamic, bool immuta
     GL_CALL( glGenBuffers(1, &buffer_) ) ;
     GL_CALL( glBindBuffer(GL_ARRAY_BUFFER, buffer_) );
 
-    vertexFormat_ = vertexFormat;
+    vertexFormatType_ = vertexFormatType;
     numVertices_ = numVertices;
     
-    bufferSizeInBytes_ = numVertices_ * vertexFormat_->GetSize();
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexFormatType_, vertexFormat);
+
+    bufferSizeInBytes_ = numVertices_ * vertexFormat->GetSize();
 
     GLenum usage;
     if (dynamic)

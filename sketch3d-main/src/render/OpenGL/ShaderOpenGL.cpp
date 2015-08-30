@@ -67,11 +67,6 @@ bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
     return true;
 }
 
-VertexShaderOpenGL::VertexShaderOpenGL()
-    : vertexFormat_(nullptr)
-{
-}
-
 bool VertexShaderOpenGL::InitializeFromSource(const string& source)
 {
     if (shader_ > 0)
@@ -90,23 +85,6 @@ bool VertexShaderOpenGL::InitializeFromSource(const string& source)
     }
 
     return true;
-}
-
-bool VertexShaderOpenGL::CreateInputLayout(VertexFormat* vertexFormat)
-{
-    if (shader_ == 0) {
-        Logger::GetInstance()->Warning("You have to create the vertex shader before creating the input layout");
-        return false;
-    }
-
-    vertexFormat_ = vertexFormat;
-
-    return true;
-}
-
-VertexFormat* VertexShaderOpenGL::GetVertexFormat() const
-{
-    return vertexFormat_;
 }
 
 }

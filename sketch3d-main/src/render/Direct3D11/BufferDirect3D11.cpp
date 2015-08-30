@@ -35,13 +35,13 @@ void BufferDirect3D11::InternalUnmap() const {
 VertexBufferDirect3D11::VertexBufferDirect3D11(ID3D11Device* device, ID3D11DeviceContext* context) : BufferDirect3D11(device, context) {
 }
 
-bool VertexBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormat* vertexFormat, size_t numVertices) {
+bool VertexBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool immutable, VertexFormatType_t vertexFormatType, size_t numVertices) {
     if (buffer_ != nullptr) {
         Logger::GetInstance()->Warning("Vertex buffer with resource id # " + to_string(resourceId_) + " already created");
         return false;
     }
 
-    vertexFormat_ = vertexFormat;
+    vertexFormatType_ = vertexFormatType;
     numVertices_ = numVertices;
 
     D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
@@ -50,6 +50,11 @@ bool VertexBufferDirect3D11::Initialize(void* initialData, bool dynamic, bool im
     } else if (dynamic) {
         usage = D3D11_USAGE_DYNAMIC;
     }
+
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexFormatType_, vertexFormat);
+
+    RegisterVertexFormatType(device_, vertexFormatType_, vertexFormat);
 
     D3D11_BUFFER_DESC desc;
     desc.Usage = usage;

@@ -270,8 +270,8 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
         GL_CALL( glGenVertexArrays(1, &vertexArrayObject_) );
     }
 
-    VertexShaderOpenGL* vertexShader = dynamic_cast<VertexShaderOpenGL*>(vertexShader_.get());
-    VertexFormat* vertexFormat = vertexShader->GetVertexFormat();
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexBuffer->GetVertexFormatType(), vertexFormat);
     const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
 
     GL_CALL( glBindVertexArray(vertexArrayObject_) );
@@ -314,8 +314,8 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
         GL_CALL( glGenVertexArrays(1, &vertexArrayObject_) );
     }
 
-    VertexShaderOpenGL* vertexShader = dynamic_cast<VertexShaderOpenGL*>(vertexShader_.get());
-    VertexFormat* vertexFormat = vertexShader->GetVertexFormat();
+    VertexFormat* vertexFormat = nullptr;
+    GetVertexFormat(vertexBuffer->GetVertexFormatType(), vertexFormat);
     const vector<InputLayout_t>& inputLayouts = vertexFormat->GetInputLayouts();
 
     GL_CALL( glBindVertexArray(vertexArrayObject_) );
@@ -397,7 +397,7 @@ Matrix4x4 RenderDeviceOpenGL::CalculatePerspectiveProjection(float width, float 
 
 Matrix4x4 RenderDeviceOpenGL::CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane)
 {
-    float yScale = 1.0f / tanf(fov / 2.0f);
+    float yScale = 1.0f / tanf( (fov / 2.0f) * DEG_2_RAD );
     float xScale = yScale / aspectRatio;
 
     projection_[0][0] = xScale;
