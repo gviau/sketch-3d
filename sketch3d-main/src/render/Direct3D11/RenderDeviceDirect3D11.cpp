@@ -33,6 +33,7 @@ RenderDeviceDirect3D11::RenderDeviceDirect3D11()
     , currentRasterizerState_(nullptr)
     , currentDepthStencilState_(nullptr)
     , currentDepthStencilBuffer_(nullptr)
+    , depthStencilTexture_(nullptr)
     , hardwareResourceCreator_(nullptr)
 {
     for (size_t i = 0; i < VertexFormatType_t::VertexFormatType_Max; i++)
@@ -54,6 +55,10 @@ RenderDeviceDirect3D11::~RenderDeviceDirect3D11() {
 
     if (defaultBackbuffer_ != nullptr) {
         defaultBackbuffer_->Release();
+    }
+
+    if (depthStencilTexture_ != nullptr) {
+        depthStencilTexture_->Release();
     }
 
     if (defaultDepthStencilBuffer_ != nullptr) {
@@ -80,14 +85,24 @@ bool RenderDeviceDirect3D11::Initialize(const shared_ptr<RenderContext>& renderC
     width_ = context->GetRenderParameters().width;
     height_ = context->GetRenderParameters().height;
 
-    CreateDefaultDepthStencilState(context->GetRenderParameters().depthStencilBits);
     CreateDefaultRasterizerState(renderContext);
+    CreateDefaultDepthStencilState(context->GetRenderParameters().depthStencilBits);
 
-    currentRenderTargets_.push_back(defaultBackbuffer_);
-    context_->OMSetRenderTargets(1, &defaultBackbuffer_, defaultDepthStencilBuffer_);
+    SetDefaultRenderTargetAndDepthStencilBuffer();
 
-    currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
-    context_->OMSetDepthStencilState(currentDepthStencilState_, 0);
+    SetRasterizerState(defaultRasterizerState_);
+    SetDepthStencilState(defaultDepthStencilState_, 0);
+
+    // Set the default viewport
+    D3D11_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = (float)width_;
+    viewport.Height = (float)height_;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    context_->RSSetViewports(1, &viewport);
 
     hardwareResourceCreator_ = new HardwareResourceCreatorDirect3D11(device_, context_);
 
@@ -158,14 +173,19 @@ void RenderDeviceDirect3D11::SetDepthStencilState(const DepthStencilState_t& dep
     }
 
     D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-    depthStencilDesc.DepthEnable = depthStencilState.depthEnable;
+    ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+    depthStencilDesc.DepthEnable = (depthStencilState.depthEnable) ? TRUE : FALSE;
     depthStencilDesc.DepthWriteMask = (depthStencilState.depthWriteMask) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
     depthStencilDesc.DepthFunc = GetD3DComparisonFunc(depthStencilState.comparisonFunction);
-    depthStencilDesc.StencilEnable = depthStencilState.stencilEnable;
+    depthStencilDesc.StencilEnable = (depthStencilState.stencilEnable) ? TRUE : FALSE;
     depthStencilDesc.StencilReadMask = depthStencilState.stencilReadMask;
     depthStencilDesc.StencilWriteMask = depthStencilState.stencilWriteMask;
 
-    device_->CreateDepthStencilState(&depthStencilDesc, &currentDepthStencilState_);
+    HRESULT hr = device_->CreateDepthStencilState(&depthStencilDesc, &currentDepthStencilState_);
+    if (FAILED(hr))
+    {
+        Logger::GetInstance()->Error("Couldn't create depth stencil state");
+    }
 
     context_->OMSetDepthStencilState(currentDepthStencilState_, referenceMask);
 }
@@ -185,6 +205,7 @@ void RenderDeviceDirect3D11::SetRasterizerState(const RasterizerState_t& rasteri
     rasterizerDesc.AntialiasedLineEnable = rasterizerState.enableAntialiasedLine;
     rasterizerDesc.DepthBias = 0;
     rasterizerDesc.DepthBiasClamp = 0.0f;
+    rasterizerDesc.SlopeScaledDepthBias = 0.0f;
 
     device_->CreateRasterizerState(&rasterizerDesc, &currentRasterizerState_);
 
@@ -524,15 +545,19 @@ bool RenderDeviceDirect3D11::CreateDefaultDepthStencilState(DepthStencilBits_t d
     depthStencilDesc.CPUAccessFlags = 0;
     depthStencilDesc.MiscFlags = 0;
 
-    ID3D11Texture2D* depthStencilTexture;
-    HRESULT result = device_->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture);
+    HRESULT result = device_->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture_);
     if (FAILED(result)) {
         Logger::GetInstance()->Error("Couldn't create texture for depth stencil buffer");
         return false;
     }
 
-    result = device_->CreateDepthStencilView(depthStencilTexture, nullptr, &defaultDepthStencilBuffer_);
-    depthStencilTexture->Release();
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+    depthStencilViewDesc.Format = depthStencilFormat;
+    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    depthStencilViewDesc.Texture2D.MipSlice = 0;
+    depthStencilViewDesc.Flags = 0;
+
+    result = device_->CreateDepthStencilView(depthStencilTexture_, &depthStencilViewDesc, &defaultDepthStencilBuffer_);
 
     if (FAILED(result)) {
         Logger::GetInstance()->Error("Couldn't create depth stencil buffer");
@@ -545,8 +570,6 @@ bool RenderDeviceDirect3D11::CreateDefaultDepthStencilState(DepthStencilBits_t d
     defaultDepthStencilState_.stencilEnable = false;
     defaultDepthStencilState_.stencilReadMask = 0;
     defaultDepthStencilState_.stencilWriteMask = 0;
-
-    SetDepthStencilState(defaultDepthStencilState_, 0);
 
     return true;
 }
@@ -576,8 +599,6 @@ bool RenderDeviceDirect3D11::CreateDefaultRasterizerState(const shared_ptr<Rende
     defaultRasterizerState_.enableScissor = false;
     defaultRasterizerState_.enableMultisample = false;
     defaultRasterizerState_.enableDepthClip = true;
-
-    SetRasterizerState(defaultRasterizerState_);
     
     return true;
 }

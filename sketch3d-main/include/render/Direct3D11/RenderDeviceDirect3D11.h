@@ -94,6 +94,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
         ID3D11DeviceContext*                context_;
         ID3D11RenderTargetView*             defaultBackbuffer_;
         ID3D11DepthStencilView*             defaultDepthStencilBuffer_;
+        ID3D11Texture2D*                    depthStencilTexture_;
 
         // This stuff will move in the render state manager
         vector<ID3D11RenderTargetView*>     currentRenderTargets_;

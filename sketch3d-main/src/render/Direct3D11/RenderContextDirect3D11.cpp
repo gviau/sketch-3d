@@ -124,17 +124,6 @@ bool RenderContextDirect3D11::Initialize(Window& window, const RenderParameters_
     Logger::GetInstance()->Info("Direct3D11 context created");
     Logger::GetInstance()->Info("Feature Level = " + featureLevelStr);
 
-    // Set the default viewport
-    D3D11_VIEWPORT viewport;
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = (float)renderParameters.width;
-    viewport.Height = (float)renderParameters.height;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    context_->RSSetViewports(1, &viewport);
-
     return true;
 }
 
