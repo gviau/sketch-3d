@@ -15,7 +15,7 @@ class VertexBuffer;
 /**
  * @class SubMesh The sub mesh class is the smallest drawing unit.
  */
-class SubMesh
+class SKETCH_3D_API SubMesh
 {
     public:
         void                            Draw(const shared_ptr<RenderDevice>& renderDevice) const;

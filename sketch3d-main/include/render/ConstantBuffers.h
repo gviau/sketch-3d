@@ -12,7 +12,7 @@ namespace Sketch3D {
  * @class GPUMatrix4x4
  * This class is a class that takes a 4x4 matrix as input and automatically transpose it, to avoid programmer errors
  */
-class GPUMatrix4x4
+class SKETCH_3D_API GPUMatrix4x4
 {
     public:
         GPUMatrix4x4(const Matrix4x4& src) : data_(src.Transpose()) {}

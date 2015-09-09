@@ -10,7 +10,7 @@ namespace Sketch3D {
  * This class acts as a base class for the OpenGL context creation. Derived
  * class will implement the code depending what OS is the user using.
  */
-class RenderContextOpenGL : public RenderContext
+class SKETCH_3D_API RenderContextOpenGL : public RenderContext
 {
 	public:
 		virtual bool Initialize(Window& window, const RenderParameters_t& renderParameters) = 0;

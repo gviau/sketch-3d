@@ -19,7 +19,7 @@ namespace Sketch3D {
  * @class RenderContextDirect3D11
  * Direct3D11 implementation of the render context
  */
-class RenderContextDirect3D11 : public RenderContext {
+class SKETCH_3D_API RenderContextDirect3D11 : public RenderContext {
     friend class RenderDeviceDirect3D11;
 
     public:

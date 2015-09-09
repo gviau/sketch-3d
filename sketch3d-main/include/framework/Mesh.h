@@ -21,7 +21,7 @@ class VertexBuffer;
  * @class Mesh
  * The mesh class is composed of sub meshes. It acts as a container for them
  */
-class Mesh
+class SKETCH_3D_API Mesh
 {
     public:
         void                                Draw(const shared_ptr<RenderDevice>& renderDevice) const;

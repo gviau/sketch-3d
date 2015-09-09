@@ -11,7 +11,7 @@ namespace Sketch3D {
  * @class RenderContextOpenGLWin32
  * This class creates an OpenGL rendering context for the Windows OS
  */
-class RenderContextOpenGLWin32 : public RenderContextOpenGL
+class SKETCH_3D_API RenderContextOpenGLWin32 : public RenderContextOpenGL
 {
 	public:
 		/**
