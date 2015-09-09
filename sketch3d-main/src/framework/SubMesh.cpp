@@ -1,5 +1,7 @@
 #include "framework/SubMesh.h"
 
+#include "framework/Material.h"
+
 #include "render/Buffer.h"
 #include "render/RenderDevice.h"
 
@@ -14,6 +16,11 @@ void SubMesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
     {
         Logger::GetInstance()->Warning("Trying to a draw a submesh with a null vertex buffer");
         return;
+    }
+
+    if (material_ != nullptr)
+    {
+        material_->Apply(renderDevice);
     }
 
     IndexBuffer* indexBuffer = indexBuffer_.get();

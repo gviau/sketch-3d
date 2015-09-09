@@ -1,10 +1,14 @@
 #include "framework/Mesh.h"
 
+#include "framework/Material.h"
 #include "framework/SubMesh.h"
 
 #include "render/Buffer.h"
 #include "render/HardwareResourceCreator.h"
 #include "render/RenderDevice.h"
+#include "render/SamplerState.h"
+#include "render/Texture.h"
+#include "render/TextureMap.h"
 
 #include "system/Logger.h"
 
@@ -39,6 +43,9 @@ void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vert
 
 void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuffer);
 VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh);
+
+void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial);
+bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState);
 
 // Create a single instance of an Assimp importer to load meshes from files
 unique_ptr<Assimp::Importer> assimpImporter(new Assimp::Importer);
@@ -136,6 +143,8 @@ bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareR
         }
     }
 
+    vector<shared_ptr<Material>> createdMaterials;
+
     queue<const aiNode*> nodes;
     nodes.push(scene->mRootNode);
 
@@ -162,6 +171,38 @@ bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareR
                 subMesh->SetIndexBuffer(indexBuffer);
             }
 
+            if (scene->HasMaterials())
+            {
+                size_t materialIndex = mesh->mMaterialIndex;
+                if (materialIndex < createdMaterials.size() && createdMaterials[materialIndex].get() != nullptr)
+                {
+                    subMesh->SetMaterial(createdMaterials[mesh->mMaterialIndex]);
+                }
+                else
+                {
+                    shared_ptr<Material> material(new Material);
+
+                    LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material);
+
+                    if (materialIndex < createdMaterials.size())
+                    {
+                        createdMaterials[materialIndex] = material;
+                    }
+                    else
+                    {
+                        size_t size = createdMaterials.size();
+                        for (size_t j = size; j < materialIndex; j++)
+                        {
+                            createdMaterials.push_back(shared_ptr<Material>(nullptr));
+                        }
+
+                        createdMaterials.push_back(material);
+                    }
+
+                    subMesh->SetMaterial(material);
+                }
+            }
+
             loadedMesh->AddSubMesh(subMesh);
         }
 
@@ -170,6 +211,8 @@ bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareR
             nodes.push(node->mChildren[i]);
         }
     }
+
+    Logger::GetInstance()->Info("Successfully loaded mesh " + filename);
 
     return true;
 }
@@ -253,6 +296,126 @@ void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuf
 
         indexBuffer->Initialize((void*)&indices[0], false, false, IndexFormat_t::INT_2_BYTES, numIndices);
     }
+}
+
+void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial)
+{
+    aiColor3D ambientColor(0.0f, 0.0f, 0.0f);
+    material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
+    Vector3 ambientColorVec(ambientColor.r, ambientColor.g, ambientColor.b);
+
+    if (ambientColorVec != Vector3::ZERO)
+    {
+        newMaterial->SetAmbientColor(ambientColorVec);
+    }
+
+    aiColor3D diffuseColor(0.0f, 0.0f, 0.0f);
+    material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+    Vector3 diffuseColorVec(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+
+    if (diffuseColorVec != Vector3::ZERO)
+    {
+        newMaterial->SetDiffuseColor(diffuseColorVec);
+    }
+
+    aiColor3D specularColor(0.0f, 0.0f, 0.0f);
+    material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
+    Vector3 specularColorVec(specularColor.r, specularColor.g, specularColor.b);
+
+    if (specularColorVec != Vector3::ZERO)
+    {
+        newMaterial->SetSpecularColor(specularColorVec);
+    }
+
+    float specularPower = 0.0f;
+    material->Get(AI_MATKEY_SHININESS, specularPower);
+    
+    if (fabs(specularPower) > EPSILON)
+    {
+        newMaterial->SetSpecularPower(specularPower);
+    }
+
+    shared_ptr<Texture2D> ambientTexture;
+    shared_ptr<SamplerState> ambientSamplerState;
+    if (LoadTextureFromMaterial(aiTextureType::aiTextureType_AMBIENT, hardwareResourceCreator, material, ambientTexture, ambientSamplerState))
+    {
+        newMaterial->SetAmbientTexture(ambientTexture);
+        newMaterial->SetAmbientSamplerState(ambientSamplerState);
+    }
+
+    shared_ptr<Texture2D> diffuseTexture;
+    shared_ptr<SamplerState> diffuseSamplerState;
+    if (LoadTextureFromMaterial(aiTextureType::aiTextureType_DIFFUSE, hardwareResourceCreator, material, diffuseTexture, diffuseSamplerState))
+    {
+        newMaterial->SetDiffuseTexture(diffuseTexture);
+        newMaterial->SetDiffuseSamplerState(diffuseSamplerState);
+    }
+
+    shared_ptr<Texture2D> specularTexture;
+    shared_ptr<SamplerState> specularSamplerState;
+    if (LoadTextureFromMaterial(aiTextureType::aiTextureType_SPECULAR, hardwareResourceCreator, material, specularTexture, specularSamplerState))
+    {
+        newMaterial->SetSpecularTexture(specularTexture);
+        newMaterial->SetSpecularSamplerState(specularSamplerState);
+    }
+
+    shared_ptr<Texture2D> normalMapTexture;
+    shared_ptr<SamplerState> normalMapSamplerState;
+    if (LoadTextureFromMaterial(aiTextureType::aiTextureType_NORMALS, hardwareResourceCreator, material, normalMapTexture, normalMapSamplerState))
+    {
+        newMaterial->SetNormalMapTexture(normalMapTexture);
+        newMaterial->SetNormalMapSamplerState(normalMapSamplerState);
+    }
+}
+
+bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState)
+{
+    if (material->GetTextureCount(textureType) > 0)
+    {
+        aiString textureName;
+        aiTextureMapMode mapModes[] = { aiTextureMapMode::aiTextureMapMode_Wrap, aiTextureMapMode::aiTextureMapMode_Wrap, aiTextureMapMode::aiTextureMapMode_Wrap };
+        material->GetTexture(textureType, 0, &textureName, nullptr, nullptr, nullptr, nullptr, mapModes);
+
+        string textureFilename = textureName.C_Str();
+
+        shared_ptr<TextureMap> textureMap;
+        TextureFormat_t textureFormat;
+        LoadTextureMapFromFile("Media/" + textureFilename, textureMap, textureFormat);
+
+        texture = hardwareResourceCreator->CreateTexture2D();
+        texture->Initialize(textureMap.get(), textureFormat, false, false);
+
+        AddressMode_t addressModeU;
+        AddressMode_t addressModeV;
+        AddressMode_t addressModeW;
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            AddressMode_t* addressMode = &addressModeU;
+            if (i == 1)
+            {
+                addressMode = &addressModeV;
+            }
+            else if (i == 2)
+            {
+                addressMode = &addressModeW;
+            }
+
+            switch (mapModes[i])
+            {
+            case aiTextureMapMode::aiTextureMapMode_Clamp:  *addressMode = AddressMode_t::CLAMP; break;
+            case aiTextureMapMode::aiTextureMapMode_Wrap:   *addressMode = AddressMode_t::WRAP; break;
+            case aiTextureMapMode::aiTextureMapMode_Mirror: *addressMode = AddressMode_t::MIRROR; break;
+            }
+        }
+
+        samplerState = hardwareResourceCreator->CreateSamplerState();
+        samplerState->Initialize(FilterMode_t::LINEAR, addressModeU, addressModeV, addressModeW, ComparisonFunction_t::LESS);
+
+        return true;
+    }
+
+    return false;
 }
 
 VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)

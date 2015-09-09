@@ -1,8 +1,13 @@
+SamplerState sampler0 : register(s0);
+
+Texture2D tex : register(t0);
+
 struct PS_INPUT {
     float4 position : SV_POSITION;
-    float3 normal : TEXCOORD;
+    float2 uv : TEXCOORD0;
+    float3 normal : TEXCOORD1;
 };
 
 float4 main(PS_INPUT input) : SV_TARGET {
-    return float4(input.normal, 1.0);
+    return tex.Sample(sampler0, input.uv);
 }

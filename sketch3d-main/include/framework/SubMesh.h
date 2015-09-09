@@ -1,6 +1,8 @@
 #ifndef SKETCH_3D_SUB_MESH_H
 #define SKETCH_3D_SUB_MESH_H
 
+#include "system/Platform.h"
+
 #include <memory>
 using namespace std;
 

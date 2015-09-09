@@ -3,6 +3,8 @@
 
 #include "render/Resource.h"
 
+#include "render/Texture.h"
+
 #include <memory>
 #include <string>
 using namespace std;
@@ -33,7 +35,7 @@ class SKETCH_3D_API TextureMap : public Resource
         size_t          depth_;
 };
 
-bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& textureMap);
+bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& textureMap, TextureFormat_t& textureFormat);
 
 }
 

@@ -41,7 +41,7 @@ size_t TextureMap::GetDepth() const
     return depth_;
 }
 
-bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& textureMap)
+bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& textureMap, TextureFormat_t& textureFormat)
 {
     FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
 
@@ -110,6 +110,13 @@ bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& text
 
     free(textureData);
     FreeImage_Unload(dib);
+
+    switch (bytesPerPixel)
+    {
+    case 1: textureFormat = TextureFormat_t::GRAYSCALE; break;
+    case 3: textureFormat = TextureFormat_t::RGB24; break;
+    case 4: textureFormat = TextureFormat_t::RGBA32; break;
+    }
     
     textureMap.reset(new TextureMap(data, width, height));
 
