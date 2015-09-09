@@ -186,7 +186,7 @@ void FillVertexBuffer(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertex
     case VertexFormatType_t::Pos_Normal:                        FillVertexBuffer_Pos_Normal(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_UV_Normal:                     FillVertexBuffer_Pos_UV_Normal(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_UV_Normal_Tangent:             FillVertexBuffer_Pos_UV_Normal_Tangent(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_UV_Normal_4_Bones:             FillVertexBuffer_Pos_UV_Normal_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV_Normal_4_Bones:             FillVertexBuffer_Pos_UV_Normal_4_Bones(mesh, vertexBuffer, VertexFormatType_t::Pos_UV_Normal); break;
     case VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones:     FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_UV_4_Bones:                    FillVertexBuffer_Pos_UV_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_Normal_4_Bones:                FillVertexBuffer_Pos_Normal_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
