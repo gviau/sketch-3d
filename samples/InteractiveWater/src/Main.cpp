@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
 
     shared_ptr<Mesh> spiderMesh;
-    init = LoadMeshFromFile("Media/spider.obj", hardwareResourceCreator, spiderMesh);
+    init = LoadMeshFromFile("Media/Bob.md5mesh", hardwareResourceCreator, spiderMesh);
 
     shared_ptr<ConstantBuffer> drawConstantBuffer = hardwareResourceCreator->CreateConstantBuffer();
     init = drawConstantBuffer->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     renderDevice->SetFragmentShader(fragmentShader);
     renderDevice->SetVertexShader(vertexShader);
 
-    Matrix4x4 projectionMatrix = renderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f);
+    Matrix4x4 projectionMatrix = renderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 0.01f, 1000.0f);
 
     while (window.IsOpen())
     {
@@ -70,13 +70,17 @@ int main(int argc, char** argv) {
         }
 
         Matrix4x4 rotX, rotY;
-        rotX.RotationAroundX(angle / 2.0f);
+        rotX.RotationAroundX(-PI_OVER_2);
         rotY.RotationAroundY(angle);
-        modelMatrix = rotY;
+        modelMatrix = rotY * rotX;
         angle += 0.0005f;
 
         Matrix4x4 translation;
-        translation.SetTranslation(Vector3(0.0f, 0.0f, -125.0f));
+        translation.SetTranslation(Vector3(25.0f, 0.0f, -125.0f));
+        // translation.Scale(Vector3(0.05f, 0.05f, 0.05f));
+
+        Matrix4x4 scale;
+        scale.Scale(Vector3(0.25f, 0.25f, 0.25f));
 
         void* data = drawConstantBuffer->Map(MapFlag_t::WRITE_DISCARD);
         DrawConstants_t* drawConstants = (DrawConstants_t*)data;
