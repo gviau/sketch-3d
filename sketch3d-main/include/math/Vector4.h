@@ -3,6 +3,8 @@
 
 #include "system/Common.h"
 
+#include "math/Vector3.h"
+
 namespace Sketch3D {
 
 // Forward dependencies
@@ -122,6 +124,7 @@ class SKETCH_3D_API Vector4 {
         INLINE bool             operator!=(const Vector4& v) const;
 
         INLINE Vector4&         operator=(const Vector4& v);
+        INLINE Vector4&         operator=(const Vector3& v);
 
 };
 
@@ -237,6 +240,16 @@ INLINE Vector4& Vector4::operator=(const Vector4& v)
         return *this;
     }
 
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    w = v.w;
+
+    return *this;
+}
+
+INLINE Vector4& Vector4::operator=(const Vector3& v)
+{
     x = v.x;
     y = v.y;
     z = v.z;

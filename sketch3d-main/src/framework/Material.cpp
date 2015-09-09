@@ -1,28 +1,48 @@
 #include "framework/Material.h"
 
+#include "render/Buffer.h"
+#include "render/ConstantBuffers.h"
+#include "render/HardwareResourceCreator.h"
 #include "render/RenderDevice.h"
 #include "render/SamplerState.h"
 #include "render/Shader.h"
 #include "render/Texture.h"
 
 namespace Sketch3D {
-Material::Material()
-    : m_SpecularPower(1.0f)
+Material::Material(const shared_ptr<RenderDevice>& renderDevice)
+    : m_RenderDevice(renderDevice)
+    , m_AmbientColor(1.0f, 1.0f, 1.0f)
+    , m_DiffuseColor(1.0f, 1.0f, 1.0f)
+    , m_SpecularColor(1.0f, 1.0f, 1.0f)
+    , m_SpecularPower(1.0f)
 {
+    m_ConstantBuffer = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
 }
 
-bool Material::Apply(const shared_ptr<RenderDevice>& renderDevice) const
+void Material::Initialize()
+{
+    MaterialConstants_t materialConstants;
+    materialConstants.ambientColor = m_AmbientColor;
+    materialConstants.diffuseColor = m_DiffuseColor;
+    materialConstants.specularColorAndPower = m_SpecularColor;
+    materialConstants.specularColorAndPower.w = m_SpecularPower;
+    
+    m_ConstantBuffer->Initialize(&materialConstants, false, false, sizeof(MaterialConstants_t));
+}
+
+bool Material::Apply() const
 {
     // TEMP
     // The material would eventually create its own shader depending of the material or use an uber shader
-    RenderDevice* device = renderDevice.get();
-    if (device == nullptr)
+    RenderDevice* renderDevice = m_RenderDevice.get();
+    if (renderDevice == nullptr)
     {
         return false;
     }
 
-    device->SetFragmentShaderSamplerState(m_DiffuseSamplerState, 0);
-    device->SetFragmentShaderTexture(m_DiffuseTexture, 0);
+    renderDevice->SetFragmentShaderConstantBuffer(m_ConstantBuffer, 2);
+    renderDevice->SetFragmentShaderSamplerState(m_DiffuseSamplerState, 0);
+    renderDevice->SetFragmentShaderTexture(m_DiffuseTexture, 0);
 
     return true;
 }

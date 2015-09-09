@@ -42,6 +42,12 @@ struct ALIGNED_(16) ShadowConstants_t {
     GPUMatrix4x4 lightProjectionMatrix;
 };
 
+struct ALIGNED_(16) MaterialConstants_t {
+    Vector4 ambientColor;
+    Vector4 diffuseColor;
+    Vector4 specularColorAndPower;
+};
+
 }
 
 #endif

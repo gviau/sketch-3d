@@ -12,15 +12,17 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward class declarations
+class ConstantBuffer;
 class RenderDevice;
 class SamplerState;
 class Texture2D;
 
 class SKETCH_3D_API Material {
     public:
-                                        Material();
+                                        Material(const shared_ptr<RenderDevice>& renderDevice);
 
-        bool                            Apply(const shared_ptr<RenderDevice>& renderDevice) const;
+        void                            Initialize();
+        bool                            Apply() const;
 
         void                            SetAmbientColor(const Vector3& color);
         void                            SetDiffuseColor(const Vector3& color);
@@ -49,6 +51,8 @@ class SKETCH_3D_API Material {
         const shared_ptr<SamplerState>& GetNormalMapSamplerState() const;
 
     private:
+        shared_ptr<RenderDevice>        m_RenderDevice;
+
         Vector3                         m_AmbientColor;
         Vector3                         m_DiffuseColor;
         Vector3                         m_SpecularColor;
@@ -62,6 +66,8 @@ class SKETCH_3D_API Material {
         shared_ptr<SamplerState>        m_SpecularSamplerState;
         shared_ptr<Texture2D>           m_NormalMapTexture;
         shared_ptr<SamplerState>        m_NormalMapSamplerState;
+
+        shared_ptr<ConstantBuffer>      m_ConstantBuffer;
 };
 
 }

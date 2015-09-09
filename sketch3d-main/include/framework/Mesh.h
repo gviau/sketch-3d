@@ -37,7 +37,7 @@ class SKETCH_3D_API Mesh
         vector<shared_ptr<SubMesh>>         subMeshes_;
 };
 
-bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareResourceCreator, shared_ptr<Mesh>& loadedMesh, bool calculateTangents=false);
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents=false);
 
 }
 

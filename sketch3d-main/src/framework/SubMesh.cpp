@@ -20,7 +20,7 @@ void SubMesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
 
     if (material_ != nullptr)
     {
-        material_->Apply(renderDevice);
+        material_->Apply();
     }
 
     IndexBuffer* indexBuffer = indexBuffer_.get();

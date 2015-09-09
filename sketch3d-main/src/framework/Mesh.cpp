@@ -85,7 +85,7 @@ shared_ptr<SubMesh> Mesh::GetSubMesh(size_t index) const
     return subMeshes_[index];
 }
 
-bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareResourceCreator, shared_ptr<Mesh>& loadedMesh, bool calculateTangents)
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents)
 {
     Assimp::Importer* importer = assimpImporter.get();
     if (importer == nullptr)
@@ -143,6 +143,8 @@ bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareR
         }
     }
 
+    HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
+
     vector<shared_ptr<Material>> createdMaterials;
 
     queue<const aiNode*> nodes;
@@ -180,7 +182,7 @@ bool LoadMeshFromFile(const string& filename, HardwareResourceCreator* hardwareR
                 }
                 else
                 {
-                    shared_ptr<Material> material(new Material);
+                    shared_ptr<Material> material(new Material(renderDevice));
 
                     LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material);
 
@@ -366,6 +368,8 @@ void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMate
         newMaterial->SetNormalMapTexture(normalMapTexture);
         newMaterial->SetNormalMapSamplerState(normalMapSamplerState);
     }
+
+    newMaterial->Initialize();
 }
 
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState)

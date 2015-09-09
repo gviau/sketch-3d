@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
 
     shared_ptr<Mesh> spiderMesh;
-    init = LoadMeshFromFile("Media/spider.obj", hardwareResourceCreator, spiderMesh);
+    init = LoadMeshFromFile("Media/bob.md5mesh", renderDevice, spiderMesh);
 
     shared_ptr<ConstantBuffer> drawConstantBuffer = hardwareResourceCreator->CreateConstantBuffer();
     init = drawConstantBuffer->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
