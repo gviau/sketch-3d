@@ -1,11 +1,15 @@
-#version 330
+#version 420
 
-uniform vec3 ambient_color;
-uniform vec3 diffuse_color;
-uniform vec4 specular_color;
+layout(binding = 1) uniform OceanConstants_t
+{
+    vec4 light_position;
+    vec4 ambient_color;
+    vec4 diffuse_color;
+    vec4 specular_color;
 
-// x = diffuse, y = specular, z = ambient
-uniform vec3 light_contribution;
+    // x = diffuse, y = specular, z = ambient
+    vec4 light_contribution;
+};
 
 in vec3 normal;
 in vec3 light_dir;
@@ -46,5 +50,5 @@ void main() {
 		specular = (Beckmann(NdotH) * G(NdotH, NdotV, VdotH, NdotL) * R_F(VdotH)) / (NdotL * NdotV);
 	}
 
-	color = vec4(pow(NdotL * light_contribution.x * diffuse_color + light_contribution.y * specular + light_contribution.z * ambient_color, vec3(1.0 / 2.2)), 1.0);
+	color = vec4(pow(NdotL * light_contribution.x * diffuse_color.xyz + light_contribution.y * specular + light_contribution.z * ambient_color.xyz, vec3(1.0 / 2.2)), 1.0);
 }

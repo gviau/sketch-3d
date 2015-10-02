@@ -1,36 +1,33 @@
 #include "Ocean.h"
 
 #include "math/Vector4.h"
-#include "render/Material.h"
-#include "render/Renderer.h"
-#include "render/Shader.h"
+
+#include <render/Buffer.h>
+#include <render/ConstantBuffers.h>
+#include <render/HardwareResourceCreator.h>
+#include <render/RenderDevice.h>
+#include <render/Shader.h>
+
 using namespace Sketch3D;
 
 #include <string>
 using namespace std;
 
-Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& windStrength, const float length) :
-        numberOfPoints_(numberOfPoints),
-        amplitude_(amplitude),
-        wind_(windStrength),
-        length_(length),
-        gravity_(9.81f),
-        oceanMaterial_(nullptr),
-        oceanShader_(nullptr),
-        oceanMesh_(MESH_TYPE_DYNAMIC)
+Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& windStrength, const float length, const shared_ptr<RenderDevice>& renderDevice)
+    : m_RenderDevice(renderDevice)
+    , numberOfPoints_(numberOfPoints)
+    , amplitude_(amplitude)
+    , wind_(windStrength)
+    , length_(length)
+    , gravity_(9.81f)
 {
     windLength_ = wind_.Length();
     wind_.Normalize();
 
     // Create the vertices of the mesh
     size_t numVertices = numberOfPoints_ * numberOfPoints_;
-    oceanSurface_.numVertices = numVertices;
-    oceanSurface_.numNormals = numVertices;
-    //oceanSurface_.numTangents = numVertices;
-    oceanSurface_.vertices = new Vector3[oceanSurface_.numVertices];
-    oceanSurface_.normals = new Vector3[oceanSurface_.numNormals];
-    //oceanSurface_.tangents = new Vector3[oceanSurface_.numTangents];
-    initialPositions_.resize(oceanSurface_.numVertices);
+    m_Vertices.reserve(numVertices);
+    initialPositions_.resize(numVertices);
 
     Vector2 v;
     size_t idx = 0;
@@ -41,9 +38,12 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
             idx = i * numberOfPoints_ + j;
             v.x = (j - numberOfPoints_ / 2.0f) * length_ / numberOfPoints_;
 
-            oceanSurface_.vertices[idx] = Vector3(v.x, 0.0f, v.y);
-            initialPositions_[idx] = Vector2(oceanSurface_.vertices[idx].x, oceanSurface_.vertices[idx].z);
-            oceanSurface_.normals[idx] = Vector3::UP;
+            Vertex_Pos_Normal_t vertex;
+            vertex.position = Vector3(v.x, 0.0f, v.y);
+            initialPositions_[idx] = Vector2(vertex.position.x, vertex.position.z);
+            vertex.normal = Vector3::UP;
+
+            m_Vertices.push_back(vertex);
 
             // Compute the initial wave factors at the same time
             hTilde0_.push_back(ComputeHTilde0(i, j));
@@ -53,41 +53,36 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
 
     // Compute the indices of the mesh
     int size = numberOfPoints_ - 1;
-    oceanSurface_.numIndices = size * size * 6;
-    oceanSurface_.indices = new unsigned short[oceanSurface_.numIndices];
+    vector<unsigned int> indices;
+    indices.reserve(size * size * 6);
     idx = 0;
 
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            oceanSurface_.indices[idx++] = i + j * numberOfPoints_;
-            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_;
-            oceanSurface_.indices[idx++] = i + j * numberOfPoints_ + 1;
+            indices.push_back(i + j * numberOfPoints_);
+            indices.push_back(i + (j + 1) * numberOfPoints_);
+            indices.push_back(i + j * numberOfPoints_ + 1);
 
-            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_;
-            oceanSurface_.indices[idx++] = i + (j + 1) * numberOfPoints_ + 1;
-            oceanSurface_.indices[idx++] = i + j * numberOfPoints_ + 1;
+            indices.push_back(i + (j + 1) * numberOfPoints_);
+            indices.push_back(i + (j + 1) * numberOfPoints_ + 1);
+            indices.push_back(i + j * numberOfPoints_ + 1);
         }
     }
 
-    oceanMesh_.AddSurface(&oceanSurface_);
+    m_VertexBuffer = m_RenderDevice->GetHardwareResourceCreator()->CreateVertexBuffer();
+    m_VertexBuffer->Initialize((void*)&m_Vertices[0], true, false, VertexFormatType_t::Pos_Normal, m_Vertices.size());
 
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    oceanMesh_.Initialize(vertexAttributes);
+    m_IndexBuffer = m_RenderDevice->GetHardwareResourceCreator()->CreateIndexBuffer();
+    m_IndexBuffer->Initialize((void*)&indices[0], false, false, IndexFormat_t::INT_4_BYTES, indices.size());
 
     // Load the shader
-    oceanShader_ = Renderer::GetInstance()->CreateShader();
-    oceanShader_->SetSourceFile("Shaders/TessendorfOcean/vert", "Shaders/TessendorfOcean/frag");
+    shared_ptr<VertexShader> vertexShader = m_RenderDevice->GetHardwareResourceCreator()->CreateVertexShader();
+    shared_ptr<FragmentShader> fragmentShader = m_RenderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+    vertexShader->InitializeFromFile("Shaders/TessendorfOcean/vert.glsl");
+    fragmentShader->InitializeFromFile("Shaders/TessendorfOcean/frag.glsl");
 
-    // Create the material
-    oceanMaterial_ = new Material(oceanShader_);
-    
-    // Initialize the ocean node
-    oceanNode_.SetMaterial(oceanMaterial_);
-    oceanNode_.SetMesh(&oceanMesh_);
-    //oceanNode_.SetPosition(Vector3(48.0f, -5.0f, 32.0f));
-    Renderer::GetInstance()->GetSceneTree().AddNode(&oceanNode_);
+    m_RenderDevice->SetVertexShader(vertexShader);
+    m_RenderDevice->SetFragmentShader(fragmentShader);
 
     // Initialize the FFT specific members
     log_2_N_ = (size_t)(log(numberOfPoints_) / log(2));
@@ -125,10 +120,23 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     hTildeSlopez_ = new Complex[numVertices];
     hTildeDx_ = new Complex[numVertices];
     hTildeDz_ = new Complex[numVertices];
+
+    m_DrawConstants = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+    m_OceanConstants = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+    m_DrawConstants->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
+
+    OceanConstants_t oceanConstants;
+    oceanConstants.light_position = Vector4(0.0f, 10.0f, -16.0f);
+    oceanConstants.ambient_color = Vector4(0.0f, 0.65f, 0.75f);
+    oceanConstants.diffuse_color = Vector4(0.5f, 0.65f, 0.75f);
+    oceanConstants.specular_color = Vector4(1.0f, 0.25f, 0.0f, 120.0f);
+    oceanConstants.light_contribution =  Vector4(0.3f, 1.80f, 0.3f);
+
+    m_OceanConstants->Initialize(&oceanConstants, false, false, sizeof(OceanConstants_t));
 }
 
 Ocean::~Ocean() {
-    delete oceanMaterial_;
+    // delete oceanMaterial_;
 
     delete[] reversed_;
     for (size_t i = 0; i < log_2_N_; i++) {
@@ -199,27 +207,47 @@ void Ocean::EvaluateWaves(double t) {
             sign = signs[(i + j) & 1];
 
             hTildeHeight_[index] *= sign;
-            oceanSurface_.vertices[index].y = hTildeHeight_[index].a;
+            m_Vertices[index].position.y = hTildeHeight_[index].a;
 
             hTildeDx_[index] *= sign;
             hTildeDz_[index] *= sign;
-            oceanSurface_.vertices[index].x = initialPositions_[index].x + hTildeDx_[index].a * lambda;
-            oceanSurface_.vertices[index].z = initialPositions_[index].y + hTildeDz_[index].a * lambda;
+            m_Vertices[index].position.x = initialPositions_[index].x + hTildeDx_[index].a * lambda;
+            m_Vertices[index].position.z = initialPositions_[index].y + hTildeDz_[index].a * lambda;
 
             hTildeSlopex_[index] *= sign;
             hTildeSlopez_[index] *= sign;
-            oceanSurface_.normals[index] = Vector3(-hTildeSlopex_[index].a, 1.0f, -hTildeSlopez_[index].a).Normalized();
+            m_Vertices[index].normal = Vector3(-hTildeSlopex_[index].a, 1.0f, -hTildeSlopez_[index].a).Normalized();
         }
     }
 }
 
-void Ocean::PrepareForRender() {
-    oceanMesh_.UpdateMeshData();
+void Ocean::Render(const Matrix4x4& viewMatrix) {
+    void* data = m_VertexBuffer->Map(MapFlag_t::WRITE_DISCARD);
+
+    memcpy(data, &m_Vertices[0], m_Vertices.size() * sizeof(m_Vertices[0]));
+
+    m_VertexBuffer->Unmap();
+
+    /*
     oceanMaterial_->SetUniformVector3("light_position", Vector3(0.0f, 10.0f, -16.0f));
     oceanMaterial_->SetUniformVector3("ambient_color", Vector3(0.0f, 0.65f, 0.75f));
     oceanMaterial_->SetUniformVector3("diffuse_color", Vector3(0.5f, 0.65f, 0.75f));
     oceanMaterial_->SetUniformVector4("specular_color", Vector4(1.0f, 0.25f, 0.0f, 120.0f));
     oceanMaterial_->SetUniformVector3("light_contribution", Vector3(0.3f, 1.80f, 0.3f));
+    */
+
+    data = m_DrawConstants->Map(MapFlag_t::WRITE_DISCARD);
+    DrawConstants_t* drawConstants = (DrawConstants_t*)data;
+
+    drawConstants->modelViewMatrix = viewMatrix;
+    drawConstants->modelViewProjectionMatrix = m_RenderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f) * viewMatrix;
+
+    m_DrawConstants->Unmap();
+
+    m_RenderDevice->SetVertexShaderConstantBuffer(m_DrawConstants, 0);
+    m_RenderDevice->SetVertexShaderConstantBuffer(m_OceanConstants, 1);
+    m_RenderDevice->SetFragmentShaderConstantBuffer(m_OceanConstants, 1);
+    m_RenderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, m_VertexBuffer, m_IndexBuffer, 0, 0);
 }
 
 Complex Ocean::ComputeHTilde0(int i, int j) const {
