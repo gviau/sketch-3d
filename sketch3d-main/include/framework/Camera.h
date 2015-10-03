@@ -4,7 +4,6 @@
 #include "system/Platform.h"
 
 #include "math/Matrix4x4.h"
-#include "math/Quaternion.h"
 #include "math/Vector3.h"
 
 namespace Sketch3D {
@@ -34,16 +33,20 @@ public:
 
     void SetConstrainPlane(ConstrainPlane_t constrainPlane);
     void SetPosition(const Vector3& position);
-    void SetOrientation(const Quaternion& orientation);
+    void SetOrientation(const Vector3& right, const Vector3& up, const Vector3& look);
 
     const Matrix4x4& GetViewMatrix();
     const Vector3& GetPosition() const;
-    const Quaternion& GetOrientation() const;
+    const Vector3& GetRight() const;
+    const Vector3& GetUp() const;
+    const Vector3& GetLook() const;
 
 private:
     ConstrainPlane_t    m_ConstrainPlane;
     Vector3             m_Position;
-    Quaternion          m_Orientation;
+    Vector3             m_Right;
+    Vector3             m_Up;
+    Vector3             m_Look;
     bool                m_NeedViewMatrixUpdate;
     Matrix4x4           m_ViewMatrix;
 };
