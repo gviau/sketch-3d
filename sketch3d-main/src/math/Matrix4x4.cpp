@@ -239,6 +239,26 @@ void Matrix4x4::Scale(const Vector3& scale) {
     data_[2][2] = scale.z;
 }
 
+Vector3 Matrix4x4::GetXAxis() const
+{
+    return Vector3(data_[0][0], data_[1][0], data_[2][0]);
+}
+
+Vector3 Matrix4x4::GetYAxis() const
+{
+    return Vector3(data_[0][1], data_[1][1], data_[2][1]);
+}
+
+Vector3 Matrix4x4::GetZAxis() const
+{
+    return Vector3(data_[0][2], data_[1][2], data_[2][2]);
+}
+
+Vector3 Matrix4x4::GetWAxis() const
+{
+    return Vector3(data_[0][3], data_[1][3], data_[2][3]);
+}
+
 Vector4 Matrix4x4::operator*(const Vector3& v) const {
     Vector4 w(v.x, v.y, v.z);
     return *this * w;

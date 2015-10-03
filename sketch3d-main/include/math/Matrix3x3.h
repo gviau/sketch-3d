@@ -102,6 +102,10 @@ class SKETCH_3D_API Matrix3x3
          */
         void                    Scale(const Vector3& scale);
 
+        Vector3                 GetXAxis() const;
+        Vector3                 GetYAxis() const;
+        Vector3                 GetZAxis() const;
+
         // ACCESS OPERATORS
         /**
          * Access a row of the matrix

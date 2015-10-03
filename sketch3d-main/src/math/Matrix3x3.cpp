@@ -194,6 +194,21 @@ void Matrix3x3::Scale(const Vector3& scale) {
     data_[2][2] = scale.z;
 }
 
+Vector3 Matrix3x3::GetXAxis() const
+{
+    return Vector3(data_[0][0], data_[1][0], data_[2][0]);
+}
+
+Vector3 Matrix3x3::GetYAxis() const
+{
+    return Vector3(data_[0][1], data_[1][1], data_[2][1]);
+}
+
+Vector3 Matrix3x3::GetZAxis() const
+{
+    return Vector3(data_[0][2], data_[1][2], data_[2][2]);
+}
+
 Vector3 Matrix3x3::operator*(const Vector2& v) const {
     Vector3 w(v.x, v.y, 1.0f);
     return *this * w;

@@ -100,7 +100,12 @@ class SKETCH_3D_API Matrix4x4
          * Transform this matrix into a scale matrix
          * @param scale A vector representing the amount to scale on each axis
          */
-        void                    Scale(const Vector3& scale);
+        void                    Scale(const Vector3& scale); 
+
+        Vector3                 GetXAxis() const;
+        Vector3                 GetYAxis() const;
+        Vector3                 GetZAxis() const;
+        Vector3                 GetWAxis() const;
 
         // ACCESS OPERATORS
         /**
