@@ -15,6 +15,7 @@ namespace Sketch3D {
 class SKETCH_3D_API GPUMatrix4x4
 {
     public:
+        GPUMatrix4x4() {}
         GPUMatrix4x4(const Matrix4x4& src) : data_(src.Transpose()) {}
         void operator= (const Matrix4x4& rhs) { data_ = rhs.Transpose(); }
 
