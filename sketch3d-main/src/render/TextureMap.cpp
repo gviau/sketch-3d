@@ -76,6 +76,8 @@ bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& text
 
     size_t pad = (bytesPerPixel == 3) ? 1 : 0;
     size += (pad * width * height);
+
+    size_t realPad = pitch - (width * bytesPerPixel);
     
     unsigned char* data = (unsigned char*)malloc(size);
     FreeImage_ConvertToRawBits(textureData, dib, pitch, bpp, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, FALSE);
@@ -106,6 +108,8 @@ bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& text
             idx += bytesPerPixel + pad;
             textureIdx += bytesPerPixel;
         }
+
+        textureIdx += realPad;
     }
 
     free(textureData);
