@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     noiseTexture->Initialize(noiseTextureMap.get(), noiseTextureFormat, false);
 
     Camera camera;
-    camera.LookAt(Vector3(0.0f, 0.0f, 5.0f), -Vector3::LOOK, Vector3::UP);
+    camera.LookAt(Vector3(0.0f, 0.0f, 2.0f), -Vector3::LOOK, Vector3::UP);
 
     float threshold = 0.0f;
     float range = 0.075f;
