@@ -1,7 +1,9 @@
 #include "render/OpenGL/HardwareResourceCreatorOpenGL.h"
 
 #include "render/OpenGL/BufferOpenGL.h"
+#include "render/OpenGL/SamplerStateOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
+#include "render/OpenGL/TextureOpenGL.h"
 
 #include "system/Logger.h"
 
@@ -30,11 +32,13 @@ shared_ptr<RenderTarget> HardwareResourceCreatorOpenGL::CreateRenderTarget() {
 }
 
 shared_ptr<SamplerState> HardwareResourceCreatorOpenGL::CreateSamplerState() {
-    return shared_ptr<SamplerState>();
+    SamplerState* samplerState = new SamplerStateOpenGL;
+    return shared_ptr<SamplerState>(samplerState);
 }
 
 shared_ptr<Texture2D> HardwareResourceCreatorOpenGL::CreateTexture2D() {
-    return shared_ptr<Texture2D>();
+    Texture2D* texture2D = new Texture2DOpenGL;
+    return shared_ptr<Texture2D>(texture2D);
 }
 
 shared_ptr<VertexBuffer> HardwareResourceCreatorOpenGL::CreateVertexBuffer() {

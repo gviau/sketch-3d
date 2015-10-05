@@ -25,6 +25,7 @@ class RenderContext;
 class RenderTarget;
 class SamplerState;
 class Texture;
+class Texture2DOpenGL;
 class VertexBuffer;
 class VertexFormat;
 class VertexShader;
@@ -89,6 +90,9 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         GLuint                              vertexArrayObject_;
 
         HardwareResourceCreatorOpenGL*      hardwareResourceCreator_;
+
+        vector<Texture2DOpenGL*>            m_TexturesToBind;
+        vector<SamplerState*>               m_SamplerStatesToBind;
 
         virtual bool                        CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) override;
         virtual bool                        CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) override;

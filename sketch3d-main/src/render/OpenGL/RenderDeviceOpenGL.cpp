@@ -5,7 +5,13 @@
 #include "render/OpenGL/BufferOpenGL.h"
 #include "render/OpenGL/ErrorCheckingOpenGL.h"
 #include "render/OpenGL/RenderContextOpenGL.h"
+#include "render/OpenGL/SamplerStateOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
+#include "render/OpenGL/TextureOpenGL.h"
+
+#include <iomanip>
+#include <sstream>
+using namespace std;
 
 namespace Sketch3D {
 
@@ -30,6 +36,7 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     height_ = renderContext->GetRenderParameters().height;
 
     GL_CALL( glEnable(GL_CULL_FACE) );
+    GL_CALL( glEnable(GL_TEXTURE_2D) );
 
     CreateDefaultDepthStencilState(renderContext->GetRenderParameters().depthStencilBits);
     CreateDefaultRasterizerState(renderContext);
@@ -167,7 +174,18 @@ bool RenderDeviceOpenGL::SetFragmentShaderConstantBuffer(const shared_ptr<Consta
 
 bool RenderDeviceOpenGL::SetFragmentShaderSamplerState(const shared_ptr<SamplerState>& samplerState, size_t slot)
 {
-    return false;
+    if (fragmentShader_ == nullptr || samplerState == nullptr) {
+        return false;
+    }
+
+    if (m_SamplerStatesToBind.size() >= slot)
+    {
+        m_SamplerStatesToBind.resize(slot + 1);
+    }
+
+    m_SamplerStatesToBind[slot] = samplerState.get();
+
+    return true;
 }
 
 bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<Texture1D>& texture, unsigned int slot)
@@ -177,7 +195,18 @@ bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<Texture1D>& t
 
 bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<Texture2D>& texture, unsigned int slot)
 {
-    return false;
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    if (m_TexturesToBind.size() >= slot)
+    {
+        m_TexturesToBind.resize(slot + 1);
+    }
+
+    m_TexturesToBind[slot] = static_cast<Texture2DOpenGL*>(texture.get());
+
+    return true;
 }
 
 bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<Texture3D>& texture, unsigned int slot)
@@ -265,6 +294,33 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
         return false;
     }
 
+    // TODO
+    // Cache this / find a better way to do it
+    FragmentShaderOpenGL* fragmentShader = static_cast<FragmentShaderOpenGL*>(fragmentShader_.get());
+    GL_CALL( glActiveShaderProgram(pipeline_, fragmentShader->GetShader()) );
+
+    for (size_t i = 0; i < m_SamplerStatesToBind.size(); i++)
+    {
+        for (size_t j = 0; j < m_TexturesToBind.size(); j++)
+        {
+            size_t textureIndex = i * m_TexturesToBind.size() + j;
+
+            GL_CALL( glActiveTexture(GL_TEXTURE0 + textureIndex) );
+            m_TexturesToBind[j]->Bind();
+
+            m_TexturesToBind[j]->ApplySamplerState(m_SamplerStatesToBind[i]);
+
+            string uniformName = "";
+            stringstream ss;
+            ss << "_" << i << "_" << setfill('0') << setw(2) << j;
+            uniformName = "texture" + ss.str();
+
+            size_t idx;
+            GL_CALL( idx = glGetUniformLocation(fragmentShader->GetShader(), uniformName.c_str()) );
+            GL_CALL( glUniform1i(idx, textureIndex) );
+        }
+    }
+
     if (vertexArrayObject_ == 0)
     {
         GL_CALL( glGenVertexArrays(1, &vertexArrayObject_) );
@@ -308,6 +364,35 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
     {
         return false;
     }
+
+    // TODO
+    // Cache this / find a better way to do it
+    FragmentShaderOpenGL* fragmentShader = static_cast<FragmentShaderOpenGL*>(fragmentShader_.get());
+    GL_CALL( glActiveShaderProgram(pipeline_, fragmentShader->GetShader()) );
+
+    for (size_t i = 0; i < m_SamplerStatesToBind.size(); i++)
+    {
+        for (size_t j = 0; j < m_TexturesToBind.size(); j++)
+        {
+            size_t textureIndex = i * m_TexturesToBind.size() + j;
+
+            GL_CALL( glActiveTexture(GL_TEXTURE0 + textureIndex) );
+            m_TexturesToBind[j]->Bind();
+
+            m_TexturesToBind[j]->ApplySamplerState(m_SamplerStatesToBind[i]);
+
+            string uniformName = "";
+            stringstream ss;
+            ss << "_" << i << "_" << setfill('0') << setw(2) << j;
+            uniformName = "texture" + ss.str();
+
+            size_t idx;
+            GL_CALL( idx = glGetUniformLocation(fragmentShader->GetShader(), uniformName.c_str()) );
+            GL_CALL( glUniform1i(idx, textureIndex) );
+        }
+    }
+
+    glValidateProgramPipeline(pipeline_);
 
     if (vertexArrayObject_ == 0)
     {
