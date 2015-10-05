@@ -3,6 +3,8 @@
 #include "render/VertexFormat.h"
 #include "render/OpenGL/ErrorCheckingOpenGL.h"
 
+#include "render/Hlsl-To-Glsl/HlslToGlsl.h"
+
 #include "system/Logger.h"
 
 #include <vector>
@@ -55,7 +57,11 @@ bool FragmentShaderOpenGL::InitializeFromSource(const string& source)
         return false;
     }
 
-    const char* sourcePtr = source.c_str();
+    // Convert from HLSL to GLSL source
+    string glslSource = "";
+    HlslToGlsl::ConvertHlslToGlslFromSource(source, "main", false, glslSource);
+
+    const char* sourcePtr = glslSource.c_str();
     GL_CALL( shader_ = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &sourcePtr) );
 
     if (!ValidateShader())
@@ -75,7 +81,11 @@ bool VertexShaderOpenGL::InitializeFromSource(const string& source)
         return false;
     }
 
-    const char* sourcePtr = source.c_str();
+    // Convert from HLSL to GLSL source
+    string glslSource = "";
+    HlslToGlsl::ConvertHlslToGlslFromSource(source, "main", true, glslSource);
+
+    const char* sourcePtr = glslSource.c_str();
     GL_CALL( shader_ = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &sourcePtr) );
 
     if (!ValidateShader())
