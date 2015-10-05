@@ -36,20 +36,13 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    float4 vertex = float4(input.in_vertex, 1.0);
-    float4 hpos = mul(modelViewMatrix, vertex);
-    float3 pos = hpos.xyz;
+    float3 pos = mul(modelViewMatrix, float4(input.in_vertex, 1.0)).xyz;
 
-    float3x3 modelView = (float3x3)modelViewMatrix;
-    float3 n = input.in_normal;
-
-    float3 lightPos = light_position.xyz;
-
-    output.normal = normalize(mul(modelView, n));
-    output.light_dir = normalize( mul(modelView, lightPos) - pos);
+    output.normal = normalize(mul((float3x3)modelViewMatrix, input.in_normal));
+    output.light_dir = normalize( mul((float3x3)modelViewMatrix, light_position.xyz) - pos);
     output.eye = normalize(-pos);
 
-    output.position = mul(modelViewProjectionMatrix, vertex);
+    output.position = mul(modelViewProjectionMatrix, float4(input.in_vertex, 1.0));
 
     return output;
 }

@@ -20,8 +20,7 @@ struct VS_OUTPUT {
 
 VS_OUTPUT main(VS_INPUT input) {
     VS_OUTPUT output;
-    float4 vertex = float4(input.in_vertex, 1.0);
-    output.position = mul(modelViewProjectionMatrix, vertex);
+    output.position = mul(modelViewProjectionMatrix, float4(input.in_vertex, 1.0));
     output.uv = input.in_uv;
     return output;
 }
