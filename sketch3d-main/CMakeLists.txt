@@ -166,6 +166,21 @@ endif ()
 source_group("Source Files\\render\\OpenGL" FILES ${RENDER_OPENGL_SOURCE_FILES})
 source_group("Header Files\\render\\OpenGL" FILES ${RENDER_OPENGL_HEADER_FILES})
 
+# Hlsl-to-Glsl files
+set (RENDER_HLSL_TO_GLSL_SOURCE_FILES
+	 src/render/Hlsl-To-Glsl/CodeGenerator.cpp
+	 src/render/Hlsl-To-Glsl/HlslToGlsl.cpp
+	 src/render/Hlsl-To-Glsl/Tokenizer.cpp
+)
+
+set (RENDER_HLSL_TO_GLSL_HEADER_FILES
+	 include/render/Hlsl-To-Glsl/CodeGenerator.h
+	 include/render/Hlsl-To-Glsl/HlslToGlsl.h
+	 include/render/Hlsl-To-Glsl/Tokenizer.h
+)
+source_group("Source Files\\render\\Hlsl-To-Glsl" FILES ${RENDER_HLSL_TO_GLSL_SOURCE_FILES})
+source_group("Header Files\\render\\Hlsl-To-Glsl" FILES ${RENDER_HLSL_TO_GLSL_HEADER_FILES})
+
 # System files
 set (SYSTEM_SOURCE_FILES
 	 src/system/Logger.cpp
@@ -244,6 +259,7 @@ add_library(
 	${RENDER_SOURCE_FILES}
 	${RENDER_OPENGL_SOURCE_FILES}
 	${RENDER_DIRECT3D11_SOURCE_FILES}
+	${RENDER_HLSL_TO_GLSL_SOURCE_FILES}
 	
 	${SYSTEM_SOURCE_FILES}
 	${SYSTEM_PLATFORM_SOURCE_FILES}
@@ -254,8 +270,8 @@ add_library(
 	
 	${RENDER_HEADER_FILES}
 	${RENDER_OPENGL_HEADER_FILES}
-	${RENDER_DIRECT3D9_HEADER_FILES}
 	${RENDER_DIRECT3D11_HEADER_FILES}
+	${RENDER_HLSL_TO_GLSL_HEADER_FILES}
 	
 	${SYSTEM_HEADER_FILES}
 	${SYSTEM_PLATFORM_HEADER_FILES}
