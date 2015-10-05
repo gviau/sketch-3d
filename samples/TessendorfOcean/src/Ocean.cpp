@@ -78,8 +78,8 @@ Ocean::Ocean(const int numberOfPoints, const float amplitude, const Vector2& win
     // Load the shader
     shared_ptr<VertexShader> vertexShader = m_RenderDevice->GetHardwareResourceCreator()->CreateVertexShader();
     shared_ptr<FragmentShader> fragmentShader = m_RenderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
-    vertexShader->InitializeFromFile("Shaders/TessendorfOcean/vert.glsl");
-    fragmentShader->InitializeFromFile("Shaders/TessendorfOcean/frag.glsl");
+    vertexShader->InitializeFromFile("Shaders/TessendorfOcean/vert.hlsl");
+    fragmentShader->InitializeFromFile("Shaders/TessendorfOcean/frag.hlsl");
 
     m_RenderDevice->SetVertexShader(vertexShader);
     m_RenderDevice->SetFragmentShader(fragmentShader);

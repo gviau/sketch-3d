@@ -24,14 +24,14 @@ int main(int argc, char** argv) {
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;
     renderParameters.height = 768;
-    renderParameters.displayFormat = DisplayFormat_t::X8R8G8B8;
+    renderParameters.displayFormat = DisplayFormat_t::A8R8G8B8;
     renderParameters.refreshRate = 0;
     renderParameters.depthStencilBits = DepthStencilBits_t::D32;
 
-    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::OPENGL);
+    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
     renderContext->Initialize(window, renderParameters);
 
-    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::OPENGL);
+    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::DIRECT3D11);
     renderDevice->Initialize(renderContext);
 
     Ocean ocean(256, 0.0001f, Vector2(5.0f, 3.0f), 128.0f, renderDevice);
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     clock_t begin, end;
 
     Camera camera;
-    camera.LookAt(Vector3(10.0f, 10.0f, 35.0f), Vector3(5.0f, -50.0f, 0.0f), Vector3::UP);
+    camera.LookAt(Vector3(10.0f, 15.0f, -35.0f), Vector3(0.0f, 1.0f, 0.0f), -Vector3::UP);
 
     while (window.IsOpen()) {
         begin = clock();
