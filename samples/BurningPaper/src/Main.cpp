@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     samplerState->Initialize(FilterMode_t::LINEAR, AddressMode_t::CLAMP, AddressMode_t::CLAMP, AddressMode_t::CLAMP, ComparisonFunction_t::ALWAYS);
 
     renderDevice->SetVertexShaderConstantBuffer(drawConstants, 0);
-    renderDevice->SetVertexShaderSamplerState(samplerState, 0);
+    renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
 
     float fps = 0;
     float dt = 0.0f;
