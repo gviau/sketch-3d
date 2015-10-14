@@ -47,6 +47,16 @@ bool Material::Apply() const
     return true;
 }
 
+void Material::SetVertexShader(const shared_ptr<VertexShader>& vertexShader)
+{
+    m_VertexShader = vertexShader;
+}
+
+void Material::SetFragmentShader(const shared_ptr<FragmentShader>& fragmentShader)
+{
+    m_FragmentShader = fragmentShader;
+}
+
 void Material::SetAmbientColor(const Vector3& color)
 {
     m_AmbientColor = color;
@@ -105,6 +115,16 @@ void Material::SetNormalMapTexture(const shared_ptr<Texture2D>& texture)
 void Material::SetNormalMapSamplerState(const shared_ptr<SamplerState>& samplerState)
 {
     m_NormalMapSamplerState = samplerState;
+}
+
+const shared_ptr<VertexShader>& Material::GetVertexShader() const
+{
+    return m_VertexShader;
+}
+
+const shared_ptr<FragmentShader>& Material::GetFragmentShader() const
+{
+    return m_FragmentShader;
 }
 
 const Vector3& Material::GetAmbientColor() const

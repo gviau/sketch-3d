@@ -13,6 +13,7 @@ namespace Sketch3D {
 // Forward class declarations
 class HardwareResourceCreator;
 class IndexBuffer;
+class Material;
 class RenderDevice;
 class SubMesh;
 class VertexBuffer;
@@ -30,14 +31,16 @@ class SKETCH_3D_API Mesh
         void                                RemoveSubMesh(size_t index);
         void                                ClearSubMeshes();
 
+        void                                SetMaterialForAllSubMeshes(const shared_ptr<Material>& material);
+
         const vector<shared_ptr<SubMesh>>&  GetSubMeshes() const;
         shared_ptr<SubMesh>                 GetSubMesh(size_t index) const;
 
     private:
-        vector<shared_ptr<SubMesh>>         subMeshes_;
+        vector<shared_ptr<SubMesh>>         m_SubMeshes;
 };
 
-bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents=false);
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials=true, bool calculateTangents=false);
 
 }
 

@@ -47,9 +47,12 @@ class SKETCH_3D_API RenderDevice {
         // RENDER TARGET STUFF
 		virtual void ClearRenderTargets(const Vector4& color) = 0;
         virtual void ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) = 0;
-        virtual void SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
+        virtual void SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
+        virtual void SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) = 0;
         virtual void SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
         virtual void SetDefaultRenderTargetAndDepthStencilBuffer() = 0;
+        virtual void SetDefaultRenderTarget() = 0;
+        virtual void SetDefaultDepthStencilTarget() = 0;
 
         // RENDER STATE STUFF
         virtual void SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) = 0;
@@ -89,6 +92,8 @@ class SKETCH_3D_API RenderDevice {
         virtual void CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) = 0;
         virtual Matrix4x4 CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) = 0;
         virtual Matrix4x4 CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) = 0;
+        virtual void SetViewport(float width, float height) = 0;
+        virtual void RestoreViewportToOriginal() = 0;
         
         virtual HardwareResourceCreator* GetHardwareResourceCreator() const = 0;
         const DepthStencilState_t& GetDefaultDepthStencilState() const { return defaultDepthStencilState_; }

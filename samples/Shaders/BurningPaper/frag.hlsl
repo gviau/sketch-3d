@@ -29,14 +29,13 @@ PS_OUTPUT main(PS_INPUT input) {
     if (noiseValue < thresholds.x) {
         discard;
     } else if (noiseValue >= thresholds.x && noiseValue < thresholds.x + thresholds.y) {
-        fireColor = float3(0.35, 0.0, 0.02);
+        fireColor = float3(0.55, 0.2, 0.0) * 3.0;
     }
 
     // Gamma correction
-    float3 texColor = pow( abs(paper.Sample(sampler0, input.uv).xyz), float3(2.2, 2.2, 2.2) );
-    float coeff = 1.0 / 2.2;
+    float3 texColor = pow( paper.Sample(sampler0, input.uv).xyz, float3(2.2, 2.2, 2.2));
 
-    output.color = float4(pow( texColor * fireColor, float3(coeff, coeff, coeff) ), 1.0);
+    output.color = float4(texColor * fireColor, 1.0);
     
     return output;
 }

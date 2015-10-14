@@ -52,7 +52,7 @@ unique_ptr<Assimp::Importer> assimpImporter(new Assimp::Importer);
 
 void Mesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
 {
-    for (const shared_ptr<SubMesh>& subMesh : subMeshes_)
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
     {
         subMesh->Draw(renderDevice);
     }
@@ -60,32 +60,46 @@ void Mesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
 
 void Mesh::AddSubMesh(const shared_ptr<SubMesh>& subMesh)
 {
-    subMeshes_.push_back(subMesh);
+    m_SubMeshes.push_back(subMesh);
 }
 
 void Mesh::RemoveSubMesh(size_t index)
 {
-    assert(index < subMeshes_.size());
-    subMeshes_.erase(subMeshes_.begin() + index);
+    assert(index < m_SubMeshes.size());
+    m_SubMeshes.erase(m_SubMeshes.begin() + index);
 }
 
 void Mesh::ClearSubMeshes()
 {
-    subMeshes_.clear();
+    m_SubMeshes.clear();
+}
+
+void Mesh::SetMaterialForAllSubMeshes(const shared_ptr<Material>& material)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (subMesh == nullptr)
+        {
+            continue;
+        }
+
+        subMesh->SetMaterial(material);
+    }
 }
 
 const vector<shared_ptr<SubMesh>>& Mesh::GetSubMeshes() const
 {
-    return subMeshes_;
+    return m_SubMeshes;
 }
 
 shared_ptr<SubMesh> Mesh::GetSubMesh(size_t index) const
 {
-    assert(index < subMeshes_.size());
-    return subMeshes_[index];
+    assert(index < m_SubMeshes.size());
+    return m_SubMeshes[index];
 }
 
-bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents)
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials, bool calculateTangents)
 {
     Assimp::Importer* importer = assimpImporter.get();
     if (importer == nullptr)
@@ -173,7 +187,7 @@ bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& re
                 subMesh->SetIndexBuffer(indexBuffer);
             }
 
-            if (scene->HasMaterials())
+            if (loadMaterials && scene->HasMaterials())
             {
                 size_t materialIndex = mesh->mMaterialIndex;
                 if (materialIndex < createdMaterials.size() && createdMaterials[materialIndex].get() != nullptr)

@@ -70,7 +70,11 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
     GL_CALL( glClear(clearFlags) );
 }
 
-void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
+void RenderDeviceOpenGL::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
+{
+}
+
+void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets)
 {
 }
 
@@ -79,6 +83,14 @@ void RenderDeviceOpenGL::SetDepthStencilTarget(const shared_ptr<DepthStencilTarg
 }
 
 void RenderDeviceOpenGL::SetDefaultRenderTargetAndDepthStencilBuffer()
+{
+}
+
+void RenderDeviceOpenGL::SetDefaultRenderTarget()
+{
+}
+
+void RenderDeviceOpenGL::SetDefaultDepthStencilTarget()
 {
 }
 
@@ -493,6 +505,16 @@ Matrix4x4 RenderDeviceOpenGL::CalculatePerspectiveProjectionFOV(float fov, float
     projection_[3][3] = 0.0f;
 
     return projection_;
+}
+
+void RenderDeviceOpenGL::SetViewport(float width, float height)
+{
+    GL_CALL( glViewport(0, 0, (GLsizei)width, (GLsizei)height) );
+}
+
+void RenderDeviceOpenGL::RestoreViewportToOriginal()
+{
+    GL_CALL( glViewport(0, 0, width_, height_) );
 }
 
 HardwareResourceCreator* RenderDeviceOpenGL::GetHardwareResourceCreator() const

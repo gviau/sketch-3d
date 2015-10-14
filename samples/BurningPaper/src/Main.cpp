@@ -8,6 +8,7 @@
 #include <render/HardwareResourceCreator.h>
 #include <render/RenderContext.h>
 #include <render/RenderDevice.h>
+#include <render/RenderTarget.h>
 #include <render/SamplerState.h>
 #include <render/Shader.h>
 #include <render/Texture.h>
@@ -88,9 +89,78 @@ int main(int argc, char** argv) {
     camera.LookAt(Vector3(0.0f, 0.0f, 2.0f), -Vector3::LOOK, Vector3::UP);
 
     float threshold = 0.0f;
-    float range = 0.075f;
+    float range = 0.1f;
     float t = 0.0f;
     clock_t begin, end;
+
+    // HDR & bloom stuff
+    // Create the HDR render target
+    shared_ptr<RenderTarget> hdrRenderTarget = renderDevice->GetHardwareResourceCreator()->CreateRenderTarget();
+    hdrRenderTarget->Initialize(window.GetWidth(), window.GetHeight(), TextureFormat_t::RGBA16F);
+
+    vector<shared_ptr<RenderTarget>> hdrRenderTargets;
+    hdrRenderTargets.push_back(hdrRenderTarget);
+
+    // 1/4 scale hdr sample (for blurring)
+    shared_ptr<RenderTarget> quarterHdrRenderTarget = renderDevice->GetHardwareResourceCreator()->CreateRenderTarget();
+    quarterHdrRenderTarget->Initialize(window.GetWidth() / 2, window.GetHeight() / 2, TextureFormat_t::RGBA16F);
+
+    vector<shared_ptr<RenderTarget>> quarterHdrRenderTargets;
+    quarterHdrRenderTargets.push_back(quarterHdrRenderTarget);
+
+    // Blur horizontal result
+    shared_ptr<RenderTarget> blurHorizontalResult = renderDevice->GetHardwareResourceCreator()->CreateRenderTarget();
+    blurHorizontalResult->Initialize(window.GetWidth() / 2, window.GetHeight() / 2, TextureFormat_t::RGBA16F);
+
+    vector<shared_ptr<RenderTarget>> blurHorizontalResults;
+    blurHorizontalResults.push_back(blurHorizontalResult);
+
+    // Blur vertical result
+    shared_ptr<RenderTarget> blurVerticalResult = renderDevice->GetHardwareResourceCreator()->CreateRenderTarget();
+    blurVerticalResult->Initialize(window.GetWidth() / 2, window.GetHeight() / 2, TextureFormat_t::RGBA16F);
+
+    vector<shared_ptr<RenderTarget>> blurVerticalResults;
+    blurVerticalResults.push_back(blurVerticalResult);
+
+    // Depth stencil target of quarter of the size
+    shared_ptr<DepthStencilTarget> quarterDepthStencilTarget = renderDevice->GetHardwareResourceCreator()->CreateDepthStencilTarget();
+    quarterDepthStencilTarget->Initialize(window.GetWidth() / 2, window.GetHeight() / 2, DepthStencilBits_t::D32);
+
+    // Shaders for Bloom
+    shared_ptr<VertexShader> fullscreenQuadVertexShader = renderDevice->GetHardwareResourceCreator()->CreateVertexShader();
+    shared_ptr<FragmentShader> downSampleFragmentShader = renderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+    shared_ptr<FragmentShader> blurXFragmentShader = renderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+    shared_ptr<FragmentShader> blurYFragmentShader = renderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+    shared_ptr<FragmentShader> toneMappingFragmentShader = renderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+
+    fullscreenQuadVertexShader->InitializeFromFile("Shaders/BurningPaper/fullscreenQuad.hlsl");
+    downSampleFragmentShader->InitializeFromFile("Shaders/BurningPaper/downSample.hlsl");
+    blurXFragmentShader->InitializeFromFile("Shaders/BurningPaper/blurX.hlsl");
+    blurYFragmentShader->InitializeFromFile("Shaders/BurningPaper/blurY.hlsl");
+    toneMappingFragmentShader->InitializeFromFile("Shaders/BurningPaper/toneMapping.hlsl");
+
+    // Fullscreen quad mesh
+    shared_ptr<VertexBuffer> fullscreenQuadVertices = renderDevice->GetHardwareResourceCreator()->CreateVertexBuffer();
+
+    Vertex_Pos_t quadVertices[4];
+    quadVertices[0].position = Vector3(-1.0f, -1.0f, 0.0f);
+    quadVertices[1].position = Vector3(-1.0f,  1.0f, 0.0f);
+    quadVertices[2].position = Vector3( 1.0f,  1.0f, 0.0f);
+    quadVertices[3].position = Vector3( 1.0f, -1.0f, 0.0f);
+
+    fullscreenQuadVertices->Initialize(quadVertices, false, false, VertexFormatType_t::Pos, 4);
+
+    shared_ptr<IndexBuffer> fullscreenQuadIndices = renderDevice->GetHardwareResourceCreator()->CreateIndexBuffer();
+
+    unsigned short quadIndices[6];
+    quadIndices[0] = 0;
+    quadIndices[1] = 2;
+    quadIndices[2] = 1;
+    quadIndices[3] = 0;
+    quadIndices[4] = 3;
+    quadIndices[5] = 2;
+
+    fullscreenQuadIndices->Initialize(quadIndices, false, false, IndexFormat_t::INT_2_BYTES, 6);
 
     /*
 #if PLATFORM == PLATFORM_WIN32
@@ -101,12 +171,6 @@ int main(int argc, char** argv) {
 
     Text::GetInstance()->SetTextSize(24, 24);
     */
-
-    renderDevice->SetVertexShader(vertexShader);
-    renderDevice->SetFragmentShader(fragmentShader);
-
-    renderDevice->SetFragmentShaderTexture(paperTexture, 0);
-    renderDevice->SetFragmentShaderTexture(noiseTexture, 1);
 
     shared_ptr<ConstantBuffer> burningPaperConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
     burningPaperConstants->Initialize(nullptr, true, false, sizeof(BurningPaperConstants_t));
@@ -137,20 +201,84 @@ int main(int argc, char** argv) {
         if (window.PollEvents(windowEvent)) {
         }
 
-        threshold += t / 3.0f;
+        threshold += t / 5.0f;
         
+        // Update the burning paper constants
         void* data = burningPaperConstants->Map(MapFlag_t::WRITE_DISCARD);
 
         ((BurningPaperConstants_t*)data)->thresholds = Vector4(threshold, range, 0.0f, 0.0f);
 
         burningPaperConstants->Unmap();
 
+        // Draw into the HDR render target
+        renderDevice->SetRenderTargets(hdrRenderTargets);
+
+        renderDevice->SetVertexShader(vertexShader);
+        renderDevice->SetFragmentShader(fragmentShader);
+
+        renderDevice->SetVertexShaderConstantBuffer(drawConstants, 0);
         renderDevice->SetFragmentShaderConstantBuffer(burningPaperConstants, 1);
+
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(paperTexture, 0);
+        renderDevice->SetFragmentShaderTexture(noiseTexture, 1);
+
+        renderDevice->ClearRenderTargets(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+
+        // Down scale
+        renderDevice->SetViewport((float)(window.GetWidth() / 2), (float)(window.GetHeight() / 2));
+        renderDevice->SetRenderTargetsAndDepthStencilTarget(quarterHdrRenderTargets, quarterDepthStencilTarget);
+        renderDevice->SetVertexShader(fullscreenQuadVertexShader);
+        renderDevice->SetFragmentShader(downSampleFragmentShader);
+
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(hdrRenderTarget, 0);
+
+        renderDevice->ClearRenderTargets(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVertices, fullscreenQuadIndices, 0, 0);
+
+        // Horizontal blur
+        renderDevice->SetRenderTargets(blurHorizontalResults);
+        renderDevice->SetFragmentShader(blurXFragmentShader);
+
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(quarterHdrRenderTarget, 0);
+
+        renderDevice->ClearRenderTargets(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVertices, fullscreenQuadIndices, 0, 0);
+
+        // Vertical blur
+        renderDevice->SetRenderTargets(blurVerticalResults);
+        renderDevice->SetFragmentShader(blurYFragmentShader);
+
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(blurHorizontalResult, 0);
+
+        renderDevice->ClearRenderTargets(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVertices, fullscreenQuadIndices, 0, 0);
+
+        // Compose & tone map the final image
+        renderDevice->RestoreViewportToOriginal();
+        renderDevice->SetDefaultRenderTargetAndDepthStencilBuffer();
+        renderDevice->SetFragmentShader(toneMappingFragmentShader);
+
+        renderDevice->SetFragmentShaderSamplerState(samplerState, 0);
+        renderDevice->SetFragmentShaderTexture(hdrRenderTarget, 0);
+        renderDevice->SetFragmentShaderTexture(blurVerticalResult, 1);
 
         renderDevice->ClearRenderTargets(Vector4(0.2f, 0.2f, 0.2f, 1.0f));
         renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
 
-        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+        renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, fullscreenQuadVertices, fullscreenQuadIndices, 0, 0);
 
         renderContext->SwapBuffers();
 

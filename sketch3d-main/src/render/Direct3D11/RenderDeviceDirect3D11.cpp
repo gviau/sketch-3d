@@ -120,7 +120,45 @@ void RenderDeviceDirect3D11::ClearDepthStencil(bool clearDepth, bool clearStenci
     context_->ClearDepthStencilView(currentDepthStencilBuffer_, clearFlags, depthValue, stencilValue);
 }
 
-void RenderDeviceDirect3D11::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) {
+void RenderDeviceDirect3D11::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) {
+    if (renderTargets.size() > 0)
+    {
+        ID3D11ShaderResourceView* views[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+        context_->PSSetShaderResources(0, 8, views);
+
+        currentRenderTargets_.clear();
+        for (const shared_ptr<RenderTarget>& renderTarget : renderTargets) {
+            RenderTarget* target = renderTarget.get();
+
+            if (target != nullptr) {
+                RenderTargetDirect3D11* d3dRenderTarget = static_cast<RenderTargetDirect3D11*>(target);
+                currentRenderTargets_.push_back(d3dRenderTarget->GetRenderTargetView());
+            }
+        }
+    }
+
+    DepthStencilTarget* depthStencil = depthStencilTarget.get();
+    if (depthStencil != nullptr) {
+        DepthStencilTargetDirect3D11* d3dDepthStencilTarget = static_cast<DepthStencilTargetDirect3D11*>(depthStencil);
+        currentDepthStencilBuffer_ = d3dDepthStencilTarget->GetDepthStencilView();
+    }
+
+    if (currentRenderTargets_.size() > 0) {
+        context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
+    }
+}
+
+void RenderDeviceDirect3D11::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets)
+{
+    if (renderTargets.size() == 0)
+    {
+        Logger::GetInstance()->Warning("Tried to set the render targets with an empty list");
+        return;
+    }
+
+    ID3D11ShaderResourceView* views[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    context_->PSSetShaderResources(0, 8, views);
+
     currentRenderTargets_.clear();
     for (const shared_ptr<RenderTarget>& renderTarget : renderTargets) {
         RenderTarget* target = renderTarget.get();
@@ -131,19 +169,8 @@ void RenderDeviceDirect3D11::SetRenderTargets(const vector<shared_ptr<RenderTarg
         }
     }
 
-    DepthStencilTarget* depthStencil = depthStencilTarget.get();
-    if (depthStencil != nullptr) {
-        DepthStencilTargetDirect3D11* d3dDepthStencilTarget = static_cast<DepthStencilTargetDirect3D11*>(depthStencil);
-        currentDepthStencilBuffer_ = d3dDepthStencilTarget->GetDepthStencilView();
-    } else {
-        currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
-    }
-
     if (currentRenderTargets_.size() > 0) {
         context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
-    } else {
-        currentRenderTargets_.push_back(defaultBackbuffer_);
-        context_->OMSetRenderTargets(1, &defaultBackbuffer_, currentDepthStencilBuffer_);
     }
 }
 
@@ -152,18 +179,32 @@ void RenderDeviceDirect3D11::SetDepthStencilTarget(const shared_ptr<DepthStencil
     if (depthStencil != nullptr) {
         DepthStencilTargetDirect3D11* d3dDepthStencilTarget = static_cast<DepthStencilTargetDirect3D11*>(depthStencil);
         currentDepthStencilBuffer_ = d3dDepthStencilTarget->GetDepthStencilView();
-    } else {
-        currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
     }
 
     context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
 }
 
 void RenderDeviceDirect3D11::SetDefaultRenderTargetAndDepthStencilBuffer() {
+    ID3D11ShaderResourceView* views[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    context_->PSSetShaderResources(0, 8, views);
+
     currentRenderTargets_.clear();
     currentRenderTargets_.push_back(defaultBackbuffer_);
     currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
 
+    context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
+}
+
+void RenderDeviceDirect3D11::SetDefaultRenderTarget()
+{
+    currentRenderTargets_.clear();
+    currentRenderTargets_.push_back(defaultBackbuffer_);
+    context_->OMSetRenderTargets(1, &defaultBackbuffer_, currentDepthStencilBuffer_);
+}
+
+void RenderDeviceDirect3D11::SetDefaultDepthStencilTarget()
+{
+    currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
     context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
 }
 
@@ -517,6 +558,30 @@ Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOV(float fov, f
     projection_[3][3] = 0.0f;
 
     return projection_;
+}
+
+void RenderDeviceDirect3D11::SetViewport(float width, float height)
+{
+    D3D11_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = width;
+    viewport.Height = height;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    context_->RSSetViewports(1, &viewport);
+}
+
+void RenderDeviceDirect3D11::RestoreViewportToOriginal()
+{
+    D3D11_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = (float)width_;
+    viewport.Height = (float)height_;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    context_->RSSetViewports(1, &viewport);
 }
 
 HardwareResourceCreator* RenderDeviceDirect3D11::GetHardwareResourceCreator() const {

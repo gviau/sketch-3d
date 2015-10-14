@@ -43,9 +43,12 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
 
 		virtual void                        ClearRenderTargets(const Vector4& color) override;
         virtual void                        ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) override;
-        virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
+        virtual void                        SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
+        virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) override;
         virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetDefaultRenderTargetAndDepthStencilBuffer() override;
+        virtual void                        SetDefaultRenderTarget() override;
+        virtual void                        SetDefaultDepthStencilTarget() override;
 
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;
@@ -81,6 +84,8 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         virtual void                        CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) override;
         virtual Matrix4x4                   CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) override;
         virtual Matrix4x4                   CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) override;
+        virtual void                        SetViewport(float width, float height) override;
+        virtual void                        RestoreViewportToOriginal() override;
 
         virtual HardwareResourceCreator*    GetHardwareResourceCreator() const override;
 
