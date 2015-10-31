@@ -5,9 +5,12 @@
 #include "render/OpenGL/BufferOpenGL.h"
 #include "render/OpenGL/ErrorCheckingOpenGL.h"
 #include "render/OpenGL/RenderContextOpenGL.h"
+#include "render/OpenGL/RenderTargetOpenGL.h"
 #include "render/OpenGL/SamplerStateOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/TextureOpenGL.h"
+
+#include "system/Logger.h"
 
 #include <iomanip>
 #include <sstream>
@@ -18,13 +21,31 @@ namespace Sketch3D {
 RenderDeviceOpenGL::RenderDeviceOpenGL()
     : pipeline_(0)
     , vertexArrayObject_(0)
+    , m_Framebuffer(0)
+    , m_Renderbuffer(0)
     , hardwareResourceCreator_(nullptr)
+    , m_RenderTargetsBound(false)
+    , m_DepthStencilTargetBound(false)
 {
 }
 
 RenderDeviceOpenGL::~RenderDeviceOpenGL()
 {
-    GL_CALL( glDeleteProgramPipelines(1, &pipeline_) );
+    if (m_Framebuffer > 0)
+    {
+        GL_CALL( glDeleteFramebuffers(1, &m_Framebuffer) );
+    }
+
+    if (m_Renderbuffer > 0)
+    {
+        GL_CALL( glDeleteRenderbuffers(1, &m_Renderbuffer) );
+    }
+
+    if (pipeline_ > 0)
+    {
+        GL_CALL( glDeleteProgramPipelines(1, &pipeline_) );
+    }
+
     delete hardwareResourceCreator_;
 }
 
@@ -43,6 +64,13 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
 
     GL_CALL( glGenProgramPipelines(1, &pipeline_) );
     GL_CALL( glUseProgram(0) );
+
+    GL_CALL( glGenFramebuffers(1, &m_Framebuffer) );
+    GL_CALL( glGenRenderbuffers(1, &m_Renderbuffer) );
+
+    GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, m_Renderbuffer) );
+    GL_CALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_) );
+    GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, 0) );
 
     return true;
 }
@@ -72,26 +100,100 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
 
 void RenderDeviceOpenGL::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
 {
+    m_RenderTargetsBound = true;
+    m_DepthStencilTargetBound = true;
 }
 
 void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets)
 {
+    if (renderTargets.size() == 0)
+    {
+        return;
+    }
+
+    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
+
+    GLenum buffers[8];
+
+    for (size_t i = 0; i < renderTargets.size(); i++)
+    {
+        const shared_ptr<RenderTarget>& renderTarget = renderTargets[i];
+
+        RenderTargetOpenGL* oglRenderTarget = static_cast<RenderTargetOpenGL*>(renderTarget.get());
+        if (oglRenderTarget == nullptr)
+        {
+            continue;
+        }
+
+        size_t textureName = oglRenderTarget->GetTextureName();
+
+        GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureName, 0) );
+
+        buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+    }
+
+    if (!m_DepthStencilTargetBound)
+    {
+        GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, m_Renderbuffer) );
+        GL_CALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, width_, height_) );
+        GL_CALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_Renderbuffer) );
+    }
+
+    GLenum check;
+    GL_CALL( check = glCheckFramebufferStatus(GL_FRAMEBUFFER) );
+    if (check != GL_FRAMEBUFFER_COMPLETE)
+    {
+        Logger::GetInstance()->Error("Couldn't bind the render targets");
+        GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+        return;
+    }
+
+    GL_CALL( glDrawBuffers(renderTargets.size(), buffers) );
+
+    m_RenderTargetsBound = true;
 }
 
 void RenderDeviceOpenGL::SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget)
 {
+    DepthStencilTargetOpenGL* oglDepthStencilTarget = static_cast<DepthStencilTargetOpenGL*>(depthStencilTarget.get());
+    if (oglDepthStencilTarget == nullptr)
+    {
+        return;
+    }
+
+    size_t textureName = oglDepthStencilTarget->GetTextureName();
+
+    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
+    GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureName, 0) );
+
+    GLenum check;
+    GL_CALL( check = glCheckFramebufferStatus(GL_FRAMEBUFFER) );
+    if (check != GL_FRAMEBUFFER_COMPLETE)
+    {
+        Logger::GetInstance()->Error("Couldn't bind the depth stencil target");
+        GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+        return;
+    }
+
+    m_DepthStencilTargetBound = true;
 }
 
 void RenderDeviceOpenGL::SetDefaultRenderTargetAndDepthStencilBuffer()
 {
-}
+    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
 
-void RenderDeviceOpenGL::SetDefaultRenderTarget()
-{
-}
+    for (size_t i = 0; i < 8; i++)
+    {
+        GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0) );
+    }
 
-void RenderDeviceOpenGL::SetDefaultDepthStencilTarget()
-{
+    GL_CALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
+
+    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+    GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, 0) );
+
+    m_RenderTargetsBound = false;
+    m_DepthStencilTargetBound = false;
 }
 
 void RenderDeviceOpenGL::SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask)

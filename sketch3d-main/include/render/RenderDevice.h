@@ -51,9 +51,7 @@ class SKETCH_3D_API RenderDevice {
         virtual void SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) = 0;
         virtual void SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) = 0;
         virtual void SetDefaultRenderTargetAndDepthStencilBuffer() = 0;
-        virtual void SetDefaultRenderTarget() = 0;
-        virtual void SetDefaultDepthStencilTarget() = 0;
-
+        
         // RENDER STATE STUFF
         virtual void SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) = 0;
         virtual void SetRasterizerState(const RasterizerState_t& rasterizerState) = 0;

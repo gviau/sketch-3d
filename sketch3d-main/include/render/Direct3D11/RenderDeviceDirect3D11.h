@@ -49,9 +49,7 @@ class SKETCH_3D_API RenderDeviceDirect3D11 : public RenderDevice {
         virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) override;
         virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetDefaultRenderTargetAndDepthStencilBuffer() override;
-        virtual void                        SetDefaultRenderTarget() override;
-        virtual void                        SetDefaultDepthStencilTarget() override;
-
+        
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;
         virtual void                        SetDefaultDepthStencilState(unsigned int referenceMask) override;

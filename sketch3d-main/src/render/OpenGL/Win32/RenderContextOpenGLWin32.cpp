@@ -31,6 +31,8 @@ bool RenderContextOpenGLWin32::Initialize(Window& window, const RenderParameters
 {
 	Logger::GetInstance()->Debug("Initializing OpenGL context");
 
+    renderParameters_ = renderParameters;
+
     size_t colorBits, redBits, greenBits, blueBits, depthBits;
     size_t alphaBits = 0;
     size_t stencilBits = 0;

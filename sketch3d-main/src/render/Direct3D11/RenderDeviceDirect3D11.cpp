@@ -195,19 +195,6 @@ void RenderDeviceDirect3D11::SetDefaultRenderTargetAndDepthStencilBuffer() {
     context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
 }
 
-void RenderDeviceDirect3D11::SetDefaultRenderTarget()
-{
-    currentRenderTargets_.clear();
-    currentRenderTargets_.push_back(defaultBackbuffer_);
-    context_->OMSetRenderTargets(1, &defaultBackbuffer_, currentDepthStencilBuffer_);
-}
-
-void RenderDeviceDirect3D11::SetDefaultDepthStencilTarget()
-{
-    currentDepthStencilBuffer_ = defaultDepthStencilBuffer_;
-    context_->OMSetRenderTargets(currentRenderTargets_.size(), &currentRenderTargets_[0], currentDepthStencilBuffer_);
-}
-
 void RenderDeviceDirect3D11::SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) {
     if (currentDepthStencilState_ != nullptr) {
         currentDepthStencilState_->Release();

@@ -1,6 +1,7 @@
 #include "render/OpenGL/HardwareResourceCreatorOpenGL.h"
 
 #include "render/OpenGL/BufferOpenGL.h"
+#include "render/OpenGL/RenderTargetOpenGL.h"
 #include "render/OpenGL/SamplerStateOpenGL.h"
 #include "render/OpenGL/ShaderOpenGL.h"
 #include "render/OpenGL/TextureOpenGL.h"
@@ -14,7 +15,8 @@ shared_ptr<ConstantBuffer> HardwareResourceCreatorOpenGL::CreateConstantBuffer()
 }
 
 shared_ptr<DepthStencilTarget> HardwareResourceCreatorOpenGL::CreateDepthStencilTarget() {
-    return shared_ptr<DepthStencilTarget>();
+    DepthStencilTarget* depthStencilTarget = new DepthStencilTargetOpenGL;
+    return shared_ptr<DepthStencilTarget>(depthStencilTarget);
 }
 
 shared_ptr<IndexBuffer> HardwareResourceCreatorOpenGL::CreateIndexBuffer() {
@@ -28,7 +30,8 @@ shared_ptr<FragmentShader> HardwareResourceCreatorOpenGL::CreateFragmentShader()
 }
 
 shared_ptr<RenderTarget> HardwareResourceCreatorOpenGL::CreateRenderTarget() {
-    return shared_ptr<RenderTarget>();
+    RenderTarget* renderTarget = new RenderTargetOpenGL;
+    return shared_ptr<RenderTarget>(renderTarget);
 }
 
 shared_ptr<SamplerState> HardwareResourceCreatorOpenGL::CreateSamplerState() {

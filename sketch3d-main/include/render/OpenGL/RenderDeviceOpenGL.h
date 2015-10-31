@@ -47,9 +47,7 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) override;
         virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetDefaultRenderTargetAndDepthStencilBuffer() override;
-        virtual void                        SetDefaultRenderTarget() override;
-        virtual void                        SetDefaultDepthStencilTarget() override;
-
+        
         virtual void                        SetDepthStencilState(const DepthStencilState_t& depthStencilState, unsigned int referenceMask) override;
         virtual void                        SetRasterizerState(const RasterizerState_t& rasterizerState) override;
         virtual void                        SetDefaultDepthStencilState(unsigned int referenceMask) override;
@@ -93,11 +91,16 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
         // TEMP should reuse this / find a much better way
         GLuint                              pipeline_;
         GLuint                              vertexArrayObject_;
+        GLuint                              m_Framebuffer;
+        GLuint                              m_Renderbuffer;
 
         HardwareResourceCreatorOpenGL*      hardwareResourceCreator_;
 
         vector<Texture2DOpenGL*>            m_TexturesToBind;
         vector<SamplerState*>               m_SamplerStatesToBind;
+
+        bool                                m_RenderTargetsBound;
+        bool                                m_DepthStencilTargetBound;
 
         virtual bool                        CreateDefaultDepthStencilState(DepthStencilBits_t depthStencilBits) override;
         virtual bool                        CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) override;
