@@ -31,8 +31,8 @@ PS_OUTPUT main(PS_INPUT input)
     float2 blurUv = input.uv;
     blurUv.y = 1.0 - blurUv.y;
 
-    float3 hdr = HDRTexture.Sample(samplerState, input.uv).rgb;
-    float3 blur = bluredHDR.Sample(samplerState, blurUv).rgb;
+    float3 hdr = HDRTexture.Sample(samplerState, blurUv).rgb;
+    float3 blur = bluredHDR.Sample(samplerState, input.uv).rgb;
     float3 composedColor = hdr + blur;
 
     float coeff = 1.0 / 2.2;
