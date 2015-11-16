@@ -7,15 +7,19 @@
 #include "render/OpenGL/GL/gl.h"
 
 namespace Sketch3D {
+
+// Forward class declarations
+class Texture2DOpenGL;
+
 class SKETCH_3D_API RenderViewOpenGL {
 public:
-    RenderViewOpenGL();
-    virtual ~RenderViewOpenGL();
+                        RenderViewOpenGL();
+    virtual            ~RenderViewOpenGL();
 
-    size_t GetTextureName() const;
+    Texture2DOpenGL*    GetTexture() const;
 
 protected:
-    size_t m_TextureName;
+    Texture2DOpenGL*    m_InternalTexture;
 };
 
 class SKETCH_3D_API RenderTargetOpenGL : public RenderTarget, public RenderViewOpenGL {

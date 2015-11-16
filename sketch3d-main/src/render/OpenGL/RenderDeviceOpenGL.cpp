@@ -68,10 +68,6 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     GL_CALL( glGenFramebuffers(1, &m_Framebuffer) );
     GL_CALL( glGenRenderbuffers(1, &m_Renderbuffer) );
 
-    GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, m_Renderbuffer) );
-    GL_CALL( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_) );
-    GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, 0) );
-
     return true;
 }
 
@@ -100,6 +96,47 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
 
 void RenderDeviceOpenGL::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
 {
+    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
+
+    GLenum buffers[8];
+
+    for (size_t i = 0; i < renderTargets.size(); i++)
+    {
+        const shared_ptr<RenderTarget>& renderTarget = renderTargets[i];
+
+        RenderTargetOpenGL* oglRenderTarget = static_cast<RenderTargetOpenGL*>(renderTarget.get());
+        if (oglRenderTarget == nullptr)
+        {
+            continue;
+        }
+
+        size_t textureName = oglRenderTarget->GetTexture()->GetTexture();
+
+        GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureName, 0) );
+
+        buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+    }
+
+    DepthStencilTargetOpenGL* oglDepthStencilTarget = static_cast<DepthStencilTargetOpenGL*>(depthStencilTarget.get());
+    if (oglDepthStencilTarget != nullptr)
+    {
+        size_t textureName = oglDepthStencilTarget->GetTexture()->GetTexture();
+
+        GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
+        GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureName, 0) );
+    }
+
+    GLenum check;
+    GL_CALL( check = glCheckFramebufferStatus(GL_FRAMEBUFFER) );
+    if (check != GL_FRAMEBUFFER_COMPLETE)
+    {
+        Logger::GetInstance()->Error("Couldn't bind the render targets");
+        GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+        return;
+    }
+
+    GL_CALL( glDrawBuffers(renderTargets.size(), buffers) );
+
     m_RenderTargetsBound = true;
     m_DepthStencilTargetBound = true;
 }
@@ -125,7 +162,7 @@ void RenderDeviceOpenGL::SetRenderTargets(const vector<shared_ptr<RenderTarget>>
             continue;
         }
 
-        size_t textureName = oglRenderTarget->GetTextureName();
+        size_t textureName = oglRenderTarget->GetTexture()->GetTexture();
 
         GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureName, 0) );
 
@@ -161,7 +198,7 @@ void RenderDeviceOpenGL::SetDepthStencilTarget(const shared_ptr<DepthStencilTarg
         return;
     }
 
-    size_t textureName = oglDepthStencilTarget->GetTextureName();
+    size_t textureName = oglDepthStencilTarget->GetTexture()->GetTexture();
 
     GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
     GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureName, 0) );
@@ -180,15 +217,6 @@ void RenderDeviceOpenGL::SetDepthStencilTarget(const shared_ptr<DepthStencilTarg
 
 void RenderDeviceOpenGL::SetDefaultRenderTargetAndDepthStencilBuffer()
 {
-    GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );
-
-    for (size_t i = 0; i < 8; i++)
-    {
-        GL_CALL( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, 0, 0) );
-    }
-
-    GL_CALL( glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
-
     GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
     GL_CALL( glBindRenderbuffer(GL_RENDERBUFFER, 0) );
 
@@ -330,7 +358,24 @@ bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<Texture3D>& t
 
 bool RenderDeviceOpenGL::SetFragmentShaderTexture(const shared_ptr<RenderTarget>& texture, unsigned int slot)
 {
-    return false;
+    if (fragmentShader_ == nullptr || texture == nullptr) {
+        return false;
+    }
+
+    if (m_TexturesToBind.size() >= slot)
+    {
+        m_TexturesToBind.resize(slot + 1);
+    }
+
+    RenderViewOpenGL* renderView = static_cast<RenderTargetOpenGL*>(texture.get());
+    if (renderView == nullptr)
+    {
+        return false;
+    }
+
+    m_TexturesToBind[slot] = renderView->GetTexture();
+
+    return true;
 }
 
 shared_ptr<VertexShader>& RenderDeviceOpenGL::GetVertexShader()
@@ -431,7 +476,11 @@ bool RenderDeviceOpenGL::Draw(PrimitiveTopology_t primitiveTopology, const share
 
             size_t idx;
             GL_CALL( idx = glGetUniformLocation(fragmentShader->GetShader(), uniformName.c_str()) );
-            GL_CALL( glUniform1i(idx, textureIndex) );
+
+            if (idx != -1)
+            {
+                GL_CALL( glUniform1i(idx, textureIndex) );
+            }
         }
     }
 
@@ -502,7 +551,11 @@ bool RenderDeviceOpenGL::DrawIndexed(PrimitiveTopology_t primitiveTopology, cons
 
             size_t idx;
             GL_CALL( idx = glGetUniformLocation(fragmentShader->GetShader(), uniformName.c_str()) );
-            GL_CALL( glUniform1i(idx, textureIndex) );
+            
+            if (idx != -1)
+            {
+                GL_CALL( glUniform1i(idx, textureIndex) );
+            }
         }
     }
 

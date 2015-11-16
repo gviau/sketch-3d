@@ -63,6 +63,13 @@ bool Texture2DOpenGL::Initialize(TextureMap* textureMap, TextureFormat_t texture
 
     GL_CALL( glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureMap->GetWidth(), textureMap->GetHeight(), 0, components, type, textureMap->GetData()) );
 
+    if (format == TextureFormat_t::DEPTH)
+    {
+        GL_CALL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE) );
+        GL_CALL( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL) );
+        GL_CALL( glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE) );
+    }
+
     return true;
 }
 
