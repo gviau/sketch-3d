@@ -1,8 +1,10 @@
 #include "render/RenderDevice.h"
 
+#include "render/OpenGL/RenderContextOpenGL.h"
 #include "render/OpenGL/RenderDeviceOpenGL.h"
 
 #if PLATFORM == PLATFORM_WIN32
+#include "render/Direct3D11/RenderContextDirect3D11.h"
 #include "render/Direct3D11/RenderDeviceDirect3D11.h"
 #endif
 
@@ -12,23 +14,32 @@ namespace Sketch3D {
 RenderDevice::~RenderDevice() {
 }
 
-shared_ptr<RenderDevice> SKETCH_3D_API CreateRenderDevice(RenderSystem_t renderSystem) {
+ bool SKETCH_3D_API CreateRenderDevice(const shared_ptr<RenderContext>& renderContext, shared_ptr<RenderDevice>& renderDevice) {
     // If we are on a Unix system, we can only create an opengl render context
-    RenderDevice* renderDevice = nullptr;
+    RenderDevice* pRenderDevice = nullptr;
+    RenderContext* pRenderContext = renderContext.get();
+    if (pRenderContext == nullptr)
+    {
+        Logger::GetInstance()->Error("Null render context passed to CreateRenderDevice");
+        return false;
+    }
 
 #if PLATFORM == PLATFORM_WIN32
-    switch (renderSystem) {
-        case RenderSystem_t::DIRECT3D11:    renderDevice = new RenderDeviceDirect3D11; break;
-        case RenderSystem_t::OPENGL:        renderDevice = new RenderDeviceOpenGL; break;
+    if (dynamic_cast<RenderContextDirect3D11*>(pRenderContext) != nullptr)
+    {
+        renderDevice.reset(new RenderDeviceDirect3D11);
+        return true;
+    }
+    else
+    {
+        renderDevice.reset(new RenderDeviceOpenGL);
+        return true;
     }
 #elif PLATFORM == PLATFORM_LINUX
-    renderDevice = new RenderDeviceOpenGL;
+    renderDevice.reset(RenderDeviceOpenGL);
+    return true;
 #endif
 
-    if (renderDevice == nullptr) {
-        Logger::GetInstance()->Error("Couldn't create the RenderDevice : Unknown render system");
-    }
-
-    return shared_ptr<RenderDevice>(renderDevice);
+    return false;
 }
 }

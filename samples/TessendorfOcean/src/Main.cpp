@@ -31,8 +31,11 @@ int main(int argc, char** argv) {
     shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
     renderContext->Initialize(window, renderParameters);
 
-    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::DIRECT3D11);
-    renderDevice->Initialize(renderContext);
+    shared_ptr<RenderDevice> renderDevice;
+    if (!CreateRenderDevice(renderContext, renderDevice))
+    {
+        return 1;
+    }
 
     Ocean ocean(256, 0.0001f, Vector2(5.0f, 3.0f), 128.0f, renderDevice);
 

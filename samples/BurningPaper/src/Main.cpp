@@ -48,7 +48,12 @@ int main(int argc, char** argv) {
     shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
     renderContext->Initialize(window, renderParameters);
 
-    shared_ptr<RenderDevice> renderDevice = CreateRenderDevice(RenderSystem_t::DIRECT3D11);
+    shared_ptr<RenderDevice> renderDevice;
+    if (!CreateRenderDevice(renderContext, renderDevice))
+    {
+        return 1;
+    }
+
     renderDevice->Initialize(renderContext);
 
     // Create the paper surface

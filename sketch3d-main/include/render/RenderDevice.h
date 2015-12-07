@@ -114,7 +114,7 @@ class SKETCH_3D_API RenderDevice {
         virtual bool CreateDefaultRasterizerState(const shared_ptr<RenderContext>& renderContext) = 0;
 };
 
-shared_ptr<RenderDevice> SKETCH_3D_API CreateRenderDevice(RenderSystem_t renderSystem);
+bool SKETCH_3D_API CreateRenderDevice(const shared_ptr<RenderContext>& renderContext, shared_ptr<RenderDevice>& renderDevice);
 
 }
 
