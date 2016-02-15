@@ -1,5 +1,7 @@
 #include "framework/Material.h"
 
+#include "framework/MaterialCodeGenerator.h"
+
 #include "render/Buffer.h"
 #include "render/ConstantBuffers.h"
 #include "render/HardwareResourceCreator.h"
@@ -19,7 +21,7 @@ Material::Material(const shared_ptr<RenderDevice>& renderDevice)
     m_ConstantBuffer = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
 }
 
-void Material::Initialize()
+void Material::Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGenerator* materialCodeGenerator)
 {
     MaterialConstants_t materialConstants;
     materialConstants.ambientColor = m_AmbientColor;
@@ -28,6 +30,32 @@ void Material::Initialize()
     materialConstants.specularColorAndPower.w = m_SpecularPower;
     
     m_ConstantBuffer->Initialize(&materialConstants, false, false, sizeof(MaterialConstants_t));
+
+    if (materialCodeGenerator != nullptr)
+    {
+        string vertexShaderCode;
+        string fragmentShaderCode;
+        bool usesAmbientTexture = (m_AmbientTexture.get() != nullptr);
+        bool usesDiffuseTexture = (m_DiffuseTexture.get() != nullptr);
+        bool usesSpecularTexture = (m_SpecularTexture.get() != nullptr);
+        bool usesNormalTexture = (m_NormalMapTexture.get() != nullptr);
+
+        materialCodeGenerator->WriteShader(vertexFormatType, usesAmbientTexture, usesDiffuseTexture, usesSpecularTexture, usesNormalTexture,
+                                           vertexShaderCode, fragmentShaderCode);
+
+        if (m_VertexShader.get() == nullptr)
+        {
+            m_VertexShader = m_RenderDevice->GetHardwareResourceCreator()->CreateVertexShader();
+        }
+
+        if (m_FragmentShader.get() == nullptr)
+        {
+            m_FragmentShader = m_RenderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
+        }
+
+        m_VertexShader->InitializeFromSource(vertexShaderCode);
+        m_FragmentShader->InitializeFromSource(fragmentShaderCode);
+    }
 }
 
 bool Material::Apply() const

@@ -8,6 +8,8 @@
 
 namespace Sketch3D {
 
+const int MAX_NUM_LIGHTS = 8;
+
 /**
  * @class GPUMatrix4x4
  * This class is a class that takes a 4x4 matrix as input and automatically transpose it, to avoid programmer errors
@@ -32,10 +34,17 @@ struct ALIGNED_(16) PassConstants_t {
 struct ALIGNED_(16) DrawConstants_t {
     GPUMatrix4x4 modelMatrix;
     GPUMatrix4x4 modelViewProjectionMatrix;
-    GPUMatrix4x4 ViewProjectionMatrix;
+    GPUMatrix4x4 viewProjectionMatrix;
     GPUMatrix4x4 modelViewMatrix;
 
     GPUMatrix4x4 inverseTransposeModelViewMatrix;
+};
+
+struct ALIGNED_(16) LightConstants_t {
+    int numLights;
+    Vector4 lightPositions[MAX_NUM_LIGHTS];
+    Vector4 lightDirections[MAX_NUM_LIGHTS];
+    Vector4 lightColors[MAX_NUM_LIGHTS];
 };
 
 struct ALIGNED_(16) ShadowConstants_t {

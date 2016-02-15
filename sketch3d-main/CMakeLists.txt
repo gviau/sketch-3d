@@ -7,7 +7,10 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib/")
 # Framework files
 set (FRAMEWORK_SOURCE_FILES
 	src/framework/Camera.cpp
+	src/framework/DeferredRenderingMaterialCodeGenerator.cpp
+	src/framework/ForwardRenderingMaterialCodeGenerator.cpp
 	src/framework/Material.cpp
+	src/framework/MaterialCodeGenerator.cpp
 	src/framework/Mesh.cpp
 	src/framework/SimpleObject.cpp
 	src/framework/SubMesh.cpp
@@ -16,7 +19,10 @@ set (FRAMEWORK_SOURCE_FILES
 
 set (FRAMEWORK_HEADER_FILES
 	include/framework/Camera.h
+	include/framework/DeferredRenderingMaterialCodeGenerator.h
+	include/framework/ForwardRenderingMaterialCodeGenerator.h
 	include/framework/Material.h
+	include/framework/MaterialCodeGenerator.h
 	include/framework/Mesh.h
 	include/framework/SimpleObject.h
 	include/framework/SubMesh.h

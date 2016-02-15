@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     {
         return 1;
     }
+    renderDevice->Initialize(renderContext);
 
     Ocean ocean(256, 0.0001f, Vector2(5.0f, 3.0f), 128.0f, renderDevice);
 

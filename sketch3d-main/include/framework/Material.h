@@ -6,6 +6,8 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
+#include "render/VertexFormat.h"
+
 #include <memory>
 using namespace std;
 
@@ -14,6 +16,7 @@ namespace Sketch3D {
 // Forward class declarations
 class ConstantBuffer;
 class FragmentShader;
+class MaterialCodeGenerator;
 class RenderDevice;
 class SamplerState;
 class Texture2D;
@@ -23,7 +26,7 @@ class SKETCH_3D_API Material {
     public:
                                             Material(const shared_ptr<RenderDevice>& renderDevice);
 
-        void                                Initialize();
+        void                                Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGenerator* materialCodeGenerator);
         bool                                Apply() const;
 
         void                                SetVertexShader(const shared_ptr<VertexShader>& vertexShader);
@@ -60,6 +63,8 @@ class SKETCH_3D_API Material {
 
     private:
         shared_ptr<RenderDevice>            m_RenderDevice;
+
+        MaterialCodeGenerator*              m_MaterialCodeGenerator;
 
         shared_ptr<VertexShader>            m_VertexShader;
         shared_ptr<FragmentShader>          m_FragmentShader;

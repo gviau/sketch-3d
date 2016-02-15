@@ -44,6 +44,7 @@ void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vert
 void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuffer);
 VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh);
 
+bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterial, MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents);
 void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial);
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState);
 
@@ -99,7 +100,19 @@ shared_ptr<SubMesh> Mesh::GetSubMesh(size_t index) const
     return m_SubMeshes[index];
 }
 
-bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials, bool calculateTangents)
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents)
+{
+    return LoadMeshFromFileInternal(filename, renderDevice, loadedMesh, false, nullptr, calculateTangents);
+}
+
+bool LoadMeshFromFileWithMaterial(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh,
+                                  MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents)
+{
+    return LoadMeshFromFileInternal(filename, renderDevice, loadedMesh, (materialCodeGenerator != nullptr), materialCodeGenerator, calculateTangents);
+}
+
+bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials,
+                              MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents)
 {
     Assimp::Importer* importer = assimpImporter.get();
     if (importer == nullptr)
@@ -215,6 +228,7 @@ bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& re
                         createdMaterials.push_back(material);
                     }
 
+                    material->Initialize(subMesh->GetVertexBuffer()->GetVertexFormatType(), materialCodeGenerator);
                     subMesh->SetMaterial(material);
                 }
             }
@@ -382,8 +396,6 @@ void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMate
         newMaterial->SetNormalMapTexture(normalMapTexture);
         newMaterial->SetNormalMapSamplerState(normalMapSamplerState);
     }
-
-    newMaterial->Initialize();
 }
 
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState)

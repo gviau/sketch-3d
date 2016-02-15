@@ -14,6 +14,7 @@ namespace Sketch3D {
 class HardwareResourceCreator;
 class IndexBuffer;
 class Material;
+class MaterialCodeGenerator;
 class RenderDevice;
 class SubMesh;
 class VertexBuffer;
@@ -40,7 +41,9 @@ class SKETCH_3D_API Mesh
         vector<shared_ptr<SubMesh>>         m_SubMeshes;
 };
 
-bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials=true, bool calculateTangents=false);
+bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents=false);
+bool LoadMeshFromFileWithMaterial(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh,
+                                  MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents=false);
 
 }
 
