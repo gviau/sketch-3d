@@ -282,6 +282,7 @@ bool VertexFormatTypeContainsNormals(VertexFormatType_t type)
 {
     switch (type)
     {
+    case VertexFormatType_t::Pos_Normal:
     case VertexFormatType_t::Pos_UV_Normal:
     case VertexFormatType_t::Pos_UV_Normal_Tangent:
     case VertexFormatType_t::Pos_UV_Normal_4_Bones:
