@@ -21,7 +21,7 @@ class SKETCH_3D_API Camera
 public:
     Camera();
 
-    void LookAt(const Vector3& position, const Vector3& point, const Vector3& up);
+    void LookAt(const Vector3& position, const Vector3& point, const Vector3& up=Vector3::UP);
 
     void Walk(float units);
     void Fly(float units);
