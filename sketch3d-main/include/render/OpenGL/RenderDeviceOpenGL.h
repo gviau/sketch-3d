@@ -80,8 +80,10 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
 
         virtual void                        GenerateMips(Texture* texture) override;
         virtual void                        CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) override;
-        virtual Matrix4x4                   CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) override;
-        virtual Matrix4x4                   CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjectionRightHanded(float width, float height, float nearPlane, float farPlane) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjectionFOVRightHanded(float fov, float aspectRatio, float nearPlane, float farPlane) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjectionLeftHanded(float width, float height, float nearPlane, float farPlane) override;
+        virtual Matrix4x4                   CalculatePerspectiveProjectionFOVLeftHanded(float fov, float aspectRatio, float nearPlane, float farPlane) override;
         virtual void                        SetViewport(float width, float height) override;
         virtual void                        RestoreViewportToOriginal() override;
 

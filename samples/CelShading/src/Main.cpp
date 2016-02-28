@@ -1,13 +1,18 @@
 #include <math/Quaternion.h>
 #include <math/Vector3.h>
 
-#include <render/Material.h>
-#include <render/Mesh.h>
-#include <render/Node.h>
-#include <render/Renderer.h>
-#include <render/SceneTree.h>
+#include <framework/Camera.h>
+#include <framework/Mesh.h>
+#include <framework/SubMesh.h>
+
+#include <render/Buffer.h>
+#include <render/ConstantBuffers.h>
+#include <render/HardwareResourceCreator.h>
+#include <render/RenderContext.h>
+#include <render/RenderDevice.h>
 #include <render/Shader.h>
 
+#include <system/Logger.h>
 #include <system/Window.h>
 #include <system/WindowEvent.h>
 using namespace Sketch3D;
@@ -32,36 +37,34 @@ int main(int argc, char** argv) {
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;
     renderParameters.height = 768;
-    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
+    renderParameters.displayFormat = DisplayFormat_t::A8R8G8B8;
     renderParameters.refreshRate = 0;
-    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+    renderParameters.depthStencilBits = DepthStencilBits_t::D32;
 
-    Renderer::GetInstance()->Initialize(RenderSystem_t::OPENGL, window, renderParameters);
-    Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
+    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
+    renderContext->Initialize(window, renderParameters);
+
+    shared_ptr<RenderDevice> renderDevice;
+    if (!CreateRenderDevice(renderContext, renderDevice))
+    {
+        Logger::GetInstance()->Error("Couldn't create render device");
+        return 1;
+    }
+    renderDevice->Initialize(renderContext);
 
     // Load the mesh
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    Mesh teapotMesh("Media/teapot.nff", vertexAttributes);
+    shared_ptr<Mesh> teapotMesh;
+    LoadMeshFromFile("Media/teapot.nff", renderDevice, teapotMesh);
 
     // Create the material
-    Shader* normalRenderShader = Renderer::GetInstance()->CreateShader();
-    Shader* contourRenderShader = Renderer::GetInstance()->CreateShader();
-    normalRenderShader->SetSourceFile("Shaders/CelShading/normalRender_vert", "Shaders/CelShading/normalRender_frag");
-    contourRenderShader->SetSourceFile("Shaders/CelShading/contourRender_vert", "Shaders/CelShading/contourRender_frag");
+    shared_ptr<VertexShader> vertexShader = renderDevice->GetHardwareResourceCreator()->CreateVertexShader();
+    shared_ptr<FragmentShader> fragmentShader = renderDevice->GetHardwareResourceCreator()->CreateFragmentShader();
 
-    Material normalRenderMaterial(normalRenderShader);
-    Material contourRenderMaterial(contourRenderShader);
+    vertexShader->InitializeFromFile("Shaders/CelShading/vert.hlsl");
+    fragmentShader->InitializeFromFile("Shaders/CelShading/frag.hlsl");
 
-    // Create the node
-    Node teapotNode;
-    teapotNode.SetMesh(&teapotMesh);
-    Renderer::GetInstance()->GetSceneTree().AddNode(&teapotNode);
-
-    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 2.5f, -7.5f), Vector3::LOOK);
-    Renderer::GetInstance()->SetBlendingEquation(BLENDING_EQUATION_ADD);
-    Renderer::GetInstance()->SetBlendingFactor(BLENDING_FACTOR_ONE, BLENDING_FACTOR_ONE);
+    Camera camera;
+    camera.LookAtRightHanded(Vector3(0.0f, 3.0f, 7.5f), Vector3::LOOK);
 
     // Initialize OIS if available
 #ifdef OIS_AVAILABLE
@@ -76,6 +79,17 @@ int main(int argc, char** argv) {
 #endif
 
     float teapotAngle = 0.0f;
+    const vector<shared_ptr<SubMesh>>& subMeshes = teapotMesh->GetSubMeshes();
+
+    PassConstants_t initialPassConstants;
+    initialPassConstants.projectionMatrix = renderDevice->CalculatePerspectiveProjectionFOVRightHanded(60.0f, (float)renderParameters.width / (float)renderParameters.height, 0.01f, 1000.0f);
+    initialPassConstants.viewMatrix = camera.GetViewMatrix();
+
+    shared_ptr<ConstantBuffer> passConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+    passConstants->Initialize(&initialPassConstants, false, false, sizeof(PassConstants_t));
+
+    shared_ptr<ConstantBuffer> drawConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+    drawConstants->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;
@@ -89,29 +103,41 @@ int main(int argc, char** argv) {
             break;
         }
 #endif
+
+        renderDevice->ClearRenderTargets(Vector4(0.1f, 0.1f, 0.1f, 1.0f));
+        renderDevice->ClearDepthStencil(true, false, 1.0f, 0);
+
         Quaternion rotationX, rotationY;
         rotationX.MakeFromAngleAxis(-PI_OVER_2, Vector3::RIGHT);
         rotationY.MakeFromAngleAxis(teapotAngle, Vector3::LOOK);
-        teapotNode.SetOrientation(rotationX * rotationY);
         teapotAngle += 0.0005f;
 
-        Renderer::GetInstance()->Clear();
+        Quaternion orientation = rotationX * rotationY;
+        Matrix4x4 modelMatrix;
+        orientation.ToRotationMatrix(modelMatrix);
 
-        Renderer::GetInstance()->StartRender();
-        
-        Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_FRONT_FACE);
-        teapotNode.SetMaterial(&contourRenderMaterial);
-        Renderer::GetInstance()->BindShader(contourRenderShader);
-        contourRenderShader->SetUniformFloat("offset", 0.015f);
-        Renderer::GetInstance()->Render();
-        
-        Renderer::GetInstance()->SetCullingMethod(CULLING_METHOD_BACK_FACE);
-        teapotNode.SetMaterial(&normalRenderMaterial);
-        Renderer::GetInstance()->Render();
-        
-        Renderer::GetInstance()->EndRender();
+        DrawConstants_t teapotDrawConstants;
+        teapotDrawConstants.modelMatrix = modelMatrix;
 
-        Renderer::GetInstance()->PresentFrame();
+        void* data = drawConstants->Map(MapFlag_t::WRITE_DISCARD);
+        memcpy(data, &teapotDrawConstants, sizeof(DrawConstants_t));
+        drawConstants->Unmap();
+
+        renderDevice->SetVertexShader(vertexShader);
+        renderDevice->SetVertexShaderConstantBuffer(passConstants, 0);
+        renderDevice->SetVertexShaderConstantBuffer(drawConstants, 1);
+
+        renderDevice->SetFragmentShader(fragmentShader);
+
+        for (const shared_ptr<SubMesh>& subMesh : subMeshes)
+        {
+            const shared_ptr<VertexBuffer>& vertexBuffer = subMesh->GetVertexBuffer();
+            const shared_ptr<IndexBuffer>& indexBuffer = subMesh->GetIndexBuffer();
+
+            renderDevice->DrawIndexed(PrimitiveTopology_t::TRIANGLELIST, vertexBuffer, indexBuffer, 0, 0);
+        }
+
+        renderContext->SwapBuffers();
     }
 
     return 0;

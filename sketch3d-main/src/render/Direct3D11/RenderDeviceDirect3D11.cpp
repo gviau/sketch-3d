@@ -257,10 +257,17 @@ void RenderDeviceDirect3D11::SetFragmentShader(shared_ptr<FragmentShader> fragme
         return;
     }
 
-    fragmentShader_ = fragmentShader;
     FragmentShaderDirect3D11* shader = static_cast<FragmentShaderDirect3D11*>(fragmentShader.get());
+    ID3D11PixelShader* d3dShader = shader->GetShader();
+    if (d3dShader == nullptr)
+    {
+        Logger::GetInstance()->Error("Invalid pixel shader in RenderDeviceDirect3D11::SetVertexShader");
+        return;
+    }
 
-    context_->PSSetShader(shader->GetShader(), nullptr, 0);
+    fragmentShader_ = fragmentShader;
+
+    context_->PSSetShader(d3dShader, nullptr, 0);
 }
 
 bool RenderDeviceDirect3D11::SetFragmentShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) {
@@ -350,11 +357,17 @@ void RenderDeviceDirect3D11::SetVertexShader(shared_ptr<VertexShader> vertexShad
         return;
     }
 
+    VertexShaderDirect3D11* shader = static_cast<VertexShaderDirect3D11*>(vertexShader.get());
+    ID3D11VertexShader* d3dShader = shader->GetShader();
+    if (d3dShader == nullptr)
+    {
+        Logger::GetInstance()->Error("Invalid vertex shader in RenderDeviceDirect3D11::SetVertexShader");
+        return;
+    }
+
     vertexShader_ = vertexShader;
 
-    VertexShaderDirect3D11* shader = static_cast<VertexShaderDirect3D11*>(vertexShader.get());
-
-    context_->VSSetShader(shader->GetShader(), nullptr, 0);
+    context_->VSSetShader(d3dShader, nullptr, 0);
 }
 
 bool RenderDeviceDirect3D11::SetVertexShaderConstantBuffer(const shared_ptr<ConstantBuffer>& constantBuffer, size_t slot) {
@@ -520,7 +533,7 @@ void RenderDeviceDirect3D11::GenerateMips(Texture* texture) {
 void RenderDeviceDirect3D11::CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) {
 }
 
-Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane)
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionRightHanded(float width, float height, float nearPlane, float farPlane)
 {
     projection_[0][0] = 2.0f * nearPlane / width;
     projection_[1][1] = 2.0f * nearPlane / height;
@@ -532,9 +545,9 @@ Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjection(float width, fl
     return projection_;
 }
 
-Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane)
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOVRightHanded(float fov, float aspectRatio, float nearPlane, float farPlane)
 {
-    float yScale = 1.0f / tanf( (fov / 2.0f) * DEG_2_RAD );
+    float yScale = 1.0f / tanf( (fov * 0.5f) * DEG_2_RAD );
     float xScale = yScale / aspectRatio;
 
     projection_[0][0] = xScale;
@@ -542,6 +555,33 @@ Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOV(float fov, f
     projection_[2][2] = farPlane / (nearPlane - farPlane);
     projection_[2][3] = nearPlane * farPlane / (nearPlane - farPlane);
     projection_[3][2] = -1.0f;
+    projection_[3][3] = 0.0f;
+
+    return projection_;
+}
+
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionLeftHanded(float width, float height, float nearPlane, float farPlane)
+{
+    projection_[0][0] = 2.0f * nearPlane / width;
+    projection_[1][1] = 2.0f * nearPlane / height;
+    projection_[2][2] = farPlane / (farPlane - nearPlane);
+    projection_[2][3] = -nearPlane * farPlane / (farPlane - nearPlane);
+    projection_[3][2] = 1.0f;
+    projection_[3][3] = 0.0f;
+
+    return projection_;
+}
+
+Matrix4x4 RenderDeviceDirect3D11::CalculatePerspectiveProjectionFOVLeftHanded(float fov, float aspectRatio, float nearPlane, float farPlane)
+{
+    float yScale = 1.0f / tanf( (fov * 0.5f) * DEG_2_RAD );
+    float xScale = yScale / aspectRatio;
+
+    projection_[0][0] = xScale;
+    projection_[1][1] = yScale;
+    projection_[2][2] = farPlane / (farPlane - nearPlane);
+    projection_[2][3] = -nearPlane * farPlane / (farPlane - nearPlane);
+    projection_[3][2] = 1.0f;
     projection_[3][3] = 0.0f;
 
     return projection_;

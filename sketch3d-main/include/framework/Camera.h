@@ -21,7 +21,8 @@ class SKETCH_3D_API Camera
 public:
     Camera();
 
-    void LookAt(const Vector3& position, const Vector3& point, const Vector3& up=Vector3::UP);
+    void LookAtRightHanded(const Vector3& position, const Vector3& point, const Vector3& up=Vector3::UP);
+    void LookAtLeftHanded(const Vector3& position, const Vector3& point, const Vector3& up=Vector3::UP);
 
     void Walk(float units);
     void Fly(float units);
@@ -48,6 +49,7 @@ private:
     Vector3             m_Up;
     Vector3             m_Look;
     bool                m_NeedViewMatrixUpdate;
+    bool                m_IsRightHanded;
     Matrix4x4           m_ViewMatrix;
 };
 

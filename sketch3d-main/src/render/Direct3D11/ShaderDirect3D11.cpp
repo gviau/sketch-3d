@@ -16,7 +16,10 @@ using namespace std;
 #pragma warning( default : 4005 )
 
 namespace Sketch3D {
-ShaderDirect3D11::ShaderDirect3D11(ID3D11Device* device) : device_(device), shaderBlob_(nullptr) {
+ShaderDirect3D11::ShaderDirect3D11(ID3D11Device* device)
+    : device_(device)
+    , shaderBlob_(nullptr)
+{
 }
 
 ShaderDirect3D11::~ShaderDirect3D11() {
@@ -29,7 +32,10 @@ ID3D10Blob* ShaderDirect3D11::GetShaderBlob() const {
     return shaderBlob_;
 }
 
-FragmentShaderDirect3D11::FragmentShaderDirect3D11(ID3D11Device* device) : ShaderDirect3D11(device) {
+FragmentShaderDirect3D11::FragmentShaderDirect3D11(ID3D11Device* device)
+    : ShaderDirect3D11(device)
+    , shader_(nullptr)
+{
 }
 
 FragmentShaderDirect3D11::~FragmentShaderDirect3D11() {
@@ -74,7 +80,10 @@ ID3D11PixelShader* FragmentShaderDirect3D11::GetShader() const {
     return shader_;
 }
 
-VertexShaderDirect3D11::VertexShaderDirect3D11(ID3D11Device* device) : ShaderDirect3D11(device) {
+VertexShaderDirect3D11::VertexShaderDirect3D11(ID3D11Device* device)
+    : ShaderDirect3D11(device)
+    , shader_(nullptr)
+{
 }
 
 VertexShaderDirect3D11::~VertexShaderDirect3D11() {

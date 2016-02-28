@@ -88,8 +88,10 @@ class SKETCH_3D_API RenderDevice {
         // MISC STUFF
         virtual void GenerateMips(Texture* texture) = 0;
         virtual void CopyResource(const shared_ptr<HardwareResource>& source, const shared_ptr<HardwareResource>& destination) = 0;
-        virtual Matrix4x4 CalculatePerspectiveProjection(float width, float height, float nearPlane, float farPlane) = 0;
-        virtual Matrix4x4 CalculatePerspectiveProjectionFOV(float fov, float aspectRatio, float nearPlane, float farPlane) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjectionRightHanded(float width, float height, float nearPlane, float farPlane) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjectionFOVRightHanded(float fov, float aspectRatio, float nearPlane, float farPlane) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjectionLeftHanded(float width, float height, float nearPlane, float farPlane) = 0;
+        virtual Matrix4x4 CalculatePerspectiveProjectionFOVLeftHanded(float fov, float aspectRatio, float nearPlane, float farPlane) = 0;
         virtual void SetViewport(float width, float height) = 0;
         virtual void RestoreViewportToOriginal() = 0;
         
