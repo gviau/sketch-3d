@@ -240,7 +240,7 @@ void Ocean::Render(const Matrix4x4& viewMatrix) {
     DrawConstants_t* drawConstants = (DrawConstants_t*)data;
 
     drawConstants->modelViewMatrix = viewMatrix;
-    drawConstants->modelViewProjectionMatrix = m_RenderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f) * viewMatrix;
+    drawConstants->modelViewProjectionMatrix = m_RenderDevice->CalculatePerspectiveProjectionFOVRightHanded(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f) * viewMatrix;
 
     m_DrawConstants->Unmap();
 

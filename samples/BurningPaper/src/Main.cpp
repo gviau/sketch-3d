@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
     noiseTexture->Initialize(noiseTextureMap.get(), noiseTextureFormat, false);
 
     Camera camera;
-    camera.LookAt(Vector3(0.0f, 0.0f, 2.0f), -Vector3::LOOK, Vector3::UP);
+    camera.LookAtRightHanded(Vector3(0.0f, 0.0f, 5.0f), Vector3::LOOK);
 
     float threshold = 0.0f;
     float range = 0.1f;
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
     shared_ptr<ConstantBuffer> drawConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
 
     DrawConstants_t initData;
-    initData.modelViewProjectionMatrix = renderDevice->CalculatePerspectiveProjectionFOV(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f) * camera.GetViewMatrix();
+    initData.modelViewProjectionMatrix = renderDevice->CalculatePerspectiveProjectionFOVRightHanded(60.0f, 1024.0f / 768.0f, 1.0f, 1000.0f) * camera.GetViewMatrix();
 
     drawConstants->Initialize(&initData, false, false, sizeof(DrawConstants_t));
 

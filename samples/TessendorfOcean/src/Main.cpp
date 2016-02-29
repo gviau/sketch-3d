@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     clock_t begin, end;
 
     Camera camera;
-    camera.LookAt(Vector3(10.0f, 15.0f, -35.0f), Vector3(0.0f, 1.0f, 0.0f), -Vector3::UP);
+    camera.LookAtRightHanded(Vector3(10.0f, 15.0f, 35.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3::UP);
 
     while (window.IsOpen()) {
         begin = clock();
