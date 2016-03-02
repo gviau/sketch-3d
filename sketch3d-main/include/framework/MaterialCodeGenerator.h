@@ -10,6 +10,11 @@ using namespace std;
 
 namespace Sketch3D
 {
+/**
+ * @class MaterialCodeGenerator
+ * The MaterialCodeGenerator is a base class which can be extended to generate code for a vertex and a fragment shader
+ * depending on the input to be provided to the material.
+ */
 class MaterialCodeGenerator
 {
 public:
