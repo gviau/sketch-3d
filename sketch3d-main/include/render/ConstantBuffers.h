@@ -42,6 +42,8 @@ struct ALIGNED_(16) DrawConstants_t {
 
 struct ALIGNED_(16) LightConstants_t {
     int numLights;
+    int pad[3];
+
     Vector4 lightPositions[MAX_NUM_LIGHTS];
     Vector4 lightDirections[MAX_NUM_LIGHTS];
     Vector4 lightColors[MAX_NUM_LIGHTS];
