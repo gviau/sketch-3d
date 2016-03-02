@@ -11,6 +11,7 @@ using namespace std;
 namespace Sketch3D {
 
 // Forward class declarations
+class ConstantBuffer;
 class HardwareResourceCreator;
 class IndexBuffer;
 class Material;
@@ -31,6 +32,10 @@ class SKETCH_3D_API Mesh
         void                                AddSubMesh(const shared_ptr<SubMesh>& subMesh);
         void                                RemoveSubMesh(size_t index);
         void                                ClearSubMeshes();
+
+        void                                SetConstantBuffersForAllMaterials(const vector<shared_ptr<ConstantBuffer>>& vertexShaderConstantBuffers,
+                                                                              const vector<shared_ptr<ConstantBuffer>>& fragmentShaderConstantBuffers,
+                                                                              size_t materialConstantsSlot);
 
         void                                SetMaterialForAllSubMeshes(const shared_ptr<Material>& material);
 

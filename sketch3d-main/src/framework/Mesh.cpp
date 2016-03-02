@@ -77,6 +77,30 @@ void Mesh::ClearSubMeshes()
     m_SubMeshes.clear();
 }
 
+void Mesh::SetConstantBuffersForAllMaterials(const vector<shared_ptr<ConstantBuffer>>& vertexShaderConstantBuffers,
+                                             const vector<shared_ptr<ConstantBuffer>>& fragmentShaderConstantBuffers,
+                                             size_t materialConstantsSlot)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (pSubMesh == nullptr)
+        {
+            continue;
+        }
+
+        Material* material = pSubMesh->GetMaterial().get(); 
+        if (material == nullptr)
+        {
+            continue;
+        }
+
+        material->SetVertexShaderConstantBuffers(vertexShaderConstantBuffers);
+        material->SetFragmentShaderConstantBuffers(fragmentShaderConstantBuffers);
+        material->SetMaterialConstantsBufferSlot(materialConstantsSlot);
+    }
+}
+
 void Mesh::SetMaterialForAllSubMeshes(const shared_ptr<Material>& material)
 {
     for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)

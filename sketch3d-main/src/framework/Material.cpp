@@ -13,12 +13,12 @@
 namespace Sketch3D {
 Material::Material(const shared_ptr<RenderDevice>& renderDevice)
     : m_RenderDevice(renderDevice)
-    , m_AmbientColor(1.0f, 1.0f, 1.0f)
+    , m_AmbientColor(Vector3::ZERO)
     , m_DiffuseColor(1.0f, 1.0f, 1.0f)
     , m_SpecularColor(1.0f, 1.0f, 1.0f)
     , m_SpecularPower(1.0f)
+    , m_MaterialConstantsBufferSlot(0)
 {
-    m_ConstantBuffer = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
 }
 
 void Material::Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGenerator* materialCodeGenerator)
@@ -28,8 +28,9 @@ void Material::Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGener
     materialConstants.diffuseColor = m_DiffuseColor;
     materialConstants.specularColorAndPower = m_SpecularColor;
     materialConstants.specularColorAndPower.w = m_SpecularPower;
-    
-    m_ConstantBuffer->Initialize(&materialConstants, false, false, sizeof(MaterialConstants_t));
+ 
+    m_MaterialConstants = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+    m_MaterialConstants->Initialize(&materialConstants, false, false, sizeof(MaterialConstants_t));
 
     if (materialCodeGenerator != nullptr)
     {
@@ -60,17 +61,50 @@ void Material::Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGener
 
 bool Material::Apply() const
 {
-    // TEMP
-    // The material would eventually create its own shader depending of the material or use an uber shader
     RenderDevice* renderDevice = m_RenderDevice.get();
     if (renderDevice == nullptr)
     {
         return false;
     }
 
-    renderDevice->SetFragmentShaderConstantBuffer(m_ConstantBuffer, 2);
+    // Set the shaders to use
+    renderDevice->SetVertexShader(m_VertexShader);
+    renderDevice->SetFragmentShader(m_FragmentShader);
+
+    // Set the constant buffers for the shaders
+    for (size_t i = 0; i < m_VertexShaderConstantBuffers.size(); i++)
+    {
+        renderDevice->SetVertexShaderConstantBuffer(m_VertexShaderConstantBuffers[i], i);
+    }
+
+    renderDevice->SetFragmentShaderConstantBuffer(m_MaterialConstants, m_MaterialConstantsBufferSlot);
+    for (size_t i = 0; i < m_FragmentShaderConstantBuffers.size(); i++)
+    {
+        renderDevice->SetFragmentShaderConstantBuffer(m_FragmentShaderConstantBuffers[i], i + 1);
+    }
+
+    // Set the textures and sampler states for the shaders
     renderDevice->SetFragmentShaderSamplerState(m_DiffuseSamplerState, 0);
-    renderDevice->SetFragmentShaderTexture(m_DiffuseTexture, 0);
+
+    if (m_AmbientTexture.get() != nullptr)
+    {
+        renderDevice->SetFragmentShaderTexture(m_AmbientTexture, 0);
+    }
+
+    if (m_DiffuseTexture.get() != nullptr)
+    {
+        renderDevice->SetFragmentShaderTexture(m_DiffuseTexture, 1);
+    }
+
+    if (m_SpecularTexture.get() != nullptr)
+    {
+        renderDevice->SetFragmentShaderTexture(m_SpecularTexture, 2);
+    }
+
+    if (m_NormalMapTexture.get() != nullptr)
+    {
+        renderDevice->SetFragmentShaderTexture(m_NormalMapTexture, 3);
+    }
 
     return true;
 }

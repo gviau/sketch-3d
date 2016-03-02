@@ -1,14 +1,18 @@
 #include <math/Vector2.h>
 #include <math/Vector3.h>
 
-#include <render/Material.h>
-#include <render/Mesh.h>
-#include <render/Node.h>
-#include <render/Renderer.h>
-#include <render/RenderTexture.h>
-#include <render/SceneTree.h>
-#include <render/Shader.h>
-#include <render/Texture2D.h>
+#include <framework/Camera.h>
+#include <framework/ForwardRenderingPipeline.h>
+#include <framework/Light.h>
+#include <framework/Mesh.h>
+#include <framework/Scene.h>
+#include <framework/VisualNode.h>
+
+#include <render/Buffer.h>
+#include <render/ConstantBuffers.h>
+#include <render/HardwareResourceCreator.h>
+#include <render/RenderContext.h>
+#include <render/RenderDevice.h>
 
 #include <system/Logger.h>
 #include <system/Window.h>
@@ -30,21 +34,58 @@ int main(int argc, char** argv) {
     RenderParameters_t renderParameters;
     renderParameters.width = 1024;
     renderParameters.height = 768;
-    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
+    renderParameters.displayFormat = DisplayFormat_t::A8R8G8B8;
     renderParameters.refreshRate = 0;
-    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+    renderParameters.depthStencilBits = DepthStencilBits_t::D32;
 
-    Renderer::GetInstance()->Initialize(RenderSystem_t::OPENGL, window, renderParameters);
-    Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
+    shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
+    renderContext->Initialize(window, renderParameters);
 
-    // Load the meshes
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
-    Mesh sphereMesh("Media/sphere.obj", vertexAttributes);
-    Mesh spiderMesh("Media/spider.obj", vertexAttributes);
+    shared_ptr<RenderDevice> renderDevice;
+    if (!CreateRenderDevice(renderContext, renderDevice))
+    {
+        Logger::GetInstance()->Error("Couldn't create render device");
+        return 1;
+    }
+    renderDevice->Initialize(renderContext);
 
+    ForwardRenderingPipeline forwardRenderingPipeline(renderContext, renderDevice);
+    if (!forwardRenderingPipeline.Initialize())
+    {
+        Logger::GetInstance()->Error("Couldn't initialize the forward rendering pipeline");
+        return 1;
+    }
+
+    // Load the mesh
+    shared_ptr<Mesh> bobMesh;
+    if (!LoadMeshFromFileWithMaterial("Media/Bob.md5mesh", renderDevice, bobMesh, forwardRenderingPipeline.GetMaterialCodeGenerator()))
+    {
+        Logger::GetInstance()->Error("Couldn't load mesh with material");
+        return 1;
+    }
+
+    // Create the scene
+    Scene scene;
+
+    shared_ptr<VisualNode> bobNode(new VisualNode);
+    bobNode->SetMesh(bobMesh);
+    bobNode->SetPosition(0.0f, 0.0f, -150.0f);
+
+    scene.GetRootNode().AddChild(bobNode);
+
+    vector<shared_ptr<Light>> lights;
+
+    shared_ptr<Light> light(new Light);
+    light->SetLightType(LightType_t::Point);
+    light->SetPosition(Vector3(60.0f, 35.0f, -150.0f));
+    light->SetColor(Vector4(0.2f, 0.2f, 0.8f));
+    lights.push_back(light);
+
+    scene.SetLights(lights);
+
+    Camera camera;
+
+    /*
     // Create a plane mesh
     SurfaceTriangles_t surface;
     surface.numVertices = 4;
@@ -108,16 +149,24 @@ int main(int argc, char** argv) {
     material.SetUniformTexture("positions", positionsTexture);
     material.SetUniformTexture("normals", normalsTexture);
     material.SetUniformTexture("albedos", albedosTexture);
+    */
+    bobNode->SetOrientation(0.0f, 0.0f, -PI_OVER_2);
 
     while (window.IsOpen()) {
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
 
+        bobNode->Yaw(0.001f);
+
+        forwardRenderingPipeline.RenderSceneFromCamera(camera, scene);
+
+        /*
         spiderNode.Yaw(0.001f);
 
         // Render in the GBuffer
         GBuffer->Bind();
+
         Renderer::GetInstance()->Clear();
         Renderer::GetInstance()->StartRender();
         Renderer::GetInstance()->Render();
@@ -130,6 +179,7 @@ int main(int argc, char** argv) {
         Renderer::GetInstance()->EndRender();
 
         Renderer::GetInstance()->PresentFrame();
+        */
     }
 
     return 0;

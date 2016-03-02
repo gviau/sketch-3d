@@ -32,6 +32,10 @@ class SKETCH_3D_API Material {
         void                                SetVertexShader(const shared_ptr<VertexShader>& vertexShader);
         void                                SetFragmentShader(const shared_ptr<FragmentShader>& fragmentShader);
 
+        void                                SetVertexShaderConstantBuffers(const vector<shared_ptr<ConstantBuffer>>& buffers) { m_VertexShaderConstantBuffers = buffers; }
+        void                                SetFragmentShaderConstantBuffers(const vector<shared_ptr<ConstantBuffer>>& buffers) { m_FragmentShaderConstantBuffers = buffers; }
+        void                                SetMaterialConstantsBufferSlot(size_t slot) { m_MaterialConstantsBufferSlot = slot; }
+
         void                                SetAmbientColor(const Vector3& color);
         void                                SetDiffuseColor(const Vector3& color);
         void                                SetSpecularColor(const Vector3& color);
@@ -83,7 +87,10 @@ class SKETCH_3D_API Material {
         shared_ptr<Texture2D>               m_NormalMapTexture;
         shared_ptr<SamplerState>            m_NormalMapSamplerState;
 
-        shared_ptr<ConstantBuffer>          m_ConstantBuffer;
+        vector<shared_ptr<ConstantBuffer>>  m_VertexShaderConstantBuffers;
+        vector<shared_ptr<ConstantBuffer>>  m_FragmentShaderConstantBuffers;
+        size_t                              m_MaterialConstantsBufferSlot;
+        shared_ptr<ConstantBuffer>          m_MaterialConstants;
 };
 
 }

@@ -2,6 +2,8 @@
 
 #include "render/ConstantBuffers.h"
 
+#include <typeinfo>
+
 namespace Sketch3D
 {
 void MaterialCodeGenerator::WriteShader(VertexFormatType_t vertexFormatType, bool usesAmbientTexture, bool usesDiffuseTexture, bool usesSpecularTexture,
@@ -48,6 +50,28 @@ void MaterialCodeGenerator::WriteShader(VertexFormatType_t vertexFormatType, boo
     fragmentShaderCode += GetFragmentShaderOutputStructureName() + " main(" + GetFragmentShaderInputStructureName() + " " + GetFragmentShaderInputStructureVariableName() + ") {\n";
     WriteFragmentShaderMainBody(fragmentShaderCode);
     fragmentShaderCode += "}\n";
+}
+
+map<string, size_t> MaterialCodeGenerator::GetVertexShaderConstantBuffersSlots() const
+{
+    map<string, size_t> constantBufferSlots;
+
+    constantBufferSlots[typeid(PassConstants_t).name()] = 0;
+    constantBufferSlots[typeid(DrawConstants_t).name()] = 1;
+
+    return constantBufferSlots;
+}
+
+map<string, size_t> MaterialCodeGenerator::GetFragmentShaderConstantBuffersSlots() const
+{
+    map<string, size_t> constantBufferSlots;
+
+    constantBufferSlots[typeid(PassConstants_t).name()] = 0;
+    constantBufferSlots[typeid(LightConstants_t).name()] = 1;
+
+    constantBufferSlots[typeid(MaterialConstants_t).name()] = 0;
+
+    return constantBufferSlots;
 }
 
 void MaterialCodeGenerator::WriteVertexShaderConstantBuffers(string& shaderCode)
@@ -222,17 +246,17 @@ void MaterialCodeGenerator::WriteFragmentShaderConstantBuffers(string& shaderCod
     }
 
     shaderCode +=
-        "cbuffer PassConstants_t : register(b0) {\n"
-        "    float4x4 projectionMatrix;\n"
-        "    float4x4 viewMatrix;\n"
-        "    float4x4 viewProjectionMatrix;\n"
-        "};\n";
-
-    shaderCode +=
-        "cbuffer MaterialConstants_t : register(b1) {\n"
+        "cbuffer MaterialConstants_t : register(b0) {\n"
         "    float4 ambientColor;\n"
         "    float4 diffuseColor;\n"
         "    float4 specularColorAndPower;\n"
+        "};\n";
+
+    shaderCode +=
+        "cbuffer PassConstants_t : register(b1) {\n"
+        "    float4x4 projectionMatrix;\n"
+        "    float4x4 viewMatrix;\n"
+        "    float4x4 viewProjectionMatrix;\n"
         "};\n";
 
     string numLightsString = to_string(Sketch3D::MAX_NUM_LIGHTS);

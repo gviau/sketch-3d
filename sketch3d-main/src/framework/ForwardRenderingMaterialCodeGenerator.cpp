@@ -33,7 +33,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& sh
         shaderCode += tabLevel + outputVariable + ".uv = " + inputVariable + ".in_uv;\n";
     }
 
-    shaderCode += tabLevel + outputVariable + ".eyePosition = -mul(modelViewMatrix, float4(" + inputVariable + ".in_vertex, 1.0)).xyz;\n";
+    shaderCode += tabLevel + outputVariable + ".eyePosition = mul(modelViewMatrix, float4(" + inputVariable + ".in_vertex, 1.0)).xyz;\n";
 
     shaderCode += tabLevel + "return " + outputVariable + ";\n";
 }

@@ -5,6 +5,8 @@
 
 #include "render/VertexFormat.h"
 
+#include <map>
+#include <vector>
 #include <string>
 using namespace std;
 
@@ -18,46 +20,50 @@ namespace Sketch3D
 class MaterialCodeGenerator
 {
 public:
-    void            WriteShader(VertexFormatType_t vertexFormatType, bool usesAmbientTexture, bool usesDiffuseTexture, bool usesSpecularTexture,
-                                bool usesNormalTexture, string& vertexShaderCode, string& fragmentShaderCode);
+    void                        WriteShader(VertexFormatType_t vertexFormatType, bool usesAmbientTexture, bool usesDiffuseTexture, bool usesSpecularTexture,
+                                            bool usesNormalTexture, string& vertexShaderCode, string& fragmentShaderCode);
+
+    // Returns the class name in their correct buffer slot
+    virtual map<string, size_t> GetVertexShaderConstantBuffersSlots() const;
+    virtual map<string, size_t> GetFragmentShaderConstantBuffersSlots() const;
 
 protected:
-    virtual void    WriteVertexShaderConstantBuffers(string& shaderCode);
+    virtual void                WriteVertexShaderConstantBuffers(string& shaderCode);
 
-    virtual void    WriteVertexShaderInputs(VertexFormatType_t vertexFormatType, string& shaderCode);
-    virtual void    WriteVertexShaderOutputs(string& shaderCode);
+    virtual void                WriteVertexShaderInputs(VertexFormatType_t vertexFormatType, string& shaderCode);
+    virtual void                WriteVertexShaderOutputs(string& shaderCode);
 
-    virtual void    WriteFragmentShaderConstantBuffers(string& fragmentShaderCode);
+    virtual void                WriteFragmentShaderConstantBuffers(string& fragmentShaderCode);
 
-    virtual void    WriteFragmentShaderInputs(string& shaderCode);
-    virtual void    WriteFragmentShaderOutputs(string& shaderCode);
+    virtual void                WriteFragmentShaderInputs(string& shaderCode);
+    virtual void                WriteFragmentShaderOutputs(string& shaderCode);
         
-    virtual void    WriteVertexShaderMainBody(string& shaderCode) = 0;
-    virtual void    WriteFragmentShaderMainBody(string& shaderCode) = 0;
+    virtual void                WriteVertexShaderMainBody(string& shaderCode) = 0;
+    virtual void                WriteFragmentShaderMainBody(string& shaderCode) = 0;
 
-    virtual string  GetVertexShaderInputStructureName() { return "VS_INPUT"; }
-    virtual string  GetVertexShaderOutputStructureName() { return "VS_OUTPUT"; }
-    virtual string  GetVertexShaderInputStructureVariableName() { return "input"; }
-    virtual string  GetVertexShaderOutputStructureVariableName() { return "output"; }
+    virtual string              GetVertexShaderInputStructureName() { return "VS_INPUT"; }
+    virtual string              GetVertexShaderOutputStructureName() { return "VS_OUTPUT"; }
+    virtual string              GetVertexShaderInputStructureVariableName() { return "input"; }
+    virtual string              GetVertexShaderOutputStructureVariableName() { return "output"; }
 
-    virtual string  GetFragmentShaderInputStructureName() { return "PS_INPUT"; }
-    virtual string  GetFragmentShaderOutputStructureName() { return "PS_OUTPUT"; }
-    virtual string  GetFragmentShaderInputStructureVariableName() { return "input"; }
-    virtual string  GetFragmentShaderOutputStructureVariableName() { return "output"; }
+    virtual string              GetFragmentShaderInputStructureName() { return "PS_INPUT"; }
+    virtual string              GetFragmentShaderOutputStructureName() { return "PS_OUTPUT"; }
+    virtual string              GetFragmentShaderInputStructureVariableName() { return "input"; }
+    virtual string              GetFragmentShaderOutputStructureVariableName() { return "output"; }
 
-    string          GetTabs(int tabLevel) const;
+    string                      GetTabs(int tabLevel) const;
 
-    bool            m_HasColors;
-    bool            m_HasNormals;
-    bool            m_HasUVs;
-    bool            m_HasTangents;
-    bool            m_HasBones;
-    bool            m_Has2UVs;
+    bool                        m_HasColors;
+    bool                        m_HasNormals;
+    bool                        m_HasUVs;
+    bool                        m_HasTangents;
+    bool                        m_HasBones;
+    bool                        m_Has2UVs;
 
-    bool            m_UsesAmbientTexture;
-    bool            m_UsesDiffuseTexture;
-    bool            m_UsesSpecularTexture;
-    bool            m_UsesNormalTexture;
+    bool                        m_UsesAmbientTexture;
+    bool                        m_UsesDiffuseTexture;
+    bool                        m_UsesSpecularTexture;
+    bool                        m_UsesNormalTexture;
 };
 }
 

@@ -3,10 +3,18 @@
 
 #include "framework/RenderingPipelineContext.h"
 
+#include <map>
+#include <memory>
+#include <string>
+using namespace std;
+
 namespace Sketch3D
 {
 
 class Camera;
+class MaterialCodeGenerator;
+class RenderContext;
+class RenderDevice;
 class Scene;
 
 /**
@@ -16,12 +24,25 @@ class Scene;
 class RenderingPipeline
 {
 public:
-    virtual void                RenderSceneFromCamera(const Camera& camera, const Scene& scene) = 0;
+                                RenderingPipeline(const shared_ptr<RenderContext>& renderContext, const shared_ptr<RenderDevice>& renderDevice);
+    virtual                    ~RenderingPipeline();
+
+    virtual bool                Initialize() = 0;
+
+    virtual void                RenderSceneFromCamera(Camera& camera, const Scene& scene) = 0;
+
+    MaterialCodeGenerator*      GetMaterialCodeGenerator() const { return m_MaterialCodeGenerator; }
 
 protected:
-    virtual void                ConstructRenderingPipelineContext(const Camera& camera, const Scene& scene, RenderingPipelineContext& renderingPipelineContext);
+    virtual void                ConstructRenderingPipelineContext(Camera& camera, const Scene& scene, RenderingPipelineContext& renderingPipelineContext);
 
+    shared_ptr<RenderContext>   m_RenderContext;
+    shared_ptr<RenderDevice>    m_RenderDevice;
     RenderingPipelineContext    m_CurrentRenderingContext;
+
+    MaterialCodeGenerator*      m_MaterialCodeGenerator;
+    map<string, size_t>         m_VertexShaderConstantBuffersSlots;
+    map<string, size_t>         m_FragmentShaderConstantBuffersSlots;
 };
 }
 
