@@ -22,6 +22,10 @@ enum LightType_t
 class Light
 {
 public:
+                    Light();
+
+    void            GetLightConstants(Vector4& position, Vector4& direction, Vector4& color) const;
+
     void            SetLightType(LightType_t lightType) { m_LightType = lightType; }
     void            SetPosition(const Vector3& position) { m_Position = position; }
     void            SetDirection(const Vector3& direction) { m_Direction = direction; }
