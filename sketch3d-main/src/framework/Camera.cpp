@@ -3,6 +3,9 @@
 namespace Sketch3D {
 Camera::Camera()
     : m_ConstrainPlane(ConstrainPlane_t::XZ_PLANE)
+    , m_Right(Vector3::RIGHT)
+    , m_Up(Vector3::UP)
+    , m_Look(Vector3::LOOK)
     , m_NeedViewMatrixUpdate(true)
     , m_IsRightHanded(true)
 {
@@ -133,8 +136,6 @@ const Matrix4x4& Camera::GetViewMatrix()
 {
     if (m_NeedViewMatrixUpdate)
     {
-        m_ViewMatrix = Matrix4x4::IDENTITY;
-
         m_ViewMatrix[0][0] = m_Right.x;
         m_ViewMatrix[0][1] = m_Right.y;
         m_ViewMatrix[0][2] = m_Right.z;
