@@ -36,15 +36,13 @@ VS_OUTPUT main(VS_INPUT input)
     float4x4 modelView = mul(viewMatrix, modelMatrix);
     float4x4 mvp = mul(projectionMatrix, modelView);
 
-    // output.position = mul(mvp, float4(input.in_vertex, 1.0));
-    // output.position = float4(mul(modelView, float4(input.in_vertex, 1.0)).xyz, 1.0);
     output.position = mul(mvp, float4(input.in_vertex, 1.0));
 
     float3x3 modelView3x3 = (float3x3)modelView;
     output.normal = normalize(mul(modelView3x3, input.in_normal));
 
-    float3 pos = mul(modelView3x3, input.in_vertex).xyz;
-    output.lightDir = normalize(mul(modelView, float4(5.0, 5.0, -2.0, 1.0)).xyz - pos);
+    float3 pos = mul(modelView, float4(input.in_vertex, 1.0)).xyz;
+    output.lightDir = normalize(mul(viewMatrix, float4(5.0, 5.0, 4.0, 1.0)).xyz - pos);
 
     output.eye = normalize(-pos);
 
