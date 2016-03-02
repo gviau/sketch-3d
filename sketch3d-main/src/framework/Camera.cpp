@@ -133,6 +133,8 @@ const Matrix4x4& Camera::GetViewMatrix()
 {
     if (m_NeedViewMatrixUpdate)
     {
+        m_ViewMatrix = Matrix4x4::IDENTITY;
+
         m_ViewMatrix[0][0] = m_Right.x;
         m_ViewMatrix[0][1] = m_Right.y;
         m_ViewMatrix[0][2] = m_Right.z;
