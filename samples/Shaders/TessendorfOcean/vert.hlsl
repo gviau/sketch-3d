@@ -3,10 +3,9 @@ cbuffer DrawConstants_t : register(b0)
     float4x4 modelMatrix;
     
     float4x4 modelViewProjectionMatrix;
-    float4x4 viewProjectionMatrix;
     float4x4 modelViewMatrix;
 
-    float4x4 inverseTransposeModelViewMatrix;
+    float4x4 transposedInverseModelViewMatrix;
 };
 
 cbuffer OceanConstants_t : register(b1)

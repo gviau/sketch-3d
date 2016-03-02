@@ -29,15 +29,15 @@ class SKETCH_3D_API GPUMatrix4x4
 struct ALIGNED_(16) PassConstants_t {
     GPUMatrix4x4 projectionMatrix;
     GPUMatrix4x4 viewMatrix;
+    GPUMatrix4x4 viewProjectionMatrix;
 };
 
 struct ALIGNED_(16) DrawConstants_t {
     GPUMatrix4x4 modelMatrix;
     GPUMatrix4x4 modelViewProjectionMatrix;
-    GPUMatrix4x4 viewProjectionMatrix;
     GPUMatrix4x4 modelViewMatrix;
 
-    GPUMatrix4x4 inverseTransposeModelViewMatrix;
+    GPUMatrix4x4 transposedInverseModelViewMatrix;
 };
 
 struct ALIGNED_(16) LightConstants_t {
