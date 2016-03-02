@@ -68,6 +68,8 @@ bool RenderDeviceOpenGL::Initialize(const shared_ptr<RenderContext>& renderConte
     GL_CALL( glGenFramebuffers(1, &m_Framebuffer) );
     GL_CALL( glGenRenderbuffers(1, &m_Renderbuffer) );
 
+    CalculatePerspectiveProjectionFOVRightHanded(60.0f, (float)width_ / (float)height_, 0.01f, 1000.0f);
+
     return true;
 }
 

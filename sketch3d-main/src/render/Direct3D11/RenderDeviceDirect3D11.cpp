@@ -106,6 +106,8 @@ bool RenderDeviceDirect3D11::Initialize(const shared_ptr<RenderContext>& renderC
 
     hardwareResourceCreator_ = new HardwareResourceCreatorDirect3D11(device_, context_);
 
+    CalculatePerspectiveProjectionFOVRightHanded(60.0f, (float)width_ / (float)height_, 0.01f, 1000.0f);
+
     return true;
 }
 
