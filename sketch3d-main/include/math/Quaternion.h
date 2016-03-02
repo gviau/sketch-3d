@@ -98,6 +98,14 @@ class SKETCH_3D_API Quaternion
                                              const Vector3& yAxis,
                                              const Vector3& zAxis);
 
+        /**
+         * Sets the Quaternion parts from Euler angles.
+         * @param pitchInRadians The pitch angle in radians
+         * @param yawInRadians The yaw angle in radians
+         * @param rollInRadians The roll angle in radians
+         */
+        void                    MakeFromEulerAngles(float pitchInRadians, float yawInRadians, float rollInRadians);
+
         /** 
          * Constructs the rotation matrix from the quaternion.
          * @parm mat The 3x3 matrix to construct

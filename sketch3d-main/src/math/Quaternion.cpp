@@ -135,6 +135,22 @@ void Quaternion::MakeFromAxes(const Vector3& xAxis, const Vector3& yAxis,
     MakeFromRotationMatrix(mat);
 }
 
+void Quaternion::MakeFromEulerAngles(float pitchInRadians, float yawInRadians, float rollInRadians)
+{
+    float c1 = cosf(yawInRadians * 0.5f);
+    float c2 = cosf(pitchInRadians * 0.5f);
+    float c3 = cosf(rollInRadians * 0.5f);
+
+    float s1 = sinf(yawInRadians * 0.5f);
+    float s2 = sinf(pitchInRadians * 0.5f);
+    float s3 = sinf(rollInRadians * 0.5f);
+
+    w = c1 * c2 * c3 - s1 * s2 * s3;
+    x = s1 * s2 * c3 + c1 * c2 * s3;
+    y = s1 * c2 * s3 + c1 * s2 * c3;
+    z = c1 * s2 * s3 - s1 * c2 * s3;
+}
+
 void Quaternion::ToRotationMatrix(Matrix3x3& mat) const
 {
 	float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
