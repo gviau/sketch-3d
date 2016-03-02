@@ -40,6 +40,8 @@ protected:
     virtual string  GetFragmentShaderInputStructureVariableName() { return "input"; }
     virtual string  GetFragmentShaderOutputStructureVariableName() { return "output"; }
 
+    string          GetTabs(int tabLevel) const;
+
     bool            m_HasColors;
     bool            m_HasNormals;
     bool            m_HasUVs;

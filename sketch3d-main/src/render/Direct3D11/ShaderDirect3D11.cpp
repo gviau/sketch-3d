@@ -61,7 +61,7 @@ bool FragmentShaderDirect3D11::InitializeFromSource(const string& source) {
     if (FAILED(hr)) {
         if (error != nullptr) {
             char* errorMsg = (char*)error->GetBufferPointer();
-            Logger::GetInstance()->Error("Couldn't create Vertex Shader: " + string(errorMsg, error->GetBufferSize()));
+            Logger::GetInstance()->Error("Couldn't create Fragment Shader: " + string(errorMsg, error->GetBufferSize()));
         }
 
         return false;

@@ -1,12 +1,14 @@
 #include "framework/Mesh.h"
 
 #include "framework/Material.h"
+#include "framework/MaterialCodeGenerator.h"
 #include "framework/SubMesh.h"
 
 #include "render/Buffer.h"
 #include "render/HardwareResourceCreator.h"
 #include "render/RenderDevice.h"
 #include "render/SamplerState.h"
+#include "render/Shader.h"
 #include "render/Texture.h"
 #include "render/TextureMap.h"
 
@@ -45,7 +47,7 @@ void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuf
 VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh);
 
 bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterial, MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents);
-void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial);
+void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial, MaterialCodeGenerator* materialCodeGenerator, VertexFormatType_t vertexFormatType);
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState);
 
 // Create a single instance of an Assimp importer to load meshes from files
@@ -211,7 +213,7 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
                 {
                     shared_ptr<Material> material(new Material(renderDevice));
 
-                    LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material);
+                    LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material, materialCodeGenerator, vertexBuffer->GetVertexFormatType());
 
                     if (materialIndex < createdMaterials.size())
                     {
@@ -328,7 +330,8 @@ void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuf
     }
 }
 
-void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial)
+void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial,
+                  MaterialCodeGenerator* materialCodeGenerator, VertexFormatType_t vertexFormatType)
 {
     aiColor3D ambientColor(0.0f, 0.0f, 0.0f);
     material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
