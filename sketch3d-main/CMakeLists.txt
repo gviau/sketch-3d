@@ -9,9 +9,13 @@ set (FRAMEWORK_SOURCE_FILES
 	src/framework/Camera.cpp
 	src/framework/DeferredRenderingMaterialCodeGenerator.cpp
 	src/framework/ForwardRenderingMaterialCodeGenerator.cpp
+	src/framework/ForwardRenderingPipeline.cpp
+	src/framework/Light.cpp
 	src/framework/Material.cpp
 	src/framework/MaterialCodeGenerator.cpp
 	src/framework/Mesh.cpp
+	src/framework/RenderingPipeline.cpp
+	src/framework/Scene.cpp
 	src/framework/SimpleObject.cpp
 	src/framework/SubMesh.cpp
 	src/framework/VisualNode.cpp
@@ -21,9 +25,14 @@ set (FRAMEWORK_HEADER_FILES
 	include/framework/Camera.h
 	include/framework/DeferredRenderingMaterialCodeGenerator.h
 	include/framework/ForwardRenderingMaterialCodeGenerator.h
+	include/framework/ForwardRenderingPipeline.h
+	include/framework/Light.h
 	include/framework/Material.h
 	include/framework/MaterialCodeGenerator.h
 	include/framework/Mesh.h
+	include/framework/RenderingPipeline.h
+	include/framework/RenderingPipelineContext.h
+	include/framework/Scene.h
 	include/framework/SimpleObject.h
 	include/framework/SubMesh.h
 	include/framework/VisualNode.h
