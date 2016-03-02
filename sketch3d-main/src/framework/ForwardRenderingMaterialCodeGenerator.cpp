@@ -20,7 +20,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& sh
 
     if (m_HasNormals)
     {
-        shaderCode += tabLevel + outputVariable + ".normal = mul((float3x3)inverseTransposeModelViewMatrix, " + inputVariable + ".in_normal);\n";
+        shaderCode += tabLevel + outputVariable + ".normal = mul((float3x3)transposedInverseModelViewMatrix, " + inputVariable + ".in_normal);\n";
     }
 
     if (m_Has2UVs)
