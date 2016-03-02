@@ -56,15 +56,15 @@ void MaterialCodeGenerator::WriteVertexShaderConstantBuffers(string& shaderCode)
         "cbuffer PassConstants_t : register(b0) {\n"
         "    float4x4 projectionMatrix;\n"
         "    float4x4 viewMatrix;\n"
+        "    float4x4 viewProjectionMatrix;\n"
         "};\n";
 
     shaderCode +=
         "cbuffer DrawConstants_t : register(b1) {\n"
         "    float4x4 modelMatrix;\n"
         "    float4x4 modelViewProjectionMatrix;\n"
-        "    float4x4 viewProjectionMatrix;\n"
         "    float4x4 modelViewMatrix;\n"
-        "    float4x4 inverseTransposeModelViewMatrix;\n"
+        "    float4x4 transposedInverseModelViewMatrix;\n"
         "};\n";
 }
 
@@ -225,6 +225,7 @@ void MaterialCodeGenerator::WriteFragmentShaderConstantBuffers(string& shaderCod
         "cbuffer PassConstants_t : register(b0) {\n"
         "    float4x4 projectionMatrix;\n"
         "    float4x4 viewMatrix;\n"
+        "    float4x4 viewProjectionMatrix;\n"
         "};\n";
 
     shaderCode +=
