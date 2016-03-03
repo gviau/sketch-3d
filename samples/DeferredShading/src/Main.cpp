@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 
     // Load the mesh
     shared_ptr<Mesh> bobMesh;
-    if (!LoadMeshFromFileWithMaterial("Media/Bob.md5mesh", renderDevice, bobMesh, forwardRenderingPipeline.GetMaterialCodeGenerator()))
+    if (!LoadMeshFromFileWithMaterial("Media/hellknight.md5mesh", renderDevice, bobMesh, forwardRenderingPipeline.GetMaterialCodeGenerator()))
     {
         Logger::GetInstance()->Error("Couldn't load mesh with material");
         return 1;
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     shared_ptr<VisualNode> bobNode(new VisualNode);
     bobNode->SetMesh(bobMesh);
-    bobNode->SetPosition(0.0f, 0.0f, -150.0f);
+    bobNode->SetPosition(0.0f, -50.0f, -150.0f);
 
     scene.GetRootNode().AddChild(bobNode);
 
@@ -77,8 +77,8 @@ int main(int argc, char** argv) {
 
     shared_ptr<Light> light(new Light);
     light->SetLightType(LightType_t::Point);
-    light->SetPosition(Vector3(60.0f, 35.0f, -150.0f));
-    light->SetColor(Vector4(0.2f, 0.2f, 0.8f));
+    light->SetPosition(Vector3(60.0f, 35.0f, -120.0f));
+    // light->SetColor(Vector4(0.2f, 0.2f, 0.8f));
     lights.push_back(light);
 
     scene.SetLights(lights);

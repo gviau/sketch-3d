@@ -81,7 +81,7 @@ void MaterialCodeGenerator::WriteVertexShaderConstantBuffers(string& shaderCode)
         "    float4x4 projectionMatrix;\n"
         "    float4x4 viewMatrix;\n"
         "    float4x4 viewProjectionMatrix;\n"
-        "};\n";
+        "};\n\n";
 
     shaderCode +=
         "cbuffer DrawConstants_t : register(b1) {\n"
@@ -89,7 +89,7 @@ void MaterialCodeGenerator::WriteVertexShaderConstantBuffers(string& shaderCode)
         "    float4x4 modelViewProjectionMatrix;\n"
         "    float4x4 modelViewMatrix;\n"
         "    float4x4 transposedInverseModelViewMatrix;\n"
-        "};\n";
+        "};\n\n";
 }
 
 void MaterialCodeGenerator::WriteVertexShaderInputs(VertexFormatType_t vertexFormatType, string& shaderCode)
@@ -205,7 +205,12 @@ void MaterialCodeGenerator::WriteVertexShaderOutputs(string& shaderCode)
     unsigned int semanticIndex = 0;
     if (m_HasNormals)
     {
-        shaderCode += "    float3 normal : TEXCOORD" + to_string(semanticIndex++) +";\n";
+        shaderCode += "    float3 normal : TEXCOORD" + to_string(semanticIndex++) + ";\n";  
+    }
+
+    if (m_HasTangents)
+    {
+        shaderCode += "    float3 tangent : TEXCOORD" + to_string(semanticIndex++) + ";\n";
     }
 
     if (m_Has2UVs)
@@ -245,19 +250,21 @@ void MaterialCodeGenerator::WriteFragmentShaderConstantBuffers(string& shaderCod
         shaderCode += "Texture2D normalTexture : register(t3);\n";
     }
 
+    shaderCode += "\n";
+
     shaderCode +=
         "cbuffer MaterialConstants_t : register(b0) {\n"
         "    float4 ambientColor;\n"
         "    float4 diffuseColor;\n"
         "    float4 specularColorAndPower;\n"
-        "};\n";
+        "};\n\n";
 
     shaderCode +=
         "cbuffer PassConstants_t : register(b1) {\n"
         "    float4x4 projectionMatrix;\n"
         "    float4x4 viewMatrix;\n"
         "    float4x4 viewProjectionMatrix;\n"
-        "};\n";
+        "};\n\n";
 
     string numLightsString = to_string(Sketch3D::MAX_NUM_LIGHTS);
     shaderCode +=
@@ -266,7 +273,7 @@ void MaterialCodeGenerator::WriteFragmentShaderConstantBuffers(string& shaderCod
         "    float4 lightPositions[" + numLightsString + "];\n"
         "    float4 lightDirections[" + numLightsString + "];\n"
         "    float4 lightColors[" + numLightsString + "];\n"
-        "};\n";
+        "};\n\n";
 }
      
 void MaterialCodeGenerator::WriteFragmentShaderInputs(string& shaderCode)

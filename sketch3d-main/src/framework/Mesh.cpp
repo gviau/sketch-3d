@@ -46,6 +46,8 @@ void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vert
 void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuffer);
 VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh);
 
+bool CheckIfMeshMaterialHasNormalMap(const aiScene* scene);
+
 bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterial, MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents);
 void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial, MaterialCodeGenerator* materialCodeGenerator, VertexFormatType_t vertexFormatType);
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState);
@@ -154,6 +156,12 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
     {
         Logger::GetInstance()->Error("Couldn't load mesh " + filename);
         return false;
+    }
+
+    // If the meshes' materials has a normal map and there is no tangents in the mesh, then we have to calculate them
+    if (loadMaterials && CheckIfMeshMaterialHasNormalMap(scene))
+    {
+        calculateTangents = true;
     }
 
     // Little hack to generate tangents if they weren't present and if we asked for it
@@ -286,7 +294,7 @@ void FillVertexBuffer(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertex
     case VertexFormatType_t::Pos_UV_Normal:                     FillVertexBuffer_Pos_UV_Normal(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_UV_Normal_Tangent:             FillVertexBuffer_Pos_UV_Normal_Tangent(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_UV_Normal_4_Bones:             FillVertexBuffer_Pos_UV_Normal_4_Bones(mesh, vertexBuffer, VertexFormatType_t::Pos_UV_Normal); break;
-    case VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones:     FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones:     FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(mesh, vertexBuffer, VertexFormatType_t::Pos_UV_Normal_Tangent); break;
     case VertexFormatType_t::Pos_UV_4_Bones:                    FillVertexBuffer_Pos_UV_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_Normal_4_Bones:                FillVertexBuffer_Pos_Normal_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
     case VertexFormatType_t::Pos_2_UV:                          FillVertexBuffer_Pos_2_UV(mesh, vertexBuffer, vertexFormatType); break;
@@ -590,6 +598,41 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
     // Shouldn't happen
     Logger::GetInstance()->Error("Couldn't find a valid vertex format");
     return VertexFormatType_t::Pos;
+}
+
+bool CheckIfMeshMaterialHasNormalMap(const aiScene* scene)
+{
+    if (!scene->HasMaterials())
+    {
+        return false;
+    }
+
+    queue<const aiNode*> nodes;
+    nodes.push(scene->mRootNode);
+
+    while (!nodes.empty())
+    {
+        const aiNode* currentNode = nodes.front();
+        nodes.pop();
+
+        for (size_t i = 0; i < currentNode->mNumMeshes; i++)
+        {
+            const aiMesh* mesh = scene->mMeshes[currentNode->mMeshes[i]];
+            const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+            if (material->GetTextureCount(aiTextureType_NORMALS) > 0)
+            {
+                return true;
+            }
+        }
+
+        for (size_t i = 0; i < currentNode->mNumChildren; i++)
+        {
+            nodes.push(currentNode->mChildren[i]);
+        }
+    }
+
+    return false;
 }
 
 void FillVertexBuffer_Pos(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
