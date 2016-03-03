@@ -394,11 +394,7 @@ void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMate
 
     float specularPower = 0.0f;
     material->Get(AI_MATKEY_SHININESS, specularPower);
-    
-    if (fabs(specularPower) > EPSILON)
-    {
-        newMaterial->SetSpecularPower(specularPower);
-    }
+    newMaterial->SetSpecularPower(specularPower);
 
     shared_ptr<Texture2D> ambientTexture;
     shared_ptr<SamplerState> ambientSamplerState;

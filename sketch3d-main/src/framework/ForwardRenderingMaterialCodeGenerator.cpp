@@ -177,7 +177,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
     shaderCode += tabLevel1 + "}\n\n";
 
     shaderCode += tabLevel1 + outputVariable + ".color.xyz += diffuseContribution;\n";
-    shaderCode += tabLevel1 + outputVariable + ".color.xyz += specularContribution;\n";
+    shaderCode += tabLevel1 + outputVariable + ".color.xyz += specularContribution * min(1.0, specularColorAndPower.w);\n";
 
     shaderCode += tabLevel1 + outputVariable + ".color.w = 1.0;\n\n";
     shaderCode += tabLevel1 + "return " + outputVariable + ";\n";
