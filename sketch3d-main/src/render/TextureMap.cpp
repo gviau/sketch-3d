@@ -92,10 +92,10 @@ bool LoadTextureMapFromFile(const string& filename, shared_ptr<TextureMap>& text
         {
             if (bytesPerPixel == 4)
             {
-                data[idx    ] = textureData[textureIdx + 3];
-                data[idx + 1] = textureData[textureIdx + 2];
-                data[idx + 2] = textureData[textureIdx + 1];
-                data[idx + 3] = textureData[textureIdx    ];
+                data[idx    ] = textureData[textureIdx + 2];
+                data[idx + 1] = textureData[textureIdx + 1];
+                data[idx + 2] = textureData[textureIdx    ];
+                data[idx + 3] = textureData[textureIdx + 3];
             }
             else if (bytesPerPixel == 3)
             {
