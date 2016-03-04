@@ -117,6 +117,86 @@ void Mesh::SetMaterialForAllSubMeshes(const shared_ptr<Material>& material)
     }
 }
 
+void Mesh::SetAmbientColorForAllSubMeshes(const Vector3& ambientColor)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (subMesh == nullptr)
+        {
+            continue;
+        }
+
+        Material* material = pSubMesh->GetMaterial().get();
+        if (material == nullptr)
+        {
+            continue;
+        }
+
+        material->SetAmbientColor(ambientColor);
+    }
+}
+
+void Mesh::SetDiffuseColorForAllSubMeshes(const Vector3& diffuseColor)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (subMesh == nullptr)
+        {
+            continue;
+        }
+
+        Material* material = pSubMesh->GetMaterial().get();
+        if (material == nullptr)
+        {
+            continue;
+        }
+
+        material->SetDiffuseColor(diffuseColor);
+    }
+}
+
+void Mesh::SetSpecularColorForAllSubMeshes(const Vector3& specularColor)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (subMesh == nullptr)
+        {
+            continue;
+        }
+
+        Material* material = pSubMesh->GetMaterial().get();
+        if (material == nullptr)
+        {
+            continue;
+        }
+
+        material->SetSpecularColor(specularColor);
+    }
+}
+
+void Mesh::SetSpecularPowerForAllSubMeshes(float power)
+{
+    for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)
+    {
+        SubMesh* pSubMesh = subMesh.get();
+        if (subMesh == nullptr)
+        {
+            continue;
+        }
+
+        Material* material = pSubMesh->GetMaterial().get();
+        if (material == nullptr)
+        {
+            continue;
+        }
+
+        material->SetSpecularPower(power);
+    }
+}
+
 const vector<shared_ptr<SubMesh>>& Mesh::GetSubMeshes() const
 {
     return m_SubMeshes;

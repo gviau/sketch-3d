@@ -1,11 +1,19 @@
 #include "framework/VisualNode.h"
 
+#include "framework/Material.h"
+#include "framework/Mesh.h"
+#include "framework/SubMesh.h"
+
 namespace Sketch3D
 {
 VisualNode::VisualNode()
     : m_Parent(nullptr)
     , m_NeedsTransformationMatrixUpdate(false)
     , m_Scale(1.0f, 1.0f, 1.0f)
+    , m_AmbientColor(0.0f, 0.0f, 0.0f)
+    , m_DiffuseColor(1.0f, 1.0f, 1.0f)
+    , m_SpecularColor(1.0f, 1.0f, 1.0f)
+    , m_SpecularPower(0.0f)
 {
 }
 

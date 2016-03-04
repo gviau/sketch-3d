@@ -18,19 +18,16 @@ Material::Material(const shared_ptr<RenderDevice>& renderDevice)
     , m_SpecularColor(1.0f, 1.0f, 1.0f)
     , m_SpecularPower(0.0f)
     , m_MaterialConstantsBufferSlot(0)
+    , m_UpdateMaterialConstants(false)
 {
 }
 
 void Material::Initialize(VertexFormatType_t vertexFormatType, MaterialCodeGenerator* materialCodeGenerator)
 {
-    MaterialConstants_t materialConstants;
-    materialConstants.ambientColor = m_AmbientColor;
-    materialConstants.diffuseColor = m_DiffuseColor;
-    materialConstants.specularColorAndPower = m_SpecularColor;
-    materialConstants.specularColorAndPower.w = m_SpecularPower;
- 
+    m_UpdateMaterialConstants = true;
+
     m_MaterialConstants = m_RenderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
-    m_MaterialConstants->Initialize(&materialConstants, false, false, sizeof(MaterialConstants_t));
+    m_MaterialConstants->Initialize(nullptr, true, false, sizeof(MaterialConstants_t));
 
     if (materialCodeGenerator != nullptr)
     {
@@ -65,6 +62,20 @@ bool Material::Apply() const
     if (renderDevice == nullptr)
     {
         return false;
+    }
+
+    if (m_UpdateMaterialConstants)
+    {
+        MaterialConstants_t* materialConstants = (MaterialConstants_t*)m_MaterialConstants->Map(MapFlag_t::WRITE_DISCARD);
+
+        materialConstants->ambientColor = m_AmbientColor;
+        materialConstants->diffuseColor = m_DiffuseColor;
+        materialConstants->specularColorAndPower = m_SpecularColor;
+        materialConstants->specularColorAndPower.w = m_SpecularPower;
+
+        m_MaterialConstants->Unmap();
+ 
+        m_UpdateMaterialConstants = false;
     }
 
     // Set the shaders to use
@@ -122,21 +133,25 @@ void Material::SetFragmentShader(const shared_ptr<FragmentShader>& fragmentShade
 void Material::SetAmbientColor(const Vector3& color)
 {
     m_AmbientColor = color;
+    m_UpdateMaterialConstants = true;
 }
 
 void Material::SetDiffuseColor(const Vector3& color)
 {
     m_DiffuseColor = color;
+    m_UpdateMaterialConstants = true;
 }
 
 void Material::SetSpecularColor(const Vector3& color)
 {
     m_SpecularColor = color;
+    m_UpdateMaterialConstants = true;
 }
 
 void Material::SetSpecularPower(float power)
 {
     m_SpecularPower = power;
+    m_UpdateMaterialConstants = true;
 }
 
 void Material::SetAmbientTexture(const shared_ptr<Texture2D>& texture)

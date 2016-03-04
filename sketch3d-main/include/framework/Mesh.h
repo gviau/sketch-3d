@@ -38,6 +38,10 @@ class SKETCH_3D_API Mesh
                                                                               size_t materialConstantsSlot);
 
         void                                SetMaterialForAllSubMeshes(const shared_ptr<Material>& material);
+        void                                SetAmbientColorForAllSubMeshes(const Vector3& ambientColor);
+        void                                SetDiffuseColorForAllSubMeshes(const Vector3& diffuseColor);
+        void                                SetSpecularColorForAllSubMeshes(const Vector3& specularColor);
+        void                                SetSpecularPowerForAllSubMeshes(float power);
 
         const vector<shared_ptr<SubMesh>>&  GetSubMeshes() const;
         shared_ptr<SubMesh>                 GetSubMesh(size_t index) const;

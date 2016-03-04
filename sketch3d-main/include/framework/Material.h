@@ -91,6 +91,8 @@ class SKETCH_3D_API Material {
         vector<shared_ptr<ConstantBuffer>>  m_FragmentShaderConstantBuffers;
         size_t                              m_MaterialConstantsBufferSlot;
         shared_ptr<ConstantBuffer>          m_MaterialConstants;
+
+        mutable bool                        m_UpdateMaterialConstants;
 };
 
 }

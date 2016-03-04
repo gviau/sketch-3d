@@ -45,6 +45,17 @@ public:
     void                                    Scale(const Vector3& scaling);
     void                                    Scale(float x, float y, float z);
 
+    // Used to access the material constants for every submeshes
+    void                                    SetAmbientColor(const Vector3& ambientColor) { m_AmbientColor = ambientColor; }
+    void                                    SetDiffuseColor(const Vector3& diffuseColor) { m_DiffuseColor = diffuseColor; }
+    void                                    SetSpecularColor(const Vector3& specularColor) { m_SpecularColor = specularColor; }
+    void                                    SetSpecularPower(float power) { m_SpecularPower = power; }
+
+    const Vector3&                          GetAmbientColor() const { return m_AmbientColor; }
+    const Vector3&                          GetDiffuseColor() const { return m_DiffuseColor; }
+    const Vector3&                          GetSpecularColor() const { return m_SpecularColor; }
+    float                                   GetSpecularPower() const { return m_SpecularPower; }
+
     const Vector3&                          GetPosition() const { return m_Position; }
     const Quaternion&                       GetOrientation() const { return m_Orientation; }
     const Vector3&                          GetScale() const { return m_Scale; }
@@ -63,6 +74,11 @@ private:
     Vector3                                 m_Position;
     Quaternion                              m_Orientation;
     Vector3                                 m_Scale;
+
+    Vector3                                 m_AmbientColor;
+    Vector3                                 m_DiffuseColor;
+    Vector3                                 m_SpecularColor;
+    float                                   m_SpecularPower;
 
     bool                                    m_NeedsTransformationMatrixUpdate;
     Matrix4x4                               m_ModelMatrix;

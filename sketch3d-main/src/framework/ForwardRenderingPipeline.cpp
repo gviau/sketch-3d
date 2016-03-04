@@ -144,6 +144,11 @@ void ForwardRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene
         meshToDraw->SetConstantBuffersForAllMaterials(vertexShaderConstantBuffers, fragmentShaderConstantBuffers,
                                                       m_FragmentShaderConstantBuffersSlots[typeid(MaterialConstants_t).name()]);
 
+        meshToDraw->SetAmbientColorForAllSubMeshes(visualNode->GetAmbientColor());
+        meshToDraw->SetDiffuseColorForAllSubMeshes(visualNode->GetDiffuseColor());
+        meshToDraw->SetSpecularColorForAllSubMeshes(visualNode->GetSpecularColor());
+        meshToDraw->SetSpecularPowerForAllSubMeshes(visualNode->GetSpecularPower());
+
         // Draw the mesh
         meshToDraw->Draw(m_RenderDevice);
     }
