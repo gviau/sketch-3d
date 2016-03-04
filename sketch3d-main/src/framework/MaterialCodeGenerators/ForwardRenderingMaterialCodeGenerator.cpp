@@ -1,4 +1,4 @@
-#include "framework/ForwardRenderingMaterialCodeGenerator.h"
+#include "framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h"
 
 namespace Sketch3D
 {

@@ -2,7 +2,7 @@
 #include <math/Vector3.h>
 
 #include <framework/Camera.h>
-#include <framework/ForwardRenderingPipeline.h>
+#include <framework/RenderingPipelines/ForwardRenderingPipeline.h>
 #include <framework/Light.h>
 #include <framework/Mesh.h>
 #include <framework/Scene.h>

@@ -7,9 +7,6 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib/")
 # Framework files
 set (FRAMEWORK_SOURCE_FILES
 	src/framework/Camera.cpp
-	src/framework/DeferredRenderingMaterialCodeGenerator.cpp
-	src/framework/ForwardRenderingMaterialCodeGenerator.cpp
-	src/framework/ForwardRenderingPipeline.cpp
 	src/framework/Light.cpp
 	src/framework/Material.cpp
 	src/framework/MaterialCodeGenerator.cpp
@@ -23,9 +20,6 @@ set (FRAMEWORK_SOURCE_FILES
 
 set (FRAMEWORK_HEADER_FILES
 	include/framework/Camera.h
-	include/framework/DeferredRenderingMaterialCodeGenerator.h
-	include/framework/ForwardRenderingMaterialCodeGenerator.h
-	include/framework/ForwardRenderingPipeline.h
 	include/framework/Light.h
 	include/framework/Material.h
 	include/framework/MaterialCodeGenerator.h
@@ -39,6 +33,28 @@ set (FRAMEWORK_HEADER_FILES
 )
 source_group("Source Files\\framework" FILES ${FRAMEWORK_SOURCE_FILES})
 source_group("Header Files\\framework" FILES ${FRAMEWORK_HEADER_FILES})
+
+set (FRAMEWORK_MATERIAL_CODE_GENERATOR_SOURCE_FILES
+	src/framework/MaterialCodeGenerators/DeferredRenderingMaterialCodeGenerator.cpp
+	src/framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.cpp
+)
+
+set (FRAMEWORK_MATERIAL_CODE_GENERATOR_HEADER_FILES
+	include/framework/MaterialCodeGenerators/DeferredRenderingMaterialCodeGenerator.h
+	include/framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h
+)
+source_group("Source Files\\framework\\MaterialCodeGenerators" FILES ${FRAMEWORK_MATERIAL_CODE_GENERATOR_SOURCE_FILES})
+source_group("Header Files\\framework\\MaterialCodeGenerators" FILES ${FRAMEWORK_MATERIAL_CODE_GENERATOR_HEADER_FILES})
+
+set (FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES
+	src/framework/RenderingPipelines/ForwardRenderingPipeline.cpp
+)
+
+set (FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES
+	include/framework/RenderingPipelines/ForwardRenderingPipeline.h
+)
+source_group("Source Files\\framework\\RenderingPipelines" FILES ${FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES})
+source_group("Header Files\\framework\\RenderingPipelines" FILES ${FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES})
 	
 # Math files
 set (MATH_SOURCE_FILES
@@ -268,6 +284,8 @@ add_library(
     ${LIBRARY_TYPE}
 	
 	${FRAMEWORK_SOURCE_FILES}
+	${FRAMEWORK_MATERIAL_CODE_GENERATOR_SOURCE_FILES}
+	${FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES}
 
     ${MATH_SOURCE_FILES}
 	
@@ -280,6 +298,8 @@ add_library(
 	${SYSTEM_PLATFORM_SOURCE_FILES}
 	
 	${FRAMEWORK_HEADER_FILES}
+	${FRAMEWORK_MATERIAL_CODE_GENERATOR_HEADER_FILES}
+	${FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES}
 	
     ${MATH_HEADER_FILES}
 	

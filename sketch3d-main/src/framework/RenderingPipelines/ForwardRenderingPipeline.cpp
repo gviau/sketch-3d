@@ -1,7 +1,7 @@
-#include "framework/ForwardRenderingPipeline.h"
+#include "framework/RenderingPipelines/ForwardRenderingPipeline.h"
 
 #include "framework/Camera.h"
-#include "framework/ForwardRenderingMaterialCodeGenerator.h"
+#include "framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h"
 #include "framework/Light.h"
 #include "framework/Material.h"
 #include "framework/Mesh.h"
