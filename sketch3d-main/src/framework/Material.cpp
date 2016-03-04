@@ -16,7 +16,7 @@ Material::Material(const shared_ptr<RenderDevice>& renderDevice)
     , m_AmbientColor(Vector3::ZERO)
     , m_DiffuseColor(1.0f, 1.0f, 1.0f)
     , m_SpecularColor(1.0f, 1.0f, 1.0f)
-    , m_SpecularPower(32.0f)
+    , m_SpecularPower(0.0f)
     , m_MaterialConstantsBufferSlot(0)
 {
 }
