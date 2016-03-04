@@ -47,10 +47,12 @@ source_group("Source Files\\framework\\MaterialCodeGenerators" FILES ${FRAMEWORK
 source_group("Header Files\\framework\\MaterialCodeGenerators" FILES ${FRAMEWORK_MATERIAL_CODE_GENERATOR_HEADER_FILES})
 
 set (FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES
+	src/framework/RenderingPipelines/DeferredRenderingPipeline.cpp
 	src/framework/RenderingPipelines/ForwardRenderingPipeline.cpp
 )
 
 set (FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES
+	include/framework/RenderingPipelines/DeferredRenderingPipeline.h
 	include/framework/RenderingPipelines/ForwardRenderingPipeline.h
 )
 source_group("Source Files\\framework\\RenderingPipelines" FILES ${FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES})

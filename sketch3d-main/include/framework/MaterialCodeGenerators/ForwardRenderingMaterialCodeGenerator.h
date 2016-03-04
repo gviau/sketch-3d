@@ -8,8 +8,8 @@ namespace Sketch3D
 class ForwardRenderingMaterialCodeGenerator : public MaterialCodeGenerator
 {
 protected:
-    virtual void    WriteVertexShaderMainBody(string& shaderCode);
-    virtual void    WriteFragmentShaderMainBody(string& shaderCode);
+    virtual void    WriteVertexShaderMainBody(string& shaderCode) override;
+    virtual void    WriteFragmentShaderMainBody(string& shaderCode) override;
 };
 }
 

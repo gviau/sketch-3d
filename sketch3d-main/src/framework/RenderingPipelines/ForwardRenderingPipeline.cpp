@@ -1,11 +1,12 @@
 #include "framework/RenderingPipelines/ForwardRenderingPipeline.h"
 
 #include "framework/Camera.h"
-#include "framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h"
 #include "framework/Light.h"
 #include "framework/Material.h"
 #include "framework/Mesh.h"
 #include "framework/Scene.h"
+
+#include "framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h"
 
 #include "render/Buffer.h"
 #include "render/ConstantBuffers.h"
@@ -24,7 +25,6 @@ ForwardRenderingPipeline::ForwardRenderingPipeline(const shared_ptr<RenderContex
 
 ForwardRenderingPipeline::~ForwardRenderingPipeline()
 {
-    delete m_MaterialCodeGenerator;
 }
 
 bool ForwardRenderingPipeline::Initialize()

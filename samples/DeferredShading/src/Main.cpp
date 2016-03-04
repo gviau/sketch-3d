@@ -2,7 +2,7 @@
 #include <math/Vector3.h>
 
 #include <framework/Camera.h>
-#include <framework/RenderingPipelines/ForwardRenderingPipeline.h>
+#include <framework/RenderingPipelines/DeferredRenderingPipeline.h>
 #include <framework/Light.h>
 #include <framework/Mesh.h>
 #include <framework/Scene.h>
@@ -49,16 +49,16 @@ int main(int argc, char** argv) {
     }
     renderDevice->Initialize(renderContext);
 
-    ForwardRenderingPipeline forwardRenderingPipeline(renderContext, renderDevice);
-    if (!forwardRenderingPipeline.Initialize())
+    DeferredRenderingPipeline deferredRenderingPipeline(renderContext, renderDevice);
+    if (!deferredRenderingPipeline.Initialize())
     {
-        Logger::GetInstance()->Error("Couldn't initialize the forward rendering pipeline");
+        Logger::GetInstance()->Error("Couldn't initialize the deferred rendering pipeline");
         return 1;
     }
 
     // Load the mesh
     shared_ptr<Mesh> bobMesh;
-    if (!LoadMeshFromFileWithMaterial("Media/hellknight.md5mesh", renderDevice, bobMesh, forwardRenderingPipeline.GetMaterialCodeGenerator()))
+    if (!LoadMeshFromFileWithMaterial("Media/hellknight.md5mesh", renderDevice, bobMesh, deferredRenderingPipeline.GetMaterialCodeGenerator()))
     {
         Logger::GetInstance()->Error("Couldn't load mesh with material");
         return 1;
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
 
         bobNode->Yaw(0.001f);
 
-        forwardRenderingPipeline.RenderSceneFromCamera(camera, scene);
+        deferredRenderingPipeline.RenderSceneFromCamera(camera, scene);
 
         /*
         spiderNode.Yaw(0.001f);

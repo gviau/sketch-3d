@@ -16,6 +16,7 @@ RenderingPipeline::RenderingPipeline(const shared_ptr<RenderContext>& renderCont
 
 RenderingPipeline::~RenderingPipeline()
 {
+    delete m_MaterialCodeGenerator;
 }
 
 void RenderingPipeline::ConstructRenderingPipelineContext(Camera& camera, const Scene& scene, RenderingPipelineContext& renderingPipelineContext)
