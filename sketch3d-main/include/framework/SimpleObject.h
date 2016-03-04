@@ -11,6 +11,8 @@ class MaterialCodeGenerator;
 class Mesh;
 class RenderDevice;
 
+extern shared_ptr<Mesh> g_FullscreenQuad;
+
 extern shared_ptr<Mesh> g_UnitCubeMesh;
 extern shared_ptr<Mesh> g_UnitSphereMesh;
 

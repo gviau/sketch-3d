@@ -13,9 +13,14 @@
 namespace Sketch3D
 {
 
+bool s_IsInitialized = false;
+
+shared_ptr<Mesh> g_FullscreenQuad;
+
 shared_ptr<Mesh> g_UnitCubeMesh;
 shared_ptr<Mesh> g_UnitSphereMesh;
 
+void CreateFullscreenQuad(const shared_ptr<RenderDevice>& renderDevice);
 void CreateUnitCube(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material);
 void CreateUnitSphere(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material);
 
@@ -26,11 +31,69 @@ void InitializeSimpleObjects(const shared_ptr<RenderDevice>& renderDevice, Mater
         return;
     }
 
+    if (s_IsInitialized)
+    {
+        return;
+    }
+
+    s_IsInitialized = true;
+
     shared_ptr<Material> material(new Material(renderDevice));
     material->Initialize(VertexFormatType_t::Pos_Normal, materialCodeGenerator);
 
+    CreateFullscreenQuad(renderDevice);
     CreateUnitCube(renderDevice, material);
     CreateUnitSphere(renderDevice, material);
+}
+
+void CreateFullscreenQuad(const shared_ptr<RenderDevice>& renderDevice)
+{
+    g_FullscreenQuad.reset(new Mesh);
+
+    Vertex_Pos_t vertices[4];
+    vertices[0].position = Vector3(-1.0f, -1.0f, 0.0f);
+    vertices[1].position = Vector3(-1.0f,  1.0f, 0.0f);
+    vertices[2].position = Vector3( 1.0f,  1.0f, 0.0f);
+    vertices[3].position = Vector3( 1.0f, -1.0f, 0.0f);
+
+    unsigned short indices[6];
+    indices[0] = 0; indices[1] = 2; indices[2] = 1;
+    indices[3] = 0; indices[4] = 3; indices[5] = 2;
+
+    shared_ptr<VertexBuffer> vertexBuffer = renderDevice->GetHardwareResourceCreator()->CreateVertexBuffer();
+    shared_ptr<IndexBuffer> indexBuffer = renderDevice->GetHardwareResourceCreator()->CreateIndexBuffer();
+    vertexBuffer->Initialize(vertices, false, false, VertexFormatType_t::Pos, 4);
+    indexBuffer->Initialize(indices, false, false, IndexFormat_t::INT_2_BYTES, 6);
+
+    string vertexShaderCode =
+        "struct VS_INPUT {"
+            "float3 in_vertex : POSITION;"
+        "};"
+
+        "struct VS_OUTPUT {"
+            "float4 position : SV_POSITION;"
+            "float2 uv : TEXCOORD;"
+        "};"
+
+        "VS_OUTPUT main(VS_INPUT input) {"
+            "VS_OUTPUT output;"
+            "output.position = float4(input.in_vertex.xy, 0.0, 1.0);"
+            "output.uv = input.in_vertex.xy * 0.5 + 0.5;"
+            "return output;"
+        "}";
+
+    shared_ptr<VertexShader> vertexShader = renderDevice->GetHardwareResourceCreator()->CreateVertexShader();
+    vertexShader->InitializeFromSource(vertexShaderCode);
+
+    shared_ptr<Material> material(new Material(renderDevice));
+    material->SetVertexShader(vertexShader);
+
+    shared_ptr<SubMesh> subMesh(new SubMesh);
+    subMesh->SetVertexBuffer(vertexBuffer);
+    subMesh->SetIndexBuffer(indexBuffer);
+    subMesh->SetMaterial(material);
+
+    g_FullscreenQuad->AddSubMesh(subMesh);
 }
 
 void CreateUnitCube(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material)
