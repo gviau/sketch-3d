@@ -93,20 +93,30 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
     shaderCode += "\n";
 
     // Diffuse contribution
-    shaderCode += tabLevel1 + "float3 diffuseContribution = diffuseColor.xyz;\n";
+    shaderCode += tabLevel1 + "float3 albedo = float3(1.0, 1.0, 1.0);\n";
+    shaderCode += tabLevel1 + "float3 diffuseContribution = float3(0.0, 0.0, 0.0);\n";
     if (m_UsesDiffuseTexture)
     {
-        shaderCode += tabLevel1 + "diffuseContribution *= diffuseTexture.Sample(samplerState, " + uvVariable1 + ").xyz;\n";
+        shaderCode += tabLevel1 + "albedo = diffuseTexture.Sample(samplerState, " + uvVariable1 + ").xyz;\n";
     }
+
+    shaderCode += tabLevel1 + "if (numLights == 0) {\n";
+    shaderCode += tabLevel2 + "diffuseContribution = diffuseColor;\n";
+    shaderCode += tabLevel1 + "}\n";
 
     shaderCode += "\n";
 
     // Specular contribution
-    shaderCode += tabLevel1 + "float3 specularContribution = specularColorAndPower.xyz;\n";
+    shaderCode += tabLevel1 + "float3 specularTex = float3(0.0, 0.0, 0.0);\n";
+    shaderCode += tabLevel1 + "float3 specularContribution = float3(0.0, 0.0, 0.0);\n";
     if (m_UsesSpecularTexture)
     {
-        shaderCode += tabLevel1 + "specularContribution *= specularTexture.Sample(samplerState, " + uvVariable1 + ").xyz;\n";
+        shaderCode += tabLevel1 + "specularTex = specularTexture.Sample(samplerState, " + uvVariable1 + ").xyz;\n";
     }
+
+    shaderCode += tabLevel1 + "if (numLights == 0) {\n";
+    shaderCode += tabLevel2 + "specularContribution = specularColorAndPower.xyz;\n";
+    shaderCode += tabLevel1 + "}\n";
 
     shaderCode += "\n";
 
@@ -166,18 +176,18 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
 
     shaderCode += tabLevel2 + "}\n\n";
 
-    shaderCode += tabLevel2 + "float nDotL = dot(lightDirection, N);\n";
-    shaderCode += tabLevel2 + "diffuseContribution *= nDotL * lightColors[i].xyz;\n";
+    shaderCode += tabLevel2 + "float nDotL = max(dot(lightDirection, N), 0.0);\n";
+    shaderCode += tabLevel2 + "diffuseContribution += albedo * nDotL * lightColors[i].xyz;\n";
 
     shaderCode += tabLevel2 + "float3 H = normalize(lightDirection + V);\n";
-    shaderCode += tabLevel2 + "float nDotH = dot(N, H);\n\n";
+    shaderCode += tabLevel2 + "float nDotH = max(dot(N, H), 0.0);\n\n";
             
-    shaderCode += tabLevel2 + "specularContribution *= pow(max(nDotH, 0.0), specularColorAndPower.w) * lightColors[i].xyz;\n";
+    shaderCode += tabLevel2 + "specularContribution += specularTex * pow(nDotH, specularColorAndPower.w) * lightColors[i].xyz;\n";
 
     shaderCode += tabLevel1 + "}\n\n";
 
     shaderCode += tabLevel1 + outputVariable + ".color.xyz += diffuseContribution;\n";
-    shaderCode += tabLevel1 + outputVariable + ".color.xyz += specularContribution * min(1.0, specularColorAndPower.w);\n";
+    //shaderCode += tabLevel1 + outputVariable + ".color.xyz += specularContribution * min(1.0, specularColorAndPower.w);\n";
 
     shaderCode += tabLevel1 + outputVariable + ".color.w = 1.0;\n\n";
     shaderCode += tabLevel1 + "return " + outputVariable + ";\n";
