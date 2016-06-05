@@ -7,29 +7,22 @@
 #  ASSIMP_LIBRARY - Link these to use Assimp
 
 set(_assimp_INCLUDE_SEARCH_DIRS_SYSTEM
-    C:/assimp/include
-    C:/assimp
-	C:/Assimp/include
-	C:/Assimp
-    "$ENV{ProgramFiles}/assimp/include"
-    "$ENV{ProgramFiles}/assimp"
     /sw/local/include
+	"$ENV{ASSIMPDIR}/include/"
+    "$ENV{ASSIMPDIR}"
   )
 
 set(_assimp_LIB_SEARCH_DIRS_SYSTEM
-	C:/Assimp/lib/x86
-	C:/Assimp/lib/x64
-    C:/Assimp/lib
-    C:/Assimp
-    "$ENV{ProgramFiles}/assimp/lib"
-    "$ENV{ProgramFiles}/assimp"
     /sw/local/lib
+	"$ENV{ASSIMPDIR}/lib/x86/"
+	"$ENV{ASSIMPDIR}/lib/x64/"
+    "$ENV{ASSIMPDIR}/lib/"
+    "$ENV{ASSIMPDIR}"
   )
 
 FIND_PATH(ASSIMP_INCLUDE_DIR assimp/ai_assert.h
-    $ENV{ASSIMPSDIR}/include
-    $ENV{ASSIMPSDIR}
-    $ENV{ASSIMPSDIR}/..
+    "$ENV{ASSIMPDIR}/include/"
+    "$ENV{ASSIMPDIR}"
     ~/Library/Frameworks/AssImp.framework/Headers
     /Library/Frameworks/AssImp.framework/Headers
     /usr/local/include/assimp
@@ -50,7 +43,7 @@ FIND_PATH(ASSIMP_INCLUDE_DIR assimp/ai_assert.h
 FIND_LIBRARY(ASSIMP_LIBRARY_DEBUG
     NAMES assimpD
     PATHS
-    $ENV{ASSIMPSDIR}/lib
+    "$ENV{ASSIMPDIR}/lib/"
     /usr/local/lib
     /usr/lib
     /sw/lib
@@ -63,7 +56,7 @@ FIND_LIBRARY(ASSIMP_LIBRARY_DEBUG
 FIND_LIBRARY(ASSIMP_LIBRARY_RELEASE
     NAMES assimp
     PATHS
-    $ENV{ASSIMPSDIR}/lib
+    "$ENV{ASSIMPDIR}/lib/"
     /usr/local/lib
     /usr/lib
     /sw/lib

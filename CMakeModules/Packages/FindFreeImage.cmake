@@ -24,10 +24,9 @@ SET(FreeImage_INCLUDE_SEARCH_DIRS
 	/usr/local/include
 	/opt/include
 	/opt/freeimage/include
-	C:/FreeImage
-	C:/FreeImage/include
 	$ENV{FREEIMAGE_DIR}
 	$ENV{FREEIMAGE_DIR}/include
+	$ENV{FREEIMAGE_DIR}/Source
 )
 
 SET(FreeImage_LIBRARY_SEARCH_DIRS
@@ -37,10 +36,9 @@ SET(FreeImage_LIBRARY_SEARCH_DIRS
 	/usr/local/lib
 	/opt/lib
 	/opt/freeimage/lib
-	C:/FreeImage
-	C:/FreeImage/lib
 	$ENV{FREEIMAGE_DIR}
 	$ENV{FREEIMAGE_DIR}/lib
+	$ENV{FREEIMAGE_DIR}/Dist/x32
 )
 
 FIND_PATH(FreeImage_INCLUDE_DIRS FreeImage.h ${FreeImage_INCLUDE_SEARCH_DIRS})

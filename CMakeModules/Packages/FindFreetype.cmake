@@ -70,7 +70,7 @@ find_path(FREETYPE_INCLUDE_DIR_freetype2 config/ftheader.h
     ENV GTKMM_BASEPATH
     [HKEY_CURRENT_USER\\SOFTWARE\\gtkmm\\2.4;Path]
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\gtkmm\\2.4;Path]
-  PATH_SUFFIXES include/freetype include/freetype2 include
+  PATH_SUFFIXES include/freetype include/freetype2 include/freetype2/freetype include
 )
 
 find_library(FREETYPE_LIBRARY

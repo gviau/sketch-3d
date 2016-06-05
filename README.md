@@ -34,11 +34,11 @@ And optionally:
 * OIS : http://sourceforge.net/projects/wgois/
 
 The following environment variables should be set so that CMake can properly find the libraries on your system. Variables in curly brackets {} mean that any of those can be set for CMake:
-* ASSIMPSDIR : Points at the base of your Assimp directory
-* {Boost_DIR, BOOST_ROOT, BOOSTROOT} : Points at the base of your Boost directory
+* ASSIMPSDIR : Points at the base of the Assimp directory that contains the installed libraries and include files
+* BOOST_ROOT : Points at the base of your Boost directory, where the libraries from the b2 executable were biult
 * {DXSDK_DIR, DIRECTX_HOME, DIRECTX_ROOT, DIRECTX_BASE} : Points at the base of your DirectX SDK directory
 * FREEIMAGE_DIR : Points at the base of your FreeImage directory
-* FREETYPE_DIR : Points at the base of your FreeType directory
+* FREETYPE_DIR : Points at the base of your FreeType directory that contains the installed libraries and include files
 * OISDIR : Points at the base of your OIS directory
 
 ### Linux
@@ -79,7 +79,7 @@ where the relative path "../." points to the root folder of the git repository a
 You can find all the generator names here : http://www.cmake.org/cmake/help/v3.0/manual/cmake-generators.7.html
 
 Here are some example depending of your OS:
-* For Windows, use "Visual Studio 11" for Visual Studio 2012
+* For Windows, use "Visual Studio 14 2015" for Visual Studio 2015
 * For Linux, use "Unix Makefiles"
 * For Mac OS X, use "Unix Makefiles" or Xcode
 

@@ -11,10 +11,10 @@ set (
 	"${CMAKE_SOURCE_DIR}/CMakeModules/Templates"
 )
 
-set (Boost_USE_STATIC_LIBS OFF)
-set (Boost_USE_SHARED_LIBS ON)
+set (Boost_USE_STATIC_LIBS ON)
+set (Boost_USE_SHARED_LIBS OFF)
 set (Boost_USE_MULTITHREADED ON)
-set (Boost_USE_STATIC_RUNTIME OFF)
+set (Boost_USE_STATIC_RUNTIME ON)
 
 find_package(
     Boost

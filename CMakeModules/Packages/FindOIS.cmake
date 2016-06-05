@@ -7,20 +7,18 @@
 #  OIS_LIBRARY_DEBUG - link these to use OIS in Debug
 #  OIS_BINARY_REL / OIS_BINARY_DBG - DLL names (windows only)
 set(_ois_INCLUDE_SEARCH_DIRS_SYSTEM
-    C:/ois/includes
-    C:/ois
     "$ENV{ProgramFiles}/ois/includes"
     "$ENV{ProgramFiles}/ois"
     /sw/local/include
   )
 
 set(_ois_LIB_SEARCH_DIRS_SYSTEM
-	C:/ois/lib/
     "$ENV{ProgramFiles}/ois/lib"
     /sw/local/lib
   )
 
 FIND_PATH(OIS_INCLUDE_DIR OIS.h
+    $ENV{OISDIR}/includes
     $ENV{OISDIR}/include
     $ENV{OISDIR}
     $ENV{OISDIR}/..
