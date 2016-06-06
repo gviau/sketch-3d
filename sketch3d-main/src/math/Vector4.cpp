@@ -39,7 +39,7 @@ Vector4::Vector4(const Vector4& src)
     x = src.x;
     y = src.y;
     z = src.z;
-    w = 1.0f;
+    w = src.w;
 }
 
 float Vector4::Length() const

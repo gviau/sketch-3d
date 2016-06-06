@@ -5,13 +5,26 @@ namespace Sketch3D
 void ForwardRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& shaderCode)
 {
     string tabLevel = GetTabs(1);
+	string tab7 = GetTabs(7);
 
     string inputVariable = GetVertexShaderInputStructureVariableName();
     string outputVariable = GetVertexShaderOutputStructureVariableName();
 
     shaderCode += tabLevel + GetVertexShaderOutputStructureName() + " " + outputVariable + ";\n\n";
 
-    shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, float4(" + inputVariable + ".in_vertex, 1.0));\n\n";
+	if (m_HasBones)
+	{
+		shaderCode += tabLevel + "float4x4 boneTransform = boneTransformationMatrices[(int)" + inputVariable + ".in_bones.x] * " + inputVariable + ".in_weights.x +\n";
+		shaderCode += tab7	   +						  "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.y] * " + inputVariable + ".in_weights.y +\n";
+		shaderCode += tab7	   +						  "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.z] * " + inputVariable + ".in_weights.z +\n";
+		shaderCode += tab7	   +						  "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.w] * " + inputVariable + ".in_weights.w;\n\n";
+
+		shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, mul(boneTransform, float4(" + inputVariable + ".in_vertex, 1.0)));\n\n";
+	}
+	else
+	{
+		shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, float4(" + inputVariable + ".in_vertex, 1.0));\n\n";
+	}
 
     if (m_HasColors)
     {
@@ -20,8 +33,16 @@ void ForwardRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& sh
 
     if (m_HasNormals)
     {
-        shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, " + inputVariable + ".in_normal));\n";
-        shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		if (m_HasBones)
+		{
+			shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, mul((float3x3)boneTransform, " + inputVariable + ".in_normal)));\n";
+			shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		}
+		else
+		{
+			shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, " + inputVariable + ".in_normal));\n";
+			shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		}
     }
 
     if (m_HasTangents)
@@ -94,15 +115,12 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
 
     // Diffuse contribution
     shaderCode += tabLevel1 + "float3 albedo = float3(1.0, 1.0, 1.0);\n";
-    shaderCode += tabLevel1 + "float3 diffuseContribution = float3(0.0, 0.0, 0.0);\n";
     if (m_UsesDiffuseTexture)
     {
         shaderCode += tabLevel1 + "albedo = diffuseTexture.Sample(samplerState, " + uvVariable1 + ").xyz;\n";
     }
 
-    shaderCode += tabLevel1 + "if (numLights == 0) {\n";
-    shaderCode += tabLevel2 + "diffuseContribution = diffuseColor;\n";
-    shaderCode += tabLevel1 + "}\n";
+	shaderCode += tabLevel1 + "float3 diffuseContribution = float3(0.0, 0.0, 0.0);\n";
 
     shaderCode += "\n";
 
@@ -177,7 +195,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
     shaderCode += tabLevel2 + "}\n\n";
 
     shaderCode += tabLevel2 + "float nDotL = max(dot(lightDirection, N), 0.0);\n";
-    shaderCode += tabLevel2 + "diffuseContribution += albedo * nDotL * lightColors[i].xyz;\n";
+    shaderCode += tabLevel2 + "diffuseContribution += nDotL * lightColors[i].xyz;\n";
 
     shaderCode += tabLevel2 + "float3 H = normalize(lightDirection + V);\n";
     shaderCode += tabLevel2 + "float nDotH = max(dot(N, H), 0.0);\n\n";
@@ -186,7 +204,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
 
     shaderCode += tabLevel1 + "}\n\n";
 
-    shaderCode += tabLevel1 + outputVariable + ".color.xyz += diffuseContribution;\n";
+    shaderCode += tabLevel1 + outputVariable + ".color.xyz += diffuseContribution * albedo * diffuseColor.rgb;\n";
     //shaderCode += tabLevel1 + outputVariable + ".color.xyz += specularContribution * min(1.0, specularColorAndPower.w);\n";
 
     shaderCode += tabLevel1 + outputVariable + ".color.w = 1.0;\n\n";

@@ -6,6 +6,7 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib/")
 
 # Framework files
 set (FRAMEWORK_SOURCE_FILES
+	src/framework/AnimationState.cpp
 	src/framework/Camera.cpp
 	src/framework/Light.cpp
 	src/framework/Material.cpp
@@ -14,11 +15,14 @@ set (FRAMEWORK_SOURCE_FILES
 	src/framework/RenderingPipeline.cpp
 	src/framework/Scene.cpp
 	src/framework/SimpleObject.cpp
+	src/framework/Skeleton.cpp
+	src/framework/SkinnedMesh.cpp
 	src/framework/SubMesh.cpp
 	src/framework/VisualNode.cpp
 )
 
 set (FRAMEWORK_HEADER_FILES
+	include/framework/AnimationState.h
 	include/framework/Camera.h
 	include/framework/Light.h
 	include/framework/Material.h
@@ -28,6 +32,8 @@ set (FRAMEWORK_HEADER_FILES
 	include/framework/RenderingPipelineContext.h
 	include/framework/Scene.h
 	include/framework/SimpleObject.h
+	include/framework/Skeleton.h
+	include/framework/SkinnedMesh.h
 	include/framework/SubMesh.h
 	include/framework/VisualNode.h
 )
@@ -339,13 +345,13 @@ endif ()
 if (WIN32)
 	add_custom_command(TARGET sketch-3d POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${ASSIMP_INCLUDE_DIR}/../bin/x86/Assimp32.dll"
+		"${ASSIMP_INCLUDE_DIR}/../bin/assimp.dll"
 		"${CMAKE_SOURCE_DIR}/bin/$<CONFIGURATION>/"
 	)
 	
 	add_custom_command(TARGET sketch-3d POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${FreeImage_INCLUDE_DIRS}/../FreeImage.dll"
+		"${FreeImage_INCLUDE_DIRS}/../Dist/x32/FreeImage.dll"
 		"${CMAKE_SOURCE_DIR}/bin/$<CONFIGURATION>/"
 	)
 endif ()

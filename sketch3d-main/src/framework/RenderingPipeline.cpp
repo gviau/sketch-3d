@@ -1,6 +1,7 @@
 #include "framework/RenderingPipeline.h"
 
 #include "framework/Camera.h"
+#include "framework/MaterialCodeGenerator.h"
 #include "framework/Scene.h"
 
 #include "render/RenderDevice.h"

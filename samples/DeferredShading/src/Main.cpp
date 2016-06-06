@@ -19,6 +19,7 @@
 #include <system/WindowEvent.h>
 using namespace Sketch3D;
 
+#include <chrono>
 #include <string>
 #include <vector>
 using namespace std;
@@ -152,15 +153,23 @@ int main(int argc, char** argv) {
     */
     bobNode->SetOrientation(0.0f, 0.0f, -PI_OVER_2);
 
+	clock_t begin, end;
+	double deltaTime = 0.0;
+
     while (window.IsOpen()) {
+		begin = clock();
+
         WindowEvent windowEvent;
         if (window.PollEvents(windowEvent)) {
         }
 
         bobNode->Yaw(0.001f);
 
-        deferredRenderingPipeline.RenderSceneFromCamera(camera, scene);
+        deferredRenderingPipeline.RenderSceneFromCamera(camera, scene, deltaTime);
 
+		end = clock();
+
+		deltaTime = end - begin;
         /*
         spiderNode.Yaw(0.001f);
 

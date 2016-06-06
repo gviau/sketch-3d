@@ -29,7 +29,7 @@ public:
 
     virtual bool                Initialize() = 0;
 
-    virtual void                RenderSceneFromCamera(Camera& camera, const Scene& scene) = 0;
+    virtual void                RenderSceneFromCamera(Camera& camera, const Scene& scene, double deltaTime) = 0;
 
     MaterialCodeGenerator*      GetMaterialCodeGenerator() const { return m_MaterialCodeGenerator; }
 

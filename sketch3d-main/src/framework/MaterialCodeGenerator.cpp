@@ -58,6 +58,7 @@ map<string, size_t> MaterialCodeGenerator::GetVertexShaderConstantBuffersSlots()
 
     constantBufferSlots[typeid(PassConstants_t).name()] = 0;
     constantBufferSlots[typeid(DrawConstants_t).name()] = 1;
+	constantBufferSlots[typeid(BoneConstants_t).name()] = 2;
 
     return constantBufferSlots;
 }
@@ -90,6 +91,16 @@ void MaterialCodeGenerator::WriteVertexShaderConstantBuffers(string& shaderCode)
         "    float4x4 modelViewMatrix;\n"
         "    float4x4 transposedInverseModelViewMatrix;\n"
         "};\n\n";
+
+	if (m_HasBones)
+	{
+		string maxBones = std::to_string(MAX_BONES);
+
+		shaderCode +=
+			"cbuffer BoneConstants_t : register(b2) {\n"
+			"	float4x4 boneTransformationMatrices[" + maxBones + "];\n"
+			"};\n\n";
+	}
 }
 
 void MaterialCodeGenerator::WriteVertexShaderInputs(VertexFormatType_t vertexFormatType, string& shaderCode)

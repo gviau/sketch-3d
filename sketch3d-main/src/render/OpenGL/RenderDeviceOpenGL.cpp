@@ -96,6 +96,13 @@ void RenderDeviceOpenGL::ClearDepthStencil(bool clearDepth, bool clearStencil, f
     GL_CALL( glClear(clearFlags) );
 }
 
+void RenderDeviceOpenGL::ClearDepthBuffer(float depthValue)
+{
+	GL_CALL( glClearDepth(depthValue) );
+
+	GL_CALL( glClear(GL_DEPTH_BUFFER_BIT) );
+}
+
 void RenderDeviceOpenGL::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget)
 {
     GL_CALL( glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer) );

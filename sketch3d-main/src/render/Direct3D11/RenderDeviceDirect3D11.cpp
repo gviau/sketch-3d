@@ -122,6 +122,11 @@ void RenderDeviceDirect3D11::ClearDepthStencil(bool clearDepth, bool clearStenci
     context_->ClearDepthStencilView(currentDepthStencilBuffer_, clearFlags, depthValue, stencilValue);
 }
 
+void RenderDeviceDirect3D11::ClearDepthBuffer(float depthValue)
+{
+	context_->ClearDepthStencilView(currentDepthStencilBuffer_, D3D11_CLEAR_DEPTH, depthValue, 0);
+}
+
 void RenderDeviceDirect3D11::SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) {
     if (renderTargets.size() > 0)
     {

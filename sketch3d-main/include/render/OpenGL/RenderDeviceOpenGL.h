@@ -43,6 +43,7 @@ class SKETCH_3D_API RenderDeviceOpenGL : public RenderDevice {
 
 		virtual void                        ClearRenderTargets(const Vector4& color) override;
         virtual void                        ClearDepthStencil(bool clearDepth, bool clearStencil, float depthValue, unsigned char stencilValue) override;
+		virtual void						ClearDepthBuffer(float depthValue=1.0f) override;
         virtual void                        SetRenderTargetsAndDepthStencilTarget(const vector<shared_ptr<RenderTarget>>& renderTargets, const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;
         virtual void                        SetRenderTargets(const vector<shared_ptr<RenderTarget>>& renderTargets) override;
         virtual void                        SetDepthStencilTarget(const shared_ptr<DepthStencilTarget>& depthStencilTarget) override;

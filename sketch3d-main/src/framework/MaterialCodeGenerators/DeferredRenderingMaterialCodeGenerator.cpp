@@ -5,14 +5,27 @@ namespace Sketch3D
 void DeferredRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& shaderCode)
 {
     string tabLevel = GetTabs(1);
+	string tab7 = GetTabs(7);
 
     string inputVariable = GetVertexShaderInputStructureVariableName();
     string outputVariable = GetVertexShaderOutputStructureVariableName();
 
     shaderCode += tabLevel + GetVertexShaderOutputStructureName() + " " + outputVariable + ";\n\n";
 
-    shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, float4(" + inputVariable + ".in_vertex, 1.0));\n\n";
+	if (m_HasBones)
+	{
+		shaderCode += tabLevel + "float4x4 boneTransform = boneTransformationMatrices[(int)" + inputVariable + ".in_bones.x] * " + inputVariable + ".in_weights.x +\n";
+		shaderCode += tab7 + "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.y] * " + inputVariable + ".in_weights.y +\n";
+		shaderCode += tab7 + "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.z] * " + inputVariable + ".in_weights.z +\n";
+		shaderCode += tab7 + "boneTransformationMatrices[(int)" + inputVariable + ".in_bones.w] * " + inputVariable + ".in_weights.w;\n\n";
 
+		shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, mul(boneTransform, float4(" + inputVariable + ".in_vertex, 1.0)));\n\n";
+	}
+	else
+	{
+		shaderCode += tabLevel + outputVariable + ".position = mul(modelViewProjectionMatrix, float4(" + inputVariable + ".in_vertex, 1.0));\n\n";
+	}
+    
     if (m_HasColors)
     {
         shaderCode += tabLevel + outputVariable + ".color = float4(" + inputVariable + ".in_color, 1.0);\n\n";
@@ -20,8 +33,16 @@ void DeferredRenderingMaterialCodeGenerator::WriteVertexShaderMainBody(string& s
 
     if (m_HasNormals)
     {
-        shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, " + inputVariable + ".in_normal));\n";
-        shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		if (m_HasBones)
+		{
+			shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, mul((float3x3)boneTransform, " + inputVariable + ".in_normal)));\n";
+			shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		}
+		else
+		{
+			shaderCode += tabLevel + "float3 normal = normalize(mul((float3x3)transposedInverseModelViewMatrix, " + inputVariable + ".in_normal));\n";
+			shaderCode += tabLevel + outputVariable + ".normal = normal;\n\n";
+		}
     }
 
     if (m_HasTangents)

@@ -6,6 +6,7 @@
 #include "framework/Mesh.h"
 #include "framework/Scene.h"
 #include "framework/SimpleObject.h"
+#include "framework/SkinnedMesh.h"
 #include "framework/SubMesh.h"
 
 #include "framework/MaterialCodeGenerators/DeferredRenderingMaterialCodeGenerator.h"
@@ -20,6 +21,9 @@
 #include "render/Shader.h"
 
 #include "system/Logger.h"
+
+#include <algorithm>
+using namespace std;
 
 namespace Sketch3D
 {
@@ -47,6 +51,7 @@ bool DeferredRenderingPipeline::Initialize()
 
     m_PassConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
     m_DrawConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
+	m_BoneConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
     m_LightConstants = renderDevice->GetHardwareResourceCreator()->CreateConstantBuffer();
     
     m_PositionsRenderTarget = renderDevice->GetHardwareResourceCreator()->CreateRenderTarget();
@@ -55,6 +60,7 @@ bool DeferredRenderingPipeline::Initialize()
 
     m_PassConstants->Initialize(nullptr, true, false, sizeof(PassConstants_t));
     m_DrawConstants->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
+	m_BoneConstants->Initialize(nullptr, true, false, sizeof(BoneConstants_t));
     m_LightConstants->Initialize(nullptr, true, false, sizeof(LightConstants_t));
 
     // GBuffer creation
@@ -79,7 +85,7 @@ bool DeferredRenderingPipeline::Initialize()
     return true;
 }
 
-void DeferredRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene& scene)
+void DeferredRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene& scene, double deltaTime)
 {
     ConstructRenderingPipelineContext(camera, scene, m_CurrentRenderingContext);
 
@@ -169,6 +175,26 @@ void DeferredRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scen
 
         fragmentShaderConstantBuffers[m_FragmentShaderConstantBuffersSlots[typeid(PassConstants_t).name()]] = m_PassConstants;
         fragmentShaderConstantBuffers[m_FragmentShaderConstantBuffersSlots[typeid(LightConstants_t).name()]] = m_LightConstants;
+
+		// If it's a skinned mesh, get its transformation matrices
+		if (meshToDraw->IsSkinnedMesh())
+		{
+			SkinnedMesh* skinnedMesh = static_cast<SkinnedMesh*>(meshToDraw);
+
+			skinnedMesh->Animate(deltaTime);
+			const vector<Matrix4x4>& boneTransformationMatrices = skinnedMesh->GetTransformationMatrices();
+
+			BoneConstants_t* boneConstants = (BoneConstants_t*)m_BoneConstants->Map(MapFlag_t::WRITE_DISCARD);
+
+			for (size_t i = 0; i < boneTransformationMatrices.size(); i++)
+			{
+				boneConstants->boneTransformationMatrices[i] = boneTransformationMatrices[i];
+			}
+
+			m_BoneConstants->Unmap();
+
+			vertexShaderConstantBuffers[m_VertexShaderConstantBuffersSlots[typeid(BoneConstants_t).name()]] = m_BoneConstants;
+		}
 
         meshToDraw->SetConstantBuffersForAllMaterials(vertexShaderConstantBuffers, fragmentShaderConstantBuffers,
                                                       m_FragmentShaderConstantBuffersSlots[typeid(MaterialConstants_t).name()]);

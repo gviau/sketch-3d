@@ -1,18 +1,22 @@
-#include <math/Quaternion.h>
+#include <math/Vector4.h>
 
-#include <render/Material.h>
-#include <render/Node.h>
-#include <render/Renderer.h>
-#include <render/Shader.h>
-#include <render/SkinnedMesh.h>
+#include <framework/Camera.h>
+#include <framework/RenderingPipelines/ForwardRenderingPipeline.h>
+#include <framework/Light.h>
+#include <framework/Scene.h>
+#include <framework/SkinnedMesh.h>
 
+#include <render/RenderContext.h>
+#include <render/RenderDevice.h>
+
+#include <system/Logger.h>
 #include <system/Window.h>
 #include <system/WindowEvent.h>
+
 using namespace Sketch3D;
 
 #include <chrono>
-#include <string>
-#include <vector>
+#include <memory>
 using namespace std;
 
 #if PLATFORM == PLATFORM_WIN32
@@ -22,101 +26,100 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #else
 int main(int argc, char** argv) {
 #endif
+	Window window("Sample_SkeletalAnimation", 1024, 768, true);
 
-    // CHANGE THIS VALUE TO ANIMATE ON CPU OR GPU
-    bool isSkinnedOnGpu = true;
+	RenderParameters_t renderParameters;
+	renderParameters.width = 1024;
+	renderParameters.height = 768;
+	renderParameters.displayFormat = DisplayFormat_t::A8R8G8B8;
+	renderParameters.depthStencilBits = DepthStencilBits_t::D32;
 
-    Window window("Sample_SkeletalAnimation", 1024, 768, true);
-    RenderParameters_t renderParameters;
-    renderParameters.width = 1024;
-    renderParameters.height = 768;
-    renderParameters.displayFormat = DISPLAY_FORMAT_X8R8G8B8;
-    renderParameters.refreshRate = 0;
-    renderParameters.depthStencilBits = DEPTH_STENCIL_BITS_D24X8;
+	shared_ptr<RenderContext> renderContext = CreateRenderContext(RenderSystem_t::DIRECT3D11);
+	if (!renderContext->Initialize(window, renderParameters))
+	{
+		Logger::GetInstance()->Error("Couldn't initialize rendering context");
+		return 1;
+	}
 
-    Renderer::GetInstance()->Initialize(RenderSystem_t::OPENGL, window, renderParameters);
-    Renderer::GetInstance()->SetClearColor(0.2f, 0.2f, 0.2f);
+	shared_ptr<RenderDevice> renderDevice;
+	if (!CreateRenderDevice(renderContext, renderDevice))
+	{
+		Logger::GetInstance()->Error("Couldn't create render device!");
+		return 1;
+	}
 
-    // Create the skinned mesh
-    VertexAttributesMap_t vertexAttributes;
-    vertexAttributes[VERTEX_ATTRIBUTES_POSITION] = 0;
-    vertexAttributes[VERTEX_ATTRIBUTES_NORMAL] = 1;
-    vertexAttributes[VERTEX_ATTRIBUTES_TEX_COORDS] = 2;
+	if (!renderDevice->Initialize(renderContext))
+	{
+		Logger::GetInstance()->Error("Couldn't initialize the rendering device");
+		return 1;
+	}
 
-    if (isSkinnedOnGpu) {
-        vertexAttributes[VERTEX_ATTRIBUTES_BONES] = 3;
-        vertexAttributes[VERTEX_ATTRIBUTES_WEIGHTS] = 4;
-    }
-    SkinnedMesh mesh("Media/Bob.md5mesh", vertexAttributes, isSkinnedOnGpu);
+	ForwardRenderingPipeline forwardRenderingPipeline(renderContext, renderDevice);
+	if (!forwardRenderingPipeline.Initialize())
+	{
+		Logger::GetInstance()->Error("Couldn't initialize the forward rendering pipeline");
+		return 1;
+	}
 
-    // Create the material
-    string vertexFilename = "";
-    if (isSkinnedOnGpu) {
-        vertexFilename = "Shaders/SkeletalAnimation/vertSkinned";
-    } else {
-        vertexFilename = "Shaders/SkeletalAnimation/vert";
-    }
-    Shader* shader = Renderer::GetInstance()->CreateShader();
-    shader->SetSourceFile(vertexFilename, "Shaders/SkeletalAnimation/frag");
+	// Load the mesh
+	shared_ptr<SkinnedMesh> mesh;
+	if (!LoadSkinnedMeshFromFileWithMaterial("Media/Bob.md5mesh", renderDevice, mesh, forwardRenderingPipeline.GetMaterialCodeGenerator()))
+	{
+		Logger::GetInstance()->Error("Couldn't load the mesh");
+		return 1;
+	}
 
-    Material material(shader);
+	// Setup the scene
+	Scene scene;
+	VisualNode& rootNode = scene.GetRootNode();
 
-    // Create the node
-    Node node;
-    node.SetMaterial(&material);
-    node.SetMesh(&mesh);
-    Renderer::GetInstance()->GetSceneTree().AddNode(&node);
+	shared_ptr<VisualNode> meshNode(new VisualNode);
+	meshNode->SetMesh(mesh);
 
-    Renderer::GetInstance()->CameraLookAt(Vector3(0.0f, 35.0f, -100.0f), Vector3(0.0f, 35.0f, 1.0f));
+	Quaternion rotationX, rotationY, rotationZ;
+	rotationX.MakeFromAngleAxis(PI, Vector3::RIGHT);
+	rotationY.MakeFromAngleAxis(PI, Vector3::UP);
+	rotationZ.MakeFromAngleAxis(PI, Vector3::LOOK);
+	meshNode->SetOrientation(rotationZ * rotationX * rotationY);
 
-    typedef chrono::high_resolution_clock Clock;
-    chrono::system_clock::time_point begin, end;
-    chrono::duration<double> deltaTime;
+	rootNode.AddChild(meshNode);
 
-    mesh.SetAnimationState("Default");
-    mesh.SetAnimationLoop(true);
+	vector<shared_ptr<Light>> lights;
+	
+	shared_ptr<Light> light(new Light);
+	light->SetPosition(Vector3(50.0f, 35.0f, 75.0f));
+	light->SetLightType(LightType_t::Point);
+	lights.push_back(light);
 
-    size_t numberOfFrames = 0;
-    while (window.IsOpen()) {
-        begin = Clock::now();
+	scene.SetLights(lights);
 
-        WindowEvent windowEvent;
-        if (window.PollEvents(windowEvent)) {
-        }
+	Camera camera;
+	camera.LookAtRightHanded(Vector3(0.0f, 35.0f, 100.0f), Vector3(0.0f, 35.0f, 0.0f));
 
-        Quaternion rotationZ, rotationX;
-        rotationZ.MakeFromAngleAxis(PI, Vector3::LOOK);
-        rotationX.MakeFromAngleAxis(PI, Vector3::RIGHT);
-        node.SetOrientation(rotationZ * rotationX);
+	renderDevice->CalculatePerspectiveProjectionFOVRightHanded(60.0f, 1024.0f / 768.0f, 0.01f, 1000.0f);
 
-        // CPU skinning
-        if (!isSkinnedOnGpu) {
-            if (numberOfFrames % 12 == 0) {
-                mesh.Animate(deltaTime.count());
-                deltaTime = chrono::duration<double>::zero();
-            }
-        } else {
-            vector<Matrix4x4> boneTransformationMatrices;
-            if (mesh.Animate(deltaTime.count(), boneTransformationMatrices)) {
-                // Send the matrices to the GPU
-                material.SetUniformMatrix4x4Array("boneTransformationMatrices", boneTransformationMatrices);
-            }
+	mesh->SetAnimationState("Default");
+	mesh->SetAnimationLoop(true);
+	mesh->StartAnimation();
 
-            deltaTime = chrono::duration<double>::zero();
-        }
+	clock_t begin, end;
+	double deltaTime = 0.0;
 
-        Renderer::GetInstance()->Clear();
-        Renderer::GetInstance()->StartRender();
-        Renderer::GetInstance()->Render();
-        Renderer::GetInstance()->EndRender();
+	while (window.IsOpen())
+	{
+		begin = clock();
 
-        Renderer::GetInstance()->PresentFrame();
+		WindowEvent windowEvent;
+		if (window.PollEvents(windowEvent))
+		{
+		}
 
-        end = Clock::now();
-        deltaTime += chrono::duration_cast<chrono::duration<double>>(end - begin);
+		forwardRenderingPipeline.RenderSceneFromCamera(camera, scene, deltaTime);
 
-        numberOfFrames += 1;
-    }
+		end = clock();
 
-    return 0;
+		deltaTime = (double)(end - begin) / CLOCKS_PER_SEC;
+	}
+
+	return 0;
 }

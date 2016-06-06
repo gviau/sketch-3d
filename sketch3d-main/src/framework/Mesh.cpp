@@ -25,35 +25,46 @@ using namespace std;
 
 namespace Sketch3D {
 
-void FillVertexBuffer(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer);
-void FillVertexBuffer_Pos(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_Color(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV_Normal_Tangent(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_UV_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV_Normal_Tangent(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
-void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType);
+void FillVertexData(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_Color(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV_Normal_Tangent(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_UV_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV_Normal_Tangent(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
+void FillVertexData_Pos_2_UV_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType);
 
 void FillIndexBuffer(const aiMesh* mesh, const shared_ptr<IndexBuffer>& indexBuffer);
-VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh);
+VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh, bool loadBones);
+
+void InitializeVertexBuffersInMesh(HardwareResourceCreator* hardwareResourceCreator, const shared_ptr<Mesh>& mesh,
+								   const vector<pair<void*, size_t>>& vertexDataPerSubMesh, const vector<VertexFormatType_t>& vertexFormatTypePerSubMesh);
 
 bool CheckIfMeshMaterialHasNormalMap(const aiScene* scene);
 
-bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterial, MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents);
+bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, bool loadMaterial,
+							  MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents, bool loadBones,
+							  shared_ptr<Mesh>& loadedMesh, vector<pair<void*, size_t>>& vertexDataPerSubMesh,
+							  vector<VertexFormatType_t>& vertexFormatTypePerSubMesh);
 void LoadMaterial(HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, const shared_ptr<Material>& newMaterial, MaterialCodeGenerator* materialCodeGenerator, VertexFormatType_t vertexFormatType);
 bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator* hardwareResourceCreator, const aiMaterial* material, shared_ptr<Texture2D>& texture, shared_ptr<SamplerState>& samplerState);
 
 // Create a single instance of an Assimp importer to load meshes from files
 unique_ptr<Assimp::Importer> assimpImporter(new Assimp::Importer);
+
+Mesh::Mesh()
+	: m_IsSkinnedMesh(false)
+{
+}
 
 void Mesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
 {
@@ -208,19 +219,64 @@ shared_ptr<SubMesh> Mesh::GetSubMesh(size_t index) const
     return m_SubMeshes[index];
 }
 
+void InitializeVertexBuffersInMesh(HardwareResourceCreator* hardwareResourceCreator, const shared_ptr<Mesh>& mesh,
+								   const vector<pair<void*, size_t>>& vertexDataPerSubMesh, const vector<VertexFormatType_t>& vertexFormatTypePerSubMesh)
+{
+	const vector<shared_ptr<SubMesh>>& subMeshes = mesh->GetSubMeshes();
+	for (size_t i = 0; i < subMeshes.size(); i++)
+	{
+		const shared_ptr<SubMesh>& subMesh = subMeshes[i];
+
+		const pair<void*, size_t>& vertexData = vertexDataPerSubMesh[i];
+		void* vertices = vertexData.first;
+		size_t numVertices = vertexData.second;
+
+		VertexFormatType_t vertexFormatType = vertexFormatTypePerSubMesh[i];
+
+		shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer();
+		vertexBuffer->Initialize(vertices, false, false, vertexFormatType, numVertices);
+
+		subMesh->SetVertexBuffer(vertexBuffer);
+	}
+}
+
 bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents)
 {
-    return LoadMeshFromFileInternal(filename, renderDevice, loadedMesh, false, nullptr, calculateTangents);
+	vector<pair<void*, size_t>> vertexDataPerSubMesh;
+	vector<VertexFormatType_t> vertexFormatTypePerSubMesh;
+	bool meshLoadedSuccessfully = LoadMeshFromFileInternal(filename, renderDevice, false, nullptr, calculateTangents, false,
+														  loadedMesh, vertexDataPerSubMesh, vertexFormatTypePerSubMesh);
+
+	if (meshLoadedSuccessfully)
+	{
+		HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
+		InitializeVertexBuffersInMesh(hardwareResourceCreator, loadedMesh, vertexDataPerSubMesh, vertexFormatTypePerSubMesh);
+	}
+
+	return meshLoadedSuccessfully;
 }
 
 bool LoadMeshFromFileWithMaterial(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh,
                                   MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents)
 {
-    return LoadMeshFromFileInternal(filename, renderDevice, loadedMesh, (materialCodeGenerator != nullptr), materialCodeGenerator, calculateTangents);
+	vector<pair<void*, size_t>> vertexDataPerSubMesh;
+	vector<VertexFormatType_t> vertexFormatTypePerSubMesh;
+    bool meshLoadedSuccessfully = LoadMeshFromFileInternal(filename, renderDevice, (materialCodeGenerator != nullptr), materialCodeGenerator,
+														   calculateTangents, false, loadedMesh, vertexDataPerSubMesh, vertexFormatTypePerSubMesh);
+
+	if (meshLoadedSuccessfully)
+	{
+		HardwareResourceCreator* hardwareResourceCreator = renderDevice->GetHardwareResourceCreator();
+		InitializeVertexBuffersInMesh(hardwareResourceCreator, loadedMesh, vertexDataPerSubMesh, vertexFormatTypePerSubMesh);
+	}
+
+	return meshLoadedSuccessfully;
 }
 
-bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool loadMaterials,
-                              MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents)
+bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDevice>& renderDevice, bool loadMaterials,
+                              MaterialCodeGenerator* materialCodeGenerator, bool calculateTangents, bool loadBones,
+							  shared_ptr<Mesh>& loadedMesh, vector<pair<void*, size_t>>& vertexDataPerSubMesh,
+							  vector<VertexFormatType_t>& vertexFormatTypePerSubMesh)
 {
     Assimp::Importer* importer = assimpImporter.get();
     if (importer == nullptr)
@@ -303,9 +359,12 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
             const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             shared_ptr<SubMesh> subMesh(new SubMesh);
 
-            shared_ptr<VertexBuffer> vertexBuffer = hardwareResourceCreator->CreateVertexBuffer();
-            FillVertexBuffer(mesh, vertexBuffer);
-            subMesh->SetVertexBuffer(vertexBuffer);
+			void* vertexData = nullptr;
+			VertexFormatType_t vertexFormatType = GetMeshVertexFormatType(mesh, loadBones);
+            FillVertexData(mesh, vertexData, vertexFormatType);
+
+			vertexDataPerSubMesh.push_back(pair<void*, size_t>(vertexData, mesh->mNumVertices));
+			vertexFormatTypePerSubMesh.push_back(vertexFormatType);
 
             if (mesh->HasFaces())
             {
@@ -325,7 +384,7 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
                 {
                     shared_ptr<Material> material(new Material(renderDevice));
 
-                    LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material, materialCodeGenerator, vertexBuffer->GetVertexFormatType());
+                    LoadMaterial(hardwareResourceCreator, scene->mMaterials[materialIndex], material, materialCodeGenerator, vertexFormatType);
 
                     if (materialIndex < createdMaterials.size())
                     {
@@ -342,7 +401,7 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
                         createdMaterials.push_back(material);
                     }
 
-                    material->Initialize(subMesh->GetVertexBuffer()->GetVertexFormatType(), materialCodeGenerator);
+                    material->Initialize(vertexFormatType, materialCodeGenerator);
                     subMesh->SetMaterial(material);
                 }
             }
@@ -358,31 +417,31 @@ bool LoadMeshFromFileInternal(const string& filename, const shared_ptr<RenderDev
 
     Logger::GetInstance()->Info("Successfully loaded mesh " + filename);
 
+	assimpImporter->FreeScene();
+
     return true;
 }
 
-void FillVertexBuffer(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer)
+void FillVertexData(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    VertexFormatType_t vertexFormatType = GetMeshVertexFormatType(mesh);
-
     switch (vertexFormatType)
     {
-    case VertexFormatType_t::Pos:                               FillVertexBuffer_Pos(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_Color:                         FillVertexBuffer_Pos_Color(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_UV:                            FillVertexBuffer_Pos_UV(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_Normal:                        FillVertexBuffer_Pos_Normal(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_UV_Normal:                     FillVertexBuffer_Pos_UV_Normal(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_UV_Normal_Tangent:             FillVertexBuffer_Pos_UV_Normal_Tangent(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_UV_Normal_4_Bones:             FillVertexBuffer_Pos_UV_Normal_4_Bones(mesh, vertexBuffer, VertexFormatType_t::Pos_UV_Normal); break;
-    case VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones:     FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(mesh, vertexBuffer, VertexFormatType_t::Pos_UV_Normal_Tangent); break;
-    case VertexFormatType_t::Pos_UV_4_Bones:                    FillVertexBuffer_Pos_UV_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_Normal_4_Bones:                FillVertexBuffer_Pos_Normal_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV:                          FillVertexBuffer_Pos_2_UV(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV_Normal:                   FillVertexBuffer_Pos_2_UV_Normal(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV_Normal_Tangent:           FillVertexBuffer_Pos_2_UV_Normal_Tangent(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV_Normal_4_Bones:           FillVertexBuffer_Pos_2_UV_Normal_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV_Normal_Tangent_4_Bones:   FillVertexBuffer_Pos_2_UV_Normal_Tangent_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
-    case VertexFormatType_t::Pos_2_UV_4_Bones:                  FillVertexBuffer_Pos_2_UV_4_Bones(mesh, vertexBuffer, vertexFormatType); break;
+    case VertexFormatType_t::Pos:                               FillVertexData_Pos(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_Color:                         FillVertexData_Pos_Color(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV:                            FillVertexData_Pos_UV(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_Normal:                        FillVertexData_Pos_Normal(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV_Normal:                     FillVertexData_Pos_UV_Normal(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV_Normal_Tangent:             FillVertexData_Pos_UV_Normal_Tangent(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_UV_Normal_4_Bones:             FillVertexData_Pos_UV_Normal_4_Bones(mesh, vertexData, VertexFormatType_t::Pos_UV_Normal); break;
+    case VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones:     FillVertexData_Pos_UV_Normal_Tangent_4_Bones(mesh, vertexData, VertexFormatType_t::Pos_UV_Normal_Tangent); break;
+    case VertexFormatType_t::Pos_UV_4_Bones:                    FillVertexData_Pos_UV_4_Bones(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_Normal_4_Bones:                FillVertexData_Pos_Normal_4_Bones(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV:                          FillVertexData_Pos_2_UV(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV_Normal:                   FillVertexData_Pos_2_UV_Normal(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV_Normal_Tangent:           FillVertexData_Pos_2_UV_Normal_Tangent(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV_Normal_4_Bones:           FillVertexData_Pos_2_UV_Normal_4_Bones(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV_Normal_Tangent_4_Bones:   FillVertexData_Pos_2_UV_Normal_Tangent_4_Bones(mesh, vertexData, vertexFormatType); break;
+    case VertexFormatType_t::Pos_2_UV_4_Bones:                  FillVertexData_Pos_2_UV_4_Bones(mesh, vertexData, vertexFormatType); break;
     }
 }
 
@@ -559,7 +618,7 @@ bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator*
     return false;
 }
 
-VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
+VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh, bool loadBones)
 {
     if (mesh->HasPositions())
     {
@@ -571,7 +630,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                 {
                     if (mesh->HasTangentsAndBitangents())
                     {
-                        if (mesh->HasBones())
+                        if (loadBones && mesh->HasBones())
                         {
                             return VertexFormatType_t::Pos_2_UV_Normal_Tangent_4_Bones;
                         }
@@ -582,7 +641,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                     }
                     else
                     {
-                        if (mesh->HasBones())
+                        if (loadBones && mesh->HasBones())
                         {
                             return VertexFormatType_t::Pos_2_UV_Normal_4_Bones;
                         }
@@ -594,7 +653,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                 }
                 else
                 {
-                    if (mesh->HasBones())
+                    if (loadBones && mesh->HasBones())
                     {
                         return VertexFormatType_t::Pos_2_UV_4_Bones;
                     }
@@ -610,7 +669,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                 {
                     if (mesh->HasTangentsAndBitangents())
                     {
-                        if (mesh->HasBones())
+                        if (loadBones && mesh->HasBones())
                         {
                             return VertexFormatType_t::Pos_UV_Normal_Tangent_4_Bones;
                         }
@@ -621,7 +680,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                     }
                     else
                     {
-                        if (mesh->HasBones())
+                        if (loadBones && mesh->HasBones())
                         {
                             return VertexFormatType_t::Pos_UV_Normal_4_Bones;
                         }
@@ -633,7 +692,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
                 }
                 else
                 {
-                    if (mesh->HasBones())
+                    if (loadBones && mesh->HasBones())
                     {
                         return VertexFormatType_t::Pos_UV_4_Bones;
                     }
@@ -648,7 +707,7 @@ VertexFormatType_t GetMeshVertexFormatType(const aiMesh* mesh)
         {
             if (mesh->HasNormals())
             {
-                if (mesh->HasBones())
+                if (loadBones && mesh->HasBones())
                 {
                     return VertexFormatType_t::Pos_Normal_4_Bones;
                 }
@@ -711,10 +770,10 @@ bool CheckIfMeshMaterialHasNormalMap(const aiScene* scene)
     return false;
 }
 
-void FillVertexBuffer_Pos(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_t[mesh->mNumVertices];
+	Vertex_Pos_t* vertices = (Vertex_Pos_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -725,16 +784,14 @@ void FillVertexBuffer_Pos(const aiMesh* mesh, const shared_ptr<VertexBuffer>& ve
         vertex.position.y = position.y;
         vertex.position.z = position.z;
 
-        vertices.push_back(vertex);
+		vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_Color(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_Color(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_Color_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_Color_t[mesh->mNumVertices];
+	Vertex_Pos_Color_t* vertices = (Vertex_Pos_Color_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -750,16 +807,14 @@ void FillVertexBuffer_Pos_Color(const aiMesh* mesh, const shared_ptr<VertexBuffe
         vertex.color.y = color->g;
         vertex.color.z = color->b;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_t[mesh->mNumVertices];
+	Vertex_Pos_UV_t* vertices = (Vertex_Pos_UV_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -774,16 +829,14 @@ void FillVertexBuffer_Pos_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer>&
         vertex.uv.x = uv.x;
         vertex.uv.y = uv.y;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_Normal_t[mesh->mNumVertices];
+	Vertex_Pos_Normal_t* vertices = (Vertex_Pos_Normal_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -799,16 +852,14 @@ void FillVertexBuffer_Pos_Normal(const aiMesh* mesh, const shared_ptr<VertexBuff
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_UV_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_Normal_t[mesh->mNumVertices];
+	Vertex_Pos_UV_Normal_t* vertices = (Vertex_Pos_UV_Normal_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -828,16 +879,14 @@ void FillVertexBuffer_Pos_UV_Normal(const aiMesh* mesh, const shared_ptr<VertexB
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_UV_Normal_Tangent(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV_Normal_Tangent(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_Normal_Tangent_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_Normal_Tangent_t[mesh->mNumVertices];
+	Vertex_Pos_UV_Normal_Tangent_t* vertices = (Vertex_Pos_UV_Normal_Tangent_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -862,16 +911,14 @@ void FillVertexBuffer_Pos_UV_Normal_Tangent(const aiMesh* mesh, const shared_ptr
         vertex.tangent.y = tangent.y;
         vertex.tangent.z = tangent.z;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_Normal_4_Bones_t[mesh->mNumVertices];
+	Vertex_Pos_UV_Normal_4_Bones_t* vertices = (Vertex_Pos_UV_Normal_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -879,7 +926,7 @@ void FillVertexBuffer_Pos_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr
         const aiVector3D& uv = mesh->mTextureCoords[0][i];
         const aiVector3D& normal = mesh->mNormals[i];
 
-        Vertex_Pos_UV_Normal_t vertex;
+        Vertex_Pos_UV_Normal_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -891,16 +938,17 @@ void FillVertexBuffer_Pos_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_Normal_Tangent_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_Normal_Tangent_4_Bones_t[mesh->mNumVertices];
+	Vertex_Pos_UV_Normal_Tangent_4_Bones_t* vertices = (Vertex_Pos_UV_Normal_Tangent_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -909,7 +957,7 @@ void FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const sh
         const aiVector3D& normal = mesh->mNormals[i];
         const aiVector3D& tangent = mesh->mTangents[i];
 
-        Vertex_Pos_UV_Normal_Tangent_t vertex;
+        Vertex_Pos_UV_Normal_Tangent_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -925,23 +973,24 @@ void FillVertexBuffer_Pos_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const sh
         vertex.tangent.y = tangent.y;
         vertex.tangent.z = tangent.z;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_UV_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_UV_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_UV_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_UV_4_Bones_t[mesh->mNumVertices];
+	Vertex_Pos_UV_4_Bones_t* vertices = (Vertex_Pos_UV_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         const aiVector3D& position = mesh->mVertices[i];
         const aiVector3D& uv = mesh->mTextureCoords[0][i];
 
-        Vertex_Pos_UV_t vertex;
+        Vertex_Pos_UV_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -949,23 +998,24 @@ void FillVertexBuffer_Pos_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vertex
         vertex.uv.x = uv.x;
         vertex.uv.y = uv.y;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_Normal_4_Bones_t[mesh->mNumVertices];
+	Vertex_Pos_Normal_4_Bones_t* vertices = (Vertex_Pos_Normal_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         const aiVector3D& position = mesh->mVertices[i];
         const aiVector3D& normal = mesh->mNormals[i];
 
-        Vertex_Pos_Normal_t vertex;
+        Vertex_Pos_Normal_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -974,16 +1024,17 @@ void FillVertexBuffer_Pos_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<Ve
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_2_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_t[mesh->mNumVertices];
+	Vertex_Pos_2_UV_t* vertices = (Vertex_Pos_2_UV_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1002,16 +1053,14 @@ void FillVertexBuffer_Pos_2_UV(const aiMesh* mesh, const shared_ptr<VertexBuffer
         vertex.uv2.x = uv2.x;
         vertex.uv2.y = uv2.y;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_2_UV_Normal(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV_Normal(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_Normal_t[mesh->mNumVertices];
+	Vertex_Pos_2_UV_Normal_t* vertices = (Vertex_Pos_2_UV_Normal_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1035,16 +1084,14 @@ void FillVertexBuffer_Pos_2_UV_Normal(const aiMesh* mesh, const shared_ptr<Verte
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_2_UV_Normal_Tangent(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV_Normal_Tangent(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_Normal_Tangent_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_Normal_Tangent_t[mesh->mNumVertices];
+	Vertex_Pos_2_UV_Normal_Tangent_t* vertices = (Vertex_Pos_2_UV_Normal_Tangent_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1073,16 +1120,14 @@ void FillVertexBuffer_Pos_2_UV_Normal_Tangent(const aiMesh* mesh, const shared_p
         vertex.tangent.y = tangent.y;
         vertex.tangent.z = tangent.z;
 
-        vertices.push_back(vertex);
+        vertices[i] = vertex;
     }
-
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
 }
 
-void FillVertexBuffer_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_Normal_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_Normal_4_Bones_t[mesh->mNumVertices];
+	Vertex_Pos_2_UV_Normal_4_Bones_t* vertices = (Vertex_Pos_2_UV_Normal_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1091,7 +1136,7 @@ void FillVertexBuffer_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, const shared_p
         const aiVector3D& uv2 = mesh->mTextureCoords[1][i];
         const aiVector3D& normal = mesh->mNormals[i];
 
-        Vertex_Pos_2_UV_Normal_t vertex;
+        Vertex_Pos_2_UV_Normal_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -1106,16 +1151,17 @@ void FillVertexBuffer_Pos_2_UV_Normal_4_Bones(const aiMesh* mesh, const shared_p
         vertex.normal.y = normal.y;
         vertex.normal.z = normal.z;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_Normal_Tangent_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t[mesh->mNumVertices];
+    Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t* vertices = (Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1125,7 +1171,7 @@ void FillVertexBuffer_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const 
         const aiVector3D& normal = mesh->mNormals[i];
         const aiVector3D& tangent = mesh->mTangents[i];
 
-        Vertex_Pos_2_UV_Normal_Tangent_t vertex;
+        Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -1144,16 +1190,17 @@ void FillVertexBuffer_Pos_2_UV_Normal_Tangent_4_Bones(const aiMesh* mesh, const 
         vertex.tangent.y = tangent.y;
         vertex.tangent.z = tangent.z;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
-void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<VertexBuffer>& vertexBuffer, VertexFormatType_t vertexFormatType)
+void FillVertexData_Pos_2_UV_4_Bones(const aiMesh* mesh, void*& vertexData, VertexFormatType_t vertexFormatType)
 {
-    vector<Vertex_Pos_2_UV_t> vertices;
-    vertices.reserve(mesh->mNumVertices);
+	vertexData = new Vertex_Pos_2_UV_4_Bones_t[mesh->mNumVertices];
+    Vertex_Pos_2_UV_4_Bones_t* vertices = (Vertex_Pos_2_UV_4_Bones_t*)vertexData;
 
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -1161,7 +1208,7 @@ void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vert
         const aiVector3D& uv1 = mesh->mTextureCoords[0][i];
         const aiVector3D& uv2 = mesh->mTextureCoords[1][i];
 
-        Vertex_Pos_2_UV_t vertex;
+        Vertex_Pos_2_UV_4_Bones_t vertex;
         vertex.position.x = position.x;
         vertex.position.y = position.y;
         vertex.position.z = position.z;
@@ -1172,10 +1219,11 @@ void FillVertexBuffer_Pos_2_UV_4_Bones(const aiMesh* mesh, const shared_ptr<Vert
         vertex.uv2.x = uv2.x;
         vertex.uv2.y = uv2.y;
 
-        vertices.push_back(vertex);
-    }
+        vertices[i] = vertex;
 
-    vertexBuffer->Initialize((void*)&vertices[0], false, false, vertexFormatType, mesh->mNumVertices);
+		vertices[i].bones.w = 0.0f;
+		vertices[i].weights.w = 0.0f;
+    }
 }
 
 }

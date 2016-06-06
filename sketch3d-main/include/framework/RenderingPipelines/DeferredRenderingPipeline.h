@@ -25,11 +25,12 @@ public:
 
     virtual bool                        Initialize() override;
 
-    virtual void                        RenderSceneFromCamera(Camera& camera, const Scene& scene) override;
+    virtual void                        RenderSceneFromCamera(Camera& camera, const Scene& scene, double deltaTime) override;
 
 private:
     shared_ptr<ConstantBuffer>          m_PassConstants;
     shared_ptr<ConstantBuffer>          m_DrawConstants;
+	shared_ptr<ConstantBuffer>			m_BoneConstants;
     shared_ptr<ConstantBuffer>          m_LightConstants;
 
     // GBuffer
