@@ -313,17 +313,13 @@ void MapVerticesToBones_Pos_UV_Normal_Tangent_4_Bones(const aiBone* bone, void* 
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_UV_Normal_Tangent_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_UV_Normal_Tangent_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
@@ -339,17 +335,13 @@ void MapVerticesToBones_Pos_UV_4_Bones(const aiBone* bone, void* vertexData, siz
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_UV_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_UV_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
@@ -365,17 +357,13 @@ void MapVerticesToBones_Pos_Normal_4_Bones(const aiBone* bone, void* vertexData,
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_Normal_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_Normal_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
@@ -391,17 +379,13 @@ void MapVerticesToBones_Pos_2_UV_Normal_4_Bones(const aiBone* bone, void* vertex
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_2_UV_Normal_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_2_UV_Normal_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
@@ -417,17 +401,13 @@ void MapVerticesToBones_Pos_2_UV_Normal_Tangent_4_Bones(const aiBone* bone, void
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_2_UV_Normal_Tangent_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
@@ -443,17 +423,13 @@ void MapVerticesToBones_Pos_2_UV_4_Bones(const aiBone* bone, void* vertexData, s
 
 	size_t boneIndex = it->second;
 
-	for (size_t i = 0; i < numVertices; i++)
+	// Assign the bones' index and weights to the corresponding vertices
+	for (size_t i = 0; i < bone->mNumWeights; i++)
 	{
-		Vertex_Pos_2_UV_4_Bones_t& vertex = vertices[i];
+		const aiVertexWeight& vertexWeight = bone->mWeights[i];
+		Vertex_Pos_2_UV_4_Bones_t& vertex = vertices[vertexWeight.mVertexId];
 
-		// Assign the bones' index and weights to the corresponding vertices
-		for (size_t j = 0; j < bone->mNumWeights; j++)
-		{
-			const aiVertexWeight& vertexWeight = bone->mWeights[j];
-
-			AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
-		}
+		AssignBoneAndWeightToVertex(boneIndex, vertexWeight.mWeight, vertex.bones, vertex.weights);
 	}
 }
 
