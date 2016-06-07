@@ -18,10 +18,12 @@ bool s_IsInitialized = false;
 shared_ptr<Mesh> g_FullscreenQuad;
 
 shared_ptr<Mesh> g_UnitCubeMesh;
+shared_ptr<Mesh> g_UnitPlaneMesh;
 shared_ptr<Mesh> g_UnitSphereMesh;
 
 void CreateFullscreenQuad(const shared_ptr<RenderDevice>& renderDevice);
 void CreateUnitCube(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material);
+void CreateUnitPlane(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material);
 void CreateUnitSphere(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material);
 
 void InitializeSimpleObjects(const shared_ptr<RenderDevice>& renderDevice, MaterialCodeGenerator* materialCodeGenerator)
@@ -43,6 +45,7 @@ void InitializeSimpleObjects(const shared_ptr<RenderDevice>& renderDevice, Mater
 
     CreateFullscreenQuad(renderDevice);
     CreateUnitCube(renderDevice, material);
+	CreateUnitPlane(renderDevice, material);
     CreateUnitSphere(renderDevice, material);
 }
 
@@ -129,6 +132,33 @@ void CreateUnitCube(const shared_ptr<RenderDevice>& renderDevice, const shared_p
     subMesh->SetMaterial(material);
 
     g_UnitCubeMesh->AddSubMesh(subMesh);
+}
+
+void CreateUnitPlane(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& Material)
+{
+	g_UnitPlaneMesh.reset(new Mesh);
+
+	Vertex_Pos_UV_Normal_Tangent_t vertices[4];
+	vertices[0].position = Vector3(-0.5f, 0.0f,  0.5f); vertices[0].uv = Vector2(0.0f, 0.0f); vertices[0].normal = Vector3::UP; vertices[0].tangent = Vector3::RIGHT;
+	vertices[1].position = Vector3(-0.5f, 0.0f, -0.5f); vertices[1].uv = Vector2(0.0f, 1.0f); vertices[1].normal = Vector3::UP; vertices[1].tangent = Vector3::RIGHT;
+	vertices[2].position = Vector3( 0.5f, 0.0f, -0.5f); vertices[2].uv = Vector2(1.0f, 1.0f); vertices[2].normal = Vector3::UP; vertices[2].tangent = Vector3::RIGHT;
+	vertices[3].position = Vector3( 0.5f, 0.0f,  0.5f); vertices[3].uv = Vector2(1.0f, 0.0f); vertices[3].normal = Vector3::UP; vertices[3].tangent = Vector3::RIGHT;
+
+	unsigned short indices[6];
+	indices[0] = 0; indices[1] = 2; indices[2] = 1;
+	indices[3] = 0; indices[4] = 3; indices[5] = 2;
+
+	shared_ptr<VertexBuffer> vertexBuffer = renderDevice->GetHardwareResourceCreator()->CreateVertexBuffer();
+	shared_ptr<IndexBuffer> indexBuffer = renderDevice->GetHardwareResourceCreator()->CreateIndexBuffer();
+	vertexBuffer->Initialize(vertices, false, false, VertexFormatType_t::Pos_UV_Normal_Tangent, 4);
+	indexBuffer->Initialize(indices, false, false, IndexFormat_t::INT_2_BYTES, 6);
+
+	shared_ptr<SubMesh> subMesh(new SubMesh);
+	subMesh->SetVertexBuffer(vertexBuffer);
+	subMesh->SetIndexBuffer(indexBuffer);
+	subMesh->SetMaterial(Material);
+
+	g_UnitPlaneMesh->AddSubMesh(subMesh);
 }
 
 void CreateUnitSphere(const shared_ptr<RenderDevice>& renderDevice, const shared_ptr<Material>& material)

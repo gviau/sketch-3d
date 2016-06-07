@@ -133,6 +133,7 @@ void ForwardRenderingMaterialCodeGenerator::WriteFragmentShaderMainBody(string& 
     }
 
     shaderCode += tabLevel1 + "if (numLights == 0) {\n";
+	shaderCode += tabLevel2 + "diffuseContribution = float3(1.0, 1.0, 1.0);\n";
     shaderCode += tabLevel2 + "specularContribution = specularColorAndPower.xyz;\n";
     shaderCode += tabLevel1 + "}\n";
 

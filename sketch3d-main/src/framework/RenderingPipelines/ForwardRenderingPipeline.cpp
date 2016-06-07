@@ -5,6 +5,7 @@
 #include "framework/Material.h"
 #include "framework/Mesh.h"
 #include "framework/Scene.h"
+#include "framework/SimpleObject.h"
 #include "framework/SkinnedMesh.h"
 
 #include "framework/MaterialCodeGenerators/ForwardRenderingMaterialCodeGenerator.h"
@@ -53,6 +54,8 @@ bool ForwardRenderingPipeline::Initialize()
     m_DrawConstants->Initialize(nullptr, true, false, sizeof(DrawConstants_t));
 	m_BoneConstants->Initialize(nullptr, true, false, sizeof(BoneConstants_t));
     m_LightConstants->Initialize(nullptr, true, false, sizeof(LightConstants_t));
+
+	InitializeSimpleObjects(m_RenderDevice, m_MaterialCodeGenerator);
 
     return true;
 }
