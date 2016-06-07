@@ -1,7 +1,7 @@
 #ifndef SKETCH_3D_SCENE_H
 #define SKETCH_3D_SCENE_H
 
-#include "framework/VisualNode.h"
+#include "framework/VisualNodes/VisualNode.h"
 
 #include <memory>
 #include <vector>
@@ -19,16 +19,18 @@ class Light;
 class Scene
 {
 public:
+										Scene();
+									   ~Scene();
 
     void                                SetLights(const vector<shared_ptr<Light>>& lights) { m_Lights = lights; }
 
-    VisualNode&                         GetRootNode() { return m_RootNode; }
-    const VisualNode&                   GetRootNode() const { return m_RootNode; }
+    VisualNode&                         GetRootNode() { return *m_RootNode; }
+    const VisualNode&                   GetRootNode() const { return *m_RootNode; }
 
     const vector<shared_ptr<Light>>&    GetLights() const { return m_Lights; }
 
 private:
-    VisualNode                          m_RootNode;
+    VisualNode*                         m_RootNode;
     vector<shared_ptr<Light>>           m_Lights;
 };
 }

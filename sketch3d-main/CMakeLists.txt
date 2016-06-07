@@ -18,7 +18,6 @@ set (FRAMEWORK_SOURCE_FILES
 	src/framework/Skeleton.cpp
 	src/framework/SkinnedMesh.cpp
 	src/framework/SubMesh.cpp
-	src/framework/VisualNode.cpp
 )
 
 set (FRAMEWORK_HEADER_FILES
@@ -35,7 +34,6 @@ set (FRAMEWORK_HEADER_FILES
 	include/framework/Skeleton.h
 	include/framework/SkinnedMesh.h
 	include/framework/SubMesh.h
-	include/framework/VisualNode.h
 )
 source_group("Source Files\\framework" FILES ${FRAMEWORK_SOURCE_FILES})
 source_group("Header Files\\framework" FILES ${FRAMEWORK_HEADER_FILES})
@@ -63,6 +61,20 @@ set (FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES
 )
 source_group("Source Files\\framework\\RenderingPipelines" FILES ${FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES})
 source_group("Header Files\\framework\\RenderingPipelines" FILES ${FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES})
+	
+set (FRAMEWORK_VISUAL_NODES_SOURCE_FILES
+	 src/framework/VisualNodes/VisualNode.cpp
+	 src/framework/VisualNodes/VisualNodeMesh.cpp
+	 src/framework/VisualNodes/VisualNodeSkinnedMesh.cpp
+)
+
+set (FRAMEWORK_VISUAL_NODES_HEADER_FILES
+	 include/framework/VisualNodes/VisualNode.h
+	 include/framework/VisualNodes/VisualNodeMesh.h
+	 include/framework/VisualNodes/VisualNodeSkinnedMesh.h
+)
+source_group("Source Files\\framework\\VisualNodes" FILES ${FRAMEWORK_VISUAL_NODES_SOURCE_FILES})
+source_group("Header Files\\framework\\VisualNodes" FILES ${FRAMEWORK_VISUAL_NODES_HEADER_FILES})
 	
 # Math files
 set (MATH_SOURCE_FILES
@@ -294,6 +306,7 @@ add_library(
 	${FRAMEWORK_SOURCE_FILES}
 	${FRAMEWORK_MATERIAL_CODE_GENERATOR_SOURCE_FILES}
 	${FRAMEWORK_RENDERING_PIPELINE_SOURCE_FILES}
+	${FRAMEWORK_VISUAL_NODES_SOURCE_FILES}
 
     ${MATH_SOURCE_FILES}
 	
@@ -308,6 +321,7 @@ add_library(
 	${FRAMEWORK_HEADER_FILES}
 	${FRAMEWORK_MATERIAL_CODE_GENERATOR_HEADER_FILES}
 	${FRAMEWORK_RENDERING_PIPELINE_HEADER_FILES}
+	${FRAMEWORK_VISUAL_NODES_HEADER_FILES}
 	
     ${MATH_HEADER_FILES}
 	
@@ -332,7 +346,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     ${X11_LIBRARIES}
 )
-
+                         
 # Add a bunch of post build events to copy the required files in the bin folder
 if (NOT SKETCH_3D_BUILD_STATIC)
 	add_custom_command(TARGET sketch-3d POST_BUILD

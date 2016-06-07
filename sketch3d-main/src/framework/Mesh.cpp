@@ -61,11 +61,6 @@ bool LoadTextureFromMaterial(aiTextureType textureType, HardwareResourceCreator*
 // Create a single instance of an Assimp importer to load meshes from files
 unique_ptr<Assimp::Importer> assimpImporter(new Assimp::Importer);
 
-Mesh::Mesh()
-	: m_IsSkinnedMesh(false)
-{
-}
-
 void Mesh::Draw(const shared_ptr<RenderDevice>& renderDevice) const
 {
     for (const shared_ptr<SubMesh>& subMesh : m_SubMeshes)

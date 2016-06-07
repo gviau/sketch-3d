@@ -6,7 +6,7 @@
 #include <framework/Light.h>
 #include <framework/Mesh.h>
 #include <framework/Scene.h>
-#include <framework/VisualNode.h>
+#include <framework/VisualNodes/VisualNodeMesh.h>
 
 #include <render/Buffer.h>
 #include <render/ConstantBuffers.h>
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     // Create the scene
     Scene scene;
 
-    shared_ptr<VisualNode> bobNode(new VisualNode);
+    shared_ptr<VisualNodeMesh> bobNode(new VisualNodeMesh);
     bobNode->SetMesh(bobMesh);
     bobNode->SetPosition(0.0f, -50.0f, -150.0f);
 

@@ -1,7 +1,7 @@
-#include "framework/VisualNode.h"
+#include "framework/VisualNodes/VisualNode.h"
 
 #include "framework/Material.h"
-#include "framework/Mesh.h"
+#include "framework/RenderingPipelineContext.h"
 #include "framework/SubMesh.h"
 
 namespace Sketch3D
@@ -152,5 +152,27 @@ void VisualNode::NotifyParentForTransformationMatrixUpdate_r()
     {
         m_Parent->NotifyParentForTransformationMatrixUpdate_r();
     }
+}
+
+void VisualNode::FillRenderingPipelineContextCommon(RenderingPipelineContext& renderingPipelineContext)
+{
+	renderingPipelineContext.m_Flags.m_IsUniformScaling = !(fabsf(m_Scale.x - m_Scale.y) > EPSILON ||
+															fabsf(m_Scale.x - m_Scale.z) > EPSILON ||
+															fabs(m_Scale.y - m_Scale.z) > EPSILON);
+
+	renderingPipelineContext.m_ModelMatrix = GetModelMatrix();
+
+	renderingPipelineContext.m_ModelViewMatrix = renderingPipelineContext.m_ViewMatrix * renderingPipelineContext.m_ModelMatrix;
+
+	if (renderingPipelineContext.m_Flags.m_IsUniformScaling)
+	{
+		renderingPipelineContext.m_TransposedInverseModelViewMatrix = renderingPipelineContext.m_ModelViewMatrix;
+	}
+	else
+	{
+		renderingPipelineContext.m_TransposedInverseModelViewMatrix = renderingPipelineContext.m_ModelViewMatrix.Inverse().Transpose();
+	}
+
+	renderingPipelineContext.m_ModelViewProjectionMatrix = renderingPipelineContext.m_ProjectionMatrix * renderingPipelineContext.m_ModelViewMatrix;
 }
 }

@@ -4,6 +4,7 @@
 #include "framework/MaterialCodeGenerator.h"
 #include "framework/Scene.h"
 
+#include "render/ConstantBuffers.h"
 #include "render/RenderDevice.h"
 
 namespace Sketch3D
@@ -30,5 +31,9 @@ void RenderingPipeline::ConstructRenderingPipelineContext(Camera& camera, const 
 
     renderingPipelineContext.m_ProjectionMatrix = renderDevice->GetProjectionMatrix();
     renderingPipelineContext.m_ViewMatrix = camera.GetViewMatrix();
+
+	// Also reset the state of the rendering context
+	renderingPipelineContext.m_Flags.m_IsSkinnedMesh = false;
+	renderingPipelineContext.m_Flags.m_IsUniformScaling = false;
 }
 }

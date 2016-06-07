@@ -107,34 +107,20 @@ void ForwardRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene
             continue;
         }
 
-        Mesh* meshToDraw = visualNode->GetMesh().get();
-        if (meshToDraw == nullptr)
-        {
-            continue;
-        }
+		if (!visualNode->IsNodeValidForRendering())
+		{
+			continue;
+		}
 
-        Matrix4x4 modelMatrix = visualNode->GetModelMatrix();
+		visualNode->FillRenderingPipelineContext(m_CurrentRenderingContext, deltaTime);
 
         // Fill the draw constants
         DrawConstants_t* drawConstants = (DrawConstants_t*)m_DrawConstants->Map(MapFlag_t::WRITE_DISCARD);
 
-        Matrix4x4 modelViewMatrix = m_CurrentRenderingContext.m_ViewMatrix * modelMatrix;
-        drawConstants->modelMatrix = modelMatrix;
-        drawConstants->modelViewMatrix = modelViewMatrix;
-
-        const Vector3& scale = visualNode->GetScale();
-        bool isScalingUniform = !(fabsf(scale.x - scale.y) > EPSILON || fabsf(scale.x - scale.z) > EPSILON || fabs(scale.y - scale.z) > EPSILON);
-
-        if (isScalingUniform)
-        {
-            drawConstants->transposedInverseModelViewMatrix = modelViewMatrix;
-        }
-        else
-        {
-            drawConstants->transposedInverseModelViewMatrix = modelViewMatrix.Inverse().Transpose();
-        }
-
-        drawConstants->modelViewProjectionMatrix = m_CurrentRenderingContext.m_ProjectionMatrix * modelViewMatrix;
+        drawConstants->modelMatrix = m_CurrentRenderingContext.m_ModelMatrix;
+        drawConstants->modelViewMatrix = m_CurrentRenderingContext.m_ModelViewMatrix;
+		drawConstants->transposedInverseModelViewMatrix = m_CurrentRenderingContext.m_TransposedInverseModelViewMatrix;
+		drawConstants->modelViewProjectionMatrix = m_CurrentRenderingContext.m_ModelViewProjectionMatrix;
 
         m_DrawConstants->Unmap();
 
@@ -151,18 +137,13 @@ void ForwardRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene
         fragmentShaderConstantBuffers[m_FragmentShaderConstantBuffersSlots[typeid(LightConstants_t).name()]] = m_LightConstants;
 
 		// If it's a skinned mesh, get its transformation matrices
-		if (meshToDraw->IsSkinnedMesh())
+		if (m_CurrentRenderingContext.m_Flags.m_IsSkinnedMesh)
 		{
-			SkinnedMesh* skinnedMesh = static_cast<SkinnedMesh*>(meshToDraw);
-
-			skinnedMesh->Animate(deltaTime);
-			const vector<Matrix4x4>& boneTransformationMatrices = skinnedMesh->GetTransformationMatrices();
-
 			BoneConstants_t* boneConstants = (BoneConstants_t*)m_BoneConstants->Map(MapFlag_t::WRITE_DISCARD);
 
-			for (size_t i = 0; i < boneTransformationMatrices.size(); i++)
+			for (size_t i = 0; i < m_CurrentRenderingContext.m_BoneTransformationMatrices.size(); i++)
 			{
-				boneConstants->boneTransformationMatrices[i] = boneTransformationMatrices[i];
+				boneConstants->boneTransformationMatrices[i] = m_CurrentRenderingContext.m_BoneTransformationMatrices[i];
 			}
 
 			m_BoneConstants->Unmap();
@@ -170,16 +151,10 @@ void ForwardRenderingPipeline::RenderSceneFromCamera(Camera& camera, const Scene
 			vertexShaderConstantBuffers[m_VertexShaderConstantBuffersSlots[typeid(BoneConstants_t).name()]] = m_BoneConstants;
 		}
 
-        meshToDraw->SetConstantBuffersForAllMaterials(vertexShaderConstantBuffers, fragmentShaderConstantBuffers,
-                                                      m_FragmentShaderConstantBuffersSlots[typeid(MaterialConstants_t).name()]);
-
-        meshToDraw->SetAmbientColorForAllSubMeshes(visualNode->GetAmbientColor());
-        meshToDraw->SetDiffuseColorForAllSubMeshes(visualNode->GetDiffuseColor());
-        meshToDraw->SetSpecularColorForAllSubMeshes(visualNode->GetSpecularColor());
-        meshToDraw->SetSpecularPowerForAllSubMeshes(visualNode->GetSpecularPower());
-
-        // Draw the mesh
-        meshToDraw->Draw(m_RenderDevice);
+		visualNode->RenderNode(m_RenderDevice,
+							   vertexShaderConstantBuffers,
+							   fragmentShaderConstantBuffers,
+							   m_FragmentShaderConstantBuffersSlots[typeid(MaterialConstants_t).name()]);
     }
 
     m_RenderContext->SwapBuffers();

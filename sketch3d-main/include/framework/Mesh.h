@@ -28,8 +28,6 @@ class VertexBuffer;
 class SKETCH_3D_API Mesh
 {
 public:
-										Mesh();
-
     void                                Draw(const shared_ptr<RenderDevice>& renderDevice) const;
 
     void                                AddSubMesh(const shared_ptr<SubMesh>& subMesh);
@@ -37,8 +35,8 @@ public:
     void                                ClearSubMeshes();
 
     void                                SetConstantBuffersForAllMaterials(const vector<shared_ptr<ConstantBuffer>>& vertexShaderConstantBuffers,
-                                                                            const vector<shared_ptr<ConstantBuffer>>& fragmentShaderConstantBuffers,
-                                                                            size_t materialConstantsSlot);
+                                                                          const vector<shared_ptr<ConstantBuffer>>& fragmentShaderConstantBuffers,
+                                                                          size_t materialConstantsSlot);
 
     void                                SetMaterialForAllSubMeshes(const shared_ptr<Material>& material);
     void                                SetAmbientColorForAllSubMeshes(const Vector3& ambientColor);
@@ -49,11 +47,8 @@ public:
     const vector<shared_ptr<SubMesh>>&  GetSubMeshes() const;
     shared_ptr<SubMesh>                 GetSubMesh(size_t index) const;
 
-	bool								IsSkinnedMesh() const { return m_IsSkinnedMesh; }
-
 protected:
     vector<shared_ptr<SubMesh>>         m_SubMeshes;
-	bool								m_IsSkinnedMesh;
 };
 
 bool LoadMeshFromFile(const string& filename, const shared_ptr<RenderDevice>& renderDevice, shared_ptr<Mesh>& loadedMesh, bool calculateTangents=false);

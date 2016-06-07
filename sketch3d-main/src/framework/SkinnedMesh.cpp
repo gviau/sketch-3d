@@ -49,7 +49,6 @@ SkinnedMesh::SkinnedMesh()
 	, m_IsAnimating(false)
     , m_IsLooping(false)
 {
-	m_IsSkinnedMesh = true;
 }
 
 SkinnedMesh::SkinnedMesh(const Mesh& mesh)
@@ -59,8 +58,6 @@ SkinnedMesh::SkinnedMesh(const Mesh& mesh)
 	, m_IsLooping(false)
 {
 	m_SubMeshes = mesh.GetSubMeshes();
-
-	m_IsSkinnedMesh = true;
 }
 
 bool SkinnedMesh::Animate(double deltaTime)

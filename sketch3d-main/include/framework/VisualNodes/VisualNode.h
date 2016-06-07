@@ -12,7 +12,9 @@ using namespace std;
 namespace Sketch3D
 {
 
-class Mesh;
+class ConstantBuffer;
+class RenderDevice;
+struct RenderingPipelineContext;
 
 /**
  * @class VisualNode
@@ -24,9 +26,14 @@ class VisualNode
 public:
                                             VisualNode();
 
-    void                                    AddChild(const shared_ptr<VisualNode>& childNode);
+	virtual void							FillRenderingPipelineContext(RenderingPipelineContext& renderingPipelineContext, double deltaTime) = 0;
+	virtual bool							IsNodeValidForRendering() const { return false; }
+	virtual void							RenderNode(const shared_ptr<RenderDevice>& renderDevice,
+													   const vector<shared_ptr<ConstantBuffer>>& vertexShaderConstantBuffers,
+													   const vector<shared_ptr<ConstantBuffer>>& fragmentShaderConstantBuffers,
+													   size_t materialConstantsSlot) = 0;
 
-    void                                    SetMesh(const shared_ptr<Mesh>& mesh) { m_Mesh = mesh; }
+    void                                    AddChild(const shared_ptr<VisualNode>& childNode);
 
     void                                    SetPosition(const Vector3& position);
     void                                    SetPosition(float x, float y, float z);
@@ -60,14 +67,11 @@ public:
     const Quaternion&                       GetOrientation() const { return m_Orientation; }
     const Vector3&                          GetScale() const { return m_Scale; }
 
-    const shared_ptr<Mesh>&                 GetMesh() const { return m_Mesh; }
     const vector<shared_ptr<VisualNode>>&   GetChildren() const { return m_Children; }
 
     const Matrix4x4&                        GetModelMatrix();
 
-private:
-    shared_ptr<Mesh>                        m_Mesh;
-
+protected:
     VisualNode*                             m_Parent;
     vector<shared_ptr<VisualNode>>          m_Children;
 
@@ -84,6 +88,7 @@ private:
     Matrix4x4                               m_ModelMatrix;
 
     void                                    NotifyParentForTransformationMatrixUpdate_r();
+	void									FillRenderingPipelineContextCommon(RenderingPipelineContext& renderingPipelineContext);
 };
 }
 

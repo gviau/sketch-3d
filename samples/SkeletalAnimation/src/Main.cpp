@@ -5,6 +5,7 @@
 #include <framework/Light.h>
 #include <framework/Scene.h>
 #include <framework/SkinnedMesh.h>
+#include <framework/VisualNodes/VisualNodeSkinnedMesh.h>
 
 #include <render/RenderContext.h>
 #include <render/RenderDevice.h>
@@ -73,7 +74,7 @@ int main(int argc, char** argv) {
 	Scene scene;
 	VisualNode& rootNode = scene.GetRootNode();
 
-	shared_ptr<VisualNode> meshNode(new VisualNode);
+	shared_ptr<VisualNodeSkinnedMesh> meshNode(new VisualNodeSkinnedMesh);
 	meshNode->SetMesh(mesh);
 
 	Quaternion rotationX, rotationY, rotationZ;
