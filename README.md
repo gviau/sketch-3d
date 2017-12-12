@@ -2,7 +2,7 @@
 
 A simple cross-platform 3D renderer. This is a learning experience project.
 
-You can find the compiled demos with screenshots (as of May 2015 the 10th) at this link: https://www.dropbox.com/sh/qhfo9fjf0jfxvjq/AADApvgPJ404oKv4PP980AQ7a?dl=0
+You can find the compiled demos with screenshots (as of May 2015 the 10th) at this link: https://drive.google.com/open?id=1c2CEF3EvVDlh4XDogmnwW1s6LOdN0k3-
 
 The build is managed by CMake. Following are information for the different platforms on how to build the project and where to get the dependencies.
 
